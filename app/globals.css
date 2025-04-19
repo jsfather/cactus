@@ -1,5 +1,13 @@
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'Dana';
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/dana-font@v10.0.1/dist/Dana-Regular.woff2')
+    format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   --background: #fafafa;
   --foreground: #171717;
@@ -15,6 +23,6 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Dana', sans-serif;
   margin: 0;
 }
