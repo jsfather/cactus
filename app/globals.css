@@ -1,26 +1,28 @@
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'Dana';
+  src: url('https://cdn.jsdelivr.net/gh/rastikerdar/dana-font@v10.0.1/dist/Dana-Regular.woff2')
+    format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #171717;
 }
 
-@theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-    }
-}
+/*@media (prefers-color-scheme: dark) {*/
+/*  :root {*/
+/*    --background: #0a0a0a;*/
+/*    --foreground: #ededed;*/
+/*  }*/
+/*}*/
 
 body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: Arial, Helvetica, sans-serif;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Dana', sans-serif;
+  margin: 0;
 }
