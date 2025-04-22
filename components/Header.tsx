@@ -4,13 +4,13 @@ import { Bell, Search, CircleHelp } from 'lucide-react';
 
 const Header = async () => {
   return (
-    <header className="flex h-[80px] bg-white shadow-xs">
-      <div className="flex w-[256px] items-center justify-center shadow-sm">
+    <header className="flex h-[80px] flex-row bg-white shadow-xs">
+      <div className="flex w-64 items-center justify-center">
         <Link href="/admin">
           <Image src="/logo.png" alt="logo" width={56} height={48} />
         </Link>
       </div>
-      <nav className="flex w-full items-center justify-between p-4">
+      <nav className="flex w-[calc(100%-256px)] items-center justify-between p-4">
         <div className="flex w-full items-center">
           <div>آرسین عزیز، خوش آمدی 👋</div>
           <div className="px-2">|</div>
