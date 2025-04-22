@@ -1,5 +1,5 @@
 const Page = async () => {
-  return <div>داشبورد</div>;
+  return <div>مالی</div>;
 };
 
 export default Page;
