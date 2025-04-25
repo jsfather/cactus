@@ -1,3 +1,5 @@
-export default function Auth() {
-  return <></>;
+import { redirect } from 'next/navigation';
+
+export default function Page() {
+  redirect('/auth/send-otp');
 }
