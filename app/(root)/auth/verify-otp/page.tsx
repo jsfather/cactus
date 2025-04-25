@@ -25,6 +25,7 @@ export default function VerifyOtpPage() {
       // هدایت به صفحه اصلی
       router.push('/admin');
     } catch (err) {
+      console.log(err);
       setError('کد تایید اشتباه است. دوباره تلاش کنید.');
       setLoading(false);
     }

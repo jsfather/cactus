@@ -21,6 +21,7 @@ export default function SendOtpPage() {
         );
       });
     } catch (err) {
+      console.log(err);
       setError('مشکلی در ارسال کد تایید به وجود آمده است. دوباره تلاش کنید.');
       setLoading(false);
     }
