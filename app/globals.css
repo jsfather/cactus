@@ -1,9 +1,9 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary-100: #F2FEE8;
-  --color-primary-200: #E7FDD4;
-  --color-primary-600: #4AE72D;
+  --color-primary-100: #f2fee8;
+  --color-primary-200: #e7fdd4;
+  --color-primary-600: #4ae72d;
 }
 
 :root {
@@ -14,7 +14,7 @@
 @font-face {
   font-family: 'Dana';
   src: url('https://cdn.jsdelivr.net/gh/rastikerdar/dana-font@v10.0.1/dist/Dana-Regular.woff2')
-  format('woff2');
+    format('woff2');
   font-weight: normal;
   font-style: normal;
 }

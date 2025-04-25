@@ -34,7 +34,6 @@ export default function Layout({
       <div className="flex flex-1 overflow-hidden">
         <Sidebar menuItems={menuItems} />
         <main className="flex-1 overflow-y-auto p-4">{children}</main>
-
       </div>
     </div>
   );
