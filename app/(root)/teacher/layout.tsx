@@ -1,17 +1,17 @@
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import { Newspaper, Users, GraduationCap, Landmark , PenSquare } from 'lucide-react';
+import { LayoutDashboard, Users, GraduationCap, Landmark } from 'lucide-react';
 
 const menuItems = [
   {
-    title: 'بلاگ',
-    href: '/admin/blogs',
-    icon: <Newspaper width={17} strokeWidth={1.7} />,
+    title: 'داشبورد',
+    href: '/admin/dashboard',
+    icon: <LayoutDashboard width={17} strokeWidth={1.7} />,
   },
   {
-    title: 'امتحانات',
-    href: '/admin/exams',
-    icon: <PenSquare width={17} strokeWidth={1.7} />,
+    title: 'کاربران',
+    href: '/admin/users',
+    icon: <Users width={17} strokeWidth={1.7} />,
   },
   {
     title: 'آموزش',
