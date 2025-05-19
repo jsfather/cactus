@@ -1,0 +1,8176 @@
+{
+	"info": {
+		"_postman_id": "2827b5be-e65a-4625-aa8b-75f8b43bc47a",
+		"name": "Cactos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44233221",
+		"_collection_link": "https://red-flare-79323-8255.postman.co/workspace/Mohammad-and-Keyvan~626e859d-5bd5-47bd-a251-8428d5bb9a18/collection/9874831-2827b5be-e65a-4625-aa8b-75f8b43bc47a?action=share&source=collection_link&creator=44233221"
+	},
+	"item": [
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "Send OTP",
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "phone",
+									"value": "09332676163",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/send_otp",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"send_otp"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "phone",
+											"value": "09332676163",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/api/send_otp",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"send_otp"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Length",
+									"value": "93"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 05 Feb 2025 06:59:23 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "X-Ratelimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-Ratelimit-Remaining",
+									"value": "59"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"کد ارسال شد.\",\n    \"data\": {\n        \"otp\": 223660\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Verify OTP",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "phone",
+									"value": "09332676163",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1234567890",
+									"type": "text"
+								},
+								{
+									"key": "otp",
+									"value": "737172",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/verify_otp",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"verify_otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Information",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "Bearer {{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "first_name",
+									"value": "علی",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "مهربانی",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "useralii",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "09332676161",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "national_code",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "father_name",
+									"value": "رضا",
+									"type": "text"
+								},
+								{
+									"key": "mother_name",
+									"value": "زهرا",
+									"type": "text"
+								},
+								{
+									"key": "father_job",
+									"value": "کارمند",
+									"type": "text"
+								},
+								{
+									"key": "mother_job",
+									"value": "کارمند",
+									"type": "text"
+								},
+								{
+									"key": "has_allergy",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "allergy_details",
+									"value": "پوستی",
+									"type": "text"
+								},
+								{
+									"key": "interest_level",
+									"value": "20",
+									"type": "text"
+								},
+								{
+									"key": "focus_level",
+									"value": "30",
+									"type": "text"
+								},
+								{
+									"key": "birth_date",
+									"value": "1375-12-10",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/information",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"information"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "phone",
+											"value": "09332676163",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/api/send_otp",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"send_otp"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Length",
+									"value": "93"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 05 Feb 2025 06:59:23 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "X-Ratelimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-Ratelimit-Remaining",
+									"value": "59"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"کد ارسال شد.\",\n    \"data\": {\n        \"otp\": 223660\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "uploadDocuments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "Bearer {{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "certificate",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "national_card",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/api/uploadDocuments",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"uploadDocuments"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "phone",
+											"value": "09332676163",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{url}}/api/send_otp",
+									"host": [
+										"{{url}}"
+									],
+									"path": [
+										"api",
+										"send_otp"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private"
+								},
+								{
+									"key": "Connection",
+									"value": "Keep-Alive"
+								},
+								{
+									"key": "Content-Length",
+									"value": "93"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 05 Feb 2025 06:59:23 GMT"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5, max=100"
+								},
+								{
+									"key": "X-Ratelimit-Limit",
+									"value": "60"
+								},
+								{
+									"key": "X-Ratelimit-Remaining",
+									"value": "59"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"کد ارسال شد.\",\n    \"data\": {\n        \"otp\": 223660\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Panel",
+			"item": [
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Blogs",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/blogs",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"blogs"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"My Firdst Blog\",\r\n  \"little_description\": \"Short description of the blog\",\r\n  \"description\": \"Detailed description of the blog\",\r\n  \"meta_title\": \"SEO Title\",\r\n  \"meta_description\": \"SEO description\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/blogs",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"blogs"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"Updeated Blog Title\",\r\n  \"little_description\": \"Updated short description\",\r\n  \"description\": \"Updated detailed description of my blog.\",\r\n  \"meta_title\": \"Updated SEO Title\",\r\n  \"meta_description\": \"Updated meta description for SEO.\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/blogs/9",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"blogs",
+												"9"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/blogs/9",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"blogs",
+												"9"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/blogs/10",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"blogs",
+												"10"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Exam",
+							"item": [
+								{
+									"name": "list",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": []
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"آزمون فیزیک\",\r\n  \"description\": \"فصل انرژی\",\r\n  \"date\": \"2025-05-05\", // can be null\r\n  \"duration\": 60, // can be null\r\n  \"term_id\": 1 // can be null\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"آزمون فیزیک\",\r\n  \"description\": \"فصل انرژی\",\r\n  \"date\": \"2025-05-05\", // can be null\r\n  \"duration\": 60, // can be null\r\n  \"term_id\": 1 // can be null\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"2"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"2"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Exam Questions",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/exams/1/questions",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"1",
+												"questions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "text",
+													"value": "سوال 3",
+													"type": "text"
+												},
+												{
+													"key": "options[0][text]",
+													"value": "جواب 1",
+													"type": "text"
+												},
+												{
+													"key": "options[0][is_correct]",
+													"value": "0",
+													"type": "text"
+												},
+												{
+													"key": "options[1][text]",
+													"value": "جواب 2",
+													"type": "text"
+												},
+												{
+													"key": "options[1][is_correct]",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "options[2][text]",
+													"value": "جواب3",
+													"type": "text"
+												},
+												{
+													"key": "options[2][is_correct]",
+													"value": "0",
+													"type": "text"
+												},
+												{
+													"key": "options[3][text]",
+													"value": "جواب 4",
+													"type": "text"
+												},
+												{
+													"key": "options[3][is_correct]",
+													"value": "0",
+													"type": "text"
+												},
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1697004599567.jpg"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams/1/questions",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"1",
+												"questions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"text\": \"سوال اول\",\r\n    \"file\": \"\",\r\n    \"options\": [\r\n        {\r\n            \"id\": 17,\r\n            \"text\": \"گزینه اول اصلاح‌شده\",\r\n            \"is_correct\": false\r\n        },\r\n        {\r\n            \"id\": 18,\r\n            \"text\": \"گزینه دوم اصلاح‌شده\",\r\n            \"is_correct\": true\r\n        },\r\n         {\r\n            \"id\": 19,\r\n            \"text\": \"گزینه سوم اصلاح‌شده\",\r\n            \"is_correct\": true\r\n        },\r\n         {\r\n            \"id\": 20,\r\n            \"text\": \"گزینه چهارم اصلاح‌شده\",\r\n            \"is_correct\": true\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams/1/questions/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"1",
+												"questions",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams/1/questions/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"1",
+												"questions",
+												"2"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/exams/1/questions/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"exams",
+												"1",
+												"questions",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "panel-guides",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/panel-guides",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"panel-guides"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "title",
+													"value": " \"My Firdst Blog\",",
+													"type": "text"
+												},
+												{
+													"key": "description",
+													"value": " \"Detailed description of the blog\",",
+													"type": "text"
+												},
+												{
+													"key": "type",
+													"value": "admin",
+													"type": "text"
+												},
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1697004599567.jpg"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/panel-guides",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"panel-guides"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "title",
+													"value": "test",
+													"type": "text"
+												},
+												{
+													"key": "description",
+													"value": " \"Detailed description of the blog\",",
+													"type": "text"
+												},
+												{
+													"key": "type",
+													"value": "student",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/panel-guides/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"panel-guides",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/panel-guides/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"panel-guides",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/panel-guides/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"panel-guides",
+												"2"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "FAQ",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/faqs",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"faqs"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"question\": \"My Firdst Blog\",\r\n  \"answer\": \"Short description of the blog\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/faqs",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"faqs"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"question\": \"My Firdst Blog\",\r\n  \"answer\": \"Short description of the blog\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/faqs/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"faqs",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/faqs/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"faqs",
+												"2"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Terms",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/terms",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"terms"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"آزمایشگاه\",\r\n  \"duration\": 60,\r\n  \"number_of_sessions\":14,\r\n  \"level_id\":2,\r\n  \"start_date\": \"1404-01-20\",\r\n  \"end_date\": \"1404-03-20\",\r\n  \"type\": \"normal\", //'normal', 'capacity_completion', 'vip'\r\n  \"capacity\": \"20\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/terms",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"terms"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"آزمایشگاه\",\r\n  \"duration\": 60,\r\n  \"number_of_sessions\":14,\r\n  \"level_id\":2,\r\n  \"start_date\": \"1404-01-20\",\r\n  \"end_date\": \"1404-03-20\",\r\n  \"type\": \"normal\", //'normal', 'capacity_completion', 'vip'\r\n  \"capacity\": \"30\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/terms/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"terms",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/terms/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"terms",
+												"2"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/terms/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"terms",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "TermTeacher",
+							"item": [
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"term_id\": 1,\r\n  \"teacher_id\": 1,\r\n  \"days\": [\r\n    {\r\n      \"day_of_week\": \"پنجشنبه\",\r\n      \"start_time\": \"20:00\",\r\n      \"end_time\": \"21:30\"\r\n    },\r\n    {\r\n      \"day_of_week\": \"دوشنبه\",\r\n      \"start_time\": \"10:00\",\r\n      \"end_time\": \"11:30\"\r\n    }\r\n  ]\r\n}\r\n",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/term-teachers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"term-teachers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/term-teachers/6",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"term-teachers",
+												"6"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/term-teachers/5",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"term-teachers",
+												"5"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "TermStudent",
+							"item": [
+								{
+									"name": "add_term",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "user_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "term_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "term_teacher_id",
+													"value": "14",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/term-students",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"term-students"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "create",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"first_name\": \"Ali\",\r\n  \"last_name\": \"Karimi\",\r\n  \"username\": \"ali.karimi\",\r\n  \"email\": \"ali.karimi@example.com\",\r\n  \"phone\": \"09123456789\",\r\n  \"type\": \"student\",\r\n  \"password\": \"securepassword123\",\r\n\r\n  \"level_id\": 1,\r\n  \"father_name\": \"Hassan\",\r\n  \"mother_name\": \"Zahra\",\r\n  \"father_job\": \"Engineer\",\r\n  \"mother_job\": \"Teacher\",\r\n  \"has_allergy\": true,\r\n  \"allergy_details\": \"Peanuts\",\r\n  \"interest_level\": 75,\r\n  \"focus_level\": 80\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/students",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"students"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Sun, 13 Apr 2025 08:15:07 GMT"
+												},
+												{
+													"key": "Server",
+													"value": "Apache/2.4.54 (Win64) OpenSSL/1.1.1q PHP/8.2.27"
+												},
+												{
+													"key": "Vary",
+													"value": "Authorization"
+												},
+												{
+													"key": "X-Powered-By",
+													"value": "PHP/8.2.27"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-cache, private"
+												},
+												{
+													"key": "X-RateLimit-Limit",
+													"value": "60"
+												},
+												{
+													"key": "X-RateLimit-Remaining",
+													"value": "58"
+												},
+												{
+													"key": "Access-Control-Allow-Origin",
+													"value": "*"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5, max=100"
+												},
+												{
+													"key": "Connection",
+													"value": "Keep-Alive"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"data\": {\n        \"user_id\": 3,\n        \"level_id\": 1,\n        \"father_name\": \"Hassan\",\n        \"mother_name\": \"Zahra\",\n        \"father_job\": \"Engineer\",\n        \"mother_job\": \"Teacher\",\n        \"has_allergy\": true,\n        \"allergy_details\": \"Peanuts\",\n        \"interest_level\": 75,\n        \"focus_level\": 80,\n        \"user\": {\n            \"first_name\": \"Ali\",\n            \"last_name\": \"Karimi\",\n            \"phone\": \"09123456789\",\n            \"email\": \"ali.karimi@example.com\"\n        }\n    }\n}"
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Students",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/students",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"students"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "first_name",
+													"value": "علی",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "useralii",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332676161",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "level_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "father_name",
+													"value": "رضا",
+													"type": "text"
+												},
+												{
+													"key": "mother_name",
+													"value": "زهرا",
+													"type": "text"
+												},
+												{
+													"key": "father_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "mother_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "has_allergy",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "allergy_details",
+													"value": "پوستی",
+													"type": "text"
+												},
+												{
+													"key": "interest_level",
+													"value": "20",
+													"type": "text"
+												},
+												{
+													"key": "focus_level",
+													"value": "30",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1697004599567.jpg"
+												},
+												{
+													"key": "national_card",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1742043205-e905a526-151c-43a8-9966-851b694ba398.jpg"
+												},
+												{
+													"key": "certificate",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/all3.jpg"
+												},
+												{
+													"key": "birth_date",
+													"value": "1375-12-10",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/students",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"students"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "create",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"first_name\": \"Ali\",\r\n  \"last_name\": \"Karimi\",\r\n  \"username\": \"ali.karimi\",\r\n  \"email\": \"ali.karimi@example.com\",\r\n  \"phone\": \"09123456789\",\r\n  \"type\": \"student\",\r\n  \"password\": \"securepassword123\",\r\n\r\n  \"level_id\": 1,\r\n  \"father_name\": \"Hassan\",\r\n  \"mother_name\": \"Zahra\",\r\n  \"father_job\": \"Engineer\",\r\n  \"mother_job\": \"Teacher\",\r\n  \"has_allergy\": true,\r\n  \"allergy_details\": \"Peanuts\",\r\n  \"interest_level\": 75,\r\n  \"focus_level\": 80\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/students",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"students"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Sun, 13 Apr 2025 08:15:07 GMT"
+												},
+												{
+													"key": "Server",
+													"value": "Apache/2.4.54 (Win64) OpenSSL/1.1.1q PHP/8.2.27"
+												},
+												{
+													"key": "Vary",
+													"value": "Authorization"
+												},
+												{
+													"key": "X-Powered-By",
+													"value": "PHP/8.2.27"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-cache, private"
+												},
+												{
+													"key": "X-RateLimit-Limit",
+													"value": "60"
+												},
+												{
+													"key": "X-RateLimit-Remaining",
+													"value": "58"
+												},
+												{
+													"key": "Access-Control-Allow-Origin",
+													"value": "*"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5, max=100"
+												},
+												{
+													"key": "Connection",
+													"value": "Keep-Alive"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"data\": {\n        \"user_id\": 3,\n        \"level_id\": 1,\n        \"father_name\": \"Hassan\",\n        \"mother_name\": \"Zahra\",\n        \"father_job\": \"Engineer\",\n        \"mother_job\": \"Teacher\",\n        \"has_allergy\": true,\n        \"allergy_details\": \"Peanuts\",\n        \"interest_level\": 75,\n        \"focus_level\": 80,\n        \"user\": {\n            \"first_name\": \"Ali\",\n            \"last_name\": \"Karimi\",\n            \"phone\": \"09123456789\",\n            \"email\": \"ali.karimi@example.com\"\n        }\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "first_name",
+													"value": "علیی",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "useralii",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332676161",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "level_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "father_name",
+													"value": "رضا",
+													"type": "text"
+												},
+												{
+													"key": "mother_name",
+													"value": "زهرا",
+													"type": "text"
+												},
+												{
+													"key": "father_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "mother_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "has_allergy",
+													"value": "0",
+													"type": "text"
+												},
+												{
+													"key": "allergy_details",
+													"value": "پوستی",
+													"type": "text"
+												},
+												{
+													"key": "interest_level",
+													"value": "20",
+													"type": "text"
+												},
+												{
+													"key": "focus_level",
+													"value": "30",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "certificate",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_card",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "birth_date",
+													"value": "1375-12-11",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/students/8",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"students",
+												"8"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "create",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"first_name\": \"Ali\",\r\n  \"last_name\": \"Karimi\",\r\n  \"username\": \"ali.karimi\",\r\n  \"email\": \"ali.karimi@example.com\",\r\n  \"phone\": \"09123456789\",\r\n  \"type\": \"student\",\r\n  \"password\": \"securepassword123\",\r\n\r\n  \"level_id\": 1,\r\n  \"father_name\": \"Hassan\",\r\n  \"mother_name\": \"Zahra\",\r\n  \"father_job\": \"Engineer\",\r\n  \"mother_job\": \"Teacher\",\r\n  \"has_allergy\": true,\r\n  \"allergy_details\": \"Peanuts\",\r\n  \"interest_level\": 75,\r\n  \"focus_level\": 80\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/students",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"students"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Sun, 13 Apr 2025 08:15:07 GMT"
+												},
+												{
+													"key": "Server",
+													"value": "Apache/2.4.54 (Win64) OpenSSL/1.1.1q PHP/8.2.27"
+												},
+												{
+													"key": "Vary",
+													"value": "Authorization"
+												},
+												{
+													"key": "X-Powered-By",
+													"value": "PHP/8.2.27"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-cache, private"
+												},
+												{
+													"key": "X-RateLimit-Limit",
+													"value": "60"
+												},
+												{
+													"key": "X-RateLimit-Remaining",
+													"value": "58"
+												},
+												{
+													"key": "Access-Control-Allow-Origin",
+													"value": "*"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5, max=100"
+												},
+												{
+													"key": "Connection",
+													"value": "Keep-Alive"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"data\": {\n        \"user_id\": 3,\n        \"level_id\": 1,\n        \"father_name\": \"Hassan\",\n        \"mother_name\": \"Zahra\",\n        \"father_job\": \"Engineer\",\n        \"mother_job\": \"Teacher\",\n        \"has_allergy\": true,\n        \"allergy_details\": \"Peanuts\",\n        \"interest_level\": 75,\n        \"focus_level\": 80,\n        \"user\": {\n            \"first_name\": \"Ali\",\n            \"last_name\": \"Karimi\",\n            \"phone\": \"09123456789\",\n            \"email\": \"ali.karimi@example.com\"\n        }\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/students/7",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"students",
+												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/students/8",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"students",
+												"8"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "placement-exam",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/students/placement-exam/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"students",
+												"placement-exam",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Teachers",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/teachers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"teachers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "first_name",
+													"value": "علی",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "useraliiiIi",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332676153",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "level_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "father_name",
+													"value": "رضا",
+													"type": "text"
+												},
+												{
+													"key": "mother_name",
+													"value": "زهرا",
+													"type": "text"
+												},
+												{
+													"key": "father_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "mother_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "has_allergy",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "allergy_details",
+													"value": "پوستی",
+													"type": "text"
+												},
+												{
+													"key": "interest_level",
+													"value": "20",
+													"type": "text"
+												},
+												{
+													"key": "focus_level",
+													"value": "30",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1697004599567.jpg"
+												},
+												{
+													"key": "national_card",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1742043205-e905a526-151c-43a8-9966-851b694ba398.jpg"
+												},
+												{
+													"key": "certificate",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/all3.jpg"
+												},
+												{
+													"key": "birth_date",
+													"value": "1375-12-10",
+													"type": "text"
+												},
+												{
+													"key": "bio",
+													"value": "dsdsd",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/teachers",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"teachers"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "first_name",
+													"value": "علیی",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "useraliit",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332674161",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "13333",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "level_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "father_name",
+													"value": "رضا",
+													"type": "text"
+												},
+												{
+													"key": "mother_name",
+													"value": "زهرا",
+													"type": "text"
+												},
+												{
+													"key": "father_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "mother_job",
+													"value": "کارمند",
+													"type": "text"
+												},
+												{
+													"key": "has_allergy",
+													"value": "0",
+													"type": "text"
+												},
+												{
+													"key": "allergy_details",
+													"value": "پوستی",
+													"type": "text"
+												},
+												{
+													"key": "interest_level",
+													"value": "20",
+													"type": "text"
+												},
+												{
+													"key": "focus_level",
+													"value": "30",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "certificate",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_card",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "birth_date",
+													"value": "1375-12-11",
+													"type": "text"
+												},
+												{
+													"key": "bio",
+													"value": "dsds",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/teachers/12",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"teachers",
+												"12"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/teachers/7",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"teachers",
+												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/teachers/12",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"teachers",
+												"12"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Users",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/users",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"users"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "",
+												"value": "",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "first_name",
+													"value": "علی",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "useraliii",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332676160",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1697004599567.jpg"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/users",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"users"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "create",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"first_name\": \"Ali\",\r\n  \"last_name\": \"Karimi\",\r\n  \"username\": \"ali.karimi\",\r\n  \"email\": \"ali.karimi@example.com\",\r\n  \"phone\": \"09123456789\",\r\n  \"type\": \"student\",\r\n  \"password\": \"securepassword123\",\r\n\r\n  \"level_id\": 1,\r\n  \"father_name\": \"Hassan\",\r\n  \"mother_name\": \"Zahra\",\r\n  \"father_job\": \"Engineer\",\r\n  \"mother_job\": \"Teacher\",\r\n  \"has_allergy\": true,\r\n  \"allergy_details\": \"Peanuts\",\r\n  \"interest_level\": 75,\r\n  \"focus_level\": 80\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/students",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"students"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Sun, 13 Apr 2025 08:15:07 GMT"
+												},
+												{
+													"key": "Server",
+													"value": "Apache/2.4.54 (Win64) OpenSSL/1.1.1q PHP/8.2.27"
+												},
+												{
+													"key": "Vary",
+													"value": "Authorization"
+												},
+												{
+													"key": "X-Powered-By",
+													"value": "PHP/8.2.27"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-cache, private"
+												},
+												{
+													"key": "X-RateLimit-Limit",
+													"value": "60"
+												},
+												{
+													"key": "X-RateLimit-Remaining",
+													"value": "58"
+												},
+												{
+													"key": "Access-Control-Allow-Origin",
+													"value": "*"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5, max=100"
+												},
+												{
+													"key": "Connection",
+													"value": "Keep-Alive"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"data\": {\n        \"user_id\": 3,\n        \"level_id\": 1,\n        \"father_name\": \"Hassan\",\n        \"mother_name\": \"Zahra\",\n        \"father_job\": \"Engineer\",\n        \"mother_job\": \"Teacher\",\n        \"has_allergy\": true,\n        \"allergy_details\": \"Peanuts\",\n        \"interest_level\": 75,\n        \"focus_level\": 80,\n        \"user\": {\n            \"first_name\": \"Ali\",\n            \"last_name\": \"Karimi\",\n            \"phone\": \"09123456789\",\n            \"email\": \"ali.karimi@example.com\"\n        }\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "first_name",
+													"value": "dsd",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "aliii",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332676160",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "12",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/users/9",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"users",
+												"9"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "create",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"first_name\": \"Ali\",\r\n  \"last_name\": \"Karimi\",\r\n  \"username\": \"ali.karimi\",\r\n  \"email\": \"ali.karimi@example.com\",\r\n  \"phone\": \"09123456789\",\r\n  \"type\": \"student\",\r\n  \"password\": \"securepassword123\",\r\n\r\n  \"level_id\": 1,\r\n  \"father_name\": \"Hassan\",\r\n  \"mother_name\": \"Zahra\",\r\n  \"father_job\": \"Engineer\",\r\n  \"mother_job\": \"Teacher\",\r\n  \"has_allergy\": true,\r\n  \"allergy_details\": \"Peanuts\",\r\n  \"interest_level\": 75,\r\n  \"focus_level\": 80\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/students",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"students"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Sun, 13 Apr 2025 08:15:07 GMT"
+												},
+												{
+													"key": "Server",
+													"value": "Apache/2.4.54 (Win64) OpenSSL/1.1.1q PHP/8.2.27"
+												},
+												{
+													"key": "Vary",
+													"value": "Authorization"
+												},
+												{
+													"key": "X-Powered-By",
+													"value": "PHP/8.2.27"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-cache, private"
+												},
+												{
+													"key": "X-RateLimit-Limit",
+													"value": "60"
+												},
+												{
+													"key": "X-RateLimit-Remaining",
+													"value": "58"
+												},
+												{
+													"key": "Access-Control-Allow-Origin",
+													"value": "*"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5, max=100"
+												},
+												{
+													"key": "Connection",
+													"value": "Keep-Alive"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"data\": {\n        \"user_id\": 3,\n        \"level_id\": 1,\n        \"father_name\": \"Hassan\",\n        \"mother_name\": \"Zahra\",\n        \"father_job\": \"Engineer\",\n        \"mother_job\": \"Teacher\",\n        \"has_allergy\": true,\n        \"allergy_details\": \"Peanuts\",\n        \"interest_level\": 75,\n        \"focus_level\": 80,\n        \"user\": {\n            \"first_name\": \"Ali\",\n            \"last_name\": \"Karimi\",\n            \"phone\": \"09123456789\",\n            \"email\": \"ali.karimi@example.com\"\n        }\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/users/7",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"users",
+												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/users/9",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"users",
+												"9"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Tickets",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/tickets",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"tickets"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "teacher_tickets",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/teacher_tickets",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"teacher_tickets"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "close",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/ticket/7/close",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"ticket",
+												"7",
+												"close"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/ticket/7",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"ticket",
+												"7"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "reply",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"message\": \"SEO Title\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/ticket/7/reply",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"ticket",
+												"7",
+												"reply"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Ticket_departments",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/tickets/departments",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"tickets",
+												"departments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/tickets/departments/5",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"tickets",
+												"departments",
+												"5"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "store_departments",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"title\": \"SEO Title\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/tickets/departments",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"tickets",
+												"departments"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Shop",
+							"item": [
+								{
+									"name": "Categories",
+									"item": [
+										{
+											"name": "list",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "{{url}}/api/admin/product-categories",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"product-categories"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "create",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"name\": \"تراشه ها\",\r\n  \"type\": \"فیزیکی\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/product-categories",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"product-categories"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "update",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"name\": \"تراشه ها\",\r\n  \"type\": \"فیزیکی\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/product-categories/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"product-categories",
+														"1"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "delete",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/product-categories/2",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"product-categories",
+														"2"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "view",
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/product-categories/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"product-categories",
+														"1"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Comment",
+									"item": [
+										{
+											"name": "list",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "{{url}}/api/admin/comments",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"comments"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "update",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "formdata",
+													"formdata": [
+														{
+															"key": "is_approved",
+															"value": "1",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/comments/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"comments",
+														"1"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "delete",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/comments/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"comments",
+														"1"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "view",
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/comments/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"comments",
+														"1"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Orders",
+									"item": [
+										{
+											"name": "list",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "{{url}}/api/admin/orders",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"orders"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "delete",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/orders/2",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"orders",
+														"2"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "view",
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/orders/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"orders",
+														"1"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "updateStatus",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "formdata",
+													"formdata": [
+														{
+															"key": "status",
+															"value": "canceled",
+															"type": "text"
+														}
+													]
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/orders/update-status/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"orders",
+														"update-status",
+														"1"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Products",
+									"item": [
+										{
+											"name": "list",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"url": {
+													"raw": "{{url}}/api/admin/products",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"products"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "create",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													},
+													{
+														"key": "Content-Type",
+														"value": "multipart/form-data",
+														"type": "text",
+														"disabled": true
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"title\": \"ساعت هوشمند\",\r\n    \"category_id\": 1,\r\n    \"description\": \"ساعت با امکانات زیاد و باتری قوی\",\r\n    \"price\": 3200000,\r\n    \"stock\": 15,\r\n    \"image\": \"\",\r\n    \"attributes\": [\r\n        {\r\n            \"key\": \"رنگ\",\r\n            \"value\": \"مشکی\"\r\n        },\r\n        {\r\n            \"key\": \"سایز\",\r\n            \"value\": \"متوسط\"\r\n        }\r\n    ]\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/products",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"products"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "update",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "PUT",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"title\": \"ساعت هوشمند مدل جدید\",\r\n  \"category_id\": 2,\r\n  \"description\": \"مدل جدیدتر با امکانات بهبود یافته\",\r\n  \"price\": 3500000,\r\n  \"stock\": 12,\r\n  \"image\": \"\",\r\n  \"attributes\": [\r\n    {\r\n      \"key\": \"رنگ\",\r\n      \"value\": \"نقره‌ای\"\r\n    },\r\n    {\r\n      \"key\": \"گارانتی\",\r\n      \"value\": \"12 ماه\"\r\n    }\r\n  ]\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/products/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"products",
+														"1"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "delete",
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "DELETE",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/products/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"products",
+														"1"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "view",
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"auth": {
+													"type": "bearer",
+													"bearer": [
+														{
+															"key": "token",
+															"value": "Bearer {{token}}",
+															"type": "string"
+														}
+													]
+												},
+												"method": "GET",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/products/1",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"products",
+														"1"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						},
+						{
+							"name": "Attendance",
+							"item": [
+								{
+									"name": "absents",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/attendances/absents",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"attendances",
+												"absents"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "student",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/attendances/student/8",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"attendances",
+												"student",
+												"8"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "term",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/attendances/term/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"attendances",
+												"term",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "schedule",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/attendances/schedule/10",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"attendances",
+												"schedule",
+												"10"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "store",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "student_id",
+													"value": "8",
+													"type": "text"
+												},
+												{
+													"key": "term_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "term_teacher_schedule_id",
+													"value": "10",
+													"type": "text"
+												},
+												{
+													"key": "status",
+													"value": "present",
+													"type": "text"
+												},
+												{
+													"key": "absence_reason",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "mark",
+													"value": "2",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/admin/attendances",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"attendances"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Term Reports",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/admin/reports?term_id&term_teacher_schedule_id",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"admin",
+												"reports"
+											],
+											"query": [
+												{
+													"key": "term_id",
+													"value": null
+												},
+												{
+													"key": "term_teacher_schedule_id",
+													"value": null
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "show",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/reports/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"reports",
+												"2"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Studnet",
+					"item": [
+						{
+							"name": "Tickets",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/student/tickets",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"tickets"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "departments",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/student/tickets/departments",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"tickets",
+												"departments"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/student/ticket/6",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"ticket",
+												"6"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"subject\": \"My Firdst Blog\",\r\n  \"message\": \"SEO Title\",\r\n  \"department_id\": 1,\r\n  \"teacher_id\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/student/ticket",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"ticket"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Terms",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/student/terms",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"terms"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "View",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/student/terms/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"terms",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "placement-exam",
+							"item": [
+								{
+									"name": "start",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/student/placement-exam/start",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"placement-exam",
+												"start"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "answer",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n     \"attempt_id\": 1,\r\n  \"question_id\": 4,\r\n  \"option_id\": 29\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/student/placement-exam/submit-answer",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"placement-exam",
+												"submit-answer"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "finish",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/student/placement-exam/finish/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"placement-exam",
+												"finish",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Homework",
+							"item": [
+								{
+									"name": "term_homeworks",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/student/term_homeworks/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"term_homeworks",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "answer",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "homework_id",
+													"value": "6",
+													"type": "text"
+												},
+												{
+													"key": "description",
+													"value": "test",
+													"type": "text"
+												},
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1697004599567.jpg"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/student/homeworks_answer",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"homeworks_answer"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "convesations Reply",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "conversation_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "message",
+													"value": "test",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/student/homeworks-conversation-reply",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"homeworks-conversation-reply"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "convesations create",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "homework_id",
+													"value": "6",
+													"type": "text"
+												},
+												{
+													"key": "message",
+													"value": "test",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/student/homeworks-conversation-message",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"homeworks-conversation-message"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "convesations",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "homework_id",
+													"value": "6",
+													"type": "text",
+													"disabled": true
+												},
+												{
+													"key": "message",
+													"value": "test",
+													"type": "text",
+													"disabled": true
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/student/homeworks-conversation/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"homeworks-conversation",
+												"2"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Attendance",
+							"item": [
+								{
+									"name": "absents",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/student/attendances/absents",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"attendances",
+												"absents"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "term",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/student/attendances/term/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"attendances",
+												"term",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "schedule",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/student/attendances/schedule/10",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"student",
+												"attendances",
+												"schedule",
+												"10"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Teacher",
+					"item": [
+						{
+							"name": "Tickets",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/teacher/tickets",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"tickets"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/ticket/5",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"ticket",
+												"5"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "reply",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"message\": \"SEO Title\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/ticket/5/reply",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"ticket",
+												"5",
+												"reply"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Attendance",
+							"item": [
+								{
+									"name": "absents",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/teacher/attendances/absents",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"attendances",
+												"absents"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "student",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/attendances/student/8",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"attendances",
+												"student",
+												"8"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "term",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/attendances/term/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"attendances",
+												"term",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "schedule",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/attendances/schedule/10",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"attendances",
+												"schedule",
+												"10"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "store",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "student_id",
+													"value": "8",
+													"type": "text"
+												},
+												{
+													"key": "term_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "term_teacher_schedule_id",
+													"value": "10",
+													"type": "text"
+												},
+												{
+													"key": "status",
+													"value": "present",
+													"type": "text"
+												},
+												{
+													"key": "absence_reason",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "mark",
+													"value": "2",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/attendances",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"attendances"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Term Reports",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/teacher/reports",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"reports"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "show",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/reports/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"reports",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/reports/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"reports",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "store",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "term_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "term_teacher_schedule_id",
+													"value": "10",
+													"type": "text"
+												},
+												{
+													"key": "content",
+													"value": "presentdsd",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/reports",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"reports"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Offline Sessions",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/teacher/offline_sessions?term_id=1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"offline_sessions"
+											],
+											"query": [
+												{
+													"key": "term_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "show",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/offline_sessions/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"offline_sessions",
+												"2"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/offline_sessions/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"offline_sessions",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "store",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "term_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "term_teacher_id",
+													"value": "14",
+													"type": "text"
+												},
+												{
+													"key": "title",
+													"value": "test",
+													"type": "text"
+												},
+												{
+													"key": "description",
+													"value": "test_description",
+													"type": "text"
+												},
+												{
+													"key": "video_url",
+													"value": "https://www.sample-videos.com/",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/offline_sessions",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"offline_sessions"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "title",
+													"value": "test2",
+													"type": "text"
+												},
+												{
+													"key": "description",
+													"value": "test_description",
+													"type": "text"
+												},
+												{
+													"key": "video_url",
+													"value": "https://www.sample-videos.com/",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/offline_sessions/2",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"offline_sessions",
+												"2"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Term Homework",
+							"item": [
+								{
+									"name": "list",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"term_id\":1, // can be null\r\n     \"schedule_id\":10 // can be null\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/homeworks",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"homeworks"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "convesations",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/teacher/homeworks-conversation/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"homeworks-conversation",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "convesations Reply",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "conversation_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "message",
+													"value": "پیام تست",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/homeworks-conversation-reply",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"homeworks-conversation-reply"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "show",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/homeworks/6",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"homeworks",
+												"6"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "delete",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "DELETE",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/homeworks/4",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"homeworks",
+												"4"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "store",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "term_id",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "term_teacher_schedule_id",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "offline_session_id",
+													"value": "2",
+													"type": "text"
+												},
+												{
+													"key": "description",
+													"value": "presentdsd",
+													"type": "text"
+												},
+												{
+													"key": "file",
+													"type": "file",
+													"src": "/C:/Users/a/Desktop/1697004599567.jpg"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/homeworks",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"homeworks"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Terms",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/teacher/terms",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"terms"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/terms/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"terms",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Students",
+							"item": [
+								{
+									"name": "list",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"url": {
+											"raw": "{{url}}/api/teacher/students?term_id=1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"students"
+											],
+											"query": [
+												{
+													"key": "term_id",
+													"value": "1"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "show",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/students/8",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"students",
+												"8"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "term_students",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/teacher/term_students/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"teacher",
+												"term_students",
+												"1"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "Profile",
+							"item": [
+								{
+									"name": "update",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "first_name",
+													"value": "dsd",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332676163",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "123",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/profile",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"profile"
+											]
+										}
+									},
+									"response": [
+										{
+											"name": "create",
+											"originalRequest": {
+												"method": "POST",
+												"header": [
+													{
+														"key": "Accept",
+														"value": "application/json",
+														"type": "text"
+													}
+												],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n  \"first_name\": \"Ali\",\r\n  \"last_name\": \"Karimi\",\r\n  \"username\": \"ali.karimi\",\r\n  \"email\": \"ali.karimi@example.com\",\r\n  \"phone\": \"09123456789\",\r\n  \"type\": \"student\",\r\n  \"password\": \"securepassword123\",\r\n\r\n  \"level_id\": 1,\r\n  \"father_name\": \"Hassan\",\r\n  \"mother_name\": \"Zahra\",\r\n  \"father_job\": \"Engineer\",\r\n  \"mother_job\": \"Teacher\",\r\n  \"has_allergy\": true,\r\n  \"allergy_details\": \"Peanuts\",\r\n  \"interest_level\": 75,\r\n  \"focus_level\": 80\r\n}\r\n",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{url}}/api/admin/students",
+													"host": [
+														"{{url}}"
+													],
+													"path": [
+														"api",
+														"admin",
+														"students"
+													]
+												}
+											},
+											"status": "Created",
+											"code": 201,
+											"_postman_previewlanguage": "json",
+											"header": [
+												{
+													"key": "Date",
+													"value": "Sun, 13 Apr 2025 08:15:07 GMT"
+												},
+												{
+													"key": "Server",
+													"value": "Apache/2.4.54 (Win64) OpenSSL/1.1.1q PHP/8.2.27"
+												},
+												{
+													"key": "Vary",
+													"value": "Authorization"
+												},
+												{
+													"key": "X-Powered-By",
+													"value": "PHP/8.2.27"
+												},
+												{
+													"key": "Cache-Control",
+													"value": "no-cache, private"
+												},
+												{
+													"key": "X-RateLimit-Limit",
+													"value": "60"
+												},
+												{
+													"key": "X-RateLimit-Remaining",
+													"value": "58"
+												},
+												{
+													"key": "Access-Control-Allow-Origin",
+													"value": "*"
+												},
+												{
+													"key": "Keep-Alive",
+													"value": "timeout=5, max=100"
+												},
+												{
+													"key": "Connection",
+													"value": "Keep-Alive"
+												},
+												{
+													"key": "Transfer-Encoding",
+													"value": "chunked"
+												},
+												{
+													"key": "Content-Type",
+													"value": "application/json"
+												}
+											],
+											"cookie": [],
+											"body": "{\n    \"data\": {\n        \"user_id\": 3,\n        \"level_id\": 1,\n        \"father_name\": \"Hassan\",\n        \"mother_name\": \"Zahra\",\n        \"father_job\": \"Engineer\",\n        \"mother_job\": \"Teacher\",\n        \"has_allergy\": true,\n        \"allergy_details\": \"Peanuts\",\n        \"interest_level\": 75,\n        \"focus_level\": 80,\n        \"user\": {\n            \"first_name\": \"Ali\",\n            \"last_name\": \"Karimi\",\n            \"phone\": \"09123456789\",\n            \"email\": \"ali.karimi@example.com\"\n        }\n    }\n}"
+										}
+									]
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/profile",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"profile"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "updatePassword",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n  \"current_password\": \"newSecurePassword456\",\r\n  \"new_password\": \"1234567890\",\r\n  \"new_password_confirmation\": \"1234567890\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/update-password",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"update-password"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Panel Guides",
+							"item": [
+								{
+									"name": "list",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											},
+											{
+												"key": "Content-Type",
+												"value": "multipart/form-data",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "first_name",
+													"value": "dsd",
+													"type": "text"
+												},
+												{
+													"key": "last_name",
+													"value": "مهربانی",
+													"type": "text"
+												},
+												{
+													"key": "username",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "phone",
+													"value": "09332676163",
+													"type": "text"
+												},
+												{
+													"key": "email",
+													"value": "",
+													"type": "text"
+												},
+												{
+													"key": "national_code",
+													"value": "123",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "1234567890",
+													"type": "text"
+												},
+												{
+													"key": "profile_picture",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/panel-guides",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"panel-guides"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/panel-guides/8",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"panel-guides",
+												"8"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Orders",
+							"item": [
+								{
+									"name": "view",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/orders/1",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"orders",
+												"1"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "show_with_code",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "code",
+													"value": "1234",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/orders/show_with_code",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"orders",
+												"show_with_code"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "list",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": []
+										},
+										"url": {
+											"raw": "{{url}}/api/orders",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"orders"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Notifications",
+							"item": [
+								{
+									"name": "read",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{url}}/api/notifications/1/read",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"notifications",
+												"1",
+												"read"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "sample_send",
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "POST",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "userId",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "type",
+													"value": "new_ticket",
+													"type": "text"
+												},
+												{
+													"key": "url",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{url}}/api/notifications/sample_send",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"notifications",
+												"sample_send"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "list",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"auth": {
+											"type": "bearer",
+											"bearer": [
+												{
+													"key": "token",
+													"value": "Bearer {{token}}",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"key": "Accept",
+												"value": "application/json",
+												"type": "text"
+											}
+										],
+										"body": {
+											"mode": "formdata",
+											"formdata": []
+										},
+										"url": {
+											"raw": "{{url}}/api/notifications",
+											"host": [
+												"{{url}}"
+											],
+											"path": [
+												"api",
+												"notifications"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Home",
+			"item": [
+				{
+					"name": "FAQ",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{url}}/api/home/faqs",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"api",
+								"home",
+								"faqs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "Bearer {{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "10|NfOSkuYFFqBUnly4m5vgMaeiOxY9VyjoNyhiyjGC19e297e4"
+		}
+	]
+}
