@@ -1,6 +1,6 @@
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import { Newspaper, Users, GraduationCap, Landmark , PenSquare } from 'lucide-react';
+import { Newspaper, MessageCircleQuestion, Landmark , PenSquare } from 'lucide-react';
 
 const menuItems = [
   {
@@ -14,9 +14,9 @@ const menuItems = [
     icon: <PenSquare width={17} strokeWidth={1.7} />,
   },
   {
-    title: 'آموزش',
-    href: '/admin/education',
-    icon: <GraduationCap width={17} strokeWidth={1.7} />,
+    title: 'سوالات متداول',
+    href: '/admin/faq',
+    icon: <MessageCircleQuestion width={17} strokeWidth={1.7} />,
   },
   {
     title: 'مالی',
