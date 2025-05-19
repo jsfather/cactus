@@ -19,7 +19,7 @@ interface DataTableProps<T> {
 
 export default function DataTable<T extends { id: number | string }>({
   columns,
-  data,
+  data = [],
   onEdit,
   onDelete,
   onCreate,
@@ -40,6 +40,9 @@ export default function DataTable<T extends { id: number | string }>({
     }
     return String(value);
   };
+
+  // Ensure data is an array
+  const tableData = Array.isArray(data) ? data : [];
 
   return (
     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -73,14 +76,14 @@ export default function DataTable<T extends { id: number | string }>({
                 در حال بارگذاری...
               </td>
             </tr>
-          ) : data.length === 0 ? (
+          ) : tableData.length === 0 ? (
             <tr>
               <td colSpan={columns.length + (onEdit || onDelete ? 1 : 0)} className="px-6 py-4 text-center">
                 داده‌ای یافت نشد
               </td>
             </tr>
           ) : (
-            data.map((row, rowIndex) => (
+            tableData.map((row, rowIndex) => (
               <tr
                 key={row.id}
                 className={`bg-white border-b hover:bg-gray-50 ${

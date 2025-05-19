@@ -21,23 +21,33 @@ export default function ExamsPage() {
 
   const columns = [
     { key: 'title', label: 'عنوان' },
-    { key: 'date', label: 'تاریخ' },
-    { key: 'duration', label: 'مدت زمان' },
-    {
-      key: 'created_at', 
-      label: 'تاریخ ایجاد',
-      format: (value: string) => moment(value).locale('fa').format('YYYY/MM/DD HH:mm')
+    { 
+      key: 'date', 
+      label: 'تاریخ',
+      format: (value: string | null) => value ? moment(value).locale('fa').format('YYYY/MM/DD') : '-'
+    },
+    { 
+      key: 'duration', 
+      label: 'مدت زمان',
+      format: (value: number | null) => value ? `${value} دقیقه` : '-'
+    },
+    { 
+      key: 'term_id', 
+      label: 'ترم',
+      format: (value: number | null) => value ? value.toString() : '-'
     }
   ];
 
   const fetchExams = async () => {
     try {
       setIsLoading(true);
-      const data = await getExams();
+      const response = await getExams();
+      const data = Array.isArray(response) ? response : [];
       setExams(data);
     } catch (error) {
       toast.error('خطا در دریافت لیست امتحانات');
       console.error('Failed to fetch exams:', error);
+      setExams([]);
     } finally {
       setIsLoading(false);
     }
@@ -52,8 +62,8 @@ export default function ExamsPage() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (blog: Exam) => {
-    setSelectedExam(blog);
+  const handleEdit = (exam: Exam) => {
+    setSelectedExam(exam);
     setIsModalOpen(true);
   };
 
@@ -98,7 +108,7 @@ export default function ExamsPage() {
         isLoading={isLoading}
       />
 
-      {/* Blog Form Modal */}
+      {/* Exam Form Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
@@ -108,12 +118,15 @@ export default function ExamsPage() {
             <form onSubmit={(e) => {
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
+              const duration = formData.get('duration');
+              const termId = formData.get('term_id');
+
               handleSubmit({
                 title: formData.get('title') as string,
                 description: formData.get('description') as string,
-                date: formData.get('date') as string,
-                duration: formData.get('duration') as number,
-                term_id: formData.get('term_id') as number,
+                date: formData.get('date') as string || null,
+                duration: duration ? parseInt(duration.toString()) : null,
+                term_id: termId ? parseInt(termId.toString()) : null,
               });
             }}>
               <div className="space-y-4">
@@ -128,16 +141,6 @@ export default function ExamsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">عنوان کوتاه</label>
-                  <input
-                    type="text"
-                    name="little_description"
-                    defaultValue={selectedExam?.little_description}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                    required
-                  />
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-gray-700">توضیحات</label>
                   <textarea
                     name="description"
@@ -147,21 +150,34 @@ export default function ExamsPage() {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">عنوان متا</label>
-                  <input
-                    type="text"
-                    name="meta_title"
-                    defaultValue={selectedExam?.meta_title}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">تاریخ</label>
+                    <input
+                      type="date"
+                      name="date"
+                      defaultValue={selectedExam?.date?.slice(0, 10)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">مدت زمان (دقیقه)</label>
+                    <input
+                      type="number"
+                      name="duration"
+                      defaultValue={selectedExam?.duration || ''}
+                      min="1"
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">توضیحات متا</label>
-                  <textarea
-                    name="meta_description"
-                    defaultValue={selectedExam?.meta_description}
-                    rows={2}
+                  <label className="block text-sm font-medium text-gray-700">ترم</label>
+                  <input
+                    type="number"
+                    name="term_id"
+                    defaultValue={selectedExam?.term_id || ''}
+                    min="1"
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                   />
                 </div>
