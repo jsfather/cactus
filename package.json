@@ -12,8 +12,10 @@
   "dependencies": {
     "@headlessui/react": "^2.2.3",
     "@heroicons/react": "^2.2.0",
+    "@types/js-cookie": "^3.0.6",
     "clsx": "^2.1.1",
     "jalali-moment": "^3.3.11",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.501.0",
     "next": "15.3.1",
     "react": "^19.0.0",
