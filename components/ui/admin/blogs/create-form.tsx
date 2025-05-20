@@ -40,10 +40,10 @@ export default function Form() {
         {/* Title and Little Description Row */}
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label htmlFor="title" className="mb-2 block text-sm font-medium">
+          <label htmlFor="title" className="mb-2 block text-sm font-medium">
               عنوان <span className="text-red-500">*</span>
-            </label>
-            <div className="relative mt-2 rounded-md">
+          </label>
+          <div className="relative mt-2 rounded-md">
               <input
                 id="title"
                 {...register('title', { required: 'عنوان الزامی است' })}
@@ -57,13 +57,13 @@ export default function Form() {
             </div>
           </div>
           <div>
-            <label
-              htmlFor="little_description"
-              className="mb-2 block text-sm font-medium"
-            >
+          <label
+            htmlFor="little_description"
+            className="mb-2 block text-sm font-medium"
+          >
               توضیحات کوتاه <span className="text-red-500">*</span>
-            </label>
-            <div className="relative mt-2 rounded-md">
+          </label>
+          <div className="relative mt-2 rounded-md">
               <input
                 id="little_description"
                 {...register('little_description', {
@@ -92,7 +92,7 @@ export default function Form() {
           </label>
           <div className="relative mt-2 rounded-md">
             <textarea
-              id="description"
+                id="description"
               rows={6}
               {...register('description', { required: 'توضیحات الزامی است' })}
               className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
@@ -110,13 +110,13 @@ export default function Form() {
         {/* Meta Title and Description Row */}
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label
-              htmlFor="meta_title"
-              className="mb-2 block text-sm font-medium"
-            >
+          <label
+            htmlFor="meta_title"
+            className="mb-2 block text-sm font-medium"
+          >
               عنوان متا <span className="text-red-500">*</span>
-            </label>
-            <div className="relative mt-2 rounded-md">
+          </label>
+          <div className="relative mt-2 rounded-md">
               <input
                 id="meta_title"
                 {...register('meta_title', { required: 'عنوان متا الزامی است' })}
@@ -132,13 +132,13 @@ export default function Form() {
             </div>
           </div>
           <div>
-            <label
-              htmlFor="meta_description"
-              className="mb-2 block text-sm font-medium"
-            >
+          <label
+            htmlFor="meta_description"
+            className="mb-2 block text-sm font-medium"
+          >
               توضیحات متا <span className="text-red-500">*</span>
-            </label>
-            <div className="relative mt-2 rounded-md">
+          </label>
+          <div className="relative mt-2 rounded-md">
               <input
                 id="meta_description"
                 {...register('meta_description', {

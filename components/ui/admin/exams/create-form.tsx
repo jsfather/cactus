@@ -6,6 +6,11 @@ import { createExam, Exam } from '@/lib/api/panel/admin/exams';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
+import DatePicker from 'react-multi-date-picker';
+import persian from 'react-date-object/calendars/persian';
+import persian_fa from 'react-date-object/locales/persian_fa';
+import DateObject from 'react-date-object';
 
 type FormData = {
   title: string;
@@ -17,9 +22,11 @@ type FormData = {
 
 export default function Form() {
   const router = useRouter();
+  const [selectedDate, setSelectedDate] = useState<string>('');
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>();
 
@@ -32,6 +39,12 @@ export default function Form() {
       toast.error(error.message || 'خطا در ایجاد امتحان');
       console.error('Failed to create exam:', error);
     }
+  };
+
+  const handleDateChange = (date: any) => {
+
+   const final = date.convert('gregorian').format('YYYY-MM-DD');
+   console.log(final);
   };
 
   return (
@@ -88,12 +101,23 @@ export default function Form() {
             </label>
             <div className="relative mt-2 rounded-md">
               <div className="relative">
-                <input
-                  id="date"
-                  type="date"
-                  {...register('date')}
-                  className="peer block w-full rounded-md border border-gray-300 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                <DatePicker
+
+                  calendar={persian}
+                  locale={persian_fa}
+                  calendarPosition="bottom-right"
+                  onChange={handleDateChange}
+                  value={selectedDate}
+                  inputClass={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                    errors.date ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  containerClassName="w-full"
+          
+                  placeholder="تاریخ را انتخاب کنید"
                 />
+                {errors.date && (
+                  <p className="mt-1 text-sm text-red-500">{errors.date.message}</p>
+                )}
               </div>
             </div>
           </div>
