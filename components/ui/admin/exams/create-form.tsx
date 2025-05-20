@@ -5,13 +5,27 @@ import { Button } from '@/components/ui/button';
 import { createExam, Exam } from '@/lib/api/panel/admin/exams';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
+
+type FormData = {
+  title: string;
+  description: string;
+  date?: string;
+  duration?: number;
+  term_id?: number;
+};
 
 export default function Form() {
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
 
-  const handleSubmit = async (formData: Partial<Exam>) => {
+  const onSubmit = async (data: FormData) => {
     try {
-      await createExam(formData);
+      await createExam(data);
       toast.success('امتحان با موفقیت ایجاد شد');
       router.push('/admin/exams');
     } catch (error: any) {
@@ -21,37 +35,24 @@ export default function Form() {
   };
 
   return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        await handleSubmit({
-          title: formData.get('title') as string,
-          description: formData.get('description') as string,
-          date: (formData.get('date') as string) || null,
-          duration: formData.get('duration')
-            ? Number(formData.get('duration'))
-            : null,
-          term_id: formData.get('term_id')
-            ? Number(formData.get('term_id'))
-            : null,
-        });
-      }}
-    >
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         <div className="mb-4">
           <label htmlFor="title" className="mb-2 block text-sm font-medium">
-            عنوان
+            عنوان <span className="text-red-500">*</span>
           </label>
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
+            <div className="relative w-1/2">
               <input
                 id="title"
-                name="title"
-                type="text"
-                required
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                {...register('title', { required: 'عنوان الزامی است' })}
+                className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                  errors.title ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+              )}
             </div>
           </div>
         </div>
@@ -60,63 +61,86 @@ export default function Form() {
             htmlFor="description"
             className="mb-2 block text-sm font-medium"
           >
-            توضیحات
+            توضیحات <span className="text-red-500">*</span>
           </label>
           <div className="relative mt-2 rounded-md">
             <div className="relative">
               <textarea
                 id="description"
-                name="description"
-                required
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                rows={6}
+                {...register('description', { required: 'توضیحات الزامی است' })}
+                className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                  errors.description ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.description.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
-        <div className="mb-4">
-          <label htmlFor="date" className="mb-2 block text-sm font-medium">
-            تاریخ
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="date"
-                name="date"
-                type="date"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
-              />
+        <div className="mb-4 grid grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="date" className="mb-2 block text-sm font-medium">
+              تاریخ
+            </label>
+            <div className="relative mt-2 rounded-md">
+              <div className="relative">
+                <input
+                  id="date"
+                  type="date"
+                  {...register('date')}
+                  className="peer block w-full rounded-md border border-gray-300 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="duration" className="mb-2 block text-sm font-medium">
-            مدت زمان (دقیقه)
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="duration"
-                name="duration"
-                type="number"
-                min="0"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
-              />
+          <div>
+            <label htmlFor="duration" className="mb-2 block text-sm font-medium">
+              مدت زمان (دقیقه)
+            </label>
+            <div className="relative mt-2 rounded-md">
+              <div className="relative">
+                <input
+                  id="duration"
+                  type="number"
+                  min="0"
+                  {...register('duration', { 
+                    min: { value: 0, message: 'مدت زمان باید مثبت باشد' }
+                  })}
+                  className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                    errors.duration ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.duration && (
+                  <p className="mt-1 text-sm text-red-500">{errors.duration.message}</p>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="term_id" className="mb-2 block text-sm font-medium">
-            ترم
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
-                id="term_id"
-                name="term_id"
-                type="number"
-                min="1"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
-              />
+          <div>
+            <label htmlFor="term_id" className="mb-2 block text-sm font-medium">
+              ترم
+            </label>
+            <div className="relative mt-2 rounded-md">
+              <div className="relative">
+                <input
+                  id="term_id"
+                  type="number"
+                  min="1"
+                  {...register('term_id', { 
+                    min: { value: 1, message: 'شماره ترم باید حداقل 1 باشد' }
+                  })}
+                  className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                    errors.term_id ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                />
+                {errors.term_id && (
+                  <p className="mt-1 text-sm text-red-500">{errors.term_id.message}</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -128,7 +152,9 @@ export default function Form() {
         >
           لغو
         </Link>
-        <Button type="submit">ساخت امتحان</Button>
+        <Button type="submit" loading={isSubmitting}>
+          ساخت امتحان
+        </Button>
       </div>
     </form>
   );
