@@ -7,7 +7,7 @@ export default function Page() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'ترم', href: '/admin/terms' },
+          { label: 'ترم ها', href: '/admin/terms' },
           {
             label: 'ساخت ترم',
             href: '/admin/terms/create',

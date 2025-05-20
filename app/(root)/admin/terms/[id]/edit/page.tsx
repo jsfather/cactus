@@ -32,7 +32,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'ترم', href: '/admin/terms' },
+          { label: 'ترم ها', href: '/admin/terms' },
           {
             label: 'ویرایش ترم',
             href: `/admin/terms/${resolvedParams.id}/edit`,

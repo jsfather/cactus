@@ -5,7 +5,7 @@ import { CreateTerm } from '@/components/ui/admin/terms/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'ترم',
+  title: 'ترم ها',
 };
 
 export default async function Page(props: {
@@ -22,7 +22,7 @@ export default async function Page(props: {
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl">ترم</h1>
+        <h1 className="text-2xl">ترم‌ها</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="جستجوی ترم" />

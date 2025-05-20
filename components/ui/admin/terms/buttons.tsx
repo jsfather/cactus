@@ -7,17 +7,6 @@ import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 import Modal from '@/components/ui/modal';
 
-const handleDelete = async (id: string) => {
-  try {
-    await deleteTerm(id);
-    toast.success('ترم با موفقیت حذف شد');
-    window.location.reload();
-  } catch (error: any) {
-    toast.error(error.message || 'خطا در حذف ترم');
-    console.error('Failed to delete term:', error);
-  }
-};
-
 export function CreateTerm() {
   return (
     <Link
@@ -43,6 +32,22 @@ export function UpdateTerm({ id }: { id: string }) {
 
 export function DeleteTerm({ id }: { id: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteTerm(id);
+      toast.success('ترم با موفقیت حذف شد');
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.message || 'خطا در حذف ترم');
+      console.error('Failed to delete term:', error);
+    } finally {
+      setIsDeleting(false);
+      setIsModalOpen(false);
+    }
+  };
 
   return (
     <>
@@ -57,11 +62,12 @@ export function DeleteTerm({ id }: { id: string }) {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={() => handleDelete(id)}
+        onConfirm={handleDelete}
         title="حذف ترم"
         description="آیا از حذف این ترم مطمئن هستید؟"
         confirmText="حذف"
         cancelText="انصراف"
+        loading={isDeleting}
       />
     </>
   );
