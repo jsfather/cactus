@@ -11,6 +11,7 @@ import DatePicker from 'react-multi-date-picker';
 import persian from 'react-date-object/calendars/persian';
 import persian_fa from 'react-date-object/locales/persian_fa';
 import DateObject from 'react-date-object';
+import moment from 'jalali-moment';
 
 type FormData = {
   title: string;
@@ -42,9 +43,13 @@ export default function Form() {
   };
 
   const handleDateChange = (date: any) => {
-
-   const final = date.convert('gregorian').format('YYYY-MM-DD');
-   console.log(final);
+    const year = date.year;
+    const month = date.month;
+    const day = date.day;
+    const persianDate = `${year}/${month}/${day}`;
+    const gregorianDate = moment(persianDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+    setSelectedDate(persianDate);
+    setValue('date', gregorianDate);
   };
 
   return (
@@ -102,7 +107,6 @@ export default function Form() {
             <div className="relative mt-2 rounded-md">
               <div className="relative">
                 <DatePicker
-
                   calendar={persian}
                   locale={persian_fa}
                   calendarPosition="bottom-right"
@@ -112,7 +116,7 @@ export default function Form() {
                     errors.date ? 'border-red-500' : 'border-gray-300'
                   }`}
                   containerClassName="w-full"
-          
+                  format='YYYY/MM/DD'
                   placeholder="تاریخ را انتخاب کنید"
                 />
                 {errors.date && (
