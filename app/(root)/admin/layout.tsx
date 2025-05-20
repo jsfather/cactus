@@ -1,6 +1,6 @@
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import { Newspaper, MessageCircleQuestion, Landmark , PenSquare } from 'lucide-react';
+import { Newspaper, MessageCircleQuestion, BookType , PenSquare } from 'lucide-react';
 
 const menuItems = [
   {
@@ -19,9 +19,9 @@ const menuItems = [
     icon: <MessageCircleQuestion width={17} strokeWidth={1.7} />,
   },
   {
-    title: 'مالی',
-    href: '/admin/financial',
-    icon: <Landmark width={17} strokeWidth={1.7} />,
+    title: 'ترم ها',
+    href: '/admin/terms',
+    icon: <BookType width={17} strokeWidth={1.7} />,
   },
 ];
 
