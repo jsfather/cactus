@@ -5,13 +5,27 @@ import { Button } from '@/components/ui/button';
 import { createBlog, Blog } from '@/lib/api/panel/admin/blogs';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
+
+type FormData = {
+  title: string;
+  little_description: string;
+  description: string;
+  meta_title: string;
+  meta_description: string;
+};
 
 export default function Form() {
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>();
 
-  const handleSubmit = async (formData: Partial<Blog>) => {
+  const onSubmit = async (data: FormData) => {
     try {
-      await createBlog(formData);
+      await createBlog(data);
       toast.success('بلاگ با موفقیت ایجاد شد');
       router.push('/admin/blogs');
     } catch (error: any) {
@@ -21,104 +35,124 @@ export default function Form() {
   };
 
   return (
-    <form
-      onSubmit={async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        await handleSubmit({
-          title: formData.get('title') as string,
-          little_description: formData.get('little_description') as string,
-          description: formData.get('description') as string,
-          meta_title: formData.get('meta_title') as string,
-          meta_description: formData.get('meta_description') as string,
-        });
-      }}
-    >
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
-        <div className="mb-4">
+        {/* Title and Little Description Row */}
+        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
           <label htmlFor="title" className="mb-2 block text-sm font-medium">
-            عنوان
+              عنوان <span className="text-red-500">*</span>
           </label>
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
               <input
                 id="title"
-                name="title"
-                type="text"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                {...register('title', { required: 'عنوان الزامی است' })}
+                className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                  errors.title ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.title && (
+                <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+              )}
             </div>
           </div>
-        </div>
-        <div className="mb-4">
+          <div>
           <label
             htmlFor="little_description"
             className="mb-2 block text-sm font-medium"
           >
-            توضیحات کوتاه
+              توضیحات کوتاه <span className="text-red-500">*</span>
           </label>
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
               <input
                 id="little_description"
-                name="little_description"
-                type="text"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                {...register('little_description', {
+                  required: 'توضیحات کوتاه الزامی است',
+                })}
+                className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                  errors.little_description ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.little_description && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.little_description.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Description Row */}
         <div className="mb-4">
           <label
             htmlFor="description"
             className="mb-2 block text-sm font-medium"
           >
-            توضیحات
+            توضیحات <span className="text-red-500">*</span>
           </label>
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
-              <input
+            <textarea
                 id="description"
-                name="description"
-                type="text"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
-              />
-            </div>
+              rows={6}
+              {...register('description', { required: 'توضیحات الزامی است' })}
+              className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                errors.description ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.description && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.description.message}
+              </p>
+            )}
           </div>
         </div>
-        <div className="mb-4">
+
+        {/* Meta Title and Description Row */}
+        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div>
           <label
             htmlFor="meta_title"
             className="mb-2 block text-sm font-medium"
           >
-            عنوان متا
+              عنوان متا <span className="text-red-500">*</span>
           </label>
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
               <input
                 id="meta_title"
-                name="meta_title"
-                type="text"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                {...register('meta_title', { required: 'عنوان متا الزامی است' })}
+                className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                  errors.meta_title ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.meta_title && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.meta_title.message}
+                </p>
+              )}
             </div>
           </div>
-        </div>
-        <div className="mb-4">
+          <div>
           <label
             htmlFor="meta_description"
             className="mb-2 block text-sm font-medium"
           >
-            توضیحات متا
+              توضیحات متا <span className="text-red-500">*</span>
           </label>
           <div className="relative mt-2 rounded-md">
-            <div className="relative">
               <input
                 id="meta_description"
-                name="meta_description"
-                type="text"
-                className="peer focus:border-primary-400 block w-full rounded-md border border-gray-200 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
+                {...register('meta_description', {
+                  required: 'توضیحات متا الزامی است',
+                })}
+                className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
+                  errors.meta_description ? 'border-red-500' : 'border-gray-300'
+                }`}
               />
+              {errors.meta_description && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.meta_description.message}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -130,7 +164,9 @@ export default function Form() {
         >
           لغو
         </Link>
-        <Button type="submit">ساخت بلاگ</Button>
+        <Button type="submit" loading={isSubmitting}>
+          ساخت بلاگ
+        </Button>
       </div>
     </form>
   );

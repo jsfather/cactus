@@ -12,13 +12,17 @@
   "dependencies": {
     "@headlessui/react": "^2.2.3",
     "@heroicons/react": "^2.2.0",
+    "@types/js-cookie": "^3.0.6",
     "clsx": "^2.1.1",
     "jalali-moment": "^3.3.11",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.501.0",
     "next": "15.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.56.4",
     "react-hot-toast": "^2.5.2",
+    "react-multi-date-picker": "^4.5.2",
     "use-debounce": "^10.0.4"
   },
   "devDependencies": {

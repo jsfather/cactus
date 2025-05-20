@@ -11,23 +11,60 @@ export interface Exam {
   updated_at: string;
 }
 
-export const getExams = () => request<Exam[]>('admin/exams');
+export const getExams = async () => {
+  const response = await request<{data: Exam[]}>('admin/exams');
+  
+  if (!response) {
+    throw new Error('خطایی در دریافت لیست امتحانات رخ داده است');
+  }
 
-export const getExam = (id: number) => request<Exam>(`admin/exams/${id}`);
+  return response;
+};
 
-export const createExam = (data: Partial<Exam>) =>
-  request<Exam>('admin/exams', {
+export const getExam = async (id: string) => {
+  const response = await request<{data: Exam}>(`admin/exams/${id}`);
+
+  if (!response) {
+    throw new Error('خطایی در دریافت اطلاعات امتحان رخ داده است');
+  }
+
+  return response;
+};
+
+export const createExam = async (data: Partial<Exam>) => {
+  const response = await request<Exam>('admin/exams', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 
-export const updateExam = (id: number, data: Partial<Exam>) =>
-  request<Exam>(`admin/exams/${id}`, {
+  if (!response) {
+    throw new Error('خطایی در ایجاد امتحان رخ داده است');
+  }
+
+  return response;
+};
+
+export const updateExam = async (id: string, data: Partial<Exam>) => {
+  const response = await request<Exam>(`admin/exams/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 
-export const deleteExam = (id: number) =>
-  request<void>(`admin/exams/${id}`, {
+  if (!response) {
+    throw new Error('خطایی در بروزرسانی امتحان رخ داده است');
+  }
+
+  return response;
+};
+
+export const deleteExam = async (id: string) => {
+  const response = await request<Exam>(`admin/exams/${id}`, {
     method: 'DELETE',
   });
+
+  if (!response) {
+    throw new Error('خطایی در حذف امتحان رخ داده است');
+  }
+
+  return response;
+};

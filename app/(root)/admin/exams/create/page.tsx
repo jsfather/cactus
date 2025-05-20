@@ -1,4 +1,6 @@
-import Form from '@/components/ui/admin/terms/create-form';
+'use client';
+
+import Form from '@/components/ui/admin/exams/create-form';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { Toaster } from 'react-hot-toast';
 
@@ -7,10 +9,10 @@ export default function Page() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'ترم', href: '/admin/terms' },
+          { label: 'امتحانات', href: '/admin/exams' },
           {
-            label: 'ساخت ترم',
-            href: '/admin/terms/create',
+            label: 'ساخت امتحان',
+            href: '/admin/exams/create',
             active: true,
           },
         ]}

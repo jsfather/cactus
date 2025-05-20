@@ -1,28 +1,29 @@
 'use client';
 
-import { UpdateBlog, DeleteBlog } from '@/components/ui/admin/blogs/buttons';
-import { Blog, getBlogs } from '@/lib/api/panel/admin/blogs';
+import { UpdateExam, DeleteExam } from '@/components/ui/admin/exams/buttons';
+import { Exam, getExams } from '@/lib/api/panel/admin/exams';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-export default function BlogsTable({}: { query: string; currentPage: number }) {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+export default function ExamsTable({}: { query: string; currentPage: number }) {
+  const [exams, setExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchBlogs = async () => {
+  const fetchExams = async () => {
     try {
-      const data = await getBlogs();
-      setBlogs(data);
+      const data = (await getExams()).data;
+      setExams(Array.isArray(data) ? data : []);
     } catch (error) {
-      toast.error('خطا در دریافت لیست بلاگ‌ها');
-      console.error('Failed to fetch blogs:', error);
+      toast.error('خطا در دریافت لیست امتحانات');
+      console.error('Failed to fetch exams:', error);
+      setExams([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBlogs();
+    fetchExams();
   }, []);
 
   if (loading) {
@@ -54,7 +55,13 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                       عنوان
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      توضیحات کوتاه
+                      توضیحات
+                    </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      تاریخ
+                    </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      مدت زمان
                     </th>
                     <th scope="col" className="relative py-3 pr-3 pl-6">
                       <span className="sr-only">Edit</span>
@@ -72,6 +79,12 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <div className="h-4 w-32 rounded bg-gray-200"></div>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="h-4 w-24 rounded bg-gray-200"></div>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="h-4 w-16 rounded bg-gray-200"></div>
                       </td>
                       <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                         <div className="flex justify-end gap-3">
@@ -95,30 +108,33 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
-            {blogs.length === 0 ? (
+            {exams.length === 0 ? (
               <div className="mb-2 w-full rounded-md bg-white p-4 text-center">
-                <p className="text-gray-500">هیچ بلاگی یافت نشد</p>
+                <p className="text-gray-500">هیچ امتحانی یافت نشد</p>
               </div>
             ) : (
-              blogs?.map((blog) => (
+              exams.map((exam) => (
                 <div
-                  key={blog.id}
+                  key={exam.id}
                   className="mb-2 w-full rounded-md bg-white p-4"
                 >
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                     <div>
-                      <p className="text-sm text-gray-500">{blog.title}</p>
+                      <p className="text-sm text-gray-500">{exam.title}</p>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
                     <div>
-                      <p className="text-xl font-medium">
-                        {blog.little_description}
+                      <p className="text-xl font-medium">{exam.description}</p>
+                      <p className="text-sm text-gray-500">
+                        {exam.date &&
+                          new Date(exam.date).toLocaleDateString('fa-IR')}
+                        {exam.duration && ` - ${exam.duration} دقیقه`}
                       </p>
                     </div>
                     <div className="flex justify-end gap-2">
-                      <UpdateBlog id={blog.id} />
-                      <DeleteBlog id={blog.id} />
+                      <UpdateExam id={exam.id.toString()} />
+                      <DeleteExam id={exam.id.toString()} />
                     </div>
                   </div>
                 </div>
@@ -132,7 +148,13 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                   عنوان
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  توضیحات کوتاه
+                  توضیحات
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  تاریخ
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  مدت زمان
                 </th>
                 <th scope="col" className="relative py-3 pr-3 pl-6">
                   <span className="sr-only">Edit</span>
@@ -140,30 +162,38 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {blogs.length === 0 ? (
+              {exams.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-4 text-center text-gray-500">
-                    هیچ بلاگی یافت نشد
+                  <td colSpan={5} className="py-4 text-center text-gray-500">
+                    هیچ امتحانی یافت نشد
                   </td>
                 </tr>
               ) : (
-                blogs?.map((blog) => (
+                exams.map((exam) => (
                   <tr
-                    key={blog.id}
+                    key={exam.id}
                     className="w-full border-b border-gray-200 py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                   >
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <p>{blog.title}</p>
+                        <p>{exam.title}</p>
                       </div>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
-                      {blog.little_description}
+                      {exam.description}
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      {exam.date
+                        ? new Date(exam.date).toLocaleDateString('fa-IR')
+                        : '-'}
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      {exam.duration ? `${exam.duration} دقیقه` : '-'}
                     </td>
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex justify-end gap-3">
-                        <UpdateBlog id={blog.id} />
-                        <DeleteBlog id={blog.id} />
+                        <UpdateExam id={exam.id.toString()} />
+                        <DeleteExam id={exam.id.toString()} />
                       </div>
                     </td>
                   </tr>

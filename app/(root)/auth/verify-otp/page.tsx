@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { verifyOtp } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Cookies from 'js-cookie';
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
@@ -20,9 +21,7 @@ export default function VerifyOtpPage() {
 
     try {
       const result = await verifyOtp(identifier, '1234567890', otp);
-      // ذخیره توکن در localStorage یا state مدیریت وضعیت
-      localStorage.setItem('authToken', result.token);
-      // هدایت به صفحه اصلی
+      Cookies.set('authToken', result.token, { expires: 28 })
       router.push('/admin');
     } catch (err) {
       console.log(err);
