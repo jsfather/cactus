@@ -3,16 +3,23 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { createBlog, Blog } from '@/lib/api/panel/admin/blogs';
-
-const handleSubmit = async (formData: Partial<Blog>) => {
-  try {
-    await createBlog(formData);
-  } catch (error) {
-    console.error('Failed to create blog:', error);
-  }
-};
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
 
 export default function Form() {
+  const router = useRouter();
+
+  const handleSubmit = async (formData: Partial<Blog>) => {
+    try {
+      await createBlog(formData);
+      toast.success('بلاگ با موفقیت ایجاد شد');
+      router.push('/admin/blogs');
+    } catch (error: any) {
+      toast.error(error.message || 'خطا در ایجاد بلاگ');
+      console.error('Failed to create blog:', error);
+    }
+  };
+
   return (
     <form
       onSubmit={async (e) => {

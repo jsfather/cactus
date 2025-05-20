@@ -1,7 +1,22 @@
+'use client';
+
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { deleteBlog } from '@/lib/api/panel/admin/blogs';
+import { toast } from 'react-hot-toast';
+import { useState } from 'react';
+import Modal from '@/components/ui/modal';
 
-// import { deleteBlog } from '@/lib/api/panel/admin/blogs';
+const handleDelete = async (id: string) => {
+  try {
+    await deleteBlog(id);
+    toast.success('بلاگ با موفقیت حذف شد');
+    window.location.reload();
+  } catch (error: any) {
+    toast.error(error.message || 'خطا در حذف بلاگ');
+    console.error('Failed to delete blog:', error);
+  }
+};
 
 export function CreateBlog() {
   return (
@@ -27,15 +42,27 @@ export function UpdateBlog({ id }: { id: string }) {
 }
 
 export function DeleteBlog({ id }: { id: string }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
-    <form>
+    <>
       <button
-        type="submit"
+        onClick={() => setIsModalOpen(true)}
         className="rounded-md border border-gray-200 p-2 hover:bg-gray-100"
       >
         <span className="sr-only">Delete</span>
         <TrashIcon className="w-5" />
       </button>
-    </form>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={() => handleDelete(id)}
+        title="حذف بلاگ"
+        description="آیا از حذف این بلاگ مطمئن هستید؟"
+        confirmText="حذف"
+        cancelText="انصراف"
+      />
+    </>
   );
 }

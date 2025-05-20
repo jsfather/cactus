@@ -1,12 +1,8 @@
 import Form from '@/components/ui/admin/blogs/create-form';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { Metadata } from 'next';
+import { Toaster } from 'react-hot-toast';
 
-export const metadata: Metadata = {
-    title: 'ساخت بلاگ',
-};
-
-export default async function Page() {
+export default function Page() {
   return (
     <main>
       <Breadcrumbs
@@ -20,6 +16,7 @@ export default async function Page() {
         ]}
       />
       <Form />
+      <Toaster position="top-center" />
     </main>
   );
 }

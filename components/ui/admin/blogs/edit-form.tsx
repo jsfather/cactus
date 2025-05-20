@@ -49,11 +49,7 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
           </div>
         </div>
 
-        {/* Invoice Status */}
         <fieldset>
-          <legend className="mb-2 block text-sm font-medium">
-            Set the invoice status
-          </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
               <div className="flex items-center">
@@ -98,7 +94,7 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
         >
           Cancel
         </Link>
-        <Button type="submit">Edit Invoice</Button>
+        <Button type="submit">ویرایش بلاگ</Button>
       </div>
     </form>
   );

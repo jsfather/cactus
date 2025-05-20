@@ -16,6 +16,11 @@ async function request<T>(
     ...options,
   });
 
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'خطایی نامشخص رخ داده است');
+  }
+
   return response.json();
 }
 
