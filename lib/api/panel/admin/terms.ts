@@ -13,7 +13,7 @@ export interface Term {
 }
 
 export const getTerms = async () => {
-  const response = await request<Term[]>('admin/terms');
+  const response = await request<{data: Term[]}>('admin/terms');
   
   if (!response) {
     throw new Error('خطایی در دریافت لیست ترم‌ها رخ داده است');
@@ -23,7 +23,7 @@ export const getTerms = async () => {
 };
 
 export const getTerm = async (id: string) => {
-  const response = await request<Term>(`admin/terms/${id}`);
+  const response = await request<{data: Term}>(`admin/terms/${id}`);
   
   if (!response) {
     throw new Error('خطایی در دریافت ترم رخ داده است');
