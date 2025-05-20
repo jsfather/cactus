@@ -5,13 +5,24 @@ import {
   MessageCircleQuestion,
   BookType,
   PenSquare,
+  LayoutDashboard
 } from 'lucide-react';
 
 const menuItems = [
   {
+    title: 'داشبورد',
+    href: '/admin/dashboard',
+    icon: <LayoutDashboard width={17} strokeWidth={1.7} />,
+  },
+  {
     title: 'بلاگ',
     href: '/admin/blogs',
     icon: <Newspaper width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'ترم ها',
+    href: '/admin/terms',
+    icon: <BookType width={17} strokeWidth={1.7} />,
   },
   {
     title: 'آزمون ها',
@@ -23,11 +34,7 @@ const menuItems = [
     href: '/admin/faq',
     icon: <MessageCircleQuestion width={17} strokeWidth={1.7} />,
   },
-  {
-    title: 'ترم ها',
-    href: '/admin/terms',
-    icon: <BookType width={17} strokeWidth={1.7} />,
-  },
+
 ];
 
 export default function Layout({
