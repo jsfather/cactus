@@ -11,9 +11,10 @@ interface MenuItem {
 
 interface SidebarProps {
   menuItems: MenuItem[];
+  children?: React.ReactNode;
 }
 
-export default function Sidebar({ menuItems }: SidebarProps) {
+export default function Sidebar({ menuItems, children }: SidebarProps) {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
@@ -21,8 +22,8 @@ export default function Sidebar({ menuItems }: SidebarProps) {
   };
 
   return (
-    <aside className="h-screen w-64 p-4 text-white">
-      <div className="space-y-2">
+    <aside className="flex h-full w-64 flex-col bg-white p-4">
+      <div className="flex-1 space-y-2 overflow-y-auto">
         {menuItems.map((item) => (
           <Link
             key={item.href}
@@ -37,6 +38,9 @@ export default function Sidebar({ menuItems }: SidebarProps) {
             {item.title}
           </Link>
         ))}
+      </div>
+      <div className="mt-4 border-t border-gray-100 pt-4">
+        {children}
       </div>
     </aside>
   );

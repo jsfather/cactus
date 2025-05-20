@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Bell, Search, CircleHelp } from 'lucide-react';
 
-const Header = async () => {
+const Header = () => {
   return (
     <header className="flex h-[80px] flex-row bg-white shadow-xs">
       <div className="flex w-64 items-center justify-center">
