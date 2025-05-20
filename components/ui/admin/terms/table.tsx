@@ -1,31 +1,33 @@
 'use client';
 
-import { UpdateBlog, DeleteBlog } from '@/components/ui/admin/blogs/buttons';
-import { Blog, getBlogs } from '@/lib/api/panel/admin/blogs';
+import { UpdateTerm, DeleteTerm } from '@/components/ui/admin/terms/buttons';
+import { Term, getTerms } from '@/lib/api/panel/admin/terms';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-export default function BlogsTable({}: {
+export default function TermsTable({}: {
   query: string;
   currentPage: number;
 }) {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [terms, setTerms] = useState<Term[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchBlogs = async () => {
+  const fetchTerms = async () => {
     try {
-      const data = await getBlogs();
-      setBlogs(data);
+      const data = (await getTerms()).data;
+      // Ensure data is an array
+      setTerms(Array.isArray(data) ? data : []);
     } catch (error) {
-      toast.error('خطا در دریافت لیست بلاگ‌ها');
-      console.error('Failed to fetch blogs:', error);
+      toast.error('خطا در دریافت لیست ترم‌ها');
+      console.error('Failed to fetch terms:', error);
+      setTerms([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBlogs();
+    fetchTerms();
   }, []);
 
   if (loading) {
@@ -57,7 +59,13 @@ export default function BlogsTable({}: {
                       عنوان
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      توضیحات کوتاه
+                      مدت زمان
+                    </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      تعداد جلسات
+                    </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      نوع
                     </th>
                     <th scope="col" className="relative py-3 pr-3 pl-6">
                       <span className="sr-only">Edit</span>
@@ -71,7 +79,13 @@ export default function BlogsTable({}: {
                         <div className="h-4 w-24 bg-gray-200 rounded"></div>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                        <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="h-4 w-16 bg-gray-200 rounded"></div>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="h-4 w-16 bg-gray-200 rounded"></div>
                       </td>
                       <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                         <div className="flex justify-end gap-3">
@@ -95,30 +109,30 @@ export default function BlogsTable({}: {
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
-            {blogs.length === 0 ? (
+            {terms.length === 0 ? (
               <div className="mb-2 w-full rounded-md bg-white p-4 text-center">
-                <p className="text-gray-500">هیچ بلاگی یافت نشد</p>
+                <p className="text-gray-500">هیچ ترمی یافت نشد</p>
               </div>
             ) : (
-              blogs?.map((blog) => (
+              terms.map((term) => (
                 <div
-                  key={blog.id}
+                  key={term.id}
                   className="mb-2 w-full rounded-md bg-white p-4"
                 >
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                     <div>
-                      <p className="text-sm text-gray-500">{blog.title}</p>
+                      <p className="text-sm text-gray-500">{term.title}</p>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
                     <div>
                       <p className="text-xl font-medium">
-                        {blog.little_description}
+                        {term.duration} دقیقه - {term.number_of_sessions} جلسه
                       </p>
                     </div>
                     <div className="flex justify-end gap-2">
-                      <UpdateBlog id={blog.id} />
-                      <DeleteBlog id={blog.id} />
+                      <UpdateTerm id={term.id} />
+                      <DeleteTerm id={term.id} />
                     </div>
                   </div>
                 </div>
@@ -132,7 +146,13 @@ export default function BlogsTable({}: {
                   عنوان
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  توضیحات کوتاه
+                  مدت زمان
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  تعداد جلسات
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  نوع
                 </th>
                 <th scope="col" className="relative py-3 pr-3 pl-6">
                   <span className="sr-only">Edit</span>
@@ -140,30 +160,38 @@ export default function BlogsTable({}: {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {blogs.length === 0 ? (
+              {terms.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-4 text-center text-gray-500">
-                    هیچ بلاگی یافت نشد
+                  <td colSpan={5} className="py-4 text-center text-gray-500">
+                    هیچ ترمی یافت نشد
                   </td>
                 </tr>
               ) : (
-                blogs?.map((blog) => (
+                terms.map((term) => (
                   <tr
-                    key={blog.id}
+                    key={term.id}
                     className="w-full border-b border-gray-200 py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                   >
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <p>{blog.title}</p>
+                        <p>{term.title}</p>
                       </div>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
-                      {blog.little_description}
+                      {term.duration} دقیقه
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      {term.number_of_sessions} جلسه
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      {term.type === 'normal' && 'عادی'}
+                      {term.type === 'capacity_completion' && 'تکمیل ظرفیت'}
+                      {term.type === 'vip' && 'ویژه'}
                     </td>
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex justify-end gap-3">
-                        <UpdateBlog id={blog.id} />
-                        <DeleteBlog id={blog.id} />
+                        <UpdateTerm id={term.id} />
+                        <DeleteTerm id={term.id} />
                       </div>
                     </td>
                   </tr>
@@ -175,4 +203,4 @@ export default function BlogsTable({}: {
       </div>
     </div>
   );
-}
+} 

@@ -1,5 +1,4 @@
 import request from '../../httpClient';
-import { redirect } from 'next/navigation';
 
 export interface Blog {
   id: string;
@@ -10,29 +9,60 @@ export interface Blog {
   meta_description: string;
 }
 
-export const getBlogs = () => request<Blog[]>('admin/blogs');
+export const getBlogs = async () => {
+  const response = await request<Blog[]>('admin/blogs');
+  
+  if (!response) {
+    throw new Error('خطایی در دریافت لیست بلاگ‌ها رخ داده است');
+  }
+  
+  return response;
+};
 
-export const getBlog = (id: string) => request<Blog>(`admin/blogs/${id}`);
+export const getBlog = async (id: string) => {
+  const response = await request<Blog>(`admin/blogs/${id}`);
+  
+  if (!response) {
+    throw new Error('خطایی در دریافت بلاگ رخ داده است');
+  }
+  
+  return response;
+};
 
-export const createBlog = (data: Partial<Blog>) =>
-  request<Blog>('admin/blogs', {
+export const createBlog = async (data: Partial<Blog>) => {
+  const response = await request<Blog>('admin/blogs', {
     method: 'POST',
     body: JSON.stringify(data),
-  })
-    .then(() => {
-      redirect('/admin/blogs');
-    })
-    .catch((error) => {
-      console.error('Failed to save blog:', error);
-    });
+  });
+  
+  if (!response) {
+    throw new Error('خطایی در ایجاد بلاگ رخ داده است');
+  }
+  
+  return response;
+};
 
-export const updateBlog = (id: string, data: Partial<Blog>) =>
-  request<Blog>(`admin/blogs/${id}`, {
+export const updateBlog = async (id: string, data: Partial<Blog>) => {
+  const response = await request<Blog>(`admin/blogs/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   });
 
-export const deleteBlog = (id: string) =>
-  request<void>(`admin/blogs/${id}`, {
+  if (!response) {
+    throw new Error('خطایی در بروزرسانی بلاگ رخ داده است');
+  }
+  
+  return response;
+};
+
+export const deleteBlog = async (id: string) => {
+  const response = await request<Blog>(`admin/blogs/${id}`, {
     method: 'DELETE',
   });
+
+  if (!response) {
+    throw new Error('خطایی در حذف بلاگ رخ داده است');
+  }
+  
+  return response;
+};
