@@ -55,7 +55,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           },
         ]}
       />
-      <Form blog={blog}/>
+      <Form blog={blog} />
       <Toaster position="top-center" />
     </main>
   );
