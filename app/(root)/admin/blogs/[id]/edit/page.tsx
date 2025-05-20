@@ -1,20 +1,43 @@
+'use client';
+
 import Form from '@/components/ui/admin/blogs/edit-form';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { getBlog, getBlogs } from '@/lib/api/panel/admin/blogs';
+import { getBlog } from '@/lib/api/panel/admin/blogs';
 import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
+import { useEffect, useState } from 'react';
+import { Blog } from '@/lib/api/panel/admin/blogs';
+import { Toaster } from 'react-hot-toast';
+import { use } from 'react';
 
-export const metadata: Metadata = {
-    title: 'ویرایش بلاگ',
-};
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const [blog, setBlog] = useState<Blog | null>(null);
+  const [loading, setLoading] = useState(true);
 
-export default async function Page(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
-  const id = params.id;
-  const [blog] = await Promise.all([
-    getBlog(id),
-    getBlogs(),
-  ]);
+  useEffect(() => {
+    const fetchBlog = async () => {
+      if (!resolvedParams?.id) {
+        notFound();
+        return;
+      }
+
+      try {
+        const data = await getBlog(resolvedParams.id);
+        setBlog(data);
+      } catch (error) {
+        console.error('Failed to fetch blog:', error);
+        notFound();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlog();
+  }, [resolvedParams?.id]);
+
+  if (loading) {
+    return <div>در حال بارگذاری...</div>;
+  }
 
   if (!blog) {
     notFound();
@@ -27,12 +50,13 @@ export default async function Page(props: { params: Promise<{ id: string }> }) {
           { label: 'بلاگ', href: '/admin/blogs' },
           {
             label: 'ویرایش بلاگ',
-            href: `/admin/blogs/${id}/edit`,
+            href: `/admin/blogs/${resolvedParams.id}/edit`,
             active: true,
           },
         ]}
       />
       <Form blog={blog}/>
+      <Toaster position="top-center" />
     </main>
   );
 }
