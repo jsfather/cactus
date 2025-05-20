@@ -7,17 +7,6 @@ import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 import Modal from '@/components/ui/modal';
 
-const handleDelete = async (id: string) => {
-  try {
-    await deleteExam(id);
-    toast.success('امتحان با موفقیت حذف شد');
-    window.location.reload();
-  } catch (error: any) {
-    toast.error(error.message || 'خطا در حذف امتحان');
-    console.error('Failed to delete exam:', error);
-  }
-};
-
 export function CreateExam() {
   return (
     <Link
@@ -43,6 +32,22 @@ export function UpdateExam({ id }: { id: string }) {
 
 export function DeleteExam({ id }: { id: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteExam(id);
+      toast.success('امتحان با موفقیت حذف شد');
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.message || 'خطا در حذف امتحان');
+      console.error('Failed to delete exam:', error);
+    } finally {
+      setIsDeleting(false);
+      setIsModalOpen(false);
+    }
+  };
 
   return (
     <>
@@ -57,11 +62,12 @@ export function DeleteExam({ id }: { id: string }) {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={() => handleDelete(id)}
+        onConfirm={handleDelete}
         title="حذف امتحان"
         description="آیا از حذف این امتحان مطمئن هستید؟"
         confirmText="حذف"
         cancelText="انصراف"
+        loading={isDeleting}
       />
     </>
   );

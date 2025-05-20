@@ -7,17 +7,6 @@ import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 import Modal from '@/components/ui/modal';
 
-const handleDelete = async (id: string) => {
-  try {
-    await deleteBlog(id);
-    toast.success('بلاگ با موفقیت حذف شد');
-    window.location.reload();
-  } catch (error: any) {
-    toast.error(error.message || 'خطا در حذف بلاگ');
-    console.error('Failed to delete blog:', error);
-  }
-};
-
 export function CreateBlog() {
   return (
     <Link
@@ -43,6 +32,22 @@ export function UpdateBlog({ id }: { id: string }) {
 
 export function DeleteBlog({ id }: { id: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteBlog(id);
+      toast.success('بلاگ با موفقیت حذف شد');
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.message || 'خطا در حذف بلاگ');
+      console.error('Failed to delete blog:', error);
+    } finally {
+      setIsDeleting(false);
+      setIsModalOpen(false);
+    }
+  };
 
   return (
     <>
@@ -57,11 +62,12 @@ export function DeleteBlog({ id }: { id: string }) {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={() => handleDelete(id)}
+        onConfirm={handleDelete}
         title="حذف بلاگ"
         description="آیا از حذف این بلاگ مطمئن هستید؟"
         confirmText="حذف"
         cancelText="انصراف"
+        loading={isDeleting}
       />
     </>
   );

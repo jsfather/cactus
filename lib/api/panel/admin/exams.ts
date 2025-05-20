@@ -12,7 +12,7 @@ export interface Exam {
 }
 
 export const getExams = async () => {
-  const response = await request<Exam[]>('admin/exams');
+  const response = await request<{data: Exam[]}>('admin/exams');
   
   if (!response) {
     throw new Error('خطایی در دریافت لیست امتحانات رخ داده است');
