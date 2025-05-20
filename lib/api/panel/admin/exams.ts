@@ -15,7 +15,7 @@ export const getExams = async () => {
   const response = await request<{data: Exam[]}>('admin/exams');
   
   if (!response) {
-    throw new Error('خطایی در دریافت لیست امتحانات رخ داده است');
+    throw new Error('خطایی در دریافت لیست آزمون ها رخ داده است');
   }
 
   return response;
@@ -25,7 +25,7 @@ export const getExam = async (id: string) => {
   const response = await request<{data: Exam}>(`admin/exams/${id}`);
 
   if (!response) {
-    throw new Error('خطایی در دریافت اطلاعات امتحان رخ داده است');
+    throw new Error('خطایی در دریافت اطلاعات آزمون رخ داده است');
   }
 
   return response;
@@ -38,7 +38,7 @@ export const createExam = async (data: Partial<Exam>) => {
   });
 
   if (!response) {
-    throw new Error('خطایی در ایجاد امتحان رخ داده است');
+    throw new Error('خطایی در ایجاد آزمون رخ داده است');
   }
 
   return response;
@@ -51,7 +51,7 @@ export const updateExam = async (id: string, data: Partial<Exam>) => {
   });
 
   if (!response) {
-    throw new Error('خطایی در بروزرسانی امتحان رخ داده است');
+    throw new Error('خطایی در بروزرسانی آزمون رخ داده است');
   }
 
   return response;
@@ -63,7 +63,7 @@ export const deleteExam = async (id: string) => {
   });
 
   if (!response) {
-    throw new Error('خطایی در حذف امتحان رخ داده است');
+    throw new Error('خطایی در حذف آزمون رخ داده است');
   }
 
   return response;

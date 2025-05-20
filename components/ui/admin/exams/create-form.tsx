@@ -33,10 +33,10 @@ export default function Form() {
   const onSubmit = async (data: FormData) => {
     try {
       await createExam(data);
-      toast.success('امتحان با موفقیت ایجاد شد');
+      toast.success('آزمون با موفقیت ایجاد شد');
       router.push('/admin/exams');
     } catch (error: any) {
-      toast.error(error.message || 'خطا در ایجاد امتحان');
+      toast.error(error.message || 'خطا در ایجاد آزمون');
       console.error('Failed to create exam:', error);
     }
   };
@@ -180,7 +180,7 @@ export default function Form() {
           لغو
         </Link>
         <Button type="submit" loading={isSubmitting}>
-          ساخت امتحان
+          ساخت آزمون
         </Button>
       </div>
     </form>

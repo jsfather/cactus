@@ -14,7 +14,7 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
       const data = (await getExams()).data;
       setExams(Array.isArray(data) ? data : []);
     } catch (error) {
-      toast.error('خطا در دریافت لیست امتحانات');
+      toast.error('خطا در دریافت لیست آزمون ها');
       console.error('Failed to fetch exams:', error);
       setExams([]);
     } finally {
@@ -110,7 +110,7 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
           <div className="md:hidden">
             {exams.length === 0 ? (
               <div className="mb-2 w-full rounded-md bg-white p-4 text-center">
-                <p className="text-gray-500">هیچ امتحانی یافت نشد</p>
+                <p className="text-gray-500">هیچ آزمونی یافت نشد</p>
               </div>
             ) : (
               exams.map((exam) => (
@@ -165,7 +165,7 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
               {exams.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-4 text-center text-gray-500">
-                    هیچ امتحانی یافت نشد
+                    هیچ آزمونی یافت نشد
                   </td>
                 </tr>
               ) : (

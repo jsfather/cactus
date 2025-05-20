@@ -14,7 +14,7 @@ const menuItems = [
     icon: <Newspaper width={17} strokeWidth={1.7} />,
   },
   {
-    title: 'امتحانات',
+    title: 'آزمون ها',
     href: '/admin/exams',
     icon: <PenSquare width={17} strokeWidth={1.7} />,
   },

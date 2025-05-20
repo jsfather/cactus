@@ -9,9 +9,9 @@ export default function Page() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'امتحانات', href: '/admin/exams' },
+          { label: 'آزمون ها', href: '/admin/exams' },
           {
-            label: 'ساخت امتحان',
+            label: 'ساخت آزمون',
             href: '/admin/exams/create',
             active: true,
           },

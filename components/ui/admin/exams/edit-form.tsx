@@ -41,10 +41,10 @@ export default function EditExamForm({ exam }: { exam: Exam }) {
   const onSubmit = async (data: FormData) => {
     try {
       await updateExam(exam.id.toString(), data);
-      toast.success('امتحان با موفقیت بروزرسانی شد');
+      toast.success('آزمون با موفقیت بروزرسانی شد');
       router.push('/admin/exams');
     } catch (error: any) {
-      toast.error(error.message || 'خطا در ذخیره امتحان');
+      toast.error(error.message || 'خطا در ذخیره آزمون');
       console.error('Failed to save exam:', error);
     }
   };
@@ -188,7 +188,7 @@ export default function EditExamForm({ exam }: { exam: Exam }) {
           لغو
         </Link>
         <Button type="submit" loading={isSubmitting}>
-          ویرایش امتحان
+          ویرایش آزمون
         </Button>
       </div>
     </form>

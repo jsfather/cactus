@@ -48,9 +48,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'امتحانات', href: '/admin/exams' },
+          { label: 'آزمون ها', href: '/admin/exams' },
           {
-            label: 'ویرایش امتحان',
+            label: 'ویرایش آزمون',
             href: `/admin/exams/${resolvedParams.id}/edit`,
             active: true,
           },
