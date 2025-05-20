@@ -56,6 +56,9 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                     <th scope="col" className="px-3 py-5 font-medium">
                       توضیحات کوتاه
                     </th>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                    عنوان متا
+                    </th>
                     <th scope="col" className="relative py-3 pr-3 pl-6">
                       <span className="sr-only">Edit</span>
                     </th>
@@ -69,6 +72,9 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                     >
                       <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                         <div className="h-4 w-24 rounded bg-gray-200"></div>
+                      </td>
+                      <td className="px-3 py-3 whitespace-nowrap">
+                        <div className="h-4 w-32 rounded bg-gray-200"></div>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <div className="h-4 w-32 rounded bg-gray-200"></div>
@@ -115,6 +121,9 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                       <p className="text-xl font-medium">
                         {blog.little_description}
                       </p>
+                      <p className="mt-2 text-sm text-gray-500">
+                        {blog.meta_title}
+                      </p>
                     </div>
                     <div className="flex justify-end gap-2">
                       <UpdateBlog id={blog.id} />
@@ -134,6 +143,9 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                 <th scope="col" className="px-3 py-5 font-medium">
                   توضیحات کوتاه
                 </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  متا تایتل
+                </th>
                 <th scope="col" className="relative py-3 pr-3 pl-6">
                   <span className="sr-only">Edit</span>
                 </th>
@@ -142,7 +154,7 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
             <tbody className="bg-white">
               {blogs.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="py-4 text-center text-gray-500">
+                  <td colSpan={4} className="py-4 text-center text-gray-500">
                     هیچ بلاگی یافت نشد
                   </td>
                 </tr>
@@ -159,6 +171,9 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
                       {blog.little_description}
+                    </td>
+                    <td className="px-3 py-3 whitespace-nowrap">
+                      {blog.meta_title}
                     </td>
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex justify-end gap-3">
