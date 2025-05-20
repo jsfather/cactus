@@ -12,8 +12,8 @@ export interface Exam {
 }
 
 export const getExams = async () => {
-  const response = await request<{data: Exam[]}>('admin/exams');
-  
+  const response = await request<{ data: Exam[] }>('admin/exams');
+
   if (!response) {
     throw new Error('خطایی در دریافت لیست آزمون ها رخ داده است');
   }
@@ -22,7 +22,7 @@ export const getExams = async () => {
 };
 
 export const getExam = async (id: string) => {
-  const response = await request<{data: Exam}>(`admin/exams/${id}`);
+  const response = await request<{ data: Exam }>(`admin/exams/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت اطلاعات آزمون رخ داده است');

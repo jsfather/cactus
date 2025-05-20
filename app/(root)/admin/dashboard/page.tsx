@@ -1,4 +1,12 @@
-import { Users, GraduationCap, Landmark, ArrowUpRight, ArrowDownRight, Clock, Calendar } from 'lucide-react';
+import {
+  Users,
+  GraduationCap,
+  Landmark,
+  ArrowUpRight,
+  ArrowDownRight,
+  Clock,
+  Calendar,
+} from 'lucide-react';
 
 const stats = [
   {
@@ -81,7 +89,7 @@ const Page = async () => {
                 </span>
               </div>
             </div>
-            <div className="rounded-full bg-primary-100 p-3 text-primary-600">
+            <div className="bg-primary-100 text-primary-600 rounded-full p-3">
               {stat.icon}
             </div>
           </div>
@@ -100,12 +108,14 @@ const Page = async () => {
                   key={activity.title}
                   className="flex items-start gap-4 border-b border-gray-100 pb-4 last:border-0 last:pb-0"
                 >
-                  <div className="rounded-full bg-primary-100 p-2 text-primary-600">
+                  <div className="bg-primary-100 text-primary-600 rounded-full p-2">
                     {activity.icon}
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium">{activity.title}</h3>
-                    <p className="text-sm text-gray-500">{activity.description}</p>
+                    <p className="text-sm text-gray-500">
+                      {activity.description}
+                    </p>
                     <div className="mt-1 flex items-center gap-1 text-xs text-gray-400">
                       <Clock className="h-3 w-3" />
                       <span>{activity.time}</span>
@@ -122,15 +132,15 @@ const Page = async () => {
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-lg font-semibold">دسترسی سریع</h2>
             <div className="space-y-3">
-              <button className="flex w-full items-center justify-between rounded-lg bg-primary-50 p-3 text-primary-600 transition-colors hover:bg-primary-100">
+              <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
                 <span>ثبت دانش‌آموز جدید</span>
                 <Users className="h-5 w-5" />
               </button>
-              <button className="flex w-full items-center justify-between rounded-lg bg-primary-50 p-3 text-primary-600 transition-colors hover:bg-primary-100">
+              <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
                 <span>برنامه کلاس‌ها</span>
                 <Calendar className="h-5 w-5" />
               </button>
-              <button className="flex w-full items-center justify-between rounded-lg bg-primary-50 p-3 text-primary-600 transition-colors hover:bg-primary-100">
+              <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
                 <span>گزارش مالی</span>
                 <Landmark className="h-5 w-5" />
               </button>

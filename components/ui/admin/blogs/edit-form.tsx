@@ -61,7 +61,9 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
                 }`}
               />
               {errors.title && (
-                <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.title.message}
+                </p>
               )}
             </div>
           </div>
@@ -79,7 +81,9 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
                   required: 'توضیحات کوتاه الزامی است',
                 })}
                 className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
-                  errors.little_description ? 'border-red-500' : 'border-gray-300'
+                  errors.little_description
+                    ? 'border-red-500'
+                    : 'border-gray-300'
                 }`}
               />
               {errors.little_description && (
@@ -128,7 +132,9 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
             <div className="relative mt-2 rounded-md">
               <input
                 id="meta_title"
-                {...register('meta_title', { required: 'عنوان متا الزامی است' })}
+                {...register('meta_title', {
+                  required: 'عنوان متا الزامی است',
+                })}
                 className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
                   errors.meta_title ? 'border-red-500' : 'border-gray-300'
                 }`}

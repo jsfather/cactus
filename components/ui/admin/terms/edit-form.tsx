@@ -72,7 +72,9 @@ export default function EditTermForm({ term }: { term: Term }) {
     const month = date.month;
     const day = date.day;
     const persianDate = `${year}/${month}/${day}`;
-    const gregorianDate = moment(persianDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+    const gregorianDate = moment(persianDate, 'jYYYY/jMM/jDD').format(
+      'YYYY-MM-DD'
+    );
     setSelectedStartDate(persianDate);
     setValue('start_date', gregorianDate);
   };
@@ -82,7 +84,9 @@ export default function EditTermForm({ term }: { term: Term }) {
     const month = date.month;
     const day = date.day;
     const persianDate = `${year}/${month}/${day}`;
-    const gregorianDate = moment(persianDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+    const gregorianDate = moment(persianDate, 'jYYYY/jMM/jDD').format(
+      'YYYY-MM-DD'
+    );
     setSelectedEndDate(persianDate);
     setValue('end_date', gregorianDate);
   };
@@ -105,13 +109,18 @@ export default function EditTermForm({ term }: { term: Term }) {
                 }`}
               />
               {errors.title && (
-                <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.title.message}
+                </p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="duration" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="duration"
+              className="mb-2 block text-sm font-medium"
+            >
               مدت زمان (دقیقه) <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
@@ -124,32 +133,46 @@ export default function EditTermForm({ term }: { term: Term }) {
                 }`}
               />
               {errors.duration && (
-                <p className="mt-1 text-sm text-red-500">{errors.duration.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.duration.message}
+                </p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="number_of_sessions" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="number_of_sessions"
+              className="mb-2 block text-sm font-medium"
+            >
               تعداد جلسات <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
               <input
                 id="number_of_sessions"
                 type="number"
-                {...register('number_of_sessions', { required: 'تعداد جلسات الزامی است' })}
+                {...register('number_of_sessions', {
+                  required: 'تعداد جلسات الزامی است',
+                })}
                 className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
-                  errors.number_of_sessions ? 'border-red-500' : 'border-gray-300'
+                  errors.number_of_sessions
+                    ? 'border-red-500'
+                    : 'border-gray-300'
                 }`}
               />
               {errors.number_of_sessions && (
-                <p className="mt-1 text-sm text-red-500">{errors.number_of_sessions.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.number_of_sessions.message}
+                </p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="level_id" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="level_id"
+              className="mb-2 block text-sm font-medium"
+            >
               سطح <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
@@ -162,7 +185,9 @@ export default function EditTermForm({ term }: { term: Term }) {
                 }`}
               />
               {errors.level_id && (
-                <p className="mt-1 text-sm text-red-500">{errors.level_id.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.level_id.message}
+                </p>
               )}
             </div>
           </div>
@@ -171,7 +196,10 @@ export default function EditTermForm({ term }: { term: Term }) {
         {/* Second Row */}
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
-            <label htmlFor="start_date" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="start_date"
+              className="mb-2 block text-sm font-medium"
+            >
               تاریخ شروع <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
@@ -185,17 +213,22 @@ export default function EditTermForm({ term }: { term: Term }) {
                   errors.start_date ? 'border-red-500' : 'border-gray-300'
                 }`}
                 containerClassName="w-full"
-                format='YYYY/MM/DD'
+                format="YYYY/MM/DD"
                 placeholder="تاریخ شروع را انتخاب کنید"
               />
               {errors.start_date && (
-                <p className="mt-1 text-sm text-red-500">{errors.start_date.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.start_date.message}
+                </p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="end_date" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="end_date"
+              className="mb-2 block text-sm font-medium"
+            >
               تاریخ پایان <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
@@ -209,11 +242,13 @@ export default function EditTermForm({ term }: { term: Term }) {
                   errors.end_date ? 'border-red-500' : 'border-gray-300'
                 }`}
                 containerClassName="w-full"
-                format='YYYY/MM/DD'
+                format="YYYY/MM/DD"
                 placeholder="تاریخ پایان را انتخاب کنید"
               />
               {errors.end_date && (
-                <p className="mt-1 text-sm text-red-500">{errors.end_date.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.end_date.message}
+                </p>
               )}
             </div>
           </div>
@@ -235,13 +270,18 @@ export default function EditTermForm({ term }: { term: Term }) {
                 <option value="vip">ویژه</option>
               </select>
               {errors.type && (
-                <p className="mt-1 text-sm text-red-500">{errors.type.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.type.message}
+                </p>
               )}
             </div>
           </div>
 
           <div>
-            <label htmlFor="capacity" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="capacity"
+              className="mb-2 block text-sm font-medium"
+            >
               ظرفیت <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
@@ -254,7 +294,9 @@ export default function EditTermForm({ term }: { term: Term }) {
                 }`}
               />
               {errors.capacity && (
-                <p className="mt-1 text-sm text-red-500">{errors.capacity.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.capacity.message}
+                </p>
               )}
             </div>
           </div>

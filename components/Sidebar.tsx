@@ -39,9 +39,7 @@ export default function Sidebar({ menuItems, children }: SidebarProps) {
           </Link>
         ))}
       </div>
-      <div className="mt-4 border-t border-gray-100 pt-4">
-        {children}
-      </div>
+      <div className="mt-4 border-t border-gray-100 pt-4">{children}</div>
     </aside>
   );
 }

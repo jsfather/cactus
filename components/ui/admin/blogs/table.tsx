@@ -57,7 +57,7 @@ export default function BlogsTable({}: { query: string; currentPage: number }) {
                       توضیحات کوتاه
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                    عنوان متا
+                      عنوان متا
                     </th>
                     <th scope="col" className="relative py-3 pr-3 pl-6">
                       <span className="sr-only">Edit</span>

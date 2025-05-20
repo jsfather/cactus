@@ -21,7 +21,7 @@ export default function VerifyOtpPage() {
 
     try {
       const result = await verifyOtp(identifier, '1234567890', otp);
-      Cookies.set('authToken', result.token, { expires: 28 })
+      Cookies.set('authToken', result.token, { expires: 28 });
       router.push('/admin');
     } catch (err) {
       console.log(err);

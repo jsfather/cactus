@@ -46,7 +46,9 @@ export default function Form() {
     const month = date.month;
     const day = date.day;
     const persianDate = `${year}/${month}/${day}`;
-    const gregorianDate = moment(persianDate, 'jYYYY/jMM/jDD').format('YYYY-MM-DD');
+    const gregorianDate = moment(persianDate, 'jYYYY/jMM/jDD').format(
+      'YYYY-MM-DD'
+    );
     setSelectedDate(persianDate);
     setValue('date', gregorianDate);
   };
@@ -68,7 +70,9 @@ export default function Form() {
                 }`}
               />
               {errors.title && (
-                <p className="mt-1 text-sm text-red-500">{errors.title.message}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.title.message}
+                </p>
               )}
             </div>
           </div>
@@ -115,17 +119,22 @@ export default function Form() {
                     errors.date ? 'border-red-500' : 'border-gray-300'
                   }`}
                   containerClassName="w-full"
-                  format='YYYY/MM/DD'
+                  format="YYYY/MM/DD"
                   placeholder="تاریخ را انتخاب کنید"
                 />
                 {errors.date && (
-                  <p className="mt-1 text-sm text-red-500">{errors.date.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.date.message}
+                  </p>
                 )}
               </div>
             </div>
           </div>
           <div>
-            <label htmlFor="duration" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="duration"
+              className="mb-2 block text-sm font-medium"
+            >
               مدت زمان (دقیقه)
             </label>
             <div className="relative mt-2 rounded-md">
@@ -134,15 +143,17 @@ export default function Form() {
                   id="duration"
                   type="number"
                   min="0"
-                  {...register('duration', { 
-                    min: { value: 0, message: 'مدت زمان باید مثبت باشد' }
+                  {...register('duration', {
+                    min: { value: 0, message: 'مدت زمان باید مثبت باشد' },
                   })}
                   className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
                     errors.duration ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
                 {errors.duration && (
-                  <p className="mt-1 text-sm text-red-500">{errors.duration.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.duration.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -157,15 +168,17 @@ export default function Form() {
                   id="term_id"
                   type="number"
                   min="1"
-                  {...register('term_id', { 
-                    min: { value: 1, message: 'شماره ترم باید حداقل 1 باشد' }
+                  {...register('term_id', {
+                    min: { value: 1, message: 'شماره ترم باید حداقل 1 باشد' },
                   })}
                   className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
                     errors.term_id ? 'border-red-500' : 'border-gray-300'
                   }`}
                 />
                 {errors.term_id && (
-                  <p className="mt-1 text-sm text-red-500">{errors.term_id.message}</p>
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.term_id.message}
+                  </p>
                 )}
               </div>
             </div>
