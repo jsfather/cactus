@@ -180,4 +180,3 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
     </form>
   );
 }
-

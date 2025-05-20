@@ -24,4 +24,4 @@ export default async function Page({ params }: { params: { id: string } }) {
       <Toaster position="top-center" />
     </main>
   );
-} 
+}

@@ -32,7 +32,10 @@ export default function Form() {
           level_id: Number(formData.get('level_id')),
           start_date: formData.get('start_date') as string,
           end_date: formData.get('end_date') as string,
-          type: formData.get('type') as 'normal' | 'capacity_completion' | 'vip',
+          type: formData.get('type') as
+            | 'normal'
+            | 'capacity_completion'
+            | 'vip',
           capacity: formData.get('capacity') as string,
         });
       }}
@@ -102,7 +105,10 @@ export default function Form() {
           </div>
         </div>
         <div className="mb-4">
-          <label htmlFor="start_date" className="mb-2 block text-sm font-medium">
+          <label
+            htmlFor="start_date"
+            className="mb-2 block text-sm font-medium"
+          >
             تاریخ شروع
           </label>
           <div className="relative mt-2 rounded-md">
@@ -176,4 +182,4 @@ export default function Form() {
       </div>
     </form>
   );
-} 
+}

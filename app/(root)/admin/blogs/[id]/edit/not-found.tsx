@@ -9,7 +9,7 @@ export default function NotFound() {
       <p>بلاگ مورد نظر پیدا نشد</p>
       <Link
         href="/admin/blogs"
-        className="mt-4 rounded-md bg-primary-600 px-4 py-2 text-sm text-white transition-colors hover:bg-primary-400"
+        className="bg-primary-600 hover:bg-primary-400 mt-4 rounded-md px-4 py-2 text-sm text-white transition-colors"
       >
         بازگشت
       </Link>

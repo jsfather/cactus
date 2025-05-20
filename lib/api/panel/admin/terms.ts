@@ -13,22 +13,22 @@ export interface Term {
 }
 
 export const getTerms = async () => {
-  const response = await request<{data: Term[]}>('admin/terms');
-  
+  const response = await request<{ data: Term[] }>('admin/terms');
+
   if (!response) {
     throw new Error('خطایی در دریافت لیست ترم‌ها رخ داده است');
   }
-  
+
   return response;
 };
 
 export const getTerm = async (id: string) => {
-  const response = await request<{data: Term}>(`admin/terms/${id}`);
-  
+  const response = await request<{ data: Term }>(`admin/terms/${id}`);
+
   if (!response) {
     throw new Error('خطایی در دریافت ترم رخ داده است');
   }
-  
+
   return response;
 };
 
@@ -37,11 +37,11 @@ export const createTerm = async (data: Partial<Term>) => {
     method: 'POST',
     body: JSON.stringify(data),
   });
-  
+
   if (!response) {
     throw new Error('خطایی در ایجاد ترم رخ داده است');
   }
-  
+
   return response;
 };
 
@@ -54,7 +54,7 @@ export const updateTerm = async (id: string, data: Partial<Term>) => {
   if (!response) {
     throw new Error('خطایی در بروزرسانی ترم رخ داده است');
   }
-  
+
   return response;
 };
 
@@ -66,6 +66,6 @@ export const deleteTerm = async (id: string) => {
   if (!response) {
     throw new Error('خطایی در حذف ترم رخ داده است');
   }
-  
+
   return response;
 };

@@ -52,11 +52,11 @@ export default function Modal({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/95 backdrop-blur-sm px-4 pb-4 pt-5 text-right shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="absolute left-0 top-0 hidden pl-4 pt-4 sm:block">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/95 px-4 pt-5 pb-4 text-right shadow-xl backdrop-blur-sm transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <div className="absolute top-0 left-0 hidden pt-4 pl-4 sm:block">
                   <button
                     type="button"
-                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
                     onClick={onClose}
                   >
                     <span className="sr-only">بستن</span>
@@ -67,7 +67,7 @@ export default function Modal({
                   <div className="mt-3 text-center sm:mt-0 sm:text-right">
                     <Dialog.Title
                       as="h3"
-                      className="text-base font-semibold leading-6 text-gray-900"
+                      className="text-base leading-6 font-semibold text-gray-900"
                     >
                       {title}
                     </Dialog.Title>
@@ -87,7 +87,7 @@ export default function Modal({
                   </Button>
                   <button
                     type="button"
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                     onClick={onClose}
                   >
                     {cancelText}
@@ -100,4 +100,4 @@ export default function Modal({
       </Dialog>
     </Transition.Root>
   );
-} 
+}
