@@ -8,6 +8,7 @@ import {
   BookType,
   PenSquare,
   LayoutDashboard,
+  Users
 } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 
@@ -16,6 +17,11 @@ const menuItems = [
     title: 'داشبورد',
     href: '/admin/dashboard',
     icon: <LayoutDashboard width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'کاربران',
+    href: '/admin/users',
+    icon: <Users width={17} strokeWidth={1.7} />,
   },
   {
     title: 'بلاگ',
