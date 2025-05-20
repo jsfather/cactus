@@ -13,7 +13,7 @@ export function CreateExam() {
       href="/admin/exams/create"
       className="bg-primary-600 hover:bg-primary-400 focus-visible:outline-primary-400 flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
     >
-      <span className="hidden md:block">ساخت امتحان</span>{' '}
+      <span className="hidden md:block">ساخت آزمون</span>{' '}
       <PlusIcon className="h-5 md:mr-4" />
     </Link>
   );
@@ -38,10 +38,10 @@ export function DeleteExam({ id }: { id: string }) {
     try {
       setIsDeleting(true);
       await deleteExam(id);
-      toast.success('امتحان با موفقیت حذف شد');
+      toast.success('آزمون با موفقیت حذف شد');
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف امتحان');
+      toast.error(error.message || 'خطا در حذف آزمون');
       console.error('Failed to delete exam:', error);
     } finally {
       setIsDeleting(false);
@@ -63,8 +63,8 @@ export function DeleteExam({ id }: { id: string }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleDelete}
-        title="حذف امتحان"
-        description="آیا از حذف این امتحان مطمئن هستید؟"
+        title="حذف آزمون"
+        description="آیا از حذف این آزمون مطمئن هستید؟"
         confirmText="حذف"
         cancelText="انصراف"
         loading={isDeleting}

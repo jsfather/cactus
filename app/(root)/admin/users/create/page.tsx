@@ -1,4 +1,4 @@
-import Form from '@/components/ui/admin/terms/create-form';
+import Form from '@/components/ui/admin/users/create-form';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
 import { Toaster } from 'react-hot-toast';
 
@@ -7,10 +7,10 @@ export default function Page() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'ترم ها', href: '/admin/terms' },
+          { label: 'کاربران', href: '/admin/users' },
           {
-            label: 'ساخت ترم',
-            href: '/admin/terms/create',
+            label: 'ساخت کاربر',
+            href: '/admin/users/create',
             active: true,
           },
         ]}

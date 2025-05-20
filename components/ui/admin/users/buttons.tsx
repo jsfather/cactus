@@ -2,27 +2,27 @@
 
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { deleteTerm } from '@/lib/api/panel/admin/terms';
+import { deleteUser } from '@/lib/api/panel/admin/users';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 import Modal from '@/components/ui/modal';
 
-export function CreateTerm() {
+export function CreateUser() {
   return (
     <Link
-      href="/admin/terms/create"
+      href="/admin/users/create"
       className="bg-primary-600 hover:bg-primary-400 focus-visible:outline-primary-400 flex h-10 items-center rounded-lg px-4 text-sm font-medium text-white transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
     >
-      <span className="hidden md:block">ساخت ترم</span>{' '}
+      <span className="hidden md:block">ساخت کاربر</span>{' '}
       <PlusIcon className="h-5 md:mr-4" />
     </Link>
   );
 }
 
-export function UpdateTerm({ id }: { id: string }) {
+export function UpdateUser({ id }: { id: string }) {
   return (
     <Link
-      href={`/admin/terms/${id}/edit`}
+      href={`/admin/users/${id}/edit`}
       className="rounded-md border border-gray-200 p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />
@@ -30,19 +30,19 @@ export function UpdateTerm({ id }: { id: string }) {
   );
 }
 
-export function DeleteTerm({ id }: { id: string }) {
+export function DeleteUser({ id }: { id: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      await deleteTerm(id);
-      toast.success('ترم با موفقیت حذف شد');
+      await deleteUser(id);
+      toast.success('کاربر با موفقیت حذف شد');
       window.location.reload();
     } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف ترم');
-      console.error('Failed to delete term:', error);
+      toast.error(error.message || 'خطا در حذف کاربر');
+      console.error('Failed to delete user:', error);
     } finally {
       setIsDeleting(false);
       setIsModalOpen(false);
@@ -63,8 +63,8 @@ export function DeleteTerm({ id }: { id: string }) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleDelete}
-        title="حذف ترم"
-        description="آیا از حذف این ترم مطمئن هستید؟"
+        title="حذف کاربر"
+        description="آیا از حذف این کاربر مطمئن هستید؟"
         confirmText="حذف"
         cancelText="انصراف"
         loading={isDeleting}

@@ -1,29 +1,28 @@
 'use client';
 
-import { UpdateExam, DeleteExam } from '@/components/ui/admin/exams/buttons';
-import { Exam, getExams } from '@/lib/api/panel/admin/exams';
+import { UpdateUser, DeleteUser } from '@/components/ui/admin/users/buttons';
+import { User, getUsers } from '@/lib/api/panel/admin/users';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-export default function ExamsTable({}: { query: string; currentPage: number }) {
-  const [exams, setExams] = useState<Exam[]>([]);
+export default function UsersTable({}: { query: string; currentPage: number }) {
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchExams = async () => {
+  const fetchUsers = async () => {
     try {
-      const data = (await getExams()).data;
-      setExams(Array.isArray(data) ? data : []);
+      const data = await getUsers();
+      setUsers(data.data);
     } catch (error) {
-      toast.error('خطا در دریافت لیست آزمون ها');
-      console.error('Failed to fetch exams:', error);
-      setExams([]);
+      toast.error('خطا در دریافت لیست کاربران');
+      console.error('Failed to fetch users:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchExams();
+    fetchUsers();
   }, []);
 
   if (loading) {
@@ -52,16 +51,16 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
                 <thead className="rounded-lg text-right text-sm font-normal">
                   <tr>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      عنوان
+                      نام و نام خانوادگی
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      توضیحات
+                      نام کاربری
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      تاریخ
+                      ایمیل
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      مدت زمان
+                      شماره تماس
                     </th>
                     <th scope="col" className="relative py-3 pr-3 pl-6">
                       <span className="sr-only">Edit</span>
@@ -81,10 +80,10 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
                         <div className="h-4 w-32 rounded bg-gray-200"></div>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <div className="h-4 w-24 rounded bg-gray-200"></div>
+                        <div className="h-4 w-32 rounded bg-gray-200"></div>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <div className="h-4 w-16 rounded bg-gray-200"></div>
+                        <div className="h-4 w-32 rounded bg-gray-200"></div>
                       </td>
                       <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                         <div className="flex justify-end gap-3">
@@ -108,33 +107,32 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
-            {exams.length === 0 ? (
+            {users.length === 0 ? (
               <div className="mb-2 w-full rounded-md bg-white p-4 text-center">
-                <p className="text-gray-500">هیچ آزمونی یافت نشد</p>
+                <p className="text-gray-500">هیچ کاربری یافت نشد</p>
               </div>
             ) : (
-              exams.map((exam) => (
+              users?.map((user) => (
                 <div
-                  key={exam.id}
+                  key={user.id}
                   className="mb-2 w-full rounded-md bg-white p-4"
                 >
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                     <div>
-                      <p className="text-sm text-gray-500">{exam.title}</p>
+                      <p className="text-sm text-gray-500">
+                        {user.first_name} {user.last_name}
+                      </p>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
                     <div>
-                      <p className="text-xl font-medium">{exam.description}</p>
-                      <p className="text-sm text-gray-500">
-                        {exam.date &&
-                          new Date(exam.date).toLocaleDateString('fa-IR')}
-                        {exam.duration && ` - ${exam.duration} دقیقه`}
-                      </p>
+                      <p className="text-xl font-medium">{user.username}</p>
+                      <p className="mt-2 text-sm text-gray-500">{user.email}</p>
+                      <p className="mt-1 text-sm text-gray-500">{user.phone}</p>
                     </div>
                     <div className="flex justify-end gap-2">
-                      <UpdateExam id={exam.id.toString()} />
-                      <DeleteExam id={exam.id.toString()} />
+                      <UpdateUser id={user.id} />
+                      <DeleteUser id={user.id} />
                     </div>
                   </div>
                 </div>
@@ -145,16 +143,16 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
             <thead className="rounded-lg text-right text-sm font-normal">
               <tr>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  عنوان
+                  نام و نام خانوادگی
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  توضیحات
+                  نام کاربری
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  تاریخ
+                  ایمیل
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  مدت زمان
+                  شماره تماس
                 </th>
                 <th scope="col" className="relative py-3 pr-3 pl-6">
                   <span className="sr-only">Edit</span>
@@ -162,38 +160,38 @@ export default function ExamsTable({}: { query: string; currentPage: number }) {
               </tr>
             </thead>
             <tbody className="bg-white">
-              {exams.length === 0 ? (
+              {users.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-4 text-center text-gray-500">
-                    هیچ آزمونی یافت نشد
+                    هیچ کاربری یافت نشد
                   </td>
                 </tr>
               ) : (
-                exams.map((exam) => (
+                users?.map((user) => (
                   <tr
-                    key={exam.id}
+                    key={user.id}
                     className="w-full border-b border-gray-200 py-3 text-sm last-of-type:border-none [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                   >
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <p>{exam.title}</p>
+                        <p>
+                          {user.first_name} {user.last_name}
+                        </p>
                       </div>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
-                      {exam.description}
+                      {user.username}
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
-                      {exam.date
-                        ? new Date(exam.date).toLocaleDateString('fa-IR')
-                        : '-'}
+                      {user.email}
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
-                      {exam.duration ? `${exam.duration} دقیقه` : '-'}
+                      {user.phone}
                     </td>
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex justify-end gap-3">
-                        <UpdateExam id={exam.id.toString()} />
-                        <DeleteExam id={exam.id.toString()} />
+                        <UpdateUser id={user.id} />
+                        <DeleteUser id={user.id} />
                       </div>
                     </td>
                   </tr>
