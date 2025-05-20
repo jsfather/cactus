@@ -22,7 +22,7 @@ export const getExams = async () => {
 };
 
 export const getExam = async (id: string) => {
-  const response = await request<Exam>(`admin/exams/${id}`);
+  const response = await request<{data: Exam}>(`admin/exams/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت اطلاعات امتحان رخ داده است');
