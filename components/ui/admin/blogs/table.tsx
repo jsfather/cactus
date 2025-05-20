@@ -5,10 +5,7 @@ import { Blog, getBlogs } from '@/lib/api/panel/admin/blogs';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 
-export default function BlogsTable({}: {
-  query: string;
-  currentPage: number;
-}) {
+export default function BlogsTable({}: { query: string; currentPage: number }) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,13 +35,13 @@ export default function BlogsTable({}: {
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="mb-2 w-full rounded-md bg-white p-4">
                     <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-                      <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                      <div className="h-4 w-24 rounded bg-gray-200"></div>
                     </div>
                     <div className="flex w-full items-center justify-between pt-4">
-                      <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                      <div className="h-4 w-32 rounded bg-gray-200"></div>
                       <div className="flex gap-2">
-                        <div className="h-8 w-8 bg-gray-200 rounded"></div>
-                        <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                        <div className="h-8 w-8 rounded bg-gray-200"></div>
+                        <div className="h-8 w-8 rounded bg-gray-200"></div>
                       </div>
                     </div>
                   </div>
@@ -66,17 +63,20 @@ export default function BlogsTable({}: {
                 </thead>
                 <tbody className="bg-white">
                   {[1, 2, 3].map((i) => (
-                    <tr key={i} className="w-full border-b border-gray-200 py-3 text-sm">
+                    <tr
+                      key={i}
+                      className="w-full border-b border-gray-200 py-3 text-sm"
+                    >
                       <td className="py-3 pr-3 pl-6 whitespace-nowrap">
-                        <div className="h-4 w-24 bg-gray-200 rounded"></div>
+                        <div className="h-4 w-24 rounded bg-gray-200"></div>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                        <div className="h-4 w-32 rounded bg-gray-200"></div>
                       </td>
                       <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                         <div className="flex justify-end gap-3">
-                          <div className="h-8 w-8 bg-gray-200 rounded"></div>
-                          <div className="h-8 w-8 bg-gray-200 rounded"></div>
+                          <div className="h-8 w-8 rounded bg-gray-200"></div>
+                          <div className="h-8 w-8 rounded bg-gray-200"></div>
                         </div>
                       </td>
                     </tr>

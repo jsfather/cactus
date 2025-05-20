@@ -13,21 +13,21 @@ export interface Exam {
 
 export const getExams = async () => {
   const response = await request<Exam[]>('admin/exams');
-  
+
   if (!response) {
     throw new Error('خطایی در دریافت لیست امتحانات رخ داده است');
   }
-  
+
   return response;
 };
 
 export const getExam = async (id: string) => {
   const response = await request<Exam>(`admin/exams/${id}`);
-  
+
   if (!response) {
     throw new Error('خطایی در دریافت اطلاعات امتحان رخ داده است');
   }
-  
+
   return response;
 };
 
@@ -36,11 +36,11 @@ export const createExam = async (data: Partial<Exam>) => {
     method: 'POST',
     body: JSON.stringify(data),
   });
-  
+
   if (!response) {
     throw new Error('خطایی در ایجاد امتحان رخ داده است');
   }
-  
+
   return response;
 };
 
@@ -49,11 +49,11 @@ export const updateExam = async (id: string, data: Partial<Exam>) => {
     method: 'PUT',
     body: JSON.stringify(data),
   });
-  
+
   if (!response) {
     throw new Error('خطایی در بروزرسانی امتحان رخ داده است');
   }
-  
+
   return response;
 };
 
@@ -61,10 +61,10 @@ export const deleteExam = async (id: string) => {
   const response = await request<Exam>(`admin/exams/${id}`, {
     method: 'DELETE',
   });
-  
+
   if (!response) {
     throw new Error('خطایی در حذف امتحان رخ داده است');
   }
-  
+
   return response;
 };

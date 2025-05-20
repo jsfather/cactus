@@ -19,4 +19,4 @@ export default function Page() {
       <Toaster position="top-center" />
     </main>
   );
-} 
+}

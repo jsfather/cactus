@@ -17,14 +17,9 @@ export default function Error({
   return (
     <main className="flex h-full flex-col items-center justify-center">
       <h2 className="text-center">خطایی رخ داده است!</h2>
-      <Button
-        className="mt-4"
-        onClick={
-          () => reset()
-        }
-      >
+      <Button className="mt-4" onClick={() => reset()}>
         تلاش مجدد
       </Button>
     </main>
   );
-} 
+}

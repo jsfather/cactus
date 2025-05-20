@@ -65,4 +65,4 @@ export function DeleteTerm({ id }: { id: string }) {
       />
     </>
   );
-} 
+}

@@ -50,16 +50,16 @@ export default function DataTable<T extends { id: number | string }>({
         <div className="p-4">
           <button
             onClick={onCreate}
-            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
           >
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="mr-2 h-5 w-5" />
             ایجاد جدید
           </button>
         </div>
       )}
-      
-      <table className="w-full text-sm text-right text-gray-500">
-        <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+
+      <table className="w-full text-right text-sm text-gray-500">
+        <thead className="bg-gray-50 text-xs text-gray-700 uppercase">
           <tr>
             {columns.map((col) => (
               <th key={col.key} className="px-6 py-3">
@@ -72,13 +72,19 @@ export default function DataTable<T extends { id: number | string }>({
         <tbody>
           {isLoading ? (
             <tr>
-              <td colSpan={columns.length + (onEdit || onDelete ? 1 : 0)} className="px-6 py-4 text-center">
+              <td
+                colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
+                className="px-6 py-4 text-center"
+              >
                 در حال بارگذاری...
               </td>
             </tr>
           ) : tableData.length === 0 ? (
             <tr>
-              <td colSpan={columns.length + (onEdit || onDelete ? 1 : 0)} className="px-6 py-4 text-center">
+              <td
+                colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
+                className="px-6 py-4 text-center"
+              >
                 داده‌ای یافت نشد
               </td>
             </tr>
@@ -86,7 +92,7 @@ export default function DataTable<T extends { id: number | string }>({
             tableData.map((row, rowIndex) => (
               <tr
                 key={row.id}
-                className={`bg-white border-b hover:bg-gray-50 ${
+                className={`border-b bg-white hover:bg-gray-50 ${
                   rowIndex % 2 === 0 ? 'bg-gray-50' : ''
                 }`}
               >
@@ -101,17 +107,17 @@ export default function DataTable<T extends { id: number | string }>({
                       {onEdit && (
                         <button
                           onClick={() => onEdit(row)}
-                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg"
+                          className="rounded-lg p-2 text-blue-600 hover:bg-blue-100"
                         >
-                          <Pencil className="w-5 h-5" />
+                          <Pencil className="h-5 w-5" />
                         </button>
                       )}
                       {onDelete && (
                         <button
                           onClick={() => setDeleteId(row.id)}
-                          className="p-2 text-red-600 hover:bg-red-100 rounded-lg"
+                          className="rounded-lg p-2 text-red-600 hover:bg-red-100"
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 className="h-5 w-5" />
                         </button>
                       )}
                     </div>
@@ -125,20 +131,20 @@ export default function DataTable<T extends { id: number | string }>({
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-xl">
-            <h3 className="text-lg font-semibold mb-4">حذف آیتم</h3>
+        <div className="bg-opacity-50 fixed inset-0 flex items-center justify-center bg-black">
+          <div className="rounded-lg bg-white p-6 shadow-xl">
+            <h3 className="mb-4 text-lg font-semibold">حذف آیتم</h3>
             <p className="mb-6">آیا از حذف این آیتم اطمینان دارید؟</p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setDeleteId(null)}
-                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                className="rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100"
               >
                 انصراف
               </button>
               <button
                 onClick={() => handleDelete(deleteId)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
               >
                 حذف
               </button>

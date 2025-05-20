@@ -7,11 +7,7 @@ import { getTerm } from '@/lib/api/panel/admin/terms';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 
-export default function Page({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [term, setTerm] = useState<any>(null);
   const resolvedParams = use(params);
 
@@ -48,4 +44,4 @@ export default function Page({
       <Toaster position="top-center" />
     </main>
   );
-} 
+}

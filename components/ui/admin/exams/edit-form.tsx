@@ -28,9 +28,13 @@ export default function EditExamForm({ exam }: { exam: Exam }) {
         await handleSubmit({
           title: formData.get('title') as string,
           description: formData.get('description') as string,
-          date: formData.get('date') as string || null,
-          duration: formData.get('duration') ? Number(formData.get('duration')) : null,
-          term_id: formData.get('term_id') ? Number(formData.get('term_id')) : null,
+          date: (formData.get('date') as string) || null,
+          duration: formData.get('duration')
+            ? Number(formData.get('duration'))
+            : null,
+          term_id: formData.get('term_id')
+            ? Number(formData.get('term_id'))
+            : null,
         });
       }}
     >
@@ -53,7 +57,10 @@ export default function EditExamForm({ exam }: { exam: Exam }) {
           </div>
         </div>
         <div className="mb-4">
-          <label htmlFor="description" className="mb-2 block text-sm font-medium">
+          <label
+            htmlFor="description"
+            className="mb-2 block text-sm font-medium"
+          >
             توضیحات
           </label>
           <div className="relative mt-2 rounded-md">
@@ -130,4 +137,4 @@ export default function EditExamForm({ exam }: { exam: Exam }) {
       </div>
     </form>
   );
-} 
+}

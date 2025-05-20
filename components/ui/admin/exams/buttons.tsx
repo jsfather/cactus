@@ -65,4 +65,4 @@ export function DeleteExam({ id }: { id: string }) {
       />
     </>
   );
-} 
+}

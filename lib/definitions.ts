@@ -11,7 +11,6 @@ export type BlogForm = {
   meta_description: string;
 };
 
-
 export type User = {
   id: string;
   name: string;
