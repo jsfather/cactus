@@ -10,6 +10,7 @@ export interface User {
   national_code: string;
   password: string;
   profile_picture: string;
+  term_id?: string;
 }
 
 export const getUsers = async () => {
