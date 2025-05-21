@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { createExam, Exam } from '@/lib/api/panel/admin/exams';
+import { getTerms, Term } from '@/lib/api/panel/admin/terms';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DatePicker from 'react-multi-date-picker';
 import persian from 'react-date-object/calendars/persian';
 import persian_fa from 'react-date-object/locales/persian_fa';
@@ -23,12 +24,30 @@ type FormData = {
 export default function Form() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [terms, setTerms] = useState<Term[]>([]);
+  const [loading, setLoading] = useState(true);
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormData>();
+
+  useEffect(() => {
+    const fetchTerms = async () => {
+      try {
+        const response = await getTerms();
+        setTerms(response.data);
+      } catch (error) {
+        console.error('Failed to fetch terms:', error);
+        toast.error('خطا در دریافت لیست ترم‌ها');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTerms();
+  }, []);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -164,17 +183,20 @@ export default function Form() {
             </label>
             <div className="relative mt-2 rounded-md">
               <div className="relative">
-                <input
+                <select
                   id="term_id"
-                  type="number"
-                  min="1"
-                  {...register('term_id', {
-                    min: { value: 1, message: 'شماره ترم باید حداقل 1 باشد' },
-                  })}
+                  {...register('term_id')}
                   className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
                     errors.term_id ? 'border-red-500' : 'border-gray-300'
                   }`}
-                />
+                >
+                  <option value="">انتخاب ترم</option>
+                  {terms.map((term) => (
+                    <option key={term.id} value={term.id}>
+                      {term.title}
+                    </option>
+                  ))}
+                </select>
                 {errors.term_id && (
                   <p className="mt-1 text-sm text-red-500">
                     {errors.term_id.message}

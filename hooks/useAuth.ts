@@ -8,10 +8,5 @@ export function useAuth() {
     setIsAuthenticated(!!token);
   }, []);
 
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    window.location.href = '/auth/send-otp';
-  };
-
-  return { isAuthenticated, logout };
+  return { isAuthenticated };
 }

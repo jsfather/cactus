@@ -6,6 +6,8 @@ import { Bell, Search, CircleHelp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import request from '@/lib/api/httpClient';
 import moment from 'jalali-moment';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
 
 interface UserFile {
   type: 'certificate' | 'national_card';
@@ -27,25 +29,39 @@ const Header = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         setLoading(true);
         setError(null);
-        
+
+        const token = Cookies.get('authToken');
+        if (!token) {
+          router.push('/auth/send-otp');
+          return;
+        }
+
         const data = await request<{ data: UserProfile }>('profile');
         setUserProfile(data.data);
       } catch (error) {
         console.error('Error fetching profile:', error);
-        setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
+        if (error instanceof Error && error.message.includes('401')) {
+          Cookies.remove('authToken');
+          router.push('/auth/send-otp');
+        } else {
+          setError(
+            error instanceof Error ? error.message : 'خطا در دریافت اطلاعات'
+          );
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchProfile();
-  }, []);
+  }, [router]);
 
   const formattedDate = moment().locale('fa').format('dddd، D MMMM YYYY');
 

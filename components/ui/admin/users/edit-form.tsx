@@ -52,7 +52,10 @@ export default function Form({ user }: { user: User }) {
         {/* Name Fields Row */}
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label htmlFor="first_name" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="first_name"
+              className="mb-2 block text-sm font-medium"
+            >
               نام <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
@@ -99,7 +102,10 @@ export default function Form({ user }: { user: User }) {
         {/* Username and Phone Row */}
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label htmlFor="username" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="username"
+              className="mb-2 block text-sm font-medium"
+            >
               نام کاربری <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
@@ -161,13 +167,18 @@ export default function Form({ user }: { user: User }) {
             </div>
           </div>
           <div>
-            <label htmlFor="national_code" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="national_code"
+              className="mb-2 block text-sm font-medium"
+            >
               کد ملی <span className="text-red-500">*</span>
             </label>
             <div className="relative mt-2 rounded-md">
               <input
                 id="national_code"
-                {...register('national_code', { required: 'کد ملی الزامی است' })}
+                {...register('national_code', {
+                  required: 'کد ملی الزامی است',
+                })}
                 className={`peer block w-full rounded-md border py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0 ${
                   errors.national_code ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -184,7 +195,10 @@ export default function Form({ user }: { user: User }) {
         {/* Password and Profile Picture Row */}
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label htmlFor="password" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="password"
+              className="mb-2 block text-sm font-medium"
+            >
               رمز عبور جدید
             </label>
             <div className="relative mt-2 rounded-md">
@@ -200,7 +214,10 @@ export default function Form({ user }: { user: User }) {
             </div>
           </div>
           <div>
-            <label htmlFor="profile_picture" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="profile_picture"
+              className="mb-2 block text-sm font-medium"
+            >
               تصویر پروفایل
             </label>
             <div className="relative mt-2 rounded-md">
