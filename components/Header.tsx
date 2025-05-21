@@ -36,13 +36,13 @@ const Header = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         const token = Cookies.get('authToken');
         if (!token) {
           router.push('/auth/send-otp');
           return;
         }
-        
+
         const data = await request<{ data: UserProfile }>('profile');
         setUserProfile(data.data);
       } catch (error) {
@@ -51,7 +51,9 @@ const Header = () => {
           Cookies.remove('authToken');
           router.push('/auth/send-otp');
         } else {
-          setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
+          setError(
+            error instanceof Error ? error.message : 'خطا در دریافت اطلاعات'
+          );
         }
       } finally {
         setLoading(false);

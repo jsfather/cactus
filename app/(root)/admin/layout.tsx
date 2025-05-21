@@ -8,7 +8,7 @@ import {
   BookType,
   PenSquare,
   LayoutDashboard,
-  Users
+  Users,
 } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 

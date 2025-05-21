@@ -14,7 +14,7 @@ export interface User {
 }
 
 export const getUsers = async () => {
-  const response = await request<{data: User[]} >('admin/users');
+  const response = await request<{ data: User[] }>('admin/users');
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست کاربران رخ داده است');
@@ -24,7 +24,7 @@ export const getUsers = async () => {
 };
 
 export const getUser = async (id: string) => {
-  const response = await request<{data:User}>(`admin/users/${id}`);
+  const response = await request<{ data: User }>(`admin/users/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت کاربر رخ داده است');
