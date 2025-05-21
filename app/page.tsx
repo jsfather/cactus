@@ -1,35 +1,53 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/UserMenu';
-import { cookies } from 'next/headers';
+import { useEffect, useState } from 'react';
+import request from '@/lib/api/httpClient';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
-async function getUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token');
-
-  if (!token) return null;
-
-  try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/profile`,
-      {
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-        },
-      }
-    );
-
-    if (!response.ok) return null;
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    return null;
-  }
+interface UserProfile {
+  id: number;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email: string | null;
+  national_code: string | null;
+  profile_picture: string | null;
 }
 
-export default async function Page() {
-  const user = await getUser();
+export default function Page() {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const token = Cookies.get('authToken');
+        if (!token) {
+          return;
+        }
+
+        const data = await request<{ data: UserProfile }>('profile');
+        setUser(data.data);
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        if (error instanceof Error && error.message.includes('401')) {
+          Cookies.remove('authToken');
+          router.push('/auth/send-otp');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [router]);
 
   return (
     <div dir="rtl" className="bg-gray-50 font-sans text-gray-900">
@@ -86,8 +104,10 @@ export default async function Page() {
                 </svg>
               </span>
             </div>
-            {user ? (
-              <UserMenu userName={user.name} />
+            {loading ? (
+              <div className="h-8 w-24 animate-pulse rounded-md bg-gray-200" />
+            ) : user ? (
+              <UserMenu userName={user.first_name} />
             ) : (
               <Link href="/auth">
                 <Button>ورود / ثبت نام</Button>
