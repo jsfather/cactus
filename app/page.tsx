@@ -107,7 +107,7 @@ export default function Page() {
             {loading ? (
               <div className="h-8 w-24 animate-pulse rounded-md bg-gray-200" />
             ) : user ? (
-              <UserMenu userName={user.first_name} />
+              <UserMenu userName={user.first_name + ' ' + user.last_name} />
             ) : (
               <Link href="/auth">
                 <Button>ورود / ثبت نام</Button>
