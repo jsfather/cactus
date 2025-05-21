@@ -1,7 +1,6 @@
 import Pagination from '@/components/ui/pagination';
 import Search from '@/components/ui/search';
-import Table from '@/components/ui/admin/blogs/table';
-import { CreateBlog } from '@/components/ui/admin/blogs/buttons';
+import Table from '@/components/ui/teacher/tickets/table';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -26,7 +25,6 @@ export default async function Page(props: {
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="جستجوی تیکت" />
-        <CreateBlog />
       </div>
       <Table query={query} currentPage={currentPage} />
       <div className="mt-5 flex w-full justify-center">
