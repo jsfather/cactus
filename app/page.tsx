@@ -89,7 +89,7 @@ export default async function Page() {
             {user ? (
               <UserMenu userName={user.name} />
             ) : (
-              <Link href="/login">
+              <Link href="/auth">
                 <Button>ورود / ثبت نام</Button>
               </Link>
             )}
