@@ -2,7 +2,7 @@
 
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import { LayoutDashboard, BookType, Ticket } from 'lucide-react';
+import { LayoutDashboard, BookType, Ticket, UserCheck } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 import { useEffect, useState } from 'react';
 import request from '@/lib/api/httpClient';
@@ -35,6 +35,11 @@ const menuItems = [
     title: 'تیکت ها',
     href: '/teacher/tickets',
     icon: <Ticket width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'حضور و غیاب',
+    href: '/teacher/attendances',
+    icon: <UserCheck width={17} strokeWidth={1.7} />,
   },
   {
     title: 'ترم ها',
