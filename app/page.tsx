@@ -1,7 +1,33 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { UserMenu } from '@/components/UserMenu';
+import { cookies } from 'next/headers';
 
-export default function Page() {
+async function getUser() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token');
+
+  if (!token) return null;
+
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile`, {
+      headers: {
+        'Authorization': `Bearer ${token.value}`
+      }
+    });
+
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return null;
+  }
+}
+
+export default async function Page() {
+  const user = await getUser();
+
   return (
     <div dir="rtl" className="bg-gray-50 text-gray-900 font-sans">
       {/* Header/Navbar */}
@@ -26,7 +52,13 @@ export default function Page() {
                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" /><path d="M21 21l-2-2" /></svg>
               </span>
             </div>
-            <button className="px-4 py-1 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition shadow">ورود / ثبت نام</button>
+            {user ? (
+              <UserMenu userName={user.name} />
+            ) : (
+              <Link href="/login">
+                <Button>ورود / ثبت نام</Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
