@@ -1,67 +1,53 @@
 import request from '../../httpClient';
 
-export interface Blog {
+export interface Report {
   id: string;
-  title: string;
-  little_description: string;
-  description: string;
-  meta_title: string;
-  meta_description: string;
+  term_id: string;
+  term_teacher_schedule_id: string;
+  content: string;
 }
 
-export const getBlogs = async () => {
-  const response = await request<Blog[]>('admin/blogs');
+export const getReports = async () => {
+  const response = await request<{ data: Report[] }>('teacher/reports');
 
   if (!response) {
-    throw new Error('خطایی در دریافت لیست بلاگ‌ها رخ داده است');
+    throw new Error('خطایی در دریافت لیست گزارش‌ ترم ها رخ داده است');
   }
 
   return response;
 };
 
-export const getBlog = async (id: string) => {
-  const response = await request<Blog>(`admin/blogs/${id}`);
+export const getReport = async (id: string) => {
+  const response = await request<Report>(`teacher/reports/${id}`);
 
   if (!response) {
-    throw new Error('خطایی در دریافت بلاگ رخ داده است');
+    throw new Error('خطایی در دریافت گزارش ترم رخ داده است');
   }
 
   return response;
 };
 
-export const createBlog = async (data: Partial<Blog>) => {
-  const response = await request<Blog>('admin/blogs', {
+export const createReport = async (data: Partial<Report>) => {
+  const response = await request<Report>('teacher/reports', {
     method: 'POST',
     body: JSON.stringify(data),
   });
 
   if (!response) {
-    throw new Error('خطایی در ایجاد بلاگ رخ داده است');
+    throw new Error('خطایی در ایجاد گزارش ترم رخ داده است');
   }
 
   return response;
 };
 
-export const updateBlog = async (id: string, data: Partial<Blog>) => {
-  const response = await request<Blog>(`admin/blogs/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
 
-  if (!response) {
-    throw new Error('خطایی در بروزرسانی بلاگ رخ داده است');
-  }
-
-  return response;
-};
-
-export const deleteBlog = async (id: string) => {
-  const response = await request<Blog>(`admin/blogs/${id}`, {
+export const deleteReport = async (id: string) => {
+  const response = await request<Report>(`teacher/reports/${id}`, {
     method: 'DELETE',
   });
 
   if (!response) {
-    throw new Error('خطایی در حذف بلاگ رخ داده است');
+    throw new Error('خطایی در حذف گزارش ترم رخ داده است');
   }
 
   return response;

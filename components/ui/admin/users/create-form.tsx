@@ -6,6 +6,7 @@ import { createUser, User } from '@/lib/api/panel/admin/users';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
+import { useRef } from 'react';
 
 type FormData = {
   first_name: string;
@@ -15,20 +16,34 @@ type FormData = {
   email: string;
   national_code: string;
   password: string;
-  profile_picture: string;
+  profile_picture: string | null;
 };
 
 export default function Form() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setValue,
+    watch,
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
     try {
-      await createUser(data);
+      const fileInput = fileInputRef.current;
+      let profile_picture: string = '';
+      if (fileInput && fileInput.files && fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        profile_picture = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+      await createUser({ ...data, profile_picture });
       toast.success('کاربر با موفقیت ایجاد شد');
       router.push('/admin/users');
     } catch (error: any) {
@@ -220,7 +235,7 @@ export default function Form() {
                 id="profile_picture"
                 type="file"
                 accept="image/*"
-                {...register('profile_picture')}
+                ref={fileInputRef}
                 className="peer block w-full rounded-md border border-gray-300 py-2 pr-4 text-sm placeholder:text-gray-500 focus:outline-0"
               />
             </div>
