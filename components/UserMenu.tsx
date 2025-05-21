@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
+import LogoutButton from './LogoutButton';
+import { LayoutDashboard , GraduationCap } from 'lucide-react';
 
 interface UserMenuProps {
   userName: string;
@@ -24,44 +25,48 @@ export function UserMenu({ userName }: UserMenuProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        router.refresh();
-        router.push('/');
-      }
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-full p-2 transition hover:bg-gray-100"
+        className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-full transition cursor-pointer"
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 font-semibold text-green-700">
+        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold">
           {userName.charAt(0).toUpperCase()}
         </div>
       </button>
 
       {isOpen && (
-        <div className="ring-opacity-5 absolute left-0 mt-2 w-48 rounded-md bg-white shadow-lg ring-1 ring-black">
-          <div className="py-1">
-            <div className="border-b px-4 py-2 text-sm text-gray-700">
-              {userName}
+        <div className="absolute left-0 mt-2 w-56 rounded-xl bg-white shadow-lg">
+          <div className="py-2">
+            <div className="px-4 py-3 text-sm text-gray-700 border-b border-gray-100">
+              <div className="font-medium">{userName}</div>
+              <div className="text-xs text-gray-500 mt-1">حساب کاربری</div>
             </div>
-            <Button
-              onClick={handleLogout}
-              className="w-full justify-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            <button
+              onClick={() => {
+                router.push('/admin');
+                setIsOpen(false);
+              }}
+              className="hover:bg-gray-50 flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors"
             >
-              خروج
-            </Button>
+              <LayoutDashboard className="mr-3 h-5 w-5 text-green-600" strokeWidth={1.7} />
+              <span>داشبورد ادمین</span>
+            </button>
+            <button
+              onClick={() => {
+                router.push('/teacher');
+                setIsOpen(false);
+              }}
+              className="hover:bg-gray-50 flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors"
+            >
+              <GraduationCap className="mr-3 h-5 w-5 text-green-600" strokeWidth={1.7} />
+              <span>داشبورد مدرس</span>
+            </button>
+            <div className="px-3">
+              <div className="h-px bg-gray-100 my-1" />
+            </div>
+            <LogoutButton />
           </div>
         </div>
       )}

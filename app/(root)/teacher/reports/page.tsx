@@ -1,10 +1,11 @@
 import Pagination from '@/components/ui/pagination';
 import Search from '@/components/ui/search';
-import Table from '@/components/ui/teacher/tickets/table';
+import Table from '@/components/ui/teacher/reports/table';
+import { CreateReport } from '@/components/ui/teacher/reports/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'تیکت',
+  title: 'گزارش ها',
 };
 
 export default async function Page(props: {
@@ -21,10 +22,11 @@ export default async function Page(props: {
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl">تیکت</h1>
+        <h1 className="text-2xl">گزارش ها</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="جستجوی تیکت" />
+        <Search placeholder="جستجوی گزارش" />
+        <CreateReport />
       </div>
       <Table query={query} currentPage={currentPage} />
       <div className="mt-5 flex w-full justify-center">

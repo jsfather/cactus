@@ -13,7 +13,7 @@ export default function LogoutButton() {
     try {
       setLoading(true);
       Cookies.remove('authToken');
-      router.push('/auth/send-otp');
+      window.location.href = '/';
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
