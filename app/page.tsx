@@ -50,7 +50,7 @@ export default function Page() {
   }, [router]);
 
   return (
-    <div dir="rtl" className="bg-gray-50 font-sans text-gray-900">
+    <div dir="rtl" className="bg-gray-50 text-gray-900">
       {/* Header/Navbar */}
       <header
         className="sticky top-0 z-30 w-full border-b border-gray-200 bg-white shadow-sm"
@@ -59,11 +59,11 @@ export default function Page() {
         <div className="container mx-auto flex h-20 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <Image src="/logo.png" alt="لوگو" width={56} height={56} />
-            <span className="text-2xl font-extrabold tracking-tight text-green-700">
+            <span className="text-2xl font-bold tracking-tight text-green-700">
               کاکتوس
             </span>
           </div>
-          <nav className="hidden gap-8 text-base font-semibold md:flex">
+          <nav className="hidden gap-8 text-base  md:flex">
             <Link href="#about" className="transition hover:text-green-600">
               درباره ما
             </Link>
@@ -126,15 +126,15 @@ export default function Page() {
           src="/sample-hero.png"
           alt="hero"
           fill
-          className="rounded-3xl object-cover shadow-xl"
+          className="object-cover shadow-sm"
           style={{ zIndex: 1 }}
         />
         <div
-          className="absolute inset-0 rounded-3xl bg-gradient-to-t from-white/80 to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-white/50 to-transparent"
           style={{ zIndex: 2 }}
         />
         <button
-          className="bg-opacity-90 absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-green-100 bg-white p-7 shadow-2xl transition hover:scale-110"
+          className="bg-opacity-90 absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 rounded-full border-4 border-green-100 bg-white p-7 shadow transition hover:scale-110"
           style={{ zIndex: 3 }}
         >
           <svg
@@ -155,12 +155,12 @@ export default function Page() {
         {stats.map((item, i) => (
           <div
             key={i}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-gray-100 bg-white p-8 shadow-md transition-all duration-200 hover:shadow-lg"
+            className="flex flex-col items-center gap-2 rounded-2xl border border-gray-100 bg-white p-8 shadow-md transition-all duration-200 hover:shadow-sm"
           >
             <div className="mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-green-50 shadow">
               {item.icon}
             </div>
-            <div className="text-3xl font-extrabold text-green-700">
+            <div className="text-3xl font-bold text-green-700">
               {item.value}
             </div>
             <div className="text-base font-medium text-gray-600">
@@ -172,7 +172,7 @@ export default function Page() {
 
       {/* About Us Section */}
       <section id="about" className="container mx-auto py-14">
-        <h2 className="mb-6 text-center text-3xl font-extrabold text-green-700">
+        <h2 className="mb-6 text-center text-3xl font-bold text-green-700">
           درباره ما
         </h2>
         <p className="mx-auto mb-12 max-w-3xl text-center text-lg leading-8 text-gray-700">
@@ -183,7 +183,7 @@ export default function Page() {
           {[1, 2, 3].map((v) => (
             <div
               key={v}
-              className="relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl transition-all duration-200 hover:shadow-2xl md:w-1/3"
+              className="relative aspect-video w-full overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md transition-all duration-200 hover:shadow-2xl md:w-1/3"
             >
               <Image
                 src="/sample-person.jpg"
@@ -210,7 +210,7 @@ export default function Page() {
 
       {/* Course Types Section */}
       <section id="courses" className="container mx-auto py-14">
-        <h2 className="mb-10 text-center text-3xl font-extrabold text-green-700">
+        <h2 className="mb-10 text-center text-3xl font-bold text-green-700">
           دوره‌های آموزشی رایگان
         </h2>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
@@ -238,7 +238,7 @@ export default function Page() {
       {/* Shop Section */}
       <section id="shop" className="container mx-auto py-14">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-3xl font-extrabold text-green-700">فروشگاه</h2>
+          <h2 className="text-3xl font-bold text-green-700">فروشگاه</h2>
           <span className="text-lg font-semibold text-green-600">
             فروش ویژه
           </span>
@@ -272,7 +272,7 @@ export default function Page() {
 
       {/* Blog Section */}
       <section id="blog" className="container mx-auto py-14">
-        <h2 className="mb-8 text-center text-3xl font-extrabold text-green-700">
+        <h2 className="mb-8 text-center text-3xl font-bold text-green-700">
           بلاگ کاکتوس
         </h2>
         <div className="flex gap-8 overflow-x-auto pb-2">

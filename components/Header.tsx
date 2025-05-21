@@ -68,7 +68,7 @@ const Header = () => {
   return (
     <header className="flex h-[80px] flex-row bg-white shadow-xs">
       <div className="flex w-64 items-center justify-center">
-        <Link href="/admin">
+        <Link href="/">
           <Image src="/logo.png" alt="logo" width={56} height={48} />
         </Link>
       </div>
