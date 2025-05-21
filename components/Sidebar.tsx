@@ -29,7 +29,7 @@ export default function Sidebar({ menuItems, user, children }: SidebarProps) {
   };
 
   // Defensive check for avatarUrl
-  let avatarSrc = '/default-avatar.png';
+  let avatarSrc = '/default-avatar.jpg';
   if (user.avatarUrl && (user.avatarUrl.startsWith('http') || user.avatarUrl.startsWith('/'))) {
     avatarSrc = user.avatarUrl;
   }
@@ -37,7 +37,7 @@ export default function Sidebar({ menuItems, user, children }: SidebarProps) {
   return (
     <aside className="flex h-full w-64 flex-col bg-white p-4">
       {/* User avatar section */}
-      <div className="flex flex-col items-center bg-green-100 rounded-xl py-6 mb-4">
+      <div className="flex flex-col items-center bg-primary-200 py-6 mb-4">
         <div className="relative">
           <Image
             src={avatarSrc}
