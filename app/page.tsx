@@ -130,7 +130,7 @@ export default function Page() {
           style={{ zIndex: 1 }}
         />
         <div
-          className="absolute inset-0 bg-gradient-to-t from-white/50 to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent"
           style={{ zIndex: 2 }}
         />
         <button
