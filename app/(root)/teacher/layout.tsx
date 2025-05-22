@@ -2,7 +2,7 @@
 
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import { LayoutDashboard, BookType, Ticket, UserCheck , ChartNoAxesCombined } from 'lucide-react';
+import { LayoutDashboard, BookType, Ticket, UserCheck , ChartNoAxesCombined , TvMinimalPlay , BookOpenCheck , Users } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 import { useEffect, useState } from 'react';
 import request from '@/lib/api/httpClient';
@@ -50,6 +50,21 @@ const menuItems = [
     title: 'گزارش ها',
     href: '/teacher/reports',
     icon: <ChartNoAxesCombined width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'کلاس های آفلاین',
+    href: '/teacher/offline_sessions',
+    icon: <TvMinimalPlay width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'تکلیف ها',
+    href: '/teacher/homeworks',
+    icon: <BookOpenCheck width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'دانش آموزان',
+    href: '/teacher/students',
+    icon: <Users width={17} strokeWidth={1.7} />,
   },
 ];
 

@@ -9,6 +9,9 @@ import {
   PenSquare,
   LayoutDashboard,
   Users,
+  BadgeHelp,
+  UserCheck,
+  ChartNoAxesCombined
 } from 'lucide-react';
 import LogoutButton from '@/components/LogoutButton';
 import { useEffect, useState } from 'react';
@@ -62,6 +65,26 @@ const menuItems = [
     title: 'سوالات متداول',
     href: '/admin/faq',
     icon: <MessageCircleQuestion width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'راهنمای پنل',
+    href: '/admin/panel-guides',
+    icon: <BadgeHelp width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'دانش آموزان',
+    href: '/teacher/students',
+    icon: <Users width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'حضور و غیاب',
+    href: '/teacher/attendances',
+    icon: <UserCheck width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'گزارش ها',
+    href: '/teacher/reports',
+    icon: <ChartNoAxesCombined width={17} strokeWidth={1.7} />,
   },
 ];
 
