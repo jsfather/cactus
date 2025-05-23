@@ -24,7 +24,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       try {
         const data = await getUser(resolvedParams.id);
-        // @ts-ignore
+        // @ts-expect-error
         setUser(data);
       } catch (error) {
         console.error('Failed to fetch user:', error);
