@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import './globals.css';
+import '@/app/ui/globals.css';
+import { dana, danaFaNum } from '@/app/ui/fonts';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
@@ -13,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <body>{children}</body>
+      <body
+        className={`${danaFaNum.variable} ${dana.variable} font-dana-fanum`}
+      >
+        {children}
+      </body>
     </html>
   );
 }
