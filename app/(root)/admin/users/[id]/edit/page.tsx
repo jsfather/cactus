@@ -11,7 +11,7 @@ import { use } from 'react';
 import LoadingSpinner from '@/components/ui/loading-spinner';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const   resolvedParams = use(params);
+  const resolvedParams = use(params);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -23,9 +23,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
 
       try {
-        const data = await getUser(resolvedParams.id);
-        // @ts-expect-error
-        setUser(data);
+        const response = await getUser(resolvedParams.id);
+        setUser(response.data);
       } catch (error) {
         console.error('Failed to fetch user:', error);
         notFound();

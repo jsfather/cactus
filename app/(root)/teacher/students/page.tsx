@@ -1,6 +1,7 @@
 import Pagination from '@/components/ui/pagination';
 import Search from '@/components/ui/search';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'دانش آموزان',
@@ -20,10 +21,14 @@ export default async function Page(props: {
         <h1 className="text-2xl">دانش آموزان</h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="جستجوی دانش آموزان" />
+        <Suspense fallback={<div className="h-10 w-full animate-pulse rounded-md bg-gray-200" />}>
+          <Search placeholder="جستجوی دانش آموزان" />
+        </Suspense>
       </div>
       <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
+        <Suspense fallback={<div className="h-10 animate-pulse rounded-md bg-gray-200 px-4" />}>
+          <Pagination totalPages={totalPages} />
+        </Suspense>
       </div>
     </div>
   );

@@ -16,11 +16,7 @@ type FormData = {
   title: string;
   duration: string;
   number_of_sessions: string;
-  level: {
-    name: string;
-    id: number;
-    label: string;
-  };
+  level_id: string;
   start_date: string;
   end_date: string;
   type: 'normal' | 'capacity_completion' | 'vip';
@@ -45,7 +41,7 @@ export default function EditTermForm({ term }: { term: Term }) {
       title: term.title,
       duration: term.duration,
       number_of_sessions: term.number_of_sessions,
-      level_id: term.level.id.toString(),
+      level_id: term.level_id.toString(),
       start_date: term.start_date,
       end_date: term.end_date,
       type: term.type,
