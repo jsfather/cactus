@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://kaktos.kanoonbartarha.ir/api';
+  process.env.NEXT_PUBLIC_API_BASE_URL || 'https://kaktos.kanoonbartarha.ir/api';
 
 import Cookies from 'js-cookie';
 
