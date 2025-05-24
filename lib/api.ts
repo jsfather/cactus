@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://kaktos.kanoonbartarha.ir/api';
+const API_BASE_URL = 'https://kaktos.kanoonbartarha.ir/api';
 
 export const sendOtp = async (phone: string) => {
   const response = await fetch(`${API_BASE_URL}/send_otp`, {
