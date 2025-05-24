@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { Suspense } from 'react';
 
 export default function Layout({
   children,
@@ -10,7 +11,11 @@ export default function Layout({
       <div className="flex w-1/2 flex-col items-center justify-between p-6">
         <Image src="/logo.png" alt="logo" width={90} height={100} />
         <div className="text-xl font-bold">به مجموعه کاکتوس خوش آمدید.</div>
-        <div className="rounded-xl p-8 shadow-md">{children}</div>
+        <div className="rounded-xl p-8 shadow-md">
+          <Suspense fallback={<div className="h-[300px] w-[400px] animate-pulse rounded-md bg-gray-200" />}>
+            {children}
+          </Suspense>
+        </div>
         <Link href="/" className="flex items-center gap-1 text-sm">
           <div>بازگشت به وبسایت</div>
           <ArrowLeft width={17} strokeWidth={1.7} />
