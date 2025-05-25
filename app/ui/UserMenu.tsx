@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from './LogoutButton';
-import { LayoutDashboard, GraduationCap } from 'lucide-react';
+import { LayoutDashboard, GraduationCap , User } from 'lucide-react';
 
 interface UserMenuProps {
   userName: string;
@@ -68,6 +68,19 @@ export function UserMenu({ userName }: UserMenuProps) {
                 strokeWidth={1.7}
               />
               <span>داشبورد مدرس</span>
+            </button>
+            <button
+              onClick={() => {
+                router.push('/student');
+                setIsOpen(false);
+              }}
+              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              <User
+                className="mr-3 h-5 w-5 text-green-600"
+                strokeWidth={1.7}
+              />
+              <span>داشبورد دانش آموز</span>
             </button>
             <div className="px-3">
               <div className="my-1 h-px bg-gray-100" />
