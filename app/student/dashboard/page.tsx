@@ -1,78 +1,78 @@
 'use client';
 
 import {
-  Users,
-  GraduationCap,
-  Landmark,
+  BookOpenCheck,
+  UserCheck,
+  BookType,
   ArrowUpRight,
-  ArrowDownRight,
   Clock,
   Calendar,
-  BookOpen,
-  ClipboardList,
-  FileText,
+  Ticket,
   MessageSquare,
   Settings,
-  Plus,
 } from 'lucide-react';
 
 const stats = [
   {
-    title: 'کل دانش‌آموزان',
-    value: '۲,۵۴۳',
-    change: '+۱۲٪',
+    title: 'ترم های فعال',
+    value: '۲',
+    change: 'ترم بهار و تابستان',
     trend: 'up',
-    icon: <Users className="h-6 w-6" />,
+    icon: <BookType className="h-6 w-6" />,
   },
   {
-    title: 'دوره‌های فعال',
-    value: '۱۲',
-    change: '+۳٪',
+    title: 'تکالیف باز',
+    value: '۳',
+    change: 'مهلت تا هفته آینده',
     trend: 'up',
-    icon: <GraduationCap className="h-6 w-6" />,
+    icon: <BookOpenCheck className="h-6 w-6" />,
   },
   {
-    title: 'درآمد ماهانه',
-    value: '۱۲,۵۰۰,۰۰۰',
-    change: '-۲٪',
-    trend: 'down',
-    icon: <Landmark className="h-6 w-6" />,
+    title: 'حضور و غیاب',
+    value: '۹۰٪',
+    change: 'حضور در این ترم',
+    trend: 'up',
+    icon: <UserCheck className="h-6 w-6" />,
   },
   {
-    title: 'نمرات ثبت شده',
-    value: '۱۵۶',
-    change: '+۸٪',
+    title: 'تیکت های باز',
+    value: '۱',
+    change: 'در انتظار پاسخ',
     trend: 'up',
-    icon: <FileText className="h-6 w-6" />,
+    icon: <Ticket className="h-6 w-6" />,
   },
 ];
 
 const recentActivities = [
   {
-    title: 'ثبت‌نام جدید',
-    description: 'علی محمدی در دوره رباتیک پیشرفته ثبت‌نام کرد',
+    title: 'تکلیف جدید',
+    description: 'تکلیف جدید برای درس برنامه نویسی اضافه شد',
     time: '۲ ساعت پیش',
-    icon: <Users className="h-5 w-5" />,
+    icon: <BookOpenCheck className="h-5 w-5" />,
   },
   {
-    title: 'ثبت نمره',
-    description: 'نمرات میان‌ترم دوره الکترونیک ثبت شد',
+    title: 'ثبت حضور',
+    description: 'حضور شما در کلاس برنامه نویسی ثبت شد',
     time: '۳ ساعت پیش',
-    icon: <FileText className="h-5 w-5" />,
+    icon: <UserCheck className="h-5 w-5" />,
   },
   {
-    title: 'ثبت حضور و غیاب',
-    description: 'حضور و غیاب کلاس برنامه‌نویسی ثبت شد',
+    title: 'پاسخ تیکت',
+    description: 'به تیکت پشتیبانی شما پاسخ داده شد',
     time: '۵ ساعت پیش',
-    icon: <ClipboardList className="h-5 w-5" />,
+    icon: <Ticket className="h-5 w-5" />,
   },
 ];
 
-const terms = [
+const currentTerms = [
   {
     title: 'ترم بهار ۱۴۰۳',
     status: 'فعال',
-    students: 45,
+    courses: [
+      'برنامه نویسی پیشرفته',
+      'ریاضی مهندسی',
+      'مدارهای منطقی'
+    ],
     progress: 75,
     startDate: '۱۴۰۳/۰۱/۰۱',
     endDate: '۱۴۰۳/۰۳/۳۱',
@@ -80,7 +80,10 @@ const terms = [
   {
     title: 'ترم تابستان ۱۴۰۳',
     status: 'در انتظار',
-    students: 32,
+    courses: [
+      'کارآموزی',
+      'پروژه نرم افزار'
+    ],
     progress: 0,
     startDate: '۱۴۰۳/۰۴/۰۱',
     endDate: '۱۴۰۳/۰۶/۳۱',
@@ -91,7 +94,7 @@ const Page = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">داشبورد استاد</h1>
+        <h1 className="text-2xl font-bold">داشبورد دانشجو</h1>
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <Clock className="h-4 w-4" />
           <span>آخرین بروزرسانی: ۵ دقیقه پیش</span>
@@ -109,18 +112,7 @@ const Page = () => {
               <p className="text-sm text-gray-500">{stat.title}</p>
               <p className="text-2xl font-semibold">{stat.value}</p>
               <div className="flex items-center gap-1">
-                {stat.trend === 'up' ? (
-                  <ArrowUpRight className="h-4 w-4 text-green-500" />
-                ) : (
-                  <ArrowDownRight className="h-4 w-4 text-red-500" />
-                )}
-                <span
-                  className={`text-sm ${
-                    stat.trend === 'up' ? 'text-green-500' : 'text-red-500'
-                  }`}
-                >
-                  {stat.change}
-                </span>
+                <span className="text-sm text-gray-600">{stat.change}</span>
               </div>
             </div>
             <div className="bg-primary-100 text-primary-600 rounded-full p-3">
@@ -161,17 +153,11 @@ const Page = () => {
             </div>
           </div>
 
-          {/* Terms Section */}
+          {/* Current Terms Section */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">ترم‌های فعال</h2>
-              <button className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700">
-                <Plus className="h-4 w-4" />
-                <span>ترم جدید</span>
-              </button>
-            </div>
+            <h2 className="mb-4 text-lg font-semibold">ترم‌های جاری</h2>
             <div className="space-y-4">
-              {terms.map((term) => (
+              {currentTerms.map((term) => (
                 <div
                   key={term.title}
                   className="rounded-lg border border-gray-100 p-4"
@@ -188,19 +174,13 @@ const Page = () => {
                       {term.status}
                     </span>
                   </div>
-                  <div className="mb-3 grid grid-cols-3 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-500">تعداد دانش‌آموزان</p>
-                      <p className="font-medium">{term.students} نفر</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">تاریخ شروع</p>
-                      <p className="font-medium">{term.startDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500">تاریخ پایان</p>
-                      <p className="font-medium">{term.endDate}</p>
-                    </div>
+                  <div className="mb-3 text-sm">
+                    <p className="text-gray-500 mb-2">دروس این ترم:</p>
+                    <ul className="list-disc list-inside space-y-1">
+                      {term.courses.map((course, index) => (
+                        <li key={index} className="text-gray-700">{course}</li>
+                      ))}
+                    </ul>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
@@ -227,23 +207,23 @@ const Page = () => {
             <h2 className="mb-4 text-lg font-semibold">دسترسی سریع</h2>
             <div className="space-y-3">
               <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
-                <span>ثبت حضور و غیاب</span>
-                <ClipboardList className="h-5 w-5" />
+                <span>مشاهده تکالیف</span>
+                <BookOpenCheck className="h-5 w-5" />
               </button>
               <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
-                <span>ثبت نمرات</span>
-                <FileText className="h-5 w-5" />
+                <span>حضور و غیاب</span>
+                <UserCheck className="h-5 w-5" />
               </button>
               <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
                 <span>برنامه کلاس‌ها</span>
                 <Calendar className="h-5 w-5" />
               </button>
               <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
-                <span>محتواهای آموزشی</span>
-                <BookOpen className="h-5 w-5" />
+                <span>ارسال تیکت</span>
+                <Ticket className="h-5 w-5" />
               </button>
               <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
-                <span>پیام‌های دانش‌آموزان</span>
+                <span>پیام‌های من</span>
                 <MessageSquare className="h-5 w-5" />
               </button>
               <button className="bg-primary-50 text-primary-600 hover:bg-primary-100 flex w-full items-center justify-between rounded-lg p-3 transition-colors">
@@ -253,20 +233,20 @@ const Page = () => {
             </div>
           </div>
 
-          {/* Upcoming Classes */}
+          {/* Today's Classes */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-lg font-semibold">کلاس‌های امروز</h2>
             <div className="space-y-4">
               <div className="rounded-lg border border-gray-100 p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="font-medium">رباتیک پیشرفته</h3>
+                  <h3 className="font-medium">برنامه نویسی پیشرفته</h3>
                   <span className="text-sm text-gray-500">۱۰:۰۰ - ۱۲:۰۰</span>
                 </div>
                 <p className="text-sm text-gray-500">کلاس ۳۰۱ - طبقه سوم</p>
               </div>
               <div className="rounded-lg border border-gray-100 p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="font-medium">برنامه‌نویسی مقدماتی</h3>
+                  <h3 className="font-medium">ریاضی مهندسی</h3>
                   <span className="text-sm text-gray-500">۱۴:۰۰ - ۱۶:۰۰</span>
                 </div>
                 <p className="text-sm text-gray-500">کلاس ۲۰۲ - طبقه دوم</p>
