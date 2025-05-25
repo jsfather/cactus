@@ -2,55 +2,54 @@
 
 import Header from '@/app/ui/Header';
 import Sidebar from '@/app/ui/Sidebar';
-import { LayoutDashboard, Users, GraduationCap, Landmark } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  GraduationCap,
+  Landmark,
+  Ticket,
+  UserCheck,
+  BookType,
+  BookOpenCheck,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import request from '@/app/lib/api/client';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/app/ui/LogoutButton';
-
-interface UserFile {
-  type: 'certificate' | 'national_card';
-  file_path: string;
-}
-
-interface UserProfile {
-  id: number;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  email: string | null;
-  national_code: string | null;
-  profile_picture: string | null;
-  files: UserFile[];
-}
+import { User } from '@/app/lib/types';
 
 const menuItems = [
   {
     title: 'داشبورد',
-    href: '/admin/dashboard',
+    href: '/student/dashboard',
     icon: <LayoutDashboard width={17} strokeWidth={1.7} />,
   },
   {
-    title: 'کاربران',
-    href: '/admin/users',
-    icon: <Users width={17} strokeWidth={1.7} />,
+    title: 'تیکت ها',
+    href: '/student/tickets',
+    icon: <Ticket width={17} strokeWidth={1.7} />,
   },
   {
-    title: 'آموزش',
-    href: '/admin/education',
-    icon: <GraduationCap width={17} strokeWidth={1.7} />,
+    title: 'حضور و غیاب',
+    href: '/student/attendances',
+    icon: <UserCheck width={17} strokeWidth={1.7} />,
   },
   {
-    title: 'مالی',
-    href: '/admin/financial',
-    icon: <Landmark width={17} strokeWidth={1.7} />,
+    title: 'ترم ها',
+    href: '/student/terms',
+    icon: <BookType width={17} strokeWidth={1.7} />,
+  },
+  {
+    title: 'تکلیف ها',
+    href: '/student/homeworks',
+    icon: <BookOpenCheck width={17} strokeWidth={1.7} />,
   },
 ];
 
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -65,14 +64,16 @@ export default function Layout({
           router.push('/auth/send-otp');
           return;
         }
-        const data = await request<{ data: UserProfile }>('profile');
+        const data = await request<{ data: User }>('profile');
         setUserProfile(data.data);
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
           localStorage.removeItem('authToken');
           router.push('/auth/send-otp');
         } else {
-          setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
+          setError(
+            error instanceof Error ? error.message : 'خطا در دریافت اطلاعات'
+          );
         }
       } finally {
         setLoading(false);
@@ -98,9 +99,9 @@ export default function Layout({
             <LogoutButton />
           </Sidebar>
         ) : (
-          <div className="w-64 bg-white p-4 flex flex-col items-center justify-center">
-            <div className="h-20 w-20 rounded-full bg-gray-200 animate-pulse mb-4" />
-            <div className="h-4 w-32 bg-gray-200 animate-pulse rounded mb-2" />
+          <div className="flex w-64 flex-col items-center justify-center bg-white p-4">
+            <div className="mb-4 h-20 w-20 animate-pulse rounded-full bg-gray-200" />
+            <div className="mb-2 h-4 w-32 animate-pulse rounded bg-gray-200" />
           </div>
         )}
         <main className="flex-1 overflow-y-auto p-4">{children}</main>

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 

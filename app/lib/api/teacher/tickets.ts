@@ -1,7 +1,6 @@
 import request from '@/app/lib/api/client';
 import { Reply, Ticket } from '@/app/lib/types';
 
-
 export const getTickets = async () => {
   const response = await request<{ data: Ticket[] }>('teacher/tickets');
 

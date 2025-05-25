@@ -5,7 +5,7 @@ import { CreateAttendance } from '@/components/ui/teacher/attendances/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'حضور و غیاب', 
+  title: 'حضور و غیاب',
 };
 
 export default async function Page(props: {

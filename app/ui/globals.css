@@ -1,12 +1,12 @@
 @import 'tailwindcss';
 
 @theme {
-    --color-primary-100: #f2fee8;
-    --color-primary-200: #e7fdd4;
-    --color-primary-300: #cafcab;
-    --color-primary-400: #a5f780;
-    --color-primary-500: #39ff14;
-    --color-primary-600: #4ae72d;
-    --font-dana: var(--font-dana);
-    --font-dana-fanum: var(--font-dana-fanum);
+  --color-primary-100: #f2fee8;
+  --color-primary-200: #e7fdd4;
+  --color-primary-300: #cafcab;
+  --color-primary-400: #a5f780;
+  --color-primary-500: #39ff14;
+  --color-primary-600: #4ae72d;
+  --font-dana: var(--font-dana);
+  --font-dana-fanum: var(--font-dana-fanum);
 }

@@ -30,14 +30,17 @@ export default function Sidebar({ menuItems, user, children }: SidebarProps) {
 
   // Defensive check for avatarUrl
   let avatarSrc = '/default-avatar.jpg';
-  if (user.avatarUrl && (user.avatarUrl.startsWith('http') || user.avatarUrl.startsWith('/'))) {
+  if (
+    user.avatarUrl &&
+    (user.avatarUrl.startsWith('http') || user.avatarUrl.startsWith('/'))
+  ) {
     avatarSrc = user.avatarUrl;
   }
 
   return (
     <aside className="flex h-full w-64 flex-col bg-white p-4">
       {/* User avatar section */}
-      <div className="flex flex-col items-center bg-primary-200 py-6 mb-4">
+      <div className="bg-primary-200 mb-4 flex flex-col items-center py-6">
         <div className="relative">
           <Image
             src={avatarSrc}
@@ -47,9 +50,11 @@ export default function Sidebar({ menuItems, user, children }: SidebarProps) {
             className="rounded-full border-4 border-white shadow-md"
           />
           {/* Green dot */}
-          <span className="absolute bottom-1 right-1 block h-4 w-4 rounded-full border-2 border-white bg-green-500"></span>
+          <span className="absolute right-1 bottom-1 block h-4 w-4 rounded-full border-2 border-white bg-green-500"></span>
         </div>
-        <div className="mt-2 text-lg font-semibold text-gray-900">{user.name}</div>
+        <div className="mt-2 text-lg font-semibold text-gray-900">
+          {user.name}
+        </div>
       </div>
       {/* Menu items */}
       <div className="flex-1 space-y-2 overflow-y-auto">

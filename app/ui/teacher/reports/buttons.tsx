@@ -19,7 +19,6 @@ export function CreateReport() {
   );
 }
 
-
 export function DeleteReport({ id }: { id: string }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

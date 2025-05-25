@@ -2,7 +2,10 @@
 
 import Form from '@/components/ui/teacher/offline_sessions/edit-form';
 import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { getOfflineSession, OfflineSession } from '@/lib/api/panel/teacher/offline_sessions';
+import {
+  getOfflineSession,
+  OfflineSession,
+} from '@/lib/api/panel/teacher/offline_sessions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -11,7 +14,9 @@ import LoadingSpinner from '@/components/ui/loading-spinner';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const [offlineSession, setOfflineSession] = useState<OfflineSession | null>(null);
+  const [offlineSession, setOfflineSession] = useState<OfflineSession | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

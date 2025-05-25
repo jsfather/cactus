@@ -1,4 +1,4 @@
-import { User , Term , Schedule } from '@/app/lib/types';
+import { User, Term, Schedule } from '@/app/lib/types';
 
 export interface Attendance {
   id: number;

@@ -12,7 +12,11 @@ export default function Layout({
         <Image src="/logo.png" alt="logo" width={90} height={100} />
         <div className="text-xl font-bold">به مجموعه کاکتوس خوش آمدید.</div>
         <div className="rounded-xl p-8 shadow-md">
-          <Suspense fallback={<div className="h-[300px] w-[400px] animate-pulse rounded-md bg-gray-200" />}>
+          <Suspense
+            fallback={
+              <div className="h-[300px] w-[400px] animate-pulse rounded-md bg-gray-200" />
+            }
+          >
             {children}
           </Suspense>
         </div>

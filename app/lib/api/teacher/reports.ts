@@ -1,7 +1,6 @@
 import request from '@/app/lib/api/client';
 import { Report } from '@/app/lib/types';
 
-
 export const getReports = async () => {
   const response = await request<{ data: Report[] }>('teacher/reports');
 
@@ -34,7 +33,6 @@ export const createReport = async (data: Partial<Report>) => {
 
   return response;
 };
-
 
 export const deleteReport = async (id: string) => {
   const response = await request<Report>(`teacher/reports/${id}`, {
