@@ -1,10 +1,9 @@
 'use client';
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { verifyOtp } from '@/lib/api';
+import { verifyOTP } from '@/app/lib/api/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Cookies from 'js-cookie';
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
@@ -20,8 +19,8 @@ export default function VerifyOtpPage() {
     setError('');
 
     try {
-      const result = await verifyOtp(identifier, '1234567890', otp);
-      Cookies.set('authToken', result.token, { expires: 28 });
+      const result = await verifyOTP(identifier, '1234567890', otp);
+      localStorage.setItem('authToken', result.token);
       router.push('/admin');
     } catch (err) {
       console.log(err);

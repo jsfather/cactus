@@ -1,7 +1,7 @@
-import Pagination from '@/components/ui/pagination';
-import Search from '@/components/ui/search';
-import Table from '@/components/ui/admin/exams/table';
-import { CreateExam } from '@/components/ui/admin/exams/buttons';
+import Pagination from '@/app/ui/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/admin/exams/table';
+import { CreateExam } from '@/app/ui/admin/exams/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

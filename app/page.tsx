@@ -2,11 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { UserMenu } from '@/components/UserMenu';
+import { Button } from '@/app/ui/button';
+import { UserMenu } from '@/app/ui/UserMenu';
 import { useEffect, useState } from 'react';
-import request from '@/lib/api/httpClient';
-import Cookies from 'js-cookie';
+import request from '@/app/lib/api/client';
 import { useRouter } from 'next/navigation';
 
 interface UserProfile {
@@ -28,7 +27,8 @@ export default function Page() {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const token = Cookies.get('authToken');
+        const token = localStorage.getItem('authToken');
+
         if (!token) {
           return;
         }
@@ -38,7 +38,7 @@ export default function Page() {
       } catch (error) {
         console.error('Error fetching profile:', error);
         if (error instanceof Error && error.message.includes('401')) {
-          Cookies.remove('authToken');
+          localStorage.removeItem('authToken');
           router.push('/auth/send-otp');
         }
       } finally {
@@ -63,7 +63,7 @@ export default function Page() {
               کاکتوس
             </span>
           </div>
-          <nav className="hidden gap-8 text-base  md:flex">
+          <nav className="hidden gap-8 text-base md:flex">
             <Link href="#about" className="transition hover:text-green-600">
               درباره ما
             </Link>

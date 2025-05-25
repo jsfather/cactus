@@ -1,12 +1,11 @@
 'use client';
 
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
+import Header from '@/app/ui/Header';
+import Sidebar from '@/app/ui/Sidebar';
 import { LayoutDashboard, BookType, Ticket, UserCheck , ChartNoAxesCombined , TvMinimalPlay , BookOpenCheck , Users } from 'lucide-react';
-import LogoutButton from '@/components/LogoutButton';
+import LogoutButton from '@/app/ui/LogoutButton';
 import { useEffect, useState } from 'react';
-import request from '@/lib/api/httpClient';
-import Cookies from 'js-cookie';
+import request from '@/app/lib/api/client';
 import { useRouter } from 'next/navigation';
 
 interface UserFile {
@@ -81,7 +80,7 @@ export default function Layout({
       try {
         setLoading(true);
         setError(null);
-        const token = Cookies.get('authToken');
+        const token = localStorage.getItem('authToken');
         if (!token) {
           router.push('/auth/send-otp');
           return;
@@ -90,7 +89,7 @@ export default function Layout({
         setUserProfile(data.data);
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          Cookies.remove('authToken');
+          localStorage.getItem('authToken');
           router.push('/auth/send-otp');
         } else {
           setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');

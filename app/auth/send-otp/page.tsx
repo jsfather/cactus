@@ -1,6 +1,7 @@
 'use client';
+
 import { useState } from 'react';
-import { sendOtp } from '@/lib/api';
+import { sendOTP } from '@/app/lib/api/auth';
 import { useRouter } from 'next/navigation';
 
 export default function SendOtpPage() {
@@ -15,7 +16,7 @@ export default function SendOtpPage() {
     setError('');
 
     try {
-      await sendOtp(identifier).then((res) => {
+      await sendOTP(identifier).then((res) => {
         router.push(
           `/auth/verify-otp?identifier=${encodeURIComponent(identifier)}&otp=${encodeURIComponent(res.data.otp)}`
         );

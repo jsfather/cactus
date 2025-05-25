@@ -1,13 +1,12 @@
 'use client';
 
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
+import Header from '@/app/ui/Header';
+import Sidebar from '@/app/ui/Sidebar';
 import { LayoutDashboard, Users, GraduationCap, Landmark } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import request from '@/lib/api/httpClient';
-import Cookies from 'js-cookie';
+import request from '@/app/lib/api/client';
 import { useRouter } from 'next/navigation';
-import LogoutButton from '@/components/LogoutButton';
+import LogoutButton from '@/app/ui/LogoutButton';
 
 interface UserFile {
   type: 'certificate' | 'national_card';
@@ -61,7 +60,7 @@ export default function Layout({
       try {
         setLoading(true);
         setError(null);
-        const token = Cookies.get('authToken');
+        const token = localStorage.getItem('authToken');
         if (!token) {
           router.push('/auth/send-otp');
           return;
@@ -70,7 +69,7 @@ export default function Layout({
         setUserProfile(data.data);
       } catch (error) {
         if (error instanceof Error && error.message.includes('401')) {
-          Cookies.remove('authToken');
+          localStorage.removeItem('authToken');
           router.push('/auth/send-otp');
         } else {
           setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
