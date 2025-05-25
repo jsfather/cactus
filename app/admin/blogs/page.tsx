@@ -1,7 +1,7 @@
-import Pagination from '@/components/ui/pagination';
-import Search from '@/components/ui/search';
-import Table from '@/components/ui/admin/blogs/table';
-import { CreateBlog } from '@/components/ui/admin/blogs/buttons';
+import Pagination from '@/app/ui/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/admin/blogs/table';
+import { CreateBlog } from '@/app/ui/admin/blogs/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

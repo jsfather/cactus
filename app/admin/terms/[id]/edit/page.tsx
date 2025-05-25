@@ -1,9 +1,9 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
-import Form from '@/components/ui/admin/terms/edit-form';
-import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { getTerm } from '@/lib/api/panel/admin/terms';
+import Form from '@/app/ui/admin/terms/edit-form';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
+import { getTerm } from '@/app/lib/api/admin/terms';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 

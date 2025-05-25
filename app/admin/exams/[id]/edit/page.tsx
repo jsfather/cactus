@@ -1,14 +1,14 @@
 'use client';
 
-import Form from '@/components/ui/admin/exams/edit-form';
-import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { getExam } from '@/lib/api/panel/admin/exams';
+import Form from '@/app/ui/admin/exams/edit-form';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
+import { getExam } from '@/app/lib/api/admin/exams';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Exam } from '@/lib/api/panel/admin/exams';
+import { Exam } from '@/app/lib/types';
 import { Toaster } from 'react-hot-toast';
 import { use } from 'react';
-import LoadingSpinner from '@/components/ui/loading-spinner';
+import LoadingSpinner from '@/app/ui/loading-spinner';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);

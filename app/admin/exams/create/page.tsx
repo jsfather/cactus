@@ -1,7 +1,7 @@
 'use client';
 
-import Form from '@/components/ui/admin/exams/create-form';
-import Breadcrumbs from '@/components/ui/breadcrumbs';
+import Form from '@/app/ui/admin/exams/create-form';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
 import { Toaster } from 'react-hot-toast';
 
 export default function Page() {

@@ -1,7 +1,7 @@
-import Pagination from '@/components/ui/pagination';
-import Search from '@/components/ui/search';
-import Table from '@/components/ui/admin/users/table';
-import { CreateUser } from '@/components/ui/admin/users/buttons';
+import Pagination from '@/app/ui/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/admin/users/table';
+import { CreateUser } from '@/app/ui/admin/users/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
