@@ -1,5 +1,5 @@
-import Pagination from '@/components/ui/pagination';
-import Search from '@/components/ui/search';
+import Pagination from '@/app/ui/pagination';
+import Search from '@/app/ui/search';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 

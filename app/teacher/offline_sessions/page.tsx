@@ -1,7 +1,7 @@
-import Pagination from '@/components/ui/pagination';
-import Search from '@/components/ui/search';
-import Table from '@/components/ui/teacher/offline_sessions/table';
-import { CreateOfflineSession } from '@/components/ui/teacher/offline_sessions/buttons';
+import Pagination from '@/app/ui/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/teacher/offline_sessions/table';
+import { CreateOfflineSession } from '@/app/ui/teacher/offline_sessions/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

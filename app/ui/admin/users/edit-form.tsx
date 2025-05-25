@@ -1,19 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { updateUser, User } from '@/lib/api/panel/admin/users';
+import { Button } from '@/app/ui/button';
+import { updateUser } from '@/app/lib/api/admin/users';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
+import { User } from '@/app/lib/types';
 
 type FormData = {
   first_name: string;
   last_name: string;
   username: string;
   phone: string;
-  email: string;
-  national_code: string;
+  email?: string | null;
+  national_code?: string | null;
   password?: string;
   profile_picture?: string;
 };
@@ -28,7 +29,6 @@ export default function Form({ user }: { user: User }) {
     defaultValues: {
       first_name: user.first_name,
       last_name: user.last_name,
-      username: user.username,
       phone: user.phone,
       email: user.email,
       national_code: user.national_code,

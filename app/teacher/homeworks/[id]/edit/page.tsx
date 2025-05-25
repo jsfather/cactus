@@ -1,14 +1,14 @@
 'use client';
 
-import Form from '@/components/ui/admin/blogs/edit-form';
-import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { getBlog } from '@/lib/api/panel/admin/blogs';
+import Form from '@/app/ui/admin/blogs/edit-form';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
+import { getBlog } from '@/app/lib/api/admin/blogs';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Blog } from '@/lib/api/panel/admin/blogs';
+import { Blog } from '@/app/lib/types';
 import { Toaster } from 'react-hot-toast';
 import { use } from 'react';
-import LoadingSpinner from '@/components/ui/loading-spinner';
+import LoadingSpinner from '@/app/ui/loading-spinner';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
