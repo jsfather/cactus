@@ -29,7 +29,9 @@ type FormData = {
 
 export default function Form() {
   const router = useRouter();
-  const [status, setStatus] = useState<'present' | 'absent' | 'late'>('present');
+  const [status, setStatus] = useState<'present' | 'absent' | 'late'>(
+    'present'
+  );
   const {
     register,
     handleSubmit,
@@ -64,43 +66,63 @@ export default function Form() {
         {/* Student and Schedule Row */}
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label htmlFor="student_id" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="student_id"
+              className="mb-2 block text-sm font-medium"
+            >
               دانش‌آموز <span className="text-red-500">*</span>
             </label>
             <select
               id="student_id"
-              {...register('student_id', { required: 'انتخاب دانش‌آموز الزامی است', valueAsNumber: true })}
+              {...register('student_id', {
+                required: 'انتخاب دانش‌آموز الزامی است',
+                valueAsNumber: true,
+              })}
               className={`peer block w-full rounded-md border py-2 pr-4 text-sm focus:outline-0 ${
                 errors.student_id ? 'border-red-500' : 'border-gray-300'
               }`}
             >
               <option value="">انتخاب کنید</option>
               {students.map((s) => (
-                <option key={s.id} value={s.id}>{s.name}</option>
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
               ))}
             </select>
             {errors.student_id && (
-              <p className="mt-1 text-sm text-red-500">{errors.student_id.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.student_id.message}
+              </p>
             )}
           </div>
           <div>
-            <label htmlFor="schedule_id" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="schedule_id"
+              className="mb-2 block text-sm font-medium"
+            >
               جلسه <span className="text-red-500">*</span>
             </label>
             <select
               id="schedule_id"
-              {...register('schedule_id', { required: 'انتخاب جلسه الزامی است', valueAsNumber: true })}
+              {...register('schedule_id', {
+                required: 'انتخاب جلسه الزامی است',
+                valueAsNumber: true,
+              })}
               className={`peer block w-full rounded-md border py-2 pr-4 text-sm focus:outline-0 ${
                 errors.schedule_id ? 'border-red-500' : 'border-gray-300'
               }`}
             >
               <option value="">انتخاب کنید</option>
               {schedules.map((s) => (
-                <option key={s.id} value={s.id}>{s.label}</option>
+                <option key={s.id} value={s.id}>
+                  {s.label}
+                </option>
               ))}
             </select>
             {errors.schedule_id && (
-              <p className="mt-1 text-sm text-red-500">{errors.schedule_id.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.schedule_id.message}
+              </p>
             )}
           </div>
         </div>
@@ -124,7 +146,9 @@ export default function Form() {
               <option value="late">دیرکرد</option>
             </select>
             {errors.status && (
-              <p className="mt-1 text-sm text-red-500">{errors.status.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.status.message}
+              </p>
             )}
           </div>
           <div>
@@ -147,18 +171,25 @@ export default function Form() {
         {/* Absence Reason Row (only if absent) */}
         {selectedStatus === 'absent' && (
           <div className="mb-4">
-            <label htmlFor="absence_reason" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="absence_reason"
+              className="mb-2 block text-sm font-medium"
+            >
               دلیل غیبت
             </label>
             <input
               id="absence_reason"
-              {...register('absence_reason', { required: 'دلیل غیبت الزامی است' })}
+              {...register('absence_reason', {
+                required: 'دلیل غیبت الزامی است',
+              })}
               className={`peer block w-full rounded-md border py-2 pr-4 text-sm focus:outline-0 ${
                 errors.absence_reason ? 'border-red-500' : 'border-gray-300'
               }`}
             />
             {errors.absence_reason && (
-              <p className="mt-1 text-sm text-red-500">{errors.absence_reason.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.absence_reason.message}
+              </p>
             )}
           </div>
         )}

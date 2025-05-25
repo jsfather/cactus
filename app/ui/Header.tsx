@@ -4,24 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Bell, Search, CircleHelp } from 'lucide-react';
 import moment from 'jalali-moment';
+import { User } from '@/app/lib/types';
 
-interface UserFile {
-  type: 'certificate' | 'national_card';
-  file_path: string;
-}
 
-interface UserProfile {
-  id: number;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  email: string | null;
-  national_code: string | null;
-  profile_picture: string | null;
-  files: UserFile[];
-}
-
-const Header = ({ user }: { user: UserProfile | null }) => {
+const Header = ({ user }: { user: User | null }) => {
   const formattedDate = moment().locale('fa').format('dddd، D MMMM YYYY');
 
   return (

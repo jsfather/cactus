@@ -21,7 +21,10 @@ export const verifyOTP = async (
   const response = await request<{
     message: string;
     token: string;
-  }>('verify_otp', { method: 'POST', body: JSON.stringify({ phone , password , otp }) });
+  }>('verify_otp', {
+    method: 'POST',
+    body: JSON.stringify({ phone, password, otp }),
+  });
 
   if (!response) {
     throw new Error('خطایی در تایید کد رخ داده است');

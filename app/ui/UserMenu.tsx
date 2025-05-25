@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from './LogoutButton';
-import { LayoutDashboard , GraduationCap } from 'lucide-react';
+import { LayoutDashboard, GraduationCap } from 'lucide-react';
 
 interface UserMenuProps {
   userName: string;
@@ -29,9 +29,9 @@ export function UserMenu({ userName }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 hover:bg-gray-100 p-2 rounded-full transition cursor-pointer"
+        className="flex cursor-pointer items-center gap-2 rounded-full p-2 transition hover:bg-gray-100"
       >
-        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 font-semibold text-green-700">
           {userName.charAt(0).toUpperCase()}
         </div>
       </button>
@@ -39,18 +39,21 @@ export function UserMenu({ userName }: UserMenuProps) {
       {isOpen && (
         <div className="absolute left-0 mt-2 w-56 rounded-xl bg-white shadow-lg">
           <div className="py-2">
-            <div className="px-4 py-3 text-sm text-gray-700 border-b border-gray-100">
+            <div className="border-b border-gray-100 px-4 py-3 text-sm text-gray-700">
               <div className="font-medium">{userName}</div>
-              <div className="text-xs text-gray-500 mt-1">حساب کاربری</div>
+              <div className="mt-1 text-xs text-gray-500">حساب کاربری</div>
             </div>
             <button
               onClick={() => {
                 router.push('/admin');
                 setIsOpen(false);
               }}
-              className="hover:bg-gray-50 flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors"
+              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors hover:bg-gray-50"
             >
-              <LayoutDashboard className="mr-3 h-5 w-5 text-green-600" strokeWidth={1.7} />
+              <LayoutDashboard
+                className="mr-3 h-5 w-5 text-green-600"
+                strokeWidth={1.7}
+              />
               <span>داشبورد ادمین</span>
             </button>
             <button
@@ -58,13 +61,16 @@ export function UserMenu({ userName }: UserMenuProps) {
                 router.push('/teacher');
                 setIsOpen(false);
               }}
-              className="hover:bg-gray-50 flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors"
+              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors hover:bg-gray-50"
             >
-              <GraduationCap className="mr-3 h-5 w-5 text-green-600" strokeWidth={1.7} />
+              <GraduationCap
+                className="mr-3 h-5 w-5 text-green-600"
+                strokeWidth={1.7}
+              />
               <span>داشبورد مدرس</span>
             </button>
             <div className="px-3">
-              <div className="h-px bg-gray-100 my-1" />
+              <div className="my-1 h-px bg-gray-100" />
             </div>
             <LogoutButton />
           </div>

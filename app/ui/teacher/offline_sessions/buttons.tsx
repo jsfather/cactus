@@ -58,7 +58,7 @@ export function DeleteOfflineSession({ id }: { id: string }) {
         <span className="sr-only">Delete</span>
         <TrashIcon className="w-5" />
       </button>
-    
+
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

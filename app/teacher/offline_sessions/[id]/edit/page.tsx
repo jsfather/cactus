@@ -1,17 +1,22 @@
 'use client';
 
-import Form from '@/components/ui/teacher/offline_sessions/edit-form';
-import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { getOfflineSession, OfflineSession } from '@/lib/api/panel/teacher/offline_sessions';
+import Form from '@/app/ui/teacher/offline_sessions/edit-form';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
+import {
+  getOfflineSession,
+} from '@/app/lib/api/teacher/offline_sessions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { use } from 'react';
-import LoadingSpinner from '@/components/ui/loading-spinner';
+import LoadingSpinner from '@/app/ui/loading-spinner';
+import { OfflineSession } from '@/app/lib/types';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const [offlineSession, setOfflineSession] = useState<OfflineSession | null>(null);
+  const [offlineSession, setOfflineSession] = useState<OfflineSession | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

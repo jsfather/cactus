@@ -1,8 +1,8 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
-import Breadcrumbs from '@/components/ui/breadcrumbs';
-import { getTerm } from '@/lib/api/panel/admin/terms';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
+import { getTerm } from '@/app/lib/api/admin/terms';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
 

@@ -5,7 +5,10 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Ticket } from '@/app/lib/types';
 
-export default function TicketsTable({}: { query: string; currentPage: number }) {
+export default function TicketsTable({}: {
+  query: string;
+  currentPage: number;
+}) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -118,9 +121,7 @@ export default function TicketsTable({}: { query: string; currentPage: number })
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
                     <div>
-                      <p className="text-xl font-medium">
-                        {ticket.status}
-                      </p>
+                      <p className="text-xl font-medium">{ticket.status}</p>
                       <p className="mt-2 text-sm text-gray-500">
                         {ticket.department}
                       </p>

@@ -2,7 +2,16 @@
 
 import Header from '@/app/ui/Header';
 import Sidebar from '@/app/ui/Sidebar';
-import { LayoutDashboard, BookType, Ticket, UserCheck , ChartNoAxesCombined , TvMinimalPlay , BookOpenCheck , Users } from 'lucide-react';
+import {
+  LayoutDashboard,
+  BookType,
+  Ticket,
+  UserCheck,
+  ChartNoAxesCombined,
+  TvMinimalPlay,
+  BookOpenCheck,
+  Users,
+} from 'lucide-react';
 import LogoutButton from '@/app/ui/LogoutButton';
 import { useEffect, useState } from 'react';
 import request from '@/app/lib/api/client';
@@ -92,7 +101,9 @@ export default function Layout({
           localStorage.getItem('authToken');
           router.push('/auth/send-otp');
         } else {
-          setError(error instanceof Error ? error.message : 'خطا در دریافت اطلاعات');
+          setError(
+            error instanceof Error ? error.message : 'خطا در دریافت اطلاعات'
+          );
         }
       } finally {
         setLoading(false);
@@ -118,9 +129,9 @@ export default function Layout({
             <LogoutButton />
           </Sidebar>
         ) : (
-          <div className="w-64 bg-white p-4 flex flex-col items-center justify-center">
-            <div className="h-20 w-20 rounded-full bg-gray-200 animate-pulse mb-4" />
-            <div className="h-4 w-32 bg-gray-200 animate-pulse rounded mb-2" />
+          <div className="flex w-64 flex-col items-center justify-center bg-white p-4">
+            <div className="mb-4 h-20 w-20 animate-pulse rounded-full bg-gray-200" />
+            <div className="mb-2 h-4 w-32 animate-pulse rounded bg-gray-200" />
           </div>
         )}
         <main className="flex-1 overflow-y-auto p-4">{children}</main>

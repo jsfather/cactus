@@ -1,11 +1,11 @@
-import Pagination from '@/components/ui/pagination';
-import Search from '@/components/ui/search';
-import Table from '@/components/ui/teacher/attendances/table';
-import { CreateAttendance } from '@/components/ui/teacher/attendances/buttons';
+import Pagination from '@/app/ui/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/teacher/attendances/table';
+import { CreateAttendance } from '@/app/ui/teacher/attendances/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'حضور و غیاب', 
+  title: 'حضور و غیاب',
 };
 
 export default async function Page(props: {

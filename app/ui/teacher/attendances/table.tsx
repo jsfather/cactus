@@ -114,14 +114,15 @@ export default function TermsTable({}: { query: string; currentPage: number }) {
                 >
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                     <div>
-                      <p className="text-sm text-gray-500">{attendance.student.first_name} {attendance.student.last_name}</p>
+                      <p className="text-sm text-gray-500">
+                        {attendance.student.first_name}{' '}
+                        {attendance.student.last_name}
+                      </p>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
                     <div>
-                      <p className="text-xl font-medium">
-                        {attendance.status}
-                      </p>
+                      <p className="text-xl font-medium">{attendance.status}</p>
                     </div>
                   </div>
                 </div>
@@ -132,13 +133,13 @@ export default function TermsTable({}: { query: string; currentPage: number }) {
             <thead className="rounded-lg text-right text-sm font-normal">
               <tr>
                 <th scope="col" className="px-3 py-5 font-medium">
-                    نام و نام خانوادگی
+                  نام و نام خانوادگی
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   وضعیت
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                    علت غیاب
+                  علت غیاب
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
                   وضعیت
@@ -163,7 +164,10 @@ export default function TermsTable({}: { query: string; currentPage: number }) {
                   >
                     <td className="py-3 pr-3 pl-6 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <p>{attendance.student.first_name} {attendance.student.last_name}</p>
+                        <p>
+                          {attendance.student.first_name}{' '}
+                          {attendance.student.last_name}
+                        </p>
                       </div>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">

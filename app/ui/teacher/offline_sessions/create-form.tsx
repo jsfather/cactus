@@ -62,31 +62,44 @@ export default function Form() {
             >
               <option value="">انتخاب کنید</option>
               {terms.map((t) => (
-                <option key={t.id} value={t.id}>{t.label}</option>
+                <option key={t.id} value={t.id}>
+                  {t.label}
+                </option>
               ))}
             </select>
             {errors.term_id && (
-              <p className="mt-1 text-sm text-red-500">{errors.term_id.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.term_id.message}
+              </p>
             )}
           </div>
           <div>
-            <label htmlFor="term_teacher_id" className="mb-2 block text-sm font-medium">
+            <label
+              htmlFor="term_teacher_id"
+              className="mb-2 block text-sm font-medium"
+            >
               معلم <span className="text-red-500">*</span>
             </label>
             <select
               id="term_teacher_id"
-              {...register('term_teacher_id', { required: 'انتخاب معلم الزامی است' })}
+              {...register('term_teacher_id', {
+                required: 'انتخاب معلم الزامی است',
+              })}
               className={`peer block w-full rounded-md border py-2 pr-4 text-sm focus:outline-0 ${
                 errors.term_teacher_id ? 'border-red-500' : 'border-gray-300'
               }`}
             >
               <option value="">انتخاب کنید</option>
               {teachers.map((t) => (
-                <option key={t.id} value={t.id}>{t.label}</option>
+                <option key={t.id} value={t.id}>
+                  {t.label}
+                </option>
               ))}
             </select>
             {errors.term_teacher_id && (
-              <p className="mt-1 text-sm text-red-500">{errors.term_teacher_id.message}</p>
+              <p className="mt-1 text-sm text-red-500">
+                {errors.term_teacher_id.message}
+              </p>
             )}
           </div>
         </div>
@@ -108,7 +121,10 @@ export default function Form() {
         </div>
         {/* Description Row */}
         <div className="mb-4">
-          <label htmlFor="description" className="mb-2 block text-sm font-medium">
+          <label
+            htmlFor="description"
+            className="mb-2 block text-sm font-medium"
+          >
             توضیحات <span className="text-red-500">*</span>
           </label>
           <textarea
@@ -120,7 +136,9 @@ export default function Form() {
             }`}
           />
           {errors.description && (
-            <p className="mt-1 text-sm text-red-500">{errors.description.message}</p>
+            <p className="mt-1 text-sm text-red-500">
+              {errors.description.message}
+            </p>
           )}
         </div>
         {/* Video URL Row */}
@@ -136,7 +154,9 @@ export default function Form() {
             }`}
           />
           {errors.video_url && (
-            <p className="mt-1 text-sm text-red-500">{errors.video_url.message}</p>
+            <p className="mt-1 text-sm text-red-500">
+              {errors.video_url.message}
+            </p>
           )}
         </div>
       </div>

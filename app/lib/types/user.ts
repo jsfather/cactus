@@ -5,8 +5,8 @@ export interface User {
   first_name: string;
   last_name: string;
   phone: string;
-  email: string | null;
-  national_code: string | null;
+  email?: string | null;
+  national_code?: string | null;
   profile_picture: string | null;
   files: File[];
 }

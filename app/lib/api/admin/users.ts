@@ -34,7 +34,7 @@ export const createUser = async (data: Partial<User>) => {
   return response;
 };
 
-export const updateUser = async (id: string, data: Partial<User>) => {
+export const updateUser = async (id: string | number, data: Partial<User>) => {
   const response = await request<User>(`admin/users/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),

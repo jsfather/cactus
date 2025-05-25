@@ -1,12 +1,18 @@
 'use client';
 
-import { UpdateOfflineSession, DeleteOfflineSession } from '@/app/ui/teacher/offline_sessions/buttons';
+import {
+  UpdateOfflineSession,
+  DeleteOfflineSession,
+} from '@/app/ui/teacher/offline_sessions/buttons';
 import { getOfflineSessions } from '@/app/lib/api/teacher/offline_sessions';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { OfflineSession } from '@/app/lib/types';
 
-export default function OfflineSessionsTable({}: { query: string; currentPage: number }) {
+export default function OfflineSessionsTable({}: {
+  query: string;
+  currentPage: number;
+}) {
   const [offlineSessions, setOfflineSessions] = useState<OfflineSession[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +29,7 @@ export default function OfflineSessionsTable({}: { query: string; currentPage: n
   };
 
   useEffect(() => {
-      fetchOfflineSessions();
+    fetchOfflineSessions();
   }, []);
 
   if (loading) {
@@ -114,7 +120,9 @@ export default function OfflineSessionsTable({}: { query: string; currentPage: n
                 >
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                     <div>
-                      <p className="text-sm text-gray-500">{offlineSession.term_id}</p>
+                      <p className="text-sm text-gray-500">
+                        {offlineSession.term_id}
+                      </p>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
@@ -171,7 +179,7 @@ export default function OfflineSessionsTable({}: { query: string; currentPage: n
                       </div>
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
-                        {offlineSession.title}
+                      {offlineSession.title}
                     </td>
                     <td className="px-3 py-3 whitespace-nowrap">
                       {offlineSession.description}

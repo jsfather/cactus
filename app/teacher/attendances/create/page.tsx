@@ -1,5 +1,5 @@
-import Form from '@/components/ui/teacher/attendances/create-form';
-import Breadcrumbs from '@/components/ui/breadcrumbs';
+import Form from '@/app/ui/teacher/attendances/create-form';
+import Breadcrumbs from '@/app/ui/breadcrumbs';
 import { Toaster } from 'react-hot-toast';
 
 export default function Page() {

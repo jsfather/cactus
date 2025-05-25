@@ -1,7 +1,7 @@
-import Pagination from '@/components/ui/pagination';
-import Search from '@/components/ui/search';
-import Table from '@/components/ui/teacher/reports/table';
-import { CreateReport } from '@/components/ui/teacher/reports/buttons';
+import Pagination from '@/app/ui/pagination';
+import Search from '@/app/ui/search';
+import Table from '@/app/ui/teacher/reports/table';
+import { CreateReport } from '@/app/ui/teacher/reports/buttons';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
