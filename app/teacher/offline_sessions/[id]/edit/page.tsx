@@ -2,9 +2,7 @@
 
 import Form from '@/app/ui/teacher/offline_sessions/edit-form';
 import Breadcrumbs from '@/app/ui/breadcrumbs';
-import {
-  getOfflineSession,
-} from '@/app/lib/api/teacher/offline_sessions';
+import { getOfflineSession } from '@/app/lib/api/teacher/offline_sessions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -15,7 +13,7 @@ import { OfflineSession } from '@/app/lib/types';
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const [offlineSession, setOfflineSession] = useState<OfflineSession | null>(
-    null,
+    null
   );
   const [loading, setLoading] = useState(true);
 

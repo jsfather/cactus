@@ -37,7 +37,7 @@ export default function Page() {
     } catch (error: any) {
       // Check if the error has a response property (axios error)
       const apiError = error.response?.data || error;
-      
+
       if (apiError.errors) {
         // Set errors for each field from the API response
         Object.entries(apiError.errors).forEach(([field, messages]) => {
@@ -55,12 +55,15 @@ export default function Page() {
   return (
     <div className="mx-auto max-w-2xl p-6">
       <h1 className="mb-6 text-2xl font-bold">ویرایش پروفایل</h1>
-      
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           {/* Username Field */}
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
               نام کاربری
             </label>
             <input
@@ -72,13 +75,18 @@ export default function Page() {
               }`}
             />
             {errors.username && (
-              <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.username.message}
+              </p>
             )}
           </div>
 
           {/* First Name Field */}
           <div>
-            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="first_name"
+              className="block text-sm font-medium text-gray-700"
+            >
               نام
             </label>
             <input
@@ -90,31 +98,43 @@ export default function Page() {
               }`}
             />
             {errors.first_name && (
-              <p className="mt-1 text-sm text-red-600">{errors.first_name.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.first_name.message}
+              </p>
             )}
           </div>
 
           {/* Last Name Field */}
           <div>
-            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="last_name"
+              className="block text-sm font-medium text-gray-700"
+            >
               نام خانوادگی
             </label>
             <input
               type="text"
               id="last_name"
-              {...register('last_name', { required: 'نام خانوادگی الزامی است' })}
+              {...register('last_name', {
+                required: 'نام خانوادگی الزامی است',
+              })}
               className={`mt-1 block w-full rounded-md border px-3 py-2 text-sm ${
                 errors.last_name ? 'border-red-300' : 'border-gray-300'
               }`}
             />
             {errors.last_name && (
-              <p className="mt-1 text-sm text-red-600">{errors.last_name.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.last_name.message}
+              </p>
             )}
           </div>
 
           {/* Phone Field */}
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-gray-700"
+            >
               شماره تماس
             </label>
             <input
@@ -127,13 +147,18 @@ export default function Page() {
               dir="ltr"
             />
             {errors.phone && (
-              <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.phone.message}
+              </p>
             )}
           </div>
 
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               ایمیل
             </label>
             <input
@@ -151,13 +176,18 @@ export default function Page() {
               dir="ltr"
             />
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
           {/* National Code Field */}
           <div>
-            <label htmlFor="national_code" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="national_code"
+              className="block text-sm font-medium text-gray-700"
+            >
               کد ملی
             </label>
             <input
@@ -175,7 +205,9 @@ export default function Page() {
               dir="ltr"
             />
             {errors.national_code && (
-              <p className="mt-1 text-sm text-red-600">{errors.national_code.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.national_code.message}
+              </p>
             )}
           </div>
         </div>
@@ -184,7 +216,7 @@ export default function Page() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-700 ${
+            className={`bg-primary-600 hover:bg-primary-700 rounded-md px-4 py-2 text-sm font-medium text-white transition ${
               isSubmitting ? 'cursor-not-allowed opacity-75' : ''
             }`}
           >

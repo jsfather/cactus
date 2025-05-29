@@ -1,24 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { UserMenu } from '@/app/components/UserMenu';
-import { useEffect, useState } from 'react';
-import request from '@/app/lib/api/client';
-import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import type { JSX } from 'react';
-
-interface UserProfile {
-  id: number;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  email: string | null;
-  national_code: string | null;
-  profile_picture: string | null;
-}
+import Link from 'next/link';
 
 interface Feature {
   title: string;
@@ -45,39 +31,11 @@ interface BlogPost {
 }
 
 export default function Page() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-        const data = await request<{ data: UserProfile }>('profile');
-        setUser(data.data);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        if (error instanceof Error && error.message.includes('401')) {
-          localStorage.removeItem('authToken');
-          router.push('/auth/send-otp');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [router]);
-
   return (
     <div
       dir="rtl"
-      className="text-primary-900 min-h-screen bg-gradient-to-b from-gray-50 to-white p-4"
+      className="min-h-screen p-4 text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
-
-
-      {/* Hero Section */}
       <section className="px-4 pt-32 pb-20">
         <div className="container mx-auto">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
@@ -94,15 +52,15 @@ export default function Page() {
                 <br />
                 را با ما بسازید
               </h1>
-              <p className="text-xl leading-relaxed text-gray-600">
+              <p className="text-xl leading-relaxed text-gray-600 dark:text-gray-300">
                 با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
                 ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
               </p>
               <div className="flex gap-4">
-                <Button className="bg-primary-600 hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+                <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
                   شروع یادگیری
                 </Button>
-                <Button className="text-primary-600 rounded-full bg-gray-100 px-8 py-3 text-lg transition-all duration-200 hover:bg-gray-200">
+                <Button className="text-primary-600 dark:text-primary-400 rounded-full bg-gray-100 px-8 py-3 text-lg transition-all duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                   مشاهده دوره‌ها
                 </Button>
               </div>
@@ -113,10 +71,12 @@ export default function Page() {
                   { number: '٪۹۵', label: 'رضایت' },
                 ].map((stat, index) => (
                   <div key={index} className="text-center">
-                    <div className="text-primary-600 text-2xl font-bold">
+                    <div className="text-primary-600 dark:text-primary-400 text-2xl font-bold">
                       {stat.number}
                     </div>
-                    <div className="text-sm text-gray-500">{stat.label}</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {stat.label}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -128,27 +88,41 @@ export default function Page() {
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <div className="relative h-[500px] w-full">
+              <div className="relative h-[500px] w-full group">
                 <Image
-                  src="/robotic-school.png"
+                  src="/robot-video.png"
                   alt="آموزش رباتیک"
                   fill
-                  className="rounded-2xl object-cover shadow-2xl"
+                  className="rounded-2xl object-cover shadow-2xl dark:opacity-90"
                   priority
                 />
-                <div className="from-primary-600/20 absolute inset-0 rounded-2xl bg-gradient-to-tr to-transparent" />
+                <div className="from-primary-600/20 dark:from-primary-900/30 absolute inset-0 rounded-2xl bg-gradient-to-tr to-transparent" />
+                <button 
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                           w-16 h-16 bg-white/30 hover:bg-white/40 backdrop-blur-sm
+                           rounded-full flex items-center justify-center
+                           transition-all duration-300 ease-in-out
+                           group-hover:scale-110"
+                  aria-label="Play video"
+                >
+                  <svg 
+                    className="w-8 h-8 text-white fill-current" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
               </div>
 
-              {/* Floating Cards */}
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ repeat: Infinity, duration: 2 }}
-                className="absolute -right-6 -bottom-6 rounded-xl bg-white p-4 shadow-lg"
+                className="absolute -right-6 -bottom-6 rounded-xl bg-white p-4 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50"
               >
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary-100 flex h-12 w-12 items-center justify-center rounded-full">
+                  <div className="bg-primary-100 dark:bg-primary-900/20 flex h-12 w-12 items-center justify-center rounded-full">
                     <svg
-                      className="text-primary-600 h-6 w-6"
+                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -162,8 +136,10 @@ export default function Page() {
                     </svg>
                   </div>
                   <div>
-                    <div className="font-semibold">پروژه‌های عملی</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="font-semibold dark:text-gray-100">
+                      پروژه‌های عملی
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       یادگیری با تجربه
                     </div>
                   </div>
@@ -173,12 +149,12 @@ export default function Page() {
               <motion.div
                 animate={{ y: [0, 10, 0] }}
                 transition={{ repeat: Infinity, duration: 2.5 }}
-                className="absolute -top-6 -left-6 rounded-xl bg-white p-4 shadow-lg"
+                className="absolute -top-6 -left-6 rounded-xl bg-white p-4 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50"
               >
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary-100 flex h-12 w-12 items-center justify-center rounded-full">
+                  <div className="bg-primary-100 dark:bg-primary-900/20 flex h-12 w-12 items-center justify-center rounded-full">
                     <svg
-                      className="text-primary-600 h-6 w-6"
+                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -192,8 +168,12 @@ export default function Page() {
                     </svg>
                   </div>
                   <div>
-                    <div className="font-semibold">مرکز نوآوری</div>
-                    <div className="text-sm text-gray-500">خلق و نوآوری</div>
+                    <div className="font-semibold dark:text-gray-100">
+                      مرکز نوآوری
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      خلق و نوآوری
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -203,7 +183,7 @@ export default function Page() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-50 py-20 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold">
@@ -214,7 +194,7 @@ export default function Page() {
               </span>
               را انتخاب کنید؟
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
               تجربه آموزش پیشرفته رباتیک با یادگیری عملی و راهنمایی متخصصان
             </p>
           </div>
@@ -226,20 +206,24 @@ export default function Page() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="rounded-2xl bg-white p-8 shadow-lg transition-shadow duration-200 hover:shadow-xl"
+                className="rounded-2xl bg-white p-8 shadow-lg transition-shadow duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
               >
-                <div className="bg-primary-100 mb-6 flex h-14 w-14 items-center justify-center rounded-xl">
+                <div className="bg-primary-100 dark:bg-primary-900/20 mb-6 flex h-14 w-14 items-center justify-center rounded-xl">
                   {feature.icon}
                 </div>
-                <h3 className="mb-3 text-xl font-bold">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <h3 className="mb-3 text-xl font-bold dark:text-gray-100">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {feature.description}
+                </p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="about" className="bg-gray-50 py-24">
+      <section id="about" className="bg-gray-50 py-24 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
             <motion.div
@@ -255,7 +239,7 @@ export default function Page() {
                   کاکتوس
                 </span>
               </h2>
-              <p className="text-lg leading-relaxed text-gray-600">
+              <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
                 شرکت کاکتوس با بیش از یک دهه تجربه در زمینه آموزش رباتیک، پیشرو
                 در ارائه خدمات آموزشی و تجهیزات رباتیک در ایران است. ما با تیمی
                 متشکل از متخصصان و مدرسان مجرب، به دنبال گسترش دانش و مهارت‌های
@@ -270,12 +254,14 @@ export default function Page() {
                 ].map((item, index) => (
                   <div
                     key={index}
-                    className="rounded-xl bg-white p-6 shadow-md transition-all duration-200 hover:shadow-lg"
+                    className="rounded-xl bg-white p-6 shadow-md transition-all duration-200 hover:shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
                   >
-                    <div className="text-primary-600 text-2xl font-bold">
+                    <div className="text-primary-600 dark:text-primary-400 text-2xl font-bold">
                       {item.value}
                     </div>
-                    <div className="text-gray-600">{item.title}</div>
+                    <div className="text-gray-600 dark:text-gray-300">
+                      {item.title}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -288,7 +274,7 @@ export default function Page() {
                 ].map((tag, index) => (
                   <span
                     key={index}
-                    className="bg-primary-100 text-primary-600 rounded-full px-4 py-2 text-sm font-medium"
+                    className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 rounded-full px-4 py-2 text-sm font-medium"
                   >
                     {tag}
                   </span>
@@ -344,11 +330,11 @@ export default function Page() {
                   </div>
                 </div>
               </div>
-              <div className="absolute right-6 -bottom-6 rounded-xl bg-white p-6 shadow-lg">
+              <div className="absolute right-6 -bottom-6 rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50">
                 <div className="flex items-center gap-4">
-                  <div className="bg-primary-100 flex h-12 w-12 items-center justify-center rounded-full">
+                  <div className="bg-primary-100 dark:bg-primary-900/20 flex h-12 w-12 items-center justify-center rounded-full">
                     <svg
-                      className="text-primary-600 h-6 w-6"
+                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -362,8 +348,10 @@ export default function Page() {
                     </svg>
                   </div>
                   <div>
-                    <div className="font-bold">گواهی‌نامه بین‌المللی</div>
-                    <div className="text-sm text-gray-500">
+                    <div className="font-bold dark:text-gray-100">
+                      گواهی‌نامه بین‌المللی
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       معتبر در سراسر دنیا
                     </div>
                   </div>
@@ -374,7 +362,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="shop" className="py-24">
+      <section id="shop" className="py-24 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="mb-16">
             <div className="flex items-center justify-between">
@@ -386,15 +374,15 @@ export default function Page() {
                     کاکتوس
                   </span>
                 </h2>
-                <p className="mt-2 text-lg text-gray-600">
+                <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
                   تجهیزات و کیت‌های آموزشی رباتیک
                 </p>
               </div>
               <div className="flex items-center gap-4">
-                <button className="rounded-full bg-gray-100 px-6 py-2 font-medium text-gray-600 transition-colors hover:bg-gray-200">
+                <button className="rounded-full bg-gray-100 px-6 py-2 font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                   همه محصولات
                 </button>
-                <button className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 font-medium text-white transition-colors">
+                <button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 rounded-full px-6 py-2 font-medium text-white transition-colors">
                   تخفیف‌دار
                 </button>
               </div>
@@ -445,23 +433,23 @@ export default function Page() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl"
+                className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
               >
                 <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
                   <Image
                     src={product.image}
                     alt={product.title}
                     fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
                   />
                   {product.discount && (
-                    <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white">
+                    <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
                       تخفیف
                     </div>
                   )}
-                  <button className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white">
+                  <button className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800">
                     <svg
-                      className="text-primary-600 h-6 w-6"
+                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -476,10 +464,12 @@ export default function Page() {
                   </button>
                 </div>
                 <div className="space-y-2">
-                  <div className="text-primary-600 text-sm font-medium">
+                  <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
                     {product.category}
                   </div>
-                  <h3 className="font-bold">{product.title}</h3>
+                  <h3 className="font-bold dark:text-gray-100">
+                    {product.title}
+                  </h3>
                   <div className="flex items-center gap-2">
                     <div className="flex items-center">
                       {Array.from({ length: 5 }).map((_, i) => (
@@ -487,8 +477,8 @@ export default function Page() {
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.floor(product.rating)
-                              ? 'text-yellow-400'
-                              : 'text-gray-300'
+                              ? 'text-yellow-400 dark:text-yellow-500'
+                              : 'text-gray-300 dark:text-gray-600'
                           }`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
@@ -497,7 +487,7 @@ export default function Page() {
                         </svg>
                       ))}
                     </div>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       ({product.reviews})
                     </span>
                   </div>
@@ -505,21 +495,23 @@ export default function Page() {
                     <div>
                       {product.discount ? (
                         <>
-                          <span className="text-primary-600 text-lg font-bold">
+                          <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
                             {product.discount}
                           </span>
-                          <span className="mr-2 text-sm text-gray-500 line-through">
+                          <span className="mr-2 text-sm text-gray-500 line-through dark:text-gray-400">
                             {product.price}
                           </span>
                         </>
                       ) : (
-                        <span className="text-primary-600 text-lg font-bold">
+                        <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
                           {product.price}
                         </span>
                       )}
-                      <span className="mr-1 text-sm text-gray-600">تومان</span>
+                      <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
+                        تومان
+                      </span>
                     </div>
-                    <button className="text-primary-600 rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-200">
+                    <button className="text-primary-600 dark:text-primary-400 rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
                       جزئیات
                     </button>
                   </div>
@@ -529,14 +521,14 @@ export default function Page() {
           </div>
 
           <div className="mt-12 text-center">
-            <Button className="bg-primary-600 hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+            <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
               مشاهده همه محصولات
             </Button>
           </div>
         </div>
       </section>
 
-      <section id="courses" className="py-20">
+      <section id="courses" className="py-20 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold">
@@ -546,7 +538,7 @@ export default function Page() {
                 ویژه
               </span>
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
               سفر خود را در دنیای رباتیک با محبوب‌ترین دوره‌های ما آغاز کنید
             </p>
           </div>
@@ -558,36 +550,40 @@ export default function Page() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl"
+                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
               >
                 <div className="relative h-48">
                   <Image
                     src={course.image}
                     alt={course.title}
                     fill
-                    className="object-cover"
+                    className="object-cover dark:opacity-90"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute right-4 bottom-4 left-4">
-                    <span className="bg-primary-600 rounded-full px-3 py-1 text-sm text-white">
+                    <span className="bg-primary-600 dark:bg-primary-700 rounded-full px-3 py-1 text-sm text-white">
                       {course.level}
                     </span>
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="mb-2 text-xl font-bold">{course.title}</h3>
-                  <p className="mb-4 text-gray-600">{course.description}</p>
+                  <h3 className="mb-2 text-xl font-bold dark:text-gray-100">
+                    {course.title}
+                  </h3>
+                  <p className="mb-4 text-gray-600 dark:text-gray-300">
+                    {course.description}
+                  </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {course.duration}
                     </span>
-                    <span className="text-primary-600 font-bold">
+                    <span className="text-primary-600 dark:text-primary-400 font-bold">
                       {course.price} تومان
                     </span>
                   </div>
                 </div>
                 <div className="px-6 pb-6">
-                  <button className="text-primary-600 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200">
+                  <button className="text-primary-600 dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
                     اطلاعات بیشتر
                   </button>
                 </div>
@@ -596,14 +592,15 @@ export default function Page() {
           </div>
 
           <div className="mt-12 text-center">
-            <Button className="bg-primary-600 hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+            <Link href="/courses">
+            <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
               مشاهده همه دوره‌ها
-            </Button>
+            </Button></Link>
           </div>
         </div>
       </section>
 
-      <section id="blog" className="bg-gray-50 py-24">
+      <section id="blog" className="bg-gray-50 py-24 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold">
@@ -613,7 +610,7 @@ export default function Page() {
                 بلاگ
               </span>
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 dark:text-gray-300">
               از آخرین اخبار و بینش‌ها در دنیای رباتیک مطلع شوید
             </p>
           </div>
@@ -625,31 +622,39 @@ export default function Page() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl"
+                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
               >
                 <div className="relative h-48">
                   <Image
                     src={post.image}
                     alt={post.title}
                     fill
-                    className="object-cover"
+                    className="object-cover dark:opacity-90"
                   />
                 </div>
                 <div className="p-6">
                   <div className="mb-4 flex items-center gap-4">
-                    <span className="text-sm text-gray-500">{post.date}</span>
-                    <span className="text-sm text-gray-500">•</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {post.date}
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      •
+                    </span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {post.readTime}
                     </span>
                   </div>
-                  <h3 className="mb-2 text-xl font-bold">{post.title}</h3>
-                  <p className="mb-4 text-gray-600">{post.excerpt}</p>
+                  <h3 className="mb-2 text-xl font-bold dark:text-gray-100">
+                    {post.title}
+                  </h3>
+                  <p className="mb-4 text-gray-600 dark:text-gray-300">
+                    {post.excerpt}
+                  </p>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600">
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
                       نویسنده: {post.author}
                     </span>
-                    <button className="text-primary-600 hover:text-primary-700 font-medium">
+                    <button className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
                       ادامه مطلب ←
                     </button>
                   </div>
@@ -659,7 +664,7 @@ export default function Page() {
           </div>
 
           <div className="mt-12 text-center">
-            <Button className="bg-primary-600 hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+            <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
               مشاهده همه مقالات
             </Button>
           </div>

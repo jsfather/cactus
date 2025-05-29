@@ -13,9 +13,36 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                if (typeof window !== 'undefined') {
+                  try {
+                    let isDark = false;
+                    const savedTheme = localStorage.getItem('theme');
+                    
+                    if (savedTheme) {
+                      isDark = savedTheme === 'dark';
+                    } else {
+                      isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    }
+
+                    if (isDark) {
+                      document.documentElement.classList.add('dark');
+                    }
+                  } catch (e) {}
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
-        className={`${danaFaNum.variable} ${dana.variable} font-dana-fanum`}
+        className={`${danaFaNum.variable} ${dana.variable} font-dana-fanum min-h-screen bg-white text-gray-900 antialiased transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100`}
+        suppressHydrationWarning
       >
         {children}
       </body>
