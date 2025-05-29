@@ -68,11 +68,7 @@ const currentTerms = [
   {
     title: 'ترم بهار ۱۴۰۳',
     status: 'فعال',
-    courses: [
-      'برنامه نویسی پیشرفته',
-      'ریاضی مهندسی',
-      'مدارهای منطقی'
-    ],
+    courses: ['برنامه نویسی پیشرفته', 'ریاضی مهندسی', 'مدارهای منطقی'],
     progress: 75,
     startDate: '۱۴۰۳/۰۱/۰۱',
     endDate: '۱۴۰۳/۰۳/۳۱',
@@ -80,10 +76,7 @@ const currentTerms = [
   {
     title: 'ترم تابستان ۱۴۰۳',
     status: 'در انتظار',
-    courses: [
-      'کارآموزی',
-      'پروژه نرم افزار'
-    ],
+    courses: ['کارآموزی', 'پروژه نرم افزار'],
     progress: 0,
     startDate: '۱۴۰۳/۰۴/۰۱',
     endDate: '۱۴۰۳/۰۶/۳۱',
@@ -175,10 +168,12 @@ const Page = () => {
                     </span>
                   </div>
                   <div className="mb-3 text-sm">
-                    <p className="text-gray-500 mb-2">دروس این ترم:</p>
-                    <ul className="list-disc list-inside space-y-1">
+                    <p className="mb-2 text-gray-500">دروس این ترم:</p>
+                    <ul className="list-inside list-disc space-y-1">
                       {term.courses.map((course, index) => (
-                        <li key={index} className="text-gray-700">{course}</li>
+                        <li key={index} className="text-gray-700">
+                          {course}
+                        </li>
                       ))}
                     </ul>
                   </div>

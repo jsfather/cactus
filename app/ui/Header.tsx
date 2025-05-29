@@ -6,7 +6,6 @@ import { Bell, Search, CircleHelp } from 'lucide-react';
 import moment from 'jalali-moment';
 import { User } from '@/app/lib/types';
 
-
 const Header = ({ user }: { user: User | null }) => {
   const formattedDate = moment().locale('fa').format('dddd، D MMMM YYYY');
 

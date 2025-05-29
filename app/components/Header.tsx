@@ -64,7 +64,7 @@ export default function Header() {
                 <Link
                   key={item.title}
                   href={`#${item.href}`}
-                  className="font-medium text-gray-900 transition-colors duration-200 hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+                  className="hover:text-primary-600 dark:hover:text-primary-400 font-medium text-gray-900 transition-colors duration-200 dark:text-gray-100"
                 >
                   {item.title}
                 </Link>
@@ -77,7 +77,7 @@ export default function Header() {
               <input
                 type="text"
                 placeholder="جستجو ..."
-                className="w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               />
               <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
                 <svg
@@ -104,7 +104,7 @@ export default function Header() {
               <UserMenu userName={user.first_name + ' ' + user.last_name} />
             ) : (
               <Link href="/auth">
-                <Button className="transform rounded-full bg-primary-600 px-6 py-2 text-white transition-all duration-200 hover:scale-105 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600">
+                <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
                   ورود / ثبت نام
                 </Button>
               </Link>

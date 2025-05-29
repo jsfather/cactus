@@ -3,16 +3,15 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary-100: #F2FEE8;
-  --color-primary-200: #E7FDD4;
-  --color-primary-300: #CAFCAB;
-  --color-primary-400: #A5F780;
-  --color-primary-500: #81F05F;
-  --color-primary-600: #4AE72D;
-  --color-primary-700: #2DC620;
-  --color-primary-800: #16A616;
-  --color-primary-900: #086E18;
+  --color-primary-100: #f2fee8;
+  --color-primary-200: #e7fdd4;
+  --color-primary-300: #cafcab;
+  --color-primary-400: #a5f780;
+  --color-primary-500: #81f05f;
+  --color-primary-600: #4ae72d;
+  --color-primary-700: #2dc620;
+  --color-primary-800: #16a616;
+  --color-primary-900: #086e18;
   --font-dana: var(--font-dana);
   --font-dana-fanum: var(--font-dana-fanum);
 }
-
