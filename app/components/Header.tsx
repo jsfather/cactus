@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { UserMenu } from '@/app/components/UserMenu';
 import { Button } from '@/app/ui/button';
 import { useEffect, useState } from 'react';
@@ -14,6 +15,7 @@ export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -56,15 +58,19 @@ export default function Header() {
 
             <nav className="hidden items-center gap-6 md:flex">
               {[
-                { title: 'دوره‌ها', href: 'courses' },
-                { title: 'مربیان', href: 'teachers' },
-                { title: 'درباره ما', href: 'about' },
-                { title: 'وبلاگ', href: 'blog' },
+                { title: 'دوره‌ها', href: '/courses' },
+                { title: 'مربیان', href: '/teachers' },
+                { title: 'درباره ما', href: '/about' },
+                { title: 'وبلاگ', href: '/blog' },
               ].map((item) => (
                 <Link
                   key={item.title}
-                  href={`#${item.href}`}
-                  className="hover:text-primary-600 dark:hover:text-primary-400 font-medium text-gray-900 transition-colors duration-200 dark:text-gray-100"
+                  href={item.href}
+                  className={`font-medium transition-colors duration-200 ${
+                    pathname === item.href
+                      ? 'text-primary-600 dark:text-primary-400'
+                      : 'text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400'
+                  }`}
                 >
                   {item.title}
                 </Link>

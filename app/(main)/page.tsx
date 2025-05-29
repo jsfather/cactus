@@ -4,16 +4,7 @@ import Image from 'next/image';
 import { Button } from '@/app/ui/button';
 import { motion } from 'framer-motion';
 import type { JSX } from 'react';
-
-interface UserProfile {
-  id: number;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  email: string | null;
-  national_code: string | null;
-  profile_picture: string | null;
-}
+import Link from 'next/link';
 
 interface Feature {
   title: string;
@@ -97,18 +88,32 @@ export default function Page() {
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <div className="relative h-[500px] w-full">
+              <div className="relative h-[500px] w-full group">
                 <Image
-                  src="/robotic-school.png"
+                  src="/robot-video.png"
                   alt="آموزش رباتیک"
                   fill
                   className="rounded-2xl object-cover shadow-2xl dark:opacity-90"
                   priority
                 />
                 <div className="from-primary-600/20 dark:from-primary-900/30 absolute inset-0 rounded-2xl bg-gradient-to-tr to-transparent" />
+                <button 
+                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                           w-16 h-16 bg-white/30 hover:bg-white/40 backdrop-blur-sm
+                           rounded-full flex items-center justify-center
+                           transition-all duration-300 ease-in-out
+                           group-hover:scale-110"
+                  aria-label="Play video"
+                >
+                  <svg 
+                    className="w-8 h-8 text-white fill-current" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
               </div>
 
-              {/* Floating Cards */}
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ repeat: Infinity, duration: 2 }}
@@ -587,9 +592,10 @@ export default function Page() {
           </div>
 
           <div className="mt-12 text-center">
+            <Link href="/courses">
             <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
               مشاهده همه دوره‌ها
-            </Button>
+            </Button></Link>
           </div>
         </div>
       </section>
