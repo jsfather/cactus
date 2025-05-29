@@ -47,7 +47,14 @@ const mainSkills: Skill[] = [
   { name: 'پایتون', percentage: 98 },
 ];
 
-const otherSkills = ['TensorFlow', 'PyTorch', 'Keras', 'Scikit-learn', 'NLP', 'Computer Vision'];
+const otherSkills = [
+  'TensorFlow',
+  'PyTorch',
+  'Keras',
+  'Scikit-learn',
+  'NLP',
+  'Computer Vision',
+];
 
 const courses: Course[] = [
   {
@@ -55,7 +62,7 @@ const courses: Course[] = [
     startDate: '15 مرداد 1402',
     status: 'ongoing',
     students: 45,
-    image: '/course-deep-learning.jpg',
+    image: '/course-deep-learning.webp',
   },
   {
     title: 'پردازش زبان طبیعی با پایتون',
@@ -71,13 +78,15 @@ const experiences: Experience[] = [
     title: 'مدرس ارشد هوش مصنوعی',
     company: 'آکادمی کاکتوس',
     period: '1399 تاکنون',
-    description: 'تدریس دوره‌های پیشرفته یادگیری ماشین و یادگیری عمیق. راهنمایی بیش از 200 پروژه دانشجویی در حوزه‌های مختلف هوش مصنوعی.',
+    description:
+      'تدریس دوره‌های پیشرفته یادگیری ماشین و یادگیری عمیق. راهنمایی بیش از 200 پروژه دانشجویی در حوزه‌های مختلف هوش مصنوعی.',
   },
   {
     title: 'محقق هوش مصنوعی',
     company: 'شرکت فناوران هوشمند',
     period: '1396-1399',
-    description: 'توسعه مدل‌های یادگیری عمیق برای پردازش تصویر و متن. مشارکت در 5 پروژه صنعتی موفق در حوزه تشخیص چهره و تحلیل احساسات.',
+    description:
+      'توسعه مدل‌های یادگیری عمیق برای پردازش تصویر و متن. مشارکت در 5 پروژه صنعتی موفق در حوزه تشخیص چهره و تحلیل احساسات.',
   },
 ];
 
@@ -86,7 +95,8 @@ const education: Education[] = [
     degree: 'دکترای هوش مصنوعی',
     university: 'دانشگاه تهران',
     period: '1392-1396',
-    description: 'پایان‌نامه: توسعه مدل‌های ترکیبی یادگیری عمیق برای پردازش زبان طبیعی',
+    description:
+      'پایان‌نامه: توسعه مدل‌های ترکیبی یادگیری عمیق برای پردازش زبان طبیعی',
   },
   {
     degree: 'کارشناسی ارشد مهندسی کامپیوتر',
@@ -100,22 +110,25 @@ const reviews: Review[] = [
     name: 'علیرضا حسینی',
     course: 'دوره یادگیری عمیق',
     year: '1401',
-    content: 'بهترین دوره‌ای بود که تا حالا شرکت کردم. توضیحات استاد بسیار شفاف و کاربردی بود. پروژه‌های عملی خیلی به دردم خورد.',
-    avatar: '/avatars/student-1.jpg',
+    content:
+      'بهترین دوره‌ای بود که تا حالا شرکت کردم. توضیحات استاد بسیار شفاف و کاربردی بود. پروژه‌های عملی خیلی به دردم خورد.',
+    avatar: 'https://randomuser.me/api/portraits/men/65.jpg',
   },
   {
     name: 'فاطمه کریمی',
     course: 'دوره پردازش زبان طبیعی',
     year: '1400',
-    content: 'استاد محمدی با صبر و حوصله به تمام سوالات پاسخ می‌دادند. محتوای دوره بسیار به روز و کاربردی بود. از شرکت در این دوره بسیار راضی هستم.',
-    avatar: '/avatars/student-2.jpg',
+    content:
+      'استاد محمدی با صبر و حوصله به تمام سوالات پاسخ می‌دادند. محتوای دوره بسیار به روز و کاربردی بود. از شرکت در این دوره بسیار راضی هستم.',
+    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
   },
   {
     name: 'محمد رضایی',
     course: 'دوره یادگیری ماشین',
     year: '1401',
-    content: 'با شرکت در این دوره توانستم در مصاحبه‌های شغلی قبول شوم. مطالب به گونه‌ای آموزش داده شده بود که هم جنبه تئوری و هم عملی داشت.',
-    avatar: '/avatars/student-3.jpg',
+    content:
+      'با شرکت در این دوره توانستم در مصاحبه‌های شغلی قبول شوم. مطالب به گونه‌ای آموزش داده شده بود که هم جنبه تئوری و هم عملی داشت.',
+    avatar: 'https://randomuser.me/api/portraits/men/68.jpg',
   },
 ];
 
@@ -129,16 +142,17 @@ export default function Page() {
             <div className="lg:col-span-2">
               <div className="flex items-start gap-6">
                 <div className="relative h-32 w-32 overflow-hidden rounded-xl">
-                  <Image
-                    src="/teachers/sara-mohammadi.jpg"
+                  <img
+                    src="https://randomuser.me/api/portraits/women/65.jpg"
                     alt="سارا محمدی"
-                    fill
                     className="object-cover"
                   />
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400">مربی</h5>
+                    <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      مربی
+                    </h5>
                     <h1 className="text-3xl font-bold">سارا محمدی</h1>
                   </div>
                   <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
@@ -151,7 +165,9 @@ export default function Page() {
                     <div className="flex items-center gap-1">
                       <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                       <span className="font-medium">4.9</span>
-                      <span className="text-gray-500 dark:text-gray-400">(87 نظر)</span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        (87 نظر)
+                      </span>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-6">
@@ -184,18 +200,22 @@ export default function Page() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-12">
+          <div className="space-y-12 lg:col-span-2">
             {/* About */}
             <section>
               <h2 className="mb-6 text-2xl font-bold">درباره من</h2>
               <p className="text-gray-600 dark:text-gray-300">
-                مربی با سابقه در حوزه هوش مصنوعی و یادگیری ماشین با بیش از 8 سال تجربه تدریس و کار در پروژه‌های صنعتی. متخصص در پیاده‌سازی مدل‌های یادگیری عمیق و پردازش زبان طبیعی.
+                مربی با سابقه در حوزه هوش مصنوعی و یادگیری ماشین با بیش از 8 سال
+                تجربه تدریس و کار در پروژه‌های صنعتی. متخصص در پیاده‌سازی
+                مدل‌های یادگیری عمیق و پردازش زبان طبیعی.
               </p>
             </section>
 
             {/* Current Courses */}
             <section>
-              <h2 className="mb-6 text-2xl font-bold">دوره‌های در حال برگزاری</h2>
+              <h2 className="mb-6 text-2xl font-bold">
+                دوره‌های در حال برگزاری
+              </h2>
               <div className="grid gap-6 md:grid-cols-2">
                 {courses.map((course, index) => (
                   <motion.div
@@ -236,7 +256,9 @@ export default function Page() {
                             : 'bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400'
                         }`}
                       >
-                        {course.status === 'ongoing' ? 'در حال برگزاری' : 'ثبت نام باز'}
+                        {course.status === 'ongoing'
+                          ? 'در حال برگزاری'
+                          : 'ثبت نام باز'}
                       </span>
                     </div>
                   </motion.div>
@@ -268,9 +290,13 @@ export default function Page() {
                           {exp.company}
                         </p>
                       </div>
-                      <span className="text-gray-500 dark:text-gray-400">{exp.period}</span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        {exp.period}
+                      </span>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-300">{exp.description}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {exp.description}
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -295,10 +321,14 @@ export default function Page() {
                           {edu.university}
                         </p>
                       </div>
-                      <span className="text-gray-500 dark:text-gray-400">{edu.period}</span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        {edu.period}
+                      </span>
                     </div>
                     {edu.description && (
-                      <p className="text-gray-600 dark:text-gray-300">{edu.description}</p>
+                      <p className="text-gray-600 dark:text-gray-300">
+                        {edu.description}
+                      </p>
                     )}
                   </motion.div>
                 ))}
@@ -319,10 +349,9 @@ export default function Page() {
                   >
                     <div className="mb-4 flex items-center gap-4">
                       <div className="relative h-12 w-12 overflow-hidden rounded-full">
-                        <Image
+                        <img
                           src={review.avatar}
                           alt={review.name}
-                          fill
                           className="object-cover"
                         />
                       </div>
@@ -333,7 +362,9 @@ export default function Page() {
                         </p>
                       </div>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-300">{review.content}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {review.content}
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -362,7 +393,7 @@ export default function Page() {
                         initial={{ width: 0 }}
                         whileInView={{ width: `${skill.percentage}%` }}
                         transition={{ duration: 1, delay: index * 0.1 }}
-                        className="h-2 rounded-full bg-primary-600 dark:bg-primary-500"
+                        className="bg-primary-600 dark:bg-primary-500 h-2 rounded-full"
                       />
                     </div>
                   </div>
@@ -391,9 +422,12 @@ export default function Page() {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold">مدرس برتر سال 1401</h3>
-                  <p className="text-primary-600 dark:text-primary-400">آکادمی کاکتوس</p>
+                  <p className="text-primary-600 dark:text-primary-400">
+                    آکادمی کاکتوس
+                  </p>
                   <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
-                    انتخاب به عنوان مدرس برتر سال بر اساس نظرسنجی دانشجویان و کیفیت محتوای آموزشی
+                    انتخاب به عنوان مدرس برتر سال بر اساس نظرسنجی دانشجویان و
+                    کیفیت محتوای آموزشی
                   </p>
                 </div>
                 <div>
