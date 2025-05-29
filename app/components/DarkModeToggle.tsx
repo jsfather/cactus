@@ -6,29 +6,33 @@ import { motion } from 'framer-motion';
 
 export default function DarkModeToggle() {
   const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setIsDark(savedTheme === 'dark');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      }
-      return;
-    }
-
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setIsDark(true);
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    const initialDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    setIsDark(initialDark);
+    
+    if (initialDark) {
       document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
+    
+    setMounted(true);
   }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
     const handleChange = (e: MediaQueryListEvent) => {
-      setIsDark(e.matches);
-      localStorage.setItem('theme', e.matches ? 'dark' : 'light');
-      if (e.matches) {
+      const shouldBeDark = localStorage.getItem('theme') === 'dark' ||
+        (!localStorage.getItem('theme') && e.matches);
+      
+      setIsDark(shouldBeDark);
+      if (shouldBeDark) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
@@ -40,8 +44,10 @@ export default function DarkModeToggle() {
   }, []);
 
   const toggleDarkMode = () => {
-    setIsDark(!isDark);
-    if (!isDark) {
+    const newTheme = !isDark;
+    setIsDark(newTheme);
+    
+    if (newTheme) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
@@ -49,6 +55,10 @@ export default function DarkModeToggle() {
       localStorage.setItem('theme', 'light');
     }
   };
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <button
