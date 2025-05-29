@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import request from '@/app/lib/api/client';
 import { useRouter } from 'next/navigation';
 import { User } from '@/app/lib/types';
+import DarkModeToggle from '@/app/components/DarkModeToggle';
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
@@ -36,7 +37,7 @@ export default function Header() {
   }, [router]);
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-100 bg-white/80 backdrop-blur-md">
+    <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-700 dark:bg-gray-900/80">
       <div className="container mx-auto h-20 px-4">
         <div className="flex h-full items-center justify-between">
           <div className="flex items-center gap-8">
@@ -63,7 +64,7 @@ export default function Header() {
                 <Link
                   key={item.title}
                   href={`#${item.href}`}
-                  className="hover:text-primary-600 font-medium text-gray-600 transition-colors duration-200"
+                  className="font-medium text-gray-900 transition-colors duration-200 hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
                 >
                   {item.title}
                 </Link>
@@ -76,9 +77,9 @@ export default function Header() {
               <input
                 type="text"
                 placeholder="جستجو ..."
-                className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 focus:border-transparent focus:ring-2 focus:outline-none"
+                className="w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
               />
-              <span className="absolute top-2.5 left-3 text-gray-400">
+              <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
                 <svg
                   className="h-5 w-5"
                   fill="none"
@@ -95,13 +96,15 @@ export default function Header() {
               </span>
             </div>
 
+            <DarkModeToggle />
+
             {loading ? (
-              <div className="h-10 w-32 animate-pulse rounded-full bg-gray-200" />
+              <div className="h-10 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
             ) : user ? (
               <UserMenu userName={user.first_name + ' ' + user.last_name} />
             ) : (
               <Link href="/auth">
-                <Button className="bg-primary-600 hover:bg-primary-700 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
+                <Button className="transform rounded-full bg-primary-600 px-6 py-2 text-white transition-all duration-200 hover:scale-105 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600">
                   ورود / ثبت نام
                 </Button>
               </Link>

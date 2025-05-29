@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '../ui/LogoutButton';
-import { LayoutDashboard, GraduationCap , User } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, User } from 'lucide-react';
 
 interface UserMenuProps {
   userName: string;
@@ -29,29 +29,29 @@ export function UserMenu({ userName }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex cursor-pointer items-center gap-2 rounded-full p-2 transition hover:bg-gray-100"
+        className="flex cursor-pointer items-center gap-2 rounded-full p-2 transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 font-semibold text-green-700">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 font-semibold text-primary-700 transition-colors dark:bg-primary-900/20 dark:text-primary-400">
           {userName.charAt(0).toUpperCase()}
         </div>
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 mt-2 w-56 rounded-xl bg-white shadow-lg">
+        <div className="absolute left-0 mt-2 w-56 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-200 transition-all dark:bg-gray-900 dark:ring-gray-800 dark:shadow-gray-900/50">
           <div className="py-2">
-            <div className="border-b border-gray-100 px-4 py-3 text-sm text-gray-700">
+            <div className="border-b border-gray-200 px-4 py-3 text-sm text-gray-900 dark:border-gray-800 dark:text-gray-100">
               <div className="font-medium">{userName}</div>
-              <div className="mt-1 text-xs text-gray-500">حساب کاربری</div>
+              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">حساب کاربری</div>
             </div>
             <button
               onClick={() => {
                 router.push('/admin');
                 setIsOpen(false);
               }}
-              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors hover:bg-gray-50"
+              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
             >
               <LayoutDashboard
-                className="mr-3 h-5 w-5 text-green-600"
+                className="mr-3 h-5 w-5 text-primary-600 transition-colors dark:text-primary-400"
                 strokeWidth={1.7}
               />
               <span>داشبورد ادمین</span>
@@ -61,10 +61,10 @@ export function UserMenu({ userName }: UserMenuProps) {
                 router.push('/teacher');
                 setIsOpen(false);
               }}
-              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors hover:bg-gray-50"
+              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
             >
               <GraduationCap
-                className="mr-3 h-5 w-5 text-green-600"
+                className="mr-3 h-5 w-5 text-primary-600 transition-colors dark:text-primary-400"
                 strokeWidth={1.7}
               />
               <span>داشبورد مدرس</span>
@@ -74,16 +74,16 @@ export function UserMenu({ userName }: UserMenuProps) {
                 router.push('/student');
                 setIsOpen(false);
               }}
-              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-700 transition-colors hover:bg-gray-50"
+              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
             >
               <User
-                className="mr-3 h-5 w-5 text-green-600"
+                className="mr-3 h-5 w-5 text-primary-600 transition-colors dark:text-primary-400"
                 strokeWidth={1.7}
               />
               <span>داشبورد دانش آموز</span>
             </button>
             <div className="px-3">
-              <div className="my-1 h-px bg-gray-100" />
+              <div className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
             </div>
             <LogoutButton />
           </div>
