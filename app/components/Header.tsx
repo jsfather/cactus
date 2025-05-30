@@ -12,6 +12,7 @@ import { User } from '@/app/lib/types';
 import DarkModeToggle from '@/app/components/DarkModeToggle';
 import { Menu, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUser } from '@/app/hooks/useUser';
 
 const menuItems = [
   { title: 'دوره‌ها', href: '/courses' },
@@ -22,33 +23,17 @@ const menuItems = [
 ];
 
 export default function Header() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, error } = useUser();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-        const data = await request<{ data: User }>('profile');
-        setUser(data.data);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        if (error instanceof Error && error.message.includes('401')) {
-          localStorage.removeItem('authToken');
-          router.push('/auth/send-otp');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [router]);
+    if (error?.message.includes('401')) {
+      router.push('/send-otp');
+    }
+  }, [error, router]);
 
   // Close drawer when route changes
   useEffect(() => {
@@ -72,11 +57,11 @@ export default function Header() {
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2">
                 <Image
-                  src="/logo.png"
-                  alt="لوگو کاکتوس"
-                  width={60}
-                  height={60}
-                  className="hidden rounded-xl lg:block"
+                  src="/logo.svg" 
+                  alt="کاکتوس" 
+                  width={56} 
+                  height={56}
+                  priority
                 />
                 <span className="from-primary-600 to-primary-800 mx-2 hidden bg-gradient-to-l bg-clip-text text-2xl font-black text-transparent lg:block">
                   کاکتوس
@@ -123,17 +108,20 @@ export default function Header() {
 
               <DarkModeToggle />
 
-              {loading ? (
-                <div className="h-10 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-              ) : user ? (
-                <UserMenu userName={user.first_name + ' ' + user.last_name} />
-              ) : (
-                <Link href="/send-otp">
-                  <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
-                    ورود / ثبت نام
-                  </Button>
-                </Link>
-              )}
+              {/* Auth Section */}
+              <div className="flex justify-end">
+                {!user && loading ? (
+                  <div className="h-10 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+                ) : user ? (
+                  <UserMenu userName={user.first_name + ' ' + user.last_name} />
+                ) : !loading ? (
+                  <Link href="/send-otp">
+                    <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
+                      ورود / ثبت نام
+                    </Button>
+                  </Link>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

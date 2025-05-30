@@ -93,6 +93,7 @@ export default function Page() {
                   src="/robot-video.png"
                   alt="آموزش رباتیک"
                   fill
+                  sizes="(width: 100%)"
                   className="rounded-2xl object-cover shadow-2xl dark:opacity-90"
                   priority
                 />

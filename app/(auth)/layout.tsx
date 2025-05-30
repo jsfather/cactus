@@ -1,19 +1,33 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import DarkModeToggle from '@/app/components/DarkModeToggle';
+import { useUser } from '@/app/hooks/useUser';
+import { useRouter } from 'next/navigation';
 
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const { isAuthenticated, loading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push('/admin/dashboard');
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading || isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
-      {/* Left Section - Content */}
       <div className="flex w-full flex-1 flex-col items-center justify-between gap-8 p-6 lg:w-1/2 lg:p-12">
-        {/* Logo Section */}
-    
-          <Link href="/" className="flex items-center gap-2">
+       <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.svg"
               alt="لوگو کاکتوس"

@@ -2,10 +2,8 @@
 
 import Header from '@/app/components/panel/Header';
 import Sidebar from '@/app/components/panel/Sidebar';
-import { useEffect, useState } from 'react';
-import request from '@/app/lib/api/client';
-import { useRouter } from 'next/navigation';
-import { User } from '@/app/lib/types';
+import { useState } from 'react';
+import { useUser } from '@/app/hooks/useUser';
 
 const menuItems = [
   {
@@ -67,32 +65,8 @@ const menuItems = [
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-        const data = await request<{ data: User }>('profile');
-        setUser(data.data);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        if (error instanceof Error && error.message.includes('401')) {
-          localStorage.removeItem('authToken');
-          router.push('/auth/send-otp');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [router]);
+  const { user, loading } = useUser();
 
   return (
     <div className="flex h-screen">
@@ -101,11 +75,13 @@ export default function Layout({
         menuItems={menuItems}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
+        loading={loading}
       />
       <div className="flex flex-1 flex-col">
         <Header 
           user={user}
           onMenuClick={() => setIsMobileMenuOpen(true)}
+          loading={loading}
         />
         <main className="flex-1 overflow-y-auto p-4 dark:bg-gray-900">
           {children}
