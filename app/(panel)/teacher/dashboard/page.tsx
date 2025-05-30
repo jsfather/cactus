@@ -273,7 +273,6 @@ const Page = () => {
                   className="bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50 flex w-full items-center justify-between rounded-lg p-3 transition-colors"
                 >
                   <span>{text}</span>
-                  {/* eslint-disable-next-line react/jsx-key */}
                   {
                     [
                       <ClipboardList />,
