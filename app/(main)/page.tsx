@@ -511,9 +511,11 @@ export default function Page() {
                         تومان
                       </span>
                     </div>
-                    <button className="text-primary-600 dark:text-primary-400 rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+                    <Link href="/shop/1">
+                    <button className="text-primary-600 cursor-pointer dark:text-primary-400 rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
                       جزئیات
                     </button>
+                    </Link>
                   </div>
                 </div>
               </motion.div>
@@ -521,9 +523,11 @@ export default function Page() {
           </div>
 
           <div className="mt-12 text-center">
+            <Link href="/shop">
             <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
               مشاهده همه محصولات
             </Button>
+            </Link>
           </div>
         </div>
       </section>
