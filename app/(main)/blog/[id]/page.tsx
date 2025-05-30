@@ -252,7 +252,7 @@ export default function Page() {
             <div className="mb-12 rounded-2xl bg-gray-50 p-6 dark:bg-gray-800">
               <div className="flex items-start gap-4">
                 <Image
-                  src="/avatars/amir-mohammadi.jpg"
+                  src="/user-amirali.jpg"
                   alt="امیر محمدی"
                   width={80}
                   height={80}

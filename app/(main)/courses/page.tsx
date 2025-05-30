@@ -198,9 +198,11 @@ export default function Page() {
                   </div>
                 </div>
                 <div className="px-6 pb-6">
-                  <button className="text-primary-600 dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+                  <Link href={`/courses/1`}>
+                  <button className="text-primary-600 cursor-pointer dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
                     اطلاعات بیشتر
                   </button>
+                  </Link>
                 </div>
               </motion.div>
             ))}
