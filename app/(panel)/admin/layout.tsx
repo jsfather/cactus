@@ -84,7 +84,7 @@ export default function Layout({
         console.error('Error fetching profile:', error);
         if (error instanceof Error && error.message.includes('401')) {
           localStorage.removeItem('authToken');
-          router.push('/auth/send-otp');
+          router.push('/send-otp');
         }
       } finally {
         setLoading(false);
