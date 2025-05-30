@@ -16,7 +16,7 @@ const menuItems = [
       },
       {
         title: 'تغییر رمز عبور',
-        href: '/user/change-password',
+        href: '/user/password',
       }
     ]
   },
