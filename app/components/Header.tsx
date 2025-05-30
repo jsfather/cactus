@@ -108,17 +108,20 @@ export default function Header() {
 
               <DarkModeToggle />
 
-              {loading ? (
-                <div className="h-10 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-              ) : user ? (
-                <UserMenu userName={user.first_name + ' ' + user.last_name} />
-              ) : (
-                <Link href="/send-otp">
-                  <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
-                    ورود / ثبت نام
-                  </Button>
-                </Link>
-              )}
+              {/* Auth Section */}
+              <div className="flex justify-end">
+                {!user && loading ? (
+                  <div className="h-10 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+                ) : user ? (
+                  <UserMenu userName={user.first_name + ' ' + user.last_name} />
+                ) : !loading ? (
+                  <Link href="/send-otp">
+                    <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
+                      ورود / ثبت نام
+                    </Button>
+                  </Link>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>

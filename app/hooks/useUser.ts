@@ -13,7 +13,7 @@ interface UseUserReturn {
 
 // Create a singleton to store the user data
 let globalUser: User | null = null;
-let globalLoading = false;
+let globalLoading = true; // Start with true to prevent flashing
 let globalError: Error | null = null;
 let listeners: Array<() => void> = [];
 
@@ -28,7 +28,7 @@ export function useUser(): UseUserReturn {
 
   const fetchProfile = async () => {
     try {
-      if (globalLoading) return;
+      if (globalLoading && globalUser) return; // Don't fetch if we're loading and have a user
       
       globalLoading = true;
       setLoading(true);
@@ -68,12 +68,13 @@ export function useUser(): UseUserReturn {
     listeners.push(listener);
 
     // Initial fetch if no data and has token
-    if (!globalUser && !globalLoading && localStorage.getItem('authToken')) {
+    if (!globalUser && localStorage.getItem('authToken')) {
       fetchProfile();
     } else {
       // If we already have data, just update the local state
       setUser(globalUser);
-      setLoading(globalLoading);
+      setLoading(false); // Set loading to false if we have data
+      globalLoading = false; // Update global loading state
       setError(globalError);
     }
 
