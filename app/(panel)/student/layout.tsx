@@ -4,9 +4,7 @@ import Header from '@/app/ui/Header';
 import Sidebar from '@/app/ui/Sidebar';
 import {
   LayoutDashboard,
-  Users,
-  GraduationCap,
-  Landmark,
+
   Ticket,
   UserCheck,
   BookType,
