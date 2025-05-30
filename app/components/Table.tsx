@@ -1,17 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
-
-interface Column {
+interface Column<T> {
   header: string;
-  accessor: string;
-  render?: (value: any, item: any) => React.ReactNode;
+  accessor: keyof T;
+  render?: (value: T[keyof T], item: T) => React.ReactNode;
 }
 
 interface TableProps<T> {
   data: T[];
-  columns: Column[];
+  columns: Column<T>[];
   loading?: boolean;
   actions?: (item: T) => React.ReactNode;
   emptyMessage?: string;
@@ -112,8 +109,8 @@ export default function Table<T extends { id: string | number }>({
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">
                         {columns[0].render
-                          ? columns[0].render(item[columns[0].accessor as keyof T], item)
-                          : item[columns[0].accessor as keyof T]}
+                          ? columns[0].render(item[columns[0].accessor], item)
+                          : String(item[columns[0].accessor])}
                       </p>
                     </div>
                   </div>
@@ -127,8 +124,8 @@ export default function Table<T extends { id: string | number }>({
                           }`}
                         >
                           {column.render
-                            ? column.render(item[column.accessor as keyof T], item)
-                            : item[column.accessor as keyof T]}
+                            ? column.render(item[column.accessor], item)
+                            : String(item[column.accessor])}
                         </p>
                       ))}
                     </div>
@@ -175,8 +172,8 @@ export default function Table<T extends { id: string | number }>({
                       <td key={index} className="py-3 pr-3 pl-6 whitespace-nowrap">
                         <div className="flex items-center gap-3">
                           {column.render
-                            ? column.render(item[column.accessor as keyof T], item)
-                            : item[column.accessor as keyof T]}
+                            ? column.render(item[column.accessor], item)
+                            : String(item[column.accessor])}
                         </div>
                       </td>
                     ))}

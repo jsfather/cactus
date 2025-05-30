@@ -12,7 +12,7 @@ const menuItems = [
     subItems: [
       {
         title: 'خلاصه عملکرد',
-        href: '/dashboard/summary',
+        href: '/admin/dashboard',
       }
     ]
   },
@@ -22,20 +22,16 @@ const menuItems = [
     subItems: [
       {
         title: 'دانش پژوهان',
-        href: '/users/students',
+        href: '/admin/students',
       },
       {
         title: 'مدرسین',
-        href: '/users/teachers',
+        href: '/admin/teachers',
       },
       {
-        title: 'همکاران',
-        href: '/users/colleagues',
+        title: 'کاربران',
+        href: '/admin/users',
       },
-      {
-        title: 'نمایندگی ها',
-        href: '/users/agencies',
-      }
     ]
   },
   {
