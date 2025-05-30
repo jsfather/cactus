@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { User2, X, PenSquare } from 'lucide-react';
+import { User2, X, Settings } from 'lucide-react';
 import { User } from '@/app/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -220,7 +220,7 @@ export default function Sidebar({ menuItems, user, children, isOpen, onClose, lo
             href="/user/profile" 
             className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
           >
-            <PenSquare className="h-4 w-4 text-primary-600" />
+            <Settings className="h-4 w-4 text-primary-500" />
           </Link>
         </div>
       </div>

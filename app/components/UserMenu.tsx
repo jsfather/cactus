@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/app/ui/LogoutButton';
-import { LayoutDashboard, GraduationCap, User } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, User , Settings } from 'lucide-react';
+import Link from 'next/link';
 
 interface UserMenuProps {
   userName: string;
@@ -40,10 +41,21 @@ export function UserMenu({ userName }: UserMenuProps) {
         <div className="absolute left-0 mt-2 w-56 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-200 transition-all dark:bg-gray-900 dark:shadow-gray-900/50 dark:ring-gray-800">
           <div className="py-2">
             <div className="border-b border-gray-200 px-4 py-3 text-sm text-gray-900 dark:border-gray-800 dark:text-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
               <div className="font-medium">{userName}</div>
               <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 حساب کاربری
               </div>
+              </div>
+              <Link 
+            href="/user/profile" 
+            className="p-1.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+          >
+            <Settings className="h-4 w-4 text-primary-500" />
+          </Link>
+              </div>
+             
             </div>
             <button
               onClick={() => {
