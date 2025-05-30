@@ -11,9 +11,8 @@ interface UseUserReturn {
   refetch: () => Promise<void>;
 }
 
-// Create a singleton to store the user data
 let globalUser: User | null = null;
-let globalLoading = true; // Start with true to prevent flashing
+let globalLoading = false;
 let globalError: Error | null = null;
 let listeners: Array<() => void> = [];
 
@@ -23,13 +22,13 @@ const notifyListeners = () => {
 
 export function useUser(): UseUserReturn {
   const [user, setUser] = useState<User | null>(globalUser);
-  const [loading, setLoading] = useState<boolean>(globalLoading);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(globalError);
 
   const fetchProfile = async () => {
     try {
-      if (globalLoading && globalUser) return; // Don't fetch if we're loading and have a user
-      
+      if (globalLoading) return;
+
       globalLoading = true;
       setLoading(true);
       notifyListeners();
@@ -39,6 +38,8 @@ export function useUser(): UseUserReturn {
         globalUser = null;
         globalLoading = false;
         globalError = null;
+        setLoading(false);
+        setUser(null);
         notifyListeners();
         return;
       }
@@ -46,40 +47,46 @@ export function useUser(): UseUserReturn {
       const data = await request<{ data: User }>('profile');
       globalUser = data.data;
       globalError = null;
+      setUser(data.data);
     } catch (err) {
       globalUser = null;
       globalError = err as Error;
+      setUser(null);
+      setError(err as Error);
       if (err instanceof Error && err.message.includes('401')) {
         localStorage.removeItem('authToken');
       }
     } finally {
       globalLoading = false;
+      setLoading(false);
       notifyListeners();
     }
   };
 
   useEffect(() => {
-    // Add listener for updates
+    let mounted = true;
+
     const listener = () => {
-      setUser(globalUser);
-      setLoading(globalLoading);
-      setError(globalError);
+      if (mounted) {
+        setUser(globalUser);
+        setLoading(globalLoading);
+        setError(globalError);
+      }
     };
     listeners.push(listener);
 
-    // Initial fetch if no data and has token
-    if (!globalUser && localStorage.getItem('authToken')) {
+    const token = localStorage.getItem('authToken');
+    if (!globalUser && token) {
       fetchProfile();
     } else {
-      // If we already have data, just update the local state
       setUser(globalUser);
-      setLoading(false); // Set loading to false if we have data
-      globalLoading = false; // Update global loading state
+      setLoading(false);
+      globalLoading = false;
       setError(globalError);
     }
 
-    // Cleanup listener
     return () => {
+      mounted = false;
       listeners = listeners.filter(l => l !== listener);
     };
   }, []);
@@ -88,6 +95,9 @@ export function useUser(): UseUserReturn {
     localStorage.removeItem('authToken');
     globalUser = null;
     globalError = null;
+    setUser(null);
+    setLoading(false);
+    globalLoading = false;
     notifyListeners();
   };
 

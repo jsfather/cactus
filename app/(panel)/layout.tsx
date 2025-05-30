@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/app/hooks/useUser';
+import Header from '@/app/components/panel/Header';
+import Sidebar from '@/app/components/panel/Sidebar';
 
 export default function PanelLayout({
   children,
@@ -10,9 +12,16 @@ export default function PanelLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const { loading, error, isAuthenticated } = useUser();
+  const { loading, error, isAuthenticated, user } = useUser();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     if (!loading && !isAuthenticated) {
       router.push('/send-otp');
       return;
@@ -21,12 +30,32 @@ export default function PanelLayout({
     if (error?.message.includes('401')) {
       router.push('/send-otp');
     }
-  }, [loading, isAuthenticated, error, router]);
+  }, [loading, isAuthenticated, error, router, mounted]);
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  if (!mounted) {
+    return null;
+  }
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-white dark:bg-gray-900">
-        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-t-2 border-primary-600"></div>
+      <div className="flex h-screen">
+        <Sidebar 
+          menuItems={[]}
+          isOpen={false}
+          onClose={() => {}}
+          loading={true}
+        />
+        <div className="flex flex-1 flex-col">
+          <Header 
+            user={null}
+            onMenuClick={() => {}}
+            loading={true}
+          />
+        </div>
       </div>
     );
   }
