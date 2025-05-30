@@ -9,6 +9,7 @@ interface UseUserReturn {
   isAuthenticated: boolean;
   logout: () => void;
   refetch: () => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<void>;
 }
 
 let globalUser: User | null = null;
@@ -105,12 +106,31 @@ export function useUser(): UseUserReturn {
     await fetchProfile();
   };
 
+  const updateProfile = async (data: Partial<User>) => {
+    try {
+      const response = await request<{ data: User }>('profile', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      
+      globalUser = response.data;
+      globalError = null;
+      setUser(response.data);
+      notifyListeners();
+    } catch (err) {
+      globalError = err as Error;
+      setError(err as Error);
+      throw err;
+    }
+  };
+
   return {
     user,
     loading,
     error,
     isAuthenticated: !!user,
     logout,
-    refetch
+    refetch,
+    updateProfile
   };
 } 

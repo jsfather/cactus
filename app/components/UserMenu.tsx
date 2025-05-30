@@ -47,7 +47,7 @@ export function UserMenu({ userName }: UserMenuProps) {
             </div>
             <button
               onClick={() => {
-                router.push('/admin');
+                router.push('/admin/dashboard');
                 setIsOpen(false);
               }}
               className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
@@ -60,7 +60,7 @@ export function UserMenu({ userName }: UserMenuProps) {
             </button>
             <button
               onClick={() => {
-                router.push('/teacher');
+                router.push('/teacher/dashboard');
                 setIsOpen(false);
               }}
               className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
@@ -73,7 +73,7 @@ export function UserMenu({ userName }: UserMenuProps) {
             </button>
             <button
               onClick={() => {
-                router.push('/student');
+                router.push('/student/dashboard');
                 setIsOpen(false);
               }}
               className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
