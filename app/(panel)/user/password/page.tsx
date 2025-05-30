@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { Toaster } from 'react-hot-toast';
-import { updatePassword } from '@/app/lib/api/user/update-password';
+import { updatePassword } from '@/app/lib/api/user/profile';
 
 interface PasswordFormData {
   current_password: string;
