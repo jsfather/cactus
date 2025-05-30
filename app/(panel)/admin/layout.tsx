@@ -3,9 +3,8 @@
 import Header from '@/app/components/panel/Header';
 import Sidebar from '@/app/components/panel/Sidebar';
 import { useEffect, useState } from 'react';
-import request from '@/app/lib/api/client';
 import { useRouter } from 'next/navigation';
-import { User } from '@/app/lib/types';
+import { useUser } from '@/app/hooks/useUser';
 
 const menuItems = [
   {
@@ -67,31 +66,15 @@ const menuItems = [
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { user, loading, error } = useUser();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-        const data = await request<{ data: User }>('profile');
-        setUser(data.data);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        if (error instanceof Error && error.message.includes('401')) {
-          localStorage.removeItem('authToken');
-          router.push('/send-otp');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [router]);
+    if (error?.message.includes('401')) {
+      router.push('/send-otp');
+    }
+  }, [error, router]);
 
   return (
     <div className="flex h-screen">

@@ -12,6 +12,7 @@ import { User } from '@/app/lib/types';
 import DarkModeToggle from '@/app/components/DarkModeToggle';
 import { Menu, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUser } from '@/app/hooks/useUser';
 
 const menuItems = [
   { title: 'دوره‌ها', href: '/courses' },
@@ -22,33 +23,17 @@ const menuItems = [
 ];
 
 export default function Header() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading, error } = useUser();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-        const data = await request<{ data: User }>('profile');
-        setUser(data.data);
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        if (error instanceof Error && error.message.includes('401')) {
-          localStorage.removeItem('authToken');
-          router.push('/auth/send-otp');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [router]);
+    if (error?.message.includes('401')) {
+      router.push('/send-otp');
+    }
+  }, [error, router]);
 
   // Close drawer when route changes
   useEffect(() => {
