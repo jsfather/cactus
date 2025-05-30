@@ -57,11 +57,11 @@ export default function Header() {
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2">
                 <Image
-                  src="/logo.png"
-                  alt="لوگو کاکتوس"
-                  width={60}
-                  height={60}
-                  className="hidden rounded-xl lg:block"
+                  src="/logo.svg" 
+                  alt="کاکتوس" 
+                  width={56} 
+                  height={56}
+                  priority
                 />
                 <span className="from-primary-600 to-primary-800 mx-2 hidden bg-gradient-to-l bg-clip-text text-2xl font-black text-transparent lg:block">
                   کاکتوس

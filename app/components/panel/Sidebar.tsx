@@ -172,9 +172,15 @@ export default function Sidebar({ menuItems, user, children, isOpen, onClose, lo
   const sidebarContent = (
     <aside className="flex h-full w-64 flex-col bg-white shadow-lg dark:bg-gray-900 dark:border-l dark:border-gray-800">
       {/* Logo section */}
-      <div className="flex h-[80px] items-center justify-between px-6  ">
+      <div className="flex h-[80px] items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
-          <Image src="/logo.svg" alt="logo" width={40} height={40} />
+          <Image 
+            src="/logo.svg" 
+            alt="کاکتوس" 
+            width={40} 
+            height={40}
+            priority
+          />
           <span className="bg-gradient-to-l from-primary-600 to-primary-800 bg-clip-text text-xl font-black text-transparent dark:from-primary-400 dark:to-primary-600">
             کاکتوس
           </span>
