@@ -234,6 +234,7 @@ const Page = () => {
                   className="flex w-full items-center justify-between rounded-lg bg-primary-50 p-3 text-primary-600 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
                 >
                   <span>{text}</span>
+                  {/* eslint-disable-next-line react/jsx-key */}
                   {[<ClipboardList />, <FileText />, <Calendar />, <BookOpen />, <MessageSquare />, <Settings />][index]}
                 </button>
               ))}
