@@ -2,8 +2,7 @@
 
 import Header from '@/app/components/panel/Header';
 import Sidebar from '@/app/components/panel/Sidebar';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useUser } from '@/app/hooks/useUser';
 
 const menuItems = [
@@ -67,14 +66,7 @@ export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const router = useRouter();
-  const { user, loading, error } = useUser();
-
-  useEffect(() => {
-    if (error?.message.includes('401')) {
-      router.push('/send-otp');
-    }
-  }, [error, router]);
+  const { user, loading } = useUser();
 
   return (
     <div className="flex h-screen">
