@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LogoutButton from '@/app/ui/LogoutButton';
-import { LayoutDashboard, GraduationCap, User } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, User, Settings } from 'lucide-react';
+import Link from 'next/link';
 
 interface UserMenuProps {
   userName: string;
@@ -29,9 +30,9 @@ export function UserMenu({ userName }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex cursor-pointer items-center gap-2 rounded-full  transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+        className="flex cursor-pointer items-center gap-2 rounded-full transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
       >
-        <div className="bg-primary-100 text-primary-700  h-9 w-9 dark:bg-primary-900/20 dark:text-primary-400 flex items-center justify-center rounded-full font-semibold transition-colors">
+        <div className="bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 flex h-9 w-9 items-center justify-center rounded-full font-semibold transition-colors">
           {userName.charAt(0).toUpperCase()}
         </div>
       </button>
@@ -40,14 +41,24 @@ export function UserMenu({ userName }: UserMenuProps) {
         <div className="absolute left-0 mt-2 w-56 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-200 transition-all dark:bg-gray-900 dark:shadow-gray-900/50 dark:ring-gray-800">
           <div className="py-2">
             <div className="border-b border-gray-200 px-4 py-3 text-sm text-gray-900 dark:border-gray-800 dark:text-gray-100">
-              <div className="font-medium">{userName}</div>
-              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                حساب کاربری
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium">{userName}</div>
+                  <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    حساب کاربری
+                  </div>
+                </div>
+                <Link
+                  href="/user/profile"
+                  className="p-1.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  <Settings className="text-primary-500 h-4 w-4" />
+                </Link>
               </div>
             </div>
             <button
               onClick={() => {
-                router.push('/admin');
+                router.push('/admin/dashboard');
                 setIsOpen(false);
               }}
               className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
@@ -60,7 +71,7 @@ export function UserMenu({ userName }: UserMenuProps) {
             </button>
             <button
               onClick={() => {
-                router.push('/teacher');
+                router.push('/teacher/dashboard');
                 setIsOpen(false);
               }}
               className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
@@ -73,7 +84,7 @@ export function UserMenu({ userName }: UserMenuProps) {
             </button>
             <button
               onClick={() => {
-                router.push('/student');
+                router.push('/student/dashboard');
                 setIsOpen(false);
               }}
               className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"

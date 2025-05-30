@@ -42,8 +42,8 @@ export default function SendOtpPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
-          <label 
-            htmlFor="identifier" 
+          <label
+            htmlFor="identifier"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             شماره همراه
@@ -57,7 +57,7 @@ export default function SendOtpPage() {
               type="tel"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              className="block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 placeholder-gray-500 backdrop-blur-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-gray-900/50 dark:text-white dark:placeholder-gray-400"
+              className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 placeholder-gray-500 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white dark:placeholder-gray-400"
               required
               placeholder="09123456789"
               dir="ltr"
@@ -74,7 +74,7 @@ export default function SendOtpPage() {
         <button
           type="submit"
           disabled={loading}
-          className="relative w-full transform rounded-lg bg-primary-600 px-4 py-3 text-sm font-medium text-white transition-all duration-200 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-700 dark:hover:bg-primary-600"
+          className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-600 relative w-full transform rounded-lg px-4 py-3 text-sm font-medium text-white transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <>

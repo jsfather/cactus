@@ -28,7 +28,8 @@ const comments: Comment[] = [
   {
     id: '1',
     author: 'نازنین احمدی',
-    content: 'مقاله بسیار عالی و کاربردی بود. مخصوصاً بخش تکنیک پومودورو خیلی به من کمک کرد. ممنون از آکادمی کاکتوس',
+    content:
+      'مقاله بسیار عالی و کاربردی بود. مخصوصاً بخش تکنیک پومودورو خیلی به من کمک کرد. ممنون از آکادمی کاکتوس',
     date: '۲ روز پیش',
     avatar: '/user-nazanin.jpg',
   },
@@ -43,7 +44,8 @@ const comments: Comment[] = [
   {
     id: '3',
     author: 'رضا موسوی',
-    content: 'من تازه یادگیری برنامه‌نویسی رو شروع کردم. میشه لطفاً منابع بیشتری برای شروع معرفی کنید؟',
+    content:
+      'من تازه یادگیری برنامه‌نویسی رو شروع کردم. میشه لطفاً منابع بیشتری برای شروع معرفی کنید؟',
     date: '۱ هفته پیش',
     avatar: '/user-amirali.jpg',
   },
@@ -160,33 +162,47 @@ export default function Page() {
             </div>
 
             {/* Article Content */}
-            <div className="prose prose-lg max-w-none dark:prose-invert">
+            <div className="prose prose-lg dark:prose-invert max-w-none">
               <p className="lead">
-                یادگیری برنامه‌نویسی می‌تواند هم چالش‌برانگیز و هم بسیار لذت‌بخش باشد. بسیاری از افراد در مسیر یادگیری برنامه‌نویسی با مشکلاتی مانند عدم تمرکز، فراموشی مفاهیم و کاهش انگیزه مواجه می‌شوند. در این مقاله قصد داریم راهکارهای عملی و اثبات‌شده‌ای را برای افزایش بهره‌وری در یادگیری برنامه‌نویسی با شما به اشتراک بگذاریم.
+                یادگیری برنامه‌نویسی می‌تواند هم چالش‌برانگیز و هم بسیار لذت‌بخش
+                باشد. بسیاری از افراد در مسیر یادگیری برنامه‌نویسی با مشکلاتی
+                مانند عدم تمرکز، فراموشی مفاهیم و کاهش انگیزه مواجه می‌شوند. در
+                این مقاله قصد داریم راهکارهای عملی و اثبات‌شده‌ای را برای افزایش
+                بهره‌وری در یادگیری برنامه‌نویسی با شما به اشتراک بگذاریم.
               </p>
 
               <h2>۱. تعیین هدف مشخص</h2>
               <p>
-                اولین و مهمترین قدم در یادگیری مؤثر برنامه‌نویسی، تعیین هدف مشخص است. آیا می‌خواهید وب‌سایت بسازید؟ اپلیکیشن موبایل توسعه دهید؟ یا در حوزه هوش مصنوعی فعالیت کنید؟
+                اولین و مهمترین قدم در یادگیری مؤثر برنامه‌نویسی، تعیین هدف مشخص
+                است. آیا می‌خواهید وب‌سایت بسازید؟ اپلیکیشن موبایل توسعه دهید؟
+                یا در حوزه هوش مصنوعی فعالیت کنید؟
               </p>
               <blockquote>
-                بدون هدف مشخص، مانند کشتی‌ای بدون سکان هستید که در اقیانوس برنامه‌نویسی سرگردان خواهد شد.
+                بدون هدف مشخص، مانند کشتی‌ای بدون سکان هستید که در اقیانوس
+                برنامه‌نویسی سرگردان خواهد شد.
               </blockquote>
               <p>پیشنهاد می‌کنیم:</p>
               <ul>
-                <li>اهداف خود را به صورت SMART تعیین کنید (خاص، قابل اندازه‌گیری، قابل دستیابی، مرتبط و زمان‌بندی شده)</li>
+                <li>
+                  اهداف خود را به صورت SMART تعیین کنید (خاص، قابل اندازه‌گیری،
+                  قابل دستیابی، مرتبط و زمان‌بندی شده)
+                </li>
                 <li>اهداف بلندمدت را به اهداف کوتاه‌مدت تقسیم کنید</li>
                 <li>پیشرفت خود را به صورت هفتگی ثبت و بررسی کنید</li>
               </ul>
 
               <h2>۲. تمرین روزانه و مستمر</h2>
               <p>
-                برنامه‌نویسی مانند یادگیری یک زبان جدید است. برای تسلط یافتن، نیاز به تمرین مداوم دارید. تحقیقات نشان می‌دهد که تمرین روزانه ۳۰ دقیقه‌ای بسیار مؤثرتر از تمرین ۵ ساعته در یک روز است.
+                برنامه‌نویسی مانند یادگیری یک زبان جدید است. برای تسلط یافتن،
+                نیاز به تمرین مداوم دارید. تحقیقات نشان می‌دهد که تمرین روزانه
+                ۳۰ دقیقه‌ای بسیار مؤثرتر از تمرین ۵ ساعته در یک روز است.
               </p>
 
               <h2>۳. پروژه‌محور یاد بگیرید</h2>
               <p>
-                به جای صرفاً مطالعه مفاهیم تئوری، سعی کنید هر مفهوم جدیدی را در قالب یک پروژه کوچک پیاده‌سازی کنید. این کار به درک عمیق‌تر مفاهیم کمک می‌کند.
+                به جای صرفاً مطالعه مفاهیم تئوری، سعی کنید هر مفهوم جدیدی را در
+                قالب یک پروژه کوچک پیاده‌سازی کنید. این کار به درک عمیق‌تر
+                مفاهیم کمک می‌کند.
               </p>
               <p>برخی ایده‌های پروژه برای شروع:</p>
               <ul>
@@ -197,17 +213,23 @@ export default function Page() {
               </ul>
 
               <h2>۴. استفاده از تکنیک پومودورو</h2>
-              <p>تکنیک پومودورو یکی از مؤثرترین روش‌ها برای افزایش تمرکز و بهره‌وری است. در این روش:</p>
+              <p>
+                تکنیک پومودورو یکی از مؤثرترین روش‌ها برای افزایش تمرکز و
+                بهره‌وری است. در این روش:
+              </p>
               <ul>
                 <li>۲۵ دقیقه با تمرکز کامل کدنویسی کنید</li>
                 <li>۵ دقیقه استراحت کنید</li>
                 <li>این چرخه را ۴ بار تکرار کنید</li>
-                <li>پس از ۴ پومودورو، ۱۵-۳۰ دقیقه استراحت طولانی‌تر داشته باشید</li>
+                <li>
+                  پس از ۴ پومودورو، ۱۵-۳۰ دقیقه استراحت طولانی‌تر داشته باشید
+                </li>
               </ul>
 
               <h2>۵. مشارکت در جامعه برنامه‌نویسان</h2>
               <p>
-                عضویت در جامعه برنامه‌نویسان و مشارکت در بحث‌های تخصصی می‌تواند به رشد سریع‌تر شما کمک کند. برخی از راه‌های مشارکت:
+                عضویت در جامعه برنامه‌نویسان و مشارکت در بحث‌های تخصصی می‌تواند
+                به رشد سریع‌تر شما کمک کند. برخی از راه‌های مشارکت:
               </p>
               <ul>
                 <li>شرکت در رویدادهای برنامه‌نویسی (هکاتون، مسابقات)</li>
@@ -219,11 +241,17 @@ export default function Page() {
 
             {/* Article Tags */}
             <div className="my-8 flex flex-wrap gap-2">
-              {['برنامه‌نویسی', 'یادگیری', 'بهره‌وری', 'تکنیک‌ها', 'پومودورو'].map((tag) => (
+              {[
+                'برنامه‌نویسی',
+                'یادگیری',
+                'بهره‌وری',
+                'تکنیک‌ها',
+                'پومودورو',
+              ].map((tag) => (
                 <Link
                   key={tag}
                   href={`/blog/tag/${tag}`}
-                  className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full px-4 py-1 text-sm"
+                  className="rounded-full bg-gray-100 px-4 py-1 text-sm hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
                 >
                   <Tag className="mr-1 inline-block h-3 w-3" />
                   {tag}
@@ -234,7 +262,9 @@ export default function Page() {
             {/* Article Rating */}
             <div className="mb-12 flex items-center gap-4 rounded-2xl bg-gray-50 p-6 dark:bg-gray-800">
               <div className="text-center">
-                <p className="mb-2 text-sm">این مقاله را چگونه ارزیابی می‌کنید؟</p>
+                <p className="mb-2 text-sm">
+                  این مقاله را چگونه ارزیابی می‌کنید؟
+                </p>
                 <div className="flex items-center gap-2">
                   <button className="flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm shadow-sm dark:bg-gray-700">
                     <ThumbsUp className="h-4 w-4" />
@@ -264,7 +294,9 @@ export default function Page() {
                     مدرس ارشد آکادمی کاکتوس با ۱۰ سال سابقه تدریس برنامه‌نویسی
                   </p>
                   <p className="text-gray-600 dark:text-gray-400">
-                    امیر محمدی مدرس دوره‌های پیشرفته برنامه‌نویسی و مهندسی نرم‌افزار در آکادمی کاکتوس است. او علاقه‌مند به اشتراک‌گذاری دانش و تجربیات خود در زمینه‌های مختلف فناوری است.
+                    امیر محمدی مدرس دوره‌های پیشرفته برنامه‌نویسی و مهندسی
+                    نرم‌افزار در آکادمی کاکتوس است. او علاقه‌مند به اشتراک‌گذاری
+                    دانش و تجربیات خود در زمینه‌های مختلف فناوری است.
                   </p>
                 </div>
               </div>
@@ -272,7 +304,9 @@ export default function Page() {
 
             {/* Comments */}
             <section>
-              <h2 className="mb-6 text-2xl font-bold">دیدگاه‌ها ({comments.length})</h2>
+              <h2 className="mb-6 text-2xl font-bold">
+                دیدگاه‌ها ({comments.length})
+              </h2>
               <div className="space-y-6">
                 {comments.map((comment) => (
                   <motion.div
@@ -305,7 +339,9 @@ export default function Page() {
                         </div>
                       </div>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-300">{comment.content}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {comment.content}
+                    </p>
                   </motion.div>
                 ))}
               </div>
@@ -342,7 +378,9 @@ export default function Page() {
                 <div className="mb-6">
                   <label className="flex items-center gap-2">
                     <input type="checkbox" />
-                    <span className="text-sm">نام و ایمیل من را برای دفعات بعد ذخیره کن</span>
+                    <span className="text-sm">
+                      نام و ایمیل من را برای دفعات بعد ذخیره کن
+                    </span>
                   </label>
                 </div>
                 <button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 rounded-lg px-6 py-3 text-white">
@@ -372,17 +410,17 @@ export default function Page() {
               <div className="space-y-6">
                 {relatedPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.id}`}>
-                    <div className="group flex gap-4 m-1">
-                      <div className="relative h-20 w-20 overflow-hidden rounded-lg ">
+                    <div className="group m-1 flex gap-4">
+                      <div className="relative h-20 w-20 overflow-hidden rounded-lg">
                         <Image
                           src={post.image}
                           alt={post.title}
                           fill
-                          className="object-cover  transition-transform duration-300 group-hover:scale-110"
+                          className="object-cover transition-transform duration-300 group-hover:scale-110"
                         />
                       </div>
                       <div>
-                        <h3 className="mb-1 font-bold group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                        <h3 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-1 font-bold">
                           {post.title}
                         </h3>
                         <time className="text-sm text-gray-500 dark:text-gray-400">
@@ -403,7 +441,7 @@ export default function Page() {
                   <Link
                     key={category.name}
                     href={`/blog/category/${category.name}`}
-                    className="flex items-center justify-between hover:text-primary-600 dark:hover:text-primary-400"
+                    className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center justify-between"
                   >
                     <span>{category.name}</span>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -422,7 +460,7 @@ export default function Page() {
                   <Link
                     key={tag}
                     href={`/blog/tag/${tag}`}
-                    className="bg-white hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-full px-3 py-1 text-sm"
+                    className="rounded-full bg-white px-3 py-1 text-sm hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600"
                   >
                     {tag}
                   </Link>
@@ -431,8 +469,10 @@ export default function Page() {
             </div>
 
             {/* CTA */}
-            <div className="rounded-2xl bg-primary-50 p-6 text-center dark:bg-primary-900/20">
-              <h2 className="mb-4 text-xl font-bold">آماده شروع یادگیری هستید؟</h2>
+            <div className="bg-primary-50 dark:bg-primary-900/20 rounded-2xl p-6 text-center">
+              <h2 className="mb-4 text-xl font-bold">
+                آماده شروع یادگیری هستید؟
+              </h2>
               <p className="mb-6 text-gray-600 dark:text-gray-400">
                 به جمع ۵۰۰۰+ دانشجوی آکادمی کاکتوس بپیوندید
               </p>
@@ -477,7 +517,7 @@ export default function Page() {
                           </span>
                         ))}
                       </div>
-                      <h3 className="mb-2 text-xl font-bold group-hover:text-primary-600 dark:group-hover:text-primary-400">
+                      <h3 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-xl font-bold">
                         {post.title}
                       </h3>
                       <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">

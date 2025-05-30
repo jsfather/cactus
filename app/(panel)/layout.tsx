@@ -43,18 +43,14 @@ export default function PanelLayout({
   if (loading) {
     return (
       <div className="flex h-screen">
-        <Sidebar 
+        <Sidebar
           menuItems={[]}
           isOpen={false}
           onClose={() => {}}
           loading={true}
         />
         <div className="flex flex-1 flex-col">
-          <Header 
-            user={null}
-            onMenuClick={() => {}}
-            loading={true}
-          />
+          <Header user={null} onMenuClick={() => {}} loading={true} />
         </div>
       </div>
     );
@@ -65,4 +61,4 @@ export default function PanelLayout({
   }
 
   return children;
-} 
+}

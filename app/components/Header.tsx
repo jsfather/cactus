@@ -49,7 +49,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="text-gray-600 hover:text-gray-900 cursor-pointer dark:text-gray-300 dark:hover:text-white lg:hidden"
+              className="cursor-pointer text-gray-600 hover:text-gray-900 lg:hidden dark:text-gray-300 dark:hover:text-white"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -57,9 +57,9 @@ export default function Header() {
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-2">
                 <Image
-                  src="/logo.svg" 
-                  alt="کاکتوس" 
-                  width={56} 
+                  src="/logo.svg"
+                  alt="کاکتوس"
+                  width={56}
                   height={56}
                   priority
                 />
@@ -76,7 +76,7 @@ export default function Header() {
                     className={`font-medium transition-colors duration-200 ${
                       pathname === item.href
                         ? 'text-primary-600 dark:text-primary-400'
-                        : 'text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400'
+                        : 'hover:text-primary-600 dark:hover:text-primary-400 text-gray-900 dark:text-gray-100'
                     }`}
                   >
                     {item.title}
@@ -89,7 +89,7 @@ export default function Header() {
               {/* Mobile Search Toggle */}
               <button
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-300 cursor-pointer dark:hover:text-white lg:hidden"
+                className="cursor-pointer text-gray-600 hover:text-gray-900 lg:hidden dark:text-gray-300 dark:hover:text-white"
               >
                 <Search className="h-6 w-6" />
               </button>
@@ -99,7 +99,7 @@ export default function Header() {
                 <input
                   type="text"
                   placeholder="جستجو ..."
-                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                 />
                 <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
                   <Search className="h-5 w-5" />
@@ -133,14 +133,14 @@ export default function Header() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="border-t border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 lg:hidden"
+              className="border-t border-gray-200 bg-white lg:hidden dark:border-gray-700 dark:bg-gray-900"
             >
               <div className="container mx-auto p-4">
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="جستجو ..."
-                    className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                    className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                   />
                   <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
                     <Search className="h-5 w-5" />
@@ -188,7 +188,7 @@ export default function Header() {
                 </Link>
                 <button
                   onClick={() => setIsDrawerOpen(false)}
-                  className="text-gray-600 hover:text-gray-900 cursor-pointer dark:text-gray-300 dark:hover:text-white"
+                  className="cursor-pointer text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                 >
                   <X className="h-6 w-6" />
                 </button>
