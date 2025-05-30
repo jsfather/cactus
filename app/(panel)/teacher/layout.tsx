@@ -5,7 +5,6 @@ import Sidebar from '@/app/components/panel/Sidebar';
 import { useState } from 'react';
 import { useUser } from '@/app/hooks/useUser';
 
-
 const menuItems = [
   {
     title: 'داشبورد',
@@ -14,8 +13,8 @@ const menuItems = [
       {
         title: 'خلاصه عملکرد',
         href: '/teacher/dashboard',
-      }
-    ]
+      },
+    ],
   },
   {
     title: 'آموزش',
@@ -41,7 +40,7 @@ const menuItems = [
         title: 'گزارش ها',
         href: '/teacher/reports',
       },
-    ]
+    ],
   },
   {
     title: 'کاربران',
@@ -50,8 +49,8 @@ const menuItems = [
       {
         title: 'دانش آموزان',
         href: '/teacher/students',
-      }
-    ]
+      },
+    ],
   },
   {
     title: 'ارتباطات',
@@ -60,9 +59,9 @@ const menuItems = [
       {
         title: 'تیکت ها',
         href: '/teacher/tickets',
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];
 
 export default function Layout({
@@ -73,15 +72,15 @@ export default function Layout({
 
   return (
     <div className="flex h-screen">
-      <Sidebar 
-        user={user || undefined} 
+      <Sidebar
+        user={user || undefined}
         menuItems={menuItems}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         loading={loading}
       />
       <div className="flex flex-1 flex-col">
-        <Header 
+        <Header
           user={user}
           onMenuClick={() => setIsMobileMenuOpen(true)}
           loading={loading}

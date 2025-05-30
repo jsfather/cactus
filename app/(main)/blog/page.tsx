@@ -44,7 +44,8 @@ const blogPosts: BlogPost[] = [
   {
     id: '1',
     title: 'آینده رباتیک در آموزش',
-    excerpt: 'کشف کنید چگونه رباتیک در حال تغییر چشم‌انداز آموزشی و آماده‌سازی دانش‌آموزان برای آینده است.',
+    excerpt:
+      'کشف کنید چگونه رباتیک در حال تغییر چشم‌انداز آموزشی و آماده‌سازی دانش‌آموزان برای آینده است.',
     date: '۲۵ اسفند ۱۴۰۲',
     author: 'دکتر سارا چن',
     image: '/blog-robotics-education.png',
@@ -55,7 +56,8 @@ const blogPosts: BlogPost[] = [
   {
     id: '2',
     title: '۵ پروژه برتر رباتیک برای مبتدیان',
-    excerpt: 'سفر خود در رباتیک را با این پروژه‌های جذاب و آموزشی مناسب برای مبتدیان آغاز کنید.',
+    excerpt:
+      'سفر خود در رباتیک را با این پروژه‌های جذاب و آموزشی مناسب برای مبتدیان آغاز کنید.',
     date: '۲۲ اسفند ۱۴۰۲',
     author: 'جیمز ویلسون',
     image: '/blog-robotics-projects.png',
@@ -66,7 +68,8 @@ const blogPosts: BlogPost[] = [
   {
     id: '3',
     title: 'هوش مصنوعی و رباتیک: مشارکتی کامل',
-    excerpt: 'بررسی کنید چگونه هوش مصنوعی در حال ارتقای قابلیت‌های رباتیک و ایجاد امکانات جدید است.',
+    excerpt:
+      'بررسی کنید چگونه هوش مصنوعی در حال ارتقای قابلیت‌های رباتیک و ایجاد امکانات جدید است.',
     date: '۲۰ اسفند ۱۴۰۲',
     author: 'دکتر مایکل لی',
     image: '/blog-ai-robotics.png',
@@ -83,30 +86,36 @@ export default function Page() {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredPosts = blogPosts.filter((post) => {
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'همه' || post.category === selectedCategory;
-    const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => post.tags.includes(tag));
+    const matchesCategory =
+      selectedCategory === 'همه' || post.category === selectedCategory;
+    const matchesTags =
+      selectedTags.length === 0 ||
+      selectedTags.some((tag) => post.tags.includes(tag));
     return matchesSearch && matchesCategory && matchesTags;
   });
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900">
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900"
+    >
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
             وبلاگ
             <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
-              {' '}کاکتوس
+              {' '}
+              کاکتوس
             </span>
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
@@ -126,7 +135,7 @@ export default function Page() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 dark:border-gray-700 dark:bg-gray-800"
               />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              <Search className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
             </div>
 
             {/* Filter Toggle Button */}
@@ -149,7 +158,9 @@ export default function Page() {
             >
               {/* Categories */}
               <div className="mb-4">
-                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">دسته‌بندی‌ها</h3>
+                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
+                  دسته‌بندی‌ها
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((category) => (
                     <button
@@ -157,7 +168,7 @@ export default function Page() {
                       onClick={() => setSelectedCategory(category.name)}
                       className={`rounded-full px-4 py-1 text-sm ${
                         selectedCategory === category.name
-                          ? 'bg-primary-600 text-white dark:bg-primary-500'
+                          ? 'bg-primary-600 dark:bg-primary-500 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
@@ -169,7 +180,9 @@ export default function Page() {
 
               {/* Tags */}
               <div>
-                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">برچسب‌ها</h3>
+                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
+                  برچسب‌ها
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <button
@@ -177,7 +190,7 @@ export default function Page() {
                       onClick={() => toggleTag(tag)}
                       className={`rounded-full px-3 py-1 text-sm ${
                         selectedTags.includes(tag)
-                          ? 'bg-primary-600 text-white dark:bg-primary-500'
+                          ? 'bg-primary-600 dark:bg-primary-500 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
@@ -223,17 +236,27 @@ export default function Page() {
                       </span>
                     ))}
                   </div>
-                  <h2 className="mb-2 text-xl font-bold text-gray-900 group-hover:text-primary-600 dark:text-white dark:group-hover:text-primary-400">
+                  <h2 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-xl font-bold text-gray-900 dark:text-white">
                     {post.title}
                   </h2>
-                  <p className="mb-4 text-gray-600 dark:text-gray-300">{post.excerpt}</p>
+                  <p className="mb-4 text-gray-600 dark:text-gray-300">
+                    {post.excerpt}
+                  </p>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{post.author}</span>
-                      <span className="text-gray-300 dark:text-gray-600">•</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{post.readTime}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {post.author}
+                      </span>
+                      <span className="text-gray-300 dark:text-gray-600">
+                        •
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {post.readTime}
+                      </span>
                     </div>
-                    <time className="text-sm text-gray-500 dark:text-gray-400">{post.date}</time>
+                    <time className="text-sm text-gray-500 dark:text-gray-400">
+                      {post.date}
+                    </time>
                   </div>
                 </div>
               </Link>

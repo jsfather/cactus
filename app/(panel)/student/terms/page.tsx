@@ -40,12 +40,14 @@ export default function Page() {
     {
       header: 'تاریخ شروع',
       accessor: 'start_date' as const,
-      render: (value: string | number, _item: Term) => new Date(value.toString()).toLocaleDateString('fa-IR'),
+      render: (value: string | number, _item: Term) =>
+        new Date(value.toString()).toLocaleDateString('fa-IR'),
     },
     {
       header: 'تاریخ پایان',
       accessor: 'end_date' as const,
-      render: (value: string | number, _item: Term) => new Date(value.toString()).toLocaleDateString('fa-IR'),
+      render: (value: string | number, _item: Term) =>
+        new Date(value.toString()).toLocaleDateString('fa-IR'),
     },
     {
       header: 'نوع دوره',
@@ -53,8 +55,10 @@ export default function Page() {
       render: (value: string | number, _item: Term) => {
         const typeValue = value as Term['type'];
         const typeClasses = {
-          normal: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
-          capacity_completion: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+          normal:
+            'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+          capacity_completion:
+            'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
           vip: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
         } as const;
         const typeText = {
@@ -63,7 +67,9 @@ export default function Page() {
           vip: 'ویژه',
         } as const;
         return (
-          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${typeClasses[typeValue]}`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${typeClasses[typeValue]}`}
+          >
             {typeText[typeValue]}
           </span>
         );
@@ -101,13 +107,12 @@ export default function Page() {
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">ترم‌های من</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          ترم‌های من
+        </h1>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search
-          placeholder="جستجوی ترم"
-          className="max-w-lg"
-        />
+        <Search placeholder="جستجوی ترم" className="max-w-lg" />
       </div>
       <Table
         data={terms}

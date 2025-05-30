@@ -29,7 +29,10 @@ export default function Table<T extends { id: string | number }>({
             <div className="animate-pulse">
               <div className="md:hidden">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="mb-2 w-full rounded-md bg-white p-4 dark:bg-gray-800">
+                  <div
+                    key={i}
+                    className="mb-2 w-full rounded-md bg-white p-4 dark:bg-gray-800"
+                  >
                     <div className="flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700">
                       <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
                     </div>
@@ -49,7 +52,11 @@ export default function Table<T extends { id: string | number }>({
                 <thead className="rounded-lg text-right text-sm font-normal">
                   <tr>
                     {columns.map((column, index) => (
-                      <th key={index} scope="col" className="px-3 py-5 font-medium">
+                      <th
+                        key={index}
+                        scope="col"
+                        className="px-3 py-5 font-medium"
+                      >
                         {column.header}
                       </th>
                     ))}
@@ -67,7 +74,10 @@ export default function Table<T extends { id: string | number }>({
                       className="w-full border-b border-gray-200 py-3 text-sm dark:border-gray-700"
                     >
                       {columns.map((_, index) => (
-                        <td key={index} className="py-3 pr-3 pl-6 whitespace-nowrap">
+                        <td
+                          key={index}
+                          className="py-3 pr-3 pl-6 whitespace-nowrap"
+                        >
                           <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
                         </td>
                       ))}
@@ -97,7 +107,9 @@ export default function Table<T extends { id: string | number }>({
           <div className="md:hidden">
             {data.length === 0 ? (
               <div className="mb-2 w-full rounded-md bg-white p-4 text-center dark:bg-gray-800">
-                <p className="text-gray-500 dark:text-gray-400">{emptyMessage}</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  {emptyMessage}
+                </p>
               </div>
             ) : (
               data.map((item) => (
@@ -120,7 +132,9 @@ export default function Table<T extends { id: string | number }>({
                         <p
                           key={index}
                           className={`${
-                            index === 0 ? 'text-xl font-medium' : 'mt-2 text-sm text-gray-500 dark:text-gray-400'
+                            index === 0
+                              ? 'text-xl font-medium'
+                              : 'mt-2 text-sm text-gray-500 dark:text-gray-400'
                           }`}
                         >
                           {column.render
@@ -130,7 +144,9 @@ export default function Table<T extends { id: string | number }>({
                       ))}
                     </div>
                     {actions && (
-                      <div className="flex justify-end gap-2">{actions(item)}</div>
+                      <div className="flex justify-end gap-2">
+                        {actions(item)}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -169,7 +185,10 @@ export default function Table<T extends { id: string | number }>({
                     className="w-full border-b border-gray-200 py-3 text-sm last-of-type:border-none dark:border-gray-700 [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                   >
                     {columns.map((column, index) => (
-                      <td key={index} className="py-3 pr-3 pl-6 whitespace-nowrap">
+                      <td
+                        key={index}
+                        className="py-3 pr-3 pl-6 whitespace-nowrap"
+                      >
                         <div className="flex items-center gap-3">
                           {column.render
                             ? column.render(item[column.accessor], item)
@@ -179,7 +198,9 @@ export default function Table<T extends { id: string | number }>({
                     ))}
                     {actions && (
                       <td className="py-3 pr-3 pl-6 whitespace-nowrap">
-                        <div className="flex justify-end gap-3">{actions(item)}</div>
+                        <div className="flex justify-end gap-3">
+                          {actions(item)}
+                        </div>
                       </td>
                     )}
                   </tr>

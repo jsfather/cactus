@@ -13,8 +13,8 @@ const menuItems = [
       {
         title: 'خلاصه عملکرد',
         href: '/admin/dashboard',
-      }
-    ]
+      },
+    ],
   },
   {
     title: 'کاربران',
@@ -32,7 +32,7 @@ const menuItems = [
         title: 'کاربران',
         href: '/admin/users',
       },
-    ]
+    ],
   },
   {
     title: 'آموزش',
@@ -53,9 +53,9 @@ const menuItems = [
       {
         title: 'سیستم آزمون',
         href: '/education/exam-system',
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];
 
 export default function Layout({
@@ -66,15 +66,15 @@ export default function Layout({
 
   return (
     <div className="flex h-screen">
-      <Sidebar 
-        user={user || undefined} 
+      <Sidebar
+        user={user || undefined}
         menuItems={menuItems}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         loading={loading}
       />
       <div className="flex flex-1 flex-col">
-        <Header 
+        <Header
           user={user}
           onMenuClick={() => setIsMobileMenuOpen(true)}
           loading={loading}

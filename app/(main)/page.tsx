@@ -88,7 +88,7 @@ export default function Page() {
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <div className="relative h-[500px] w-full group">
+              <div className="group relative h-[500px] w-full">
                 <Image
                   src="/robot-video.png"
                   alt="آموزش رباتیک"
@@ -98,19 +98,15 @@ export default function Page() {
                   priority
                 />
                 <div className="from-primary-600/20 dark:from-primary-900/30 absolute inset-0 rounded-2xl bg-gradient-to-tr to-transparent" />
-                <button 
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                           w-16 h-16 bg-white/30 hover:bg-white/40 backdrop-blur-sm
-                           rounded-full flex items-center justify-center
-                           transition-all duration-300 ease-in-out
-                           group-hover:scale-110"
+                <button
+                  className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 transform items-center justify-center rounded-full bg-white/30 backdrop-blur-sm transition-all duration-300 ease-in-out group-hover:scale-110 hover:bg-white/40"
                   aria-label="Play video"
                 >
-                  <svg 
-                    className="w-8 h-8 text-white fill-current" 
+                  <svg
+                    className="h-8 w-8 fill-current text-white"
                     viewBox="0 0 24 24"
                   >
-                    <path d="M8 5v14l11-7z"/>
+                    <path d="M8 5v14l11-7z" />
                   </svg>
                 </button>
               </div>
@@ -513,9 +509,9 @@ export default function Page() {
                       </span>
                     </div>
                     <Link href="/shop/1">
-                    <button className="text-primary-600 cursor-pointer dark:text-primary-400 rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                      جزئیات
-                    </button>
+                      <button className="text-primary-600 dark:text-primary-400 cursor-pointer rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+                        جزئیات
+                      </button>
                     </Link>
                   </div>
                 </div>
@@ -525,9 +521,9 @@ export default function Page() {
 
           <div className="mt-12 text-center">
             <Link href="/shop">
-            <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-              مشاهده همه محصولات
-            </Button>
+              <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+                مشاهده همه محصولات
+              </Button>
             </Link>
           </div>
         </div>
@@ -598,9 +594,10 @@ export default function Page() {
 
           <div className="mt-12 text-center">
             <Link href="/courses">
-            <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-              مشاهده همه دوره‌ها
-            </Button></Link>
+              <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+                مشاهده همه دوره‌ها
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

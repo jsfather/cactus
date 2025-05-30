@@ -12,10 +12,10 @@ interface PaginationProps {
   pageParamName?: string;
 }
 
-export default function Pagination({ 
+export default function Pagination({
   totalPages,
   className = '',
-  pageParamName = 'page'
+  pageParamName = 'page',
 }: PaginationProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -86,7 +86,8 @@ function PaginationNumber({
       'rounded-r-md': position === 'first' || position === 'single',
       'rounded-l-md': position === 'last' || position === 'single',
       'z-10 bg-primary-600 border-primary-600 text-white': isActive,
-      'hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700': !isActive && position !== 'middle',
+      'hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700':
+        !isActive && position !== 'middle',
       'text-gray-300 dark:text-gray-600': position === 'middle',
       'dark:bg-primary-500 dark:border-primary-500': isActive,
       'dark:text-white': !isActive && position !== 'middle',
@@ -115,7 +116,8 @@ function PaginationArrow({
     'flex h-10 w-10 items-center justify-center rounded-md border',
     {
       'pointer-events-none text-gray-300 dark:text-gray-600': isDisabled,
-      'hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700': !isDisabled,
+      'hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700':
+        !isDisabled,
       'mr-2 md:mr-4': direction === 'left',
       'ml-2 md:ml-4': direction === 'right',
     }

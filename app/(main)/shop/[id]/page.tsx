@@ -4,7 +4,15 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Minus, Plus, Truck, Shield, RefreshCw, ChevronLeft } from 'lucide-react';
+import {
+  Star,
+  Minus,
+  Plus,
+  Truck,
+  Shield,
+  RefreshCw,
+  ChevronLeft,
+} from 'lucide-react';
 
 // Sample product data (replace with actual data fetching)
 const product = {
@@ -17,7 +25,8 @@ const product = {
   reviews: 28,
   inStock: true,
   stockCount: 12,
-  description: 'کیت آموزشی ربات مسیریاب یک مجموعه کامل برای یادگیری مفاهیم پایه رباتیک و برنامه‌نویسی است. این کیت شامل تمام قطعات مورد نیاز برای ساخت یک ربات مسیریاب هوشمند می‌باشد.',
+  description:
+    'کیت آموزشی ربات مسیریاب یک مجموعه کامل برای یادگیری مفاهیم پایه رباتیک و برنامه‌نویسی است. این کیت شامل تمام قطعات مورد نیاز برای ساخت یک ربات مسیریاب هوشمند می‌باشد.',
   features: [
     'قابلیت تشخیص و تعقیب خط',
     'سنسورهای مادون قرمز با دقت بالا',
@@ -74,19 +83,28 @@ export default function Page() {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900">
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900"
+    >
       <div className="container mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="mb-8">
           <ol className="flex items-center gap-2 text-sm">
             <li>
-              <Link href="/shop" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+              <Link
+                href="/shop"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              >
                 فروشگاه
               </Link>
             </li>
             <ChevronLeft className="h-4 w-4 text-gray-400" />
             <li>
-              <Link href={`/shop/category/${product.category}`} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+              <Link
+                href={`/shop/category/${product.category}`}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              >
                 {product.category}
               </Link>
             </li>
@@ -147,7 +165,7 @@ export default function Page() {
                       key={i}
                       className={`h-5 w-5 ${
                         i < Math.floor(product.rating)
-                          ? 'text-yellow-400 dark:text-yellow-500 fill-current'
+                          ? 'fill-current text-yellow-400 dark:text-yellow-500'
                           : 'text-gray-300 dark:text-gray-600'
                       }`}
                     />
@@ -167,7 +185,7 @@ export default function Page() {
                 <div>
                   {product.discount ? (
                     <>
-                      <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                      <p className="text-primary-600 dark:text-primary-400 text-3xl font-bold">
                         {product.discount}
                         <span className="mr-1 text-base">تومان</span>
                       </p>
@@ -176,7 +194,7 @@ export default function Page() {
                       </p>
                     </>
                   ) : (
-                    <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                    <p className="text-primary-600 dark:text-primary-400 text-3xl font-bold">
                       {product.price}
                       <span className="mr-1 text-base">تومان</span>
                     </p>
@@ -188,7 +206,9 @@ export default function Page() {
                       موجود در انبار ({product.stockCount} عدد)
                     </span>
                   ) : (
-                    <span className="text-red-600 dark:text-red-400">ناموجود</span>
+                    <span className="text-red-600 dark:text-red-400">
+                      ناموجود
+                    </span>
                   )}
                 </div>
               </div>
@@ -202,7 +222,9 @@ export default function Page() {
                   >
                     <Minus className="h-5 w-5" />
                   </button>
-                  <span className="w-12 text-center font-medium">{quantity}</span>
+                  <span className="w-12 text-center font-medium">
+                    {quantity}
+                  </span>
                   <button
                     onClick={incrementQuantity}
                     disabled={quantity >= product.stockCount}
@@ -249,7 +271,7 @@ export default function Page() {
             </div>
 
             {/* Description */}
-            <div className="prose prose-lg max-w-none dark:prose-invert">
+            <div className="prose prose-lg dark:prose-invert max-w-none">
               <h2>توضیحات محصول</h2>
               <p>{product.description}</p>
               <h3>ویژگی‌ها</h3>
@@ -269,7 +291,9 @@ export default function Page() {
                     key={index}
                     className="flex items-center justify-between border-b border-gray-100 pb-2 last:border-0 last:pb-0 dark:border-gray-700"
                   >
-                    <span className="text-gray-600 dark:text-gray-400">{spec.name}</span>
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {spec.name}
+                    </span>
                     <span className="font-medium">{spec.value}</span>
                   </div>
                 ))}

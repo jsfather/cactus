@@ -10,27 +10,30 @@ export default function DarkModeToggle() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
+
     const initialDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
     setIsDark(initialDark);
-    
+
     if (initialDark) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-    
+
     setMounted(true);
   }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
-      const shouldBeDark = localStorage.getItem('theme') === 'dark' ||
+      const shouldBeDark =
+        localStorage.getItem('theme') === 'dark' ||
         (!localStorage.getItem('theme') && e.matches);
-      
+
       setIsDark(shouldBeDark);
       if (shouldBeDark) {
         document.documentElement.classList.add('dark');
@@ -46,7 +49,7 @@ export default function DarkModeToggle() {
   const toggleDarkMode = () => {
     const newTheme = !isDark;
     setIsDark(newTheme);
-    
+
     if (newTheme) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');

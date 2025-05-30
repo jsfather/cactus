@@ -17,8 +17,8 @@ const menuItems = [
       {
         title: 'تغییر رمز عبور',
         href: '/user/password',
-      }
-    ]
+      },
+    ],
   },
 ];
 
@@ -30,15 +30,15 @@ export default function Layout({
 
   return (
     <div className="flex h-screen">
-      <Sidebar 
-        user={user || undefined} 
+      <Sidebar
+        user={user || undefined}
         menuItems={menuItems}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
         loading={loading}
       />
       <div className="flex flex-1 flex-col">
-        <Header 
+        <Header
           user={user}
           onMenuClick={() => setIsMobileMenuOpen(true)}
           loading={loading}

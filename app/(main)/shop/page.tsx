@@ -64,26 +64,39 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState<'all' | 'under-1m' | 'under-5m' | 'above-5m'>('all');
+  const [priceRange, setPriceRange] = useState<
+    'all' | 'under-1m' | 'under-5m' | 'above-5m'
+  >('all');
   const [availability, setAvailability] = useState<'all' | 'in-stock'>('all');
 
   const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === categories.find(c => c.id === selectedCategory)?.name;
-    const matchesAvailability = availability === 'all' || (availability === 'in-stock' && product.inStock);
-    
+    const matchesSearch = product.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      product.category ===
+        categories.find((c) => c.id === selectedCategory)?.name;
+    const matchesAvailability =
+      availability === 'all' ||
+      (availability === 'in-stock' && product.inStock);
+
     return matchesSearch && matchesCategory && matchesAvailability;
   });
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900">
+    <div
+      dir="rtl"
+      className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900"
+    >
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-white">
             فروشگاه
             <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
-              {' '}کاکتوس
+              {' '}
+              کاکتوس
             </span>
           </h1>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
@@ -103,7 +116,7 @@ export default function Page() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 dark:border-gray-700 dark:bg-gray-800"
               />
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+              <Search className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
             </div>
 
             {/* Filter Toggle Button */}
@@ -126,7 +139,9 @@ export default function Page() {
             >
               {/* Categories */}
               <div className="mb-4">
-                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">دسته‌بندی‌ها</h3>
+                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
+                  دسته‌بندی‌ها
+                </h3>
                 <div className="flex flex-wrap gap-2">
                   {categories.map((category) => (
                     <button
@@ -134,7 +149,7 @@ export default function Page() {
                       onClick={() => setSelectedCategory(category.id)}
                       className={`rounded-full px-4 py-1 text-sm ${
                         selectedCategory === category.id
-                          ? 'bg-primary-600 text-white dark:bg-primary-500'
+                          ? 'bg-primary-600 dark:bg-primary-500 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
@@ -146,7 +161,9 @@ export default function Page() {
 
               {/* Availability Filter */}
               <div className="mb-4">
-                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">وضعیت موجودی</h3>
+                <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
+                  وضعیت موجودی
+                </h3>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
                     <input
@@ -233,7 +250,7 @@ export default function Page() {
                         key={i}
                         className={`h-4 w-4 ${
                           i < Math.floor(product.rating)
-                            ? 'text-yellow-400 dark:text-yellow-500 fill-current'
+                            ? 'fill-current text-yellow-400 dark:text-yellow-500'
                             : 'text-gray-300 dark:text-gray-600'
                         }`}
                       />
@@ -263,11 +280,11 @@ export default function Page() {
                       تومان
                     </span>
                   </div>
-                  <button 
+                  <button
                     className={`rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
-                      product.inStock 
-                        ? 'bg-primary-600 text-white hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600'
-                        : 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                      product.inStock
+                        ? 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white'
+                        : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
                     }`}
                     disabled={!product.inStock}
                   >

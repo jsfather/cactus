@@ -13,7 +13,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" className="scroll-smooth" suppressHydrationWarning>
+    <html
+      lang="fa"
+      dir="rtl"
+      className="scroll-smooth"
+      suppressHydrationWarning
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{

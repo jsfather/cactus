@@ -4,7 +4,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { motion } from 'framer-motion';
-import { ChevronLeft, Search, Filter, BookOpen, Clock, Users } from 'lucide-react';
+import {
+  ChevronLeft,
+  Search,
+  Filter,
+  BookOpen,
+  Clock,
+  Users,
+} from 'lucide-react';
 
 interface Course {
   title: string;
@@ -73,69 +80,77 @@ export default function Page() {
       <div className="border-b dark:border-gray-800">
         <div className="container mx-auto px-4">
           <nav className="flex items-center py-4 text-sm">
-            <Link href="/" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+            <Link
+              href="/"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            >
               خانه
             </Link>
             <ChevronLeft className="mx-2 h-4 w-4 text-gray-500" />
-            <span className="text-primary-600 dark:text-primary-400">دوره‌های آموزشی</span>
+            <span className="text-primary-600 dark:text-primary-400">
+              دوره‌های آموزشی
+            </span>
           </nav>
         </div>
       </div>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 py-20">
+      <section className="bg-gradient-to-b from-gray-50 to-white py-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.h1 
+          <div className="mx-auto max-w-4xl text-center">
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-4xl font-bold mb-6"
+              className="mb-6 text-4xl font-bold"
             >
               دوره‌های آموزشی
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
-                {' '}رباتیک
+                {' '}
+                رباتیک
               </span>
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-xl text-gray-600 dark:text-gray-300 mb-8"
+              className="mb-8 text-xl text-gray-600 dark:text-gray-300"
             >
               با بهترین اساتید، جدیدترین تکنولوژی‌ها را در حوزه رباتیک بیاموزید
             </motion.p>
 
             {/* Search and Filter */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <div className="relative flex-1 max-w-md">
+            <div className="mb-12 flex flex-col justify-center gap-4 sm:flex-row">
+              <div className="relative max-w-md flex-1">
                 <input
                   type="text"
                   placeholder="جستجو در دوره‌ها..."
-                  className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-gray-700 dark:bg-gray-800 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="focus:ring-primary-500 w-full rounded-xl border border-gray-200 px-4 py-3 pr-12 focus:border-transparent focus:ring-2 dark:border-gray-700 dark:bg-gray-800"
                 />
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
               </div>
-              <button className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+              <button className="flex items-center justify-center gap-2 rounded-xl bg-gray-100 px-6 py-3 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                 <Filter className="h-5 w-5" />
                 فیلتر دوره‌ها
               </button>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
               {stats.map((stat, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + index * 0.1 }}
-                  className="flex flex-col items-center p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg"
+                  className="flex flex-col items-center rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800"
                 >
                   <div className="text-primary-600 dark:text-primary-400 mb-2">
                     {stat.icon}
                   </div>
-                  <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                  <div className="text-gray-600 dark:text-gray-400">{stat.label}</div>
+                  <div className="mb-1 text-3xl font-bold">{stat.value}</div>
+                  <div className="text-gray-600 dark:text-gray-400">
+                    {stat.label}
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -146,13 +161,13 @@ export default function Page() {
       {/* Courses Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-12">
+          <div className="mb-12 flex items-center justify-between">
             <h2 className="text-2xl font-bold">دوره‌های ویژه</h2>
             <div className="flex gap-4">
-              <button className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+              <button className="rounded-lg bg-gray-100 px-4 py-2 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                 جدیدترین
               </button>
-              <button className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+              <button className="rounded-lg bg-gray-100 px-4 py-2 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                 محبوب‌ترین
               </button>
             </div>
@@ -199,9 +214,9 @@ export default function Page() {
                 </div>
                 <div className="px-6 pb-6">
                   <Link href={`/courses/1`}>
-                  <button className="text-primary-600 cursor-pointer dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                    اطلاعات بیشتر
-                  </button>
+                    <button className="text-primary-600 dark:text-primary-400 w-full cursor-pointer rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+                      اطلاعات بیشتر
+                    </button>
                   </Link>
                 </div>
               </motion.div>
@@ -211,14 +226,16 @@ export default function Page() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 py-20">
+      <section className="bg-gradient-to-r from-gray-100 to-gray-200 py-20 dark:from-gray-700 dark:to-gray-800">
         <div className="container mx-auto px-4">
           <div className="text-center text-gray-900 dark:text-white">
-            <h2 className="text-3xl font-bold mb-4">آماده شروع یادگیری هستید؟</h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+            <h2 className="mb-4 text-3xl font-bold">
+              آماده شروع یادگیری هستید؟
+            </h2>
+            <p className="mb-8 text-lg text-gray-600 dark:text-gray-300">
               با ما تماس بگیرید و مشاوره رایگان دریافت کنید
             </p>
-            <Button className="bg-primary-600 hover:bg-primary-700 text-white dark:bg-primary-600 dark:hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg transition-all duration-200 hover:scale-105">
+            <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
               دریافت مشاوره رایگان
             </Button>
           </div>

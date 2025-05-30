@@ -2,7 +2,15 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { MapPin, Phone, Mail, Clock, Instagram, Twitter, Facebook } from 'lucide-react';
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Instagram,
+  Twitter,
+  Facebook,
+} from 'lucide-react';
 import { useState } from 'react';
 
 interface FAQ {
@@ -13,11 +21,13 @@ interface FAQ {
 const faqs: FAQ[] = [
   {
     question: 'چگونه می‌توانم در دوره‌ها ثبت‌نام کنم؟',
-    answer: 'شما می‌توانید با مراجعه به صفحه دوره‌ها و انتخاب دوره مورد نظر خود، از طریق درگاه پرداخت آنلاین ثبت‌نام کنید.',
+    answer:
+      'شما می‌توانید با مراجعه به صفحه دوره‌ها و انتخاب دوره مورد نظر خود، از طریق درگاه پرداخت آنلاین ثبت‌نام کنید.',
   },
   {
     question: 'آیا دوره‌ها گواهینامه معتبر دارند؟',
-    answer: 'بله، تمامی دوره‌های ما دارای گواهینامه معتبر از آکادمی کاکتوس هستند.',
+    answer:
+      'بله، تمامی دوره‌های ما دارای گواهینامه معتبر از آکادمی کاکتوس هستند.',
   },
   {
     question: 'آیا امکان پرداخت اقساطی وجود دارد؟',
@@ -26,7 +36,11 @@ const faqs: FAQ[] = [
 ];
 
 const stats = [
-  { number: '۵۰۰۰+', label: 'دانشجو', description: 'تاکنون در دوره‌های ما ثبت‌نام کرده‌اند' },
+  {
+    number: '۵۰۰۰+',
+    label: 'دانشجو',
+    description: 'تاکنون در دوره‌های ما ثبت‌نام کرده‌اند',
+  },
   { number: '۵۰+', label: 'مربی', description: 'متخصص و با تجربه' },
   { number: '۱۵۰+', label: 'دوره', description: 'آموزشی تخصصی' },
   { number: '۱۰+', label: 'جایزه', description: 'در جشنواره‌های آموزشی' },
@@ -97,7 +111,9 @@ export default function Page() {
                 <div className="text-primary-600 dark:text-primary-400 mb-2 text-3xl font-bold">
                   {stat.number}
                 </div>
-                <div className="mb-2 font-semibold dark:text-white">{stat.label}</div>
+                <div className="mb-2 font-semibold dark:text-white">
+                  {stat.label}
+                </div>
                 <div className="text-sm text-gray-600 dark:text-gray-300">
                   {stat.description}
                 </div>
@@ -117,7 +133,7 @@ export default function Page() {
               className="mb-12 text-center"
             >
               <h2 className="mb-4 text-3xl font-bold">درباره آکادمی کاکتوس</h2>
-              <div className="mx-auto h-1 w-20 rounded-full bg-primary-600" />
+              <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 
             <motion.div
@@ -126,15 +142,15 @@ export default function Page() {
               className="space-y-6 text-gray-600 dark:text-gray-300"
             >
               <p>
-                آکادمی کاکتوس در سال ۱۳۹۲ با هدف ارائه آموزش‌های تخصصی و کاربردی در
-                حوزه‌های فناوری اطلاعات، برنامه‌نویسی و هوش مصنوعی تأسیس شد. ما با
-                بهره‌گیری از مربیان مجرب و متخصص، همواره در تلاش هستیم تا باکیفیت‌ترین
-                محتوای آموزشی را در اختیار دانشجویان قرار دهیم.
+                آکادمی کاکتوس در سال ۱۳۹۲ با هدف ارائه آموزش‌های تخصصی و کاربردی
+                در حوزه‌های فناوری اطلاعات، برنامه‌نویسی و هوش مصنوعی تأسیس شد.
+                ما با بهره‌گیری از مربیان مجرب و متخصص، همواره در تلاش هستیم تا
+                باکیفیت‌ترین محتوای آموزشی را در اختیار دانشجویان قرار دهیم.
               </p>
               <p>
-                در آکادمی کاکتوس، یادگیری تنها محدود به تماشای ویدیوهای آموزشی نیست. ما
-                با ارائه پروژه‌های عملی، تمرین‌های تعاملی و پشتیبانی تخصصی، مسیر
-                یادگیری را برای دانشجویان هموار می‌کنیم.
+                در آکادمی کاکتوس، یادگیری تنها محدود به تماشای ویدیوهای آموزشی
+                نیست. ما با ارائه پروژه‌های عملی، تمرین‌های تعاملی و پشتیبانی
+                تخصصی، مسیر یادگیری را برای دانشجویان هموار می‌کنیم.
               </p>
             </motion.div>
           </div>
@@ -176,20 +192,24 @@ export default function Page() {
             >
               {activeTab === 0 ? (
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-bold dark:text-white">ماموریت ما</h3>
+                  <h3 className="text-2xl font-bold dark:text-white">
+                    ماموریت ما
+                  </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    ایجاد بستری برای یادگیری مؤثر و کاربردی با هدف پرورش نیروهای متخصص و
-                    کارآمد برای بازار کار ایران و جهان. ما معتقدیم آموزش باکیفیت حق همه
-                    افراد است و باید در دسترس همه باشد.
+                    ایجاد بستری برای یادگیری مؤثر و کاربردی با هدف پرورش نیروهای
+                    متخصص و کارآمد برای بازار کار ایران و جهان. ما معتقدیم آموزش
+                    باکیفیت حق همه افراد است و باید در دسترس همه باشد.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-bold dark:text-white">چشم‌انداز</h3>
+                  <h3 className="text-2xl font-bold dark:text-white">
+                    چشم‌انداز
+                  </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    تبدیل شدن به برترین پلتفرم آموزش تخصصی آنلاین در خاورمیانه تا سال
-                    ۱۴۰۵. ما می‌خواهیم با نوآوری در روش‌های آموزشی، استانداردهای جدیدی در
-                    صنعت آموزش آنلاین تعریف کنیم.
+                    تبدیل شدن به برترین پلتفرم آموزش تخصصی آنلاین در خاورمیانه
+                    تا سال ۱۴۰۵. ما می‌خواهیم با نوآوری در روش‌های آموزشی،
+                    استانداردهای جدیدی در صنعت آموزش آنلاین تعریف کنیم.
                   </p>
                 </div>
               )}
@@ -208,7 +228,7 @@ export default function Page() {
               className="mb-12 text-center"
             >
               <h2 className="mb-4 text-3xl font-bold">تماس با ما</h2>
-              <div className="mx-auto h-1 w-20 rounded-full bg-primary-600" />
+              <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -225,7 +245,9 @@ export default function Page() {
                       {info.icon}
                     </div>
                     <div>
-                      <h3 className="mb-2 font-semibold dark:text-white">{info.title}</h3>
+                      <h3 className="mb-2 font-semibold dark:text-white">
+                        {info.title}
+                      </h3>
                       {info.details.map((detail, idx) => (
                         <p
                           key={idx}
@@ -238,7 +260,7 @@ export default function Page() {
                   </motion.div>
                 ))}
 
-                <div className="flex gap-2  space-x-reverse">
+                <div className="flex gap-2 space-x-reverse">
                   {[Instagram, Twitter, Facebook].map((Icon, index) => (
                     <a
                       key={index}
@@ -264,7 +286,7 @@ export default function Page() {
                       </label>
                       <input
                         type="text"
-                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-200 p-3 focus:ring-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                       />
                     </div>
                     <div>
@@ -273,7 +295,7 @@ export default function Page() {
                       </label>
                       <input
                         type="email"
-                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-200 p-3 focus:ring-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                       />
                     </div>
                     <div>
@@ -282,7 +304,7 @@ export default function Page() {
                       </label>
                       <input
                         type="tel"
-                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-200 p-3 focus:ring-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                       />
                     </div>
                     <div>
@@ -291,7 +313,7 @@ export default function Page() {
                       </label>
                       <input
                         type="text"
-                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-200 p-3 focus:ring-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                       />
                     </div>
                     <div className="md:col-span-2">
@@ -300,7 +322,7 @@ export default function Page() {
                       </label>
                       <textarea
                         rows={4}
-                        className="w-full rounded-lg border border-gray-200 p-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-200 p-3 focus:ring-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                       />
                     </div>
                   </div>
@@ -324,7 +346,7 @@ export default function Page() {
               className="mb-12 text-center"
             >
               <h2 className="mb-4 text-3xl font-bold">موقعیت ما روی نقشه</h2>
-              <div className="mx-auto h-1 w-20 rounded-full bg-primary-600" />
+              <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 
             <div className="overflow-hidden rounded-2xl">
@@ -351,7 +373,7 @@ export default function Page() {
               className="mb-12 text-center"
             >
               <h2 className="mb-4 text-3xl font-bold">سوالات متداول</h2>
-              <div className="mx-auto h-1 w-20 rounded-full bg-primary-600" />
+              <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 
             <div className="space-y-4">
@@ -366,7 +388,9 @@ export default function Page() {
                   <h3 className="mb-3 text-lg font-semibold dark:text-white">
                     {faq.question}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">{faq.answer}</p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {faq.answer}
+                  </p>
                 </motion.div>
               ))}
             </div>

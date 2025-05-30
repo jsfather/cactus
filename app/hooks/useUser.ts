@@ -18,7 +18,7 @@ let globalError: Error | null = null;
 let listeners: Array<() => void> = [];
 
 const notifyListeners = () => {
-  listeners.forEach(listener => listener());
+  listeners.forEach((listener) => listener());
 };
 
 export function useUser(): UseUserReturn {
@@ -88,7 +88,7 @@ export function useUser(): UseUserReturn {
 
     return () => {
       mounted = false;
-      listeners = listeners.filter(l => l !== listener);
+      listeners = listeners.filter((l) => l !== listener);
     };
   }, []);
 
@@ -112,7 +112,7 @@ export function useUser(): UseUserReturn {
         method: 'PUT',
         body: JSON.stringify(data),
       });
-      
+
       globalUser = response.data;
       globalError = null;
       setUser(response.data);
@@ -131,6 +131,6 @@ export function useUser(): UseUserReturn {
     isAuthenticated: !!user,
     logout,
     refetch,
-    updateProfile
+    updateProfile,
   };
-} 
+}

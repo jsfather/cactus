@@ -60,7 +60,9 @@ export default function Page() {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">ویرایش پروفایل</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          ویرایش پروفایل
+        </h1>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -119,7 +121,9 @@ export default function Page() {
             </label>
             <input
               type="text"
-              {...register('last_name', { required: 'نام خانوادگی الزامی است' })}
+              {...register('last_name', {
+                required: 'نام خانوادگی الزامی است',
+              })}
               className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm ${
                 errors.last_name
                   ? 'border-red-300 dark:border-red-500'
@@ -216,7 +220,7 @@ export default function Page() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-primary-700 dark:hover:bg-primary-600"
+            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-600 inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSubmitting ? (
               <>

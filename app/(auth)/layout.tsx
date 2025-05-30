@@ -27,15 +27,15 @@ export default function Layout({
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       <div className="flex w-full flex-1 flex-col items-center justify-between gap-8 p-6 lg:w-1/2 lg:p-12">
-       <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/logo.svg"
-              alt="لوگو کاکتوس"
-              width={100}
-              height={100}
-              className="rounded-xl"
-            />
-          </Link>
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/logo.svg"
+            alt="لوگو کاکتوس"
+            width={100}
+            height={100}
+            className="rounded-xl"
+          />
+        </Link>
 
         {/* Welcome Text */}
         <div className="text-center">
@@ -70,7 +70,7 @@ export default function Layout({
 
       {/* Right Section - Background */}
       <div className="hidden lg:flex lg:w-1/2">
-        <div className="relative flex h-full w-full items-center justify-center bg-primary-200 dark:bg-primary-300">
+        <div className="bg-primary-200 dark:bg-primary-300 relative flex h-full w-full items-center justify-center">
           <div className="p-12">
             <Image
               src="/logo.svg"
@@ -84,7 +84,7 @@ export default function Layout({
       </div>
 
       {/* Dark Mode Toggle - Fixed Position */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed right-6 bottom-6 z-50">
         <DarkModeToggle />
       </div>
     </div>

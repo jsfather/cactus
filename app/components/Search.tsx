@@ -10,10 +10,10 @@ interface SearchProps {
   searchParamName?: string;
 }
 
-export default function Search({ 
+export default function Search({
   placeholder,
   className = '',
-  searchParamName = 'query'
+  searchParamName = 'query',
 }: SearchProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -36,8 +36,7 @@ export default function Search({
         {placeholder}
       </label>
       <input
-        className="peer block w-full rounded-md border border-gray-200 py-[9px] pr-4 text-sm outline-none placeholder:text-gray-500 
-        focus:border-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-400"
+        className="peer focus:border-primary-500 block w-full rounded-md border border-gray-200 py-[9px] pr-4 text-sm outline-none placeholder:text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-400"
         placeholder={placeholder}
         onChange={(e) => {
           handleSearch(e.target.value);
