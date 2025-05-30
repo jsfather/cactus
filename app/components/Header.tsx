@@ -64,7 +64,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white lg:hidden"
+              className="text-gray-600 hover:text-gray-900 cursor-pointer dark:text-gray-300 dark:hover:text-white lg:hidden"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -104,7 +104,7 @@ export default function Header() {
               {/* Mobile Search Toggle */}
               <button
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white lg:hidden"
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-300 cursor-pointer dark:hover:text-white lg:hidden"
               >
                 <Search className="h-6 w-6" />
               </button>
@@ -200,7 +200,7 @@ export default function Header() {
                 </Link>
                 <button
                   onClick={() => setIsDrawerOpen(false)}
-                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                  className="text-gray-600 hover:text-gray-900 cursor-pointer dark:text-gray-300 dark:hover:text-white"
                 >
                   <X className="h-6 w-6" />
                 </button>

@@ -29,9 +29,9 @@ export function UserMenu({ userName }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex cursor-pointer items-center gap-2 rounded-full p-2 transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+        className="flex cursor-pointer items-center gap-2 rounded-full  transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
       >
-        <div className="bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 flex h-8 w-8 items-center justify-center rounded-full font-semibold transition-colors">
+        <div className="bg-primary-100 text-primary-700  h-9 w-9 dark:bg-primary-900/20 dark:text-primary-400 flex items-center justify-center rounded-full font-semibold transition-colors">
           {userName.charAt(0).toUpperCase()}
         </div>
       </button>
