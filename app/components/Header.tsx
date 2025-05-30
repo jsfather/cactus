@@ -128,7 +128,7 @@ export default function Header() {
               ) : user ? (
                 <UserMenu userName={user.first_name + ' ' + user.last_name} />
               ) : (
-                <Link href="/auth">
+                <Link href="/send-otp">
                   <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
                     ورود / ثبت نام
                   </Button>
@@ -213,7 +213,7 @@ export default function Header() {
                     href={item.href}
                     className={`block rounded-lg px-4 py-2.5 font-medium transition-colors duration-200 ${
                       pathname === item.href
-                        ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                        ? 'bg-primary-200 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
                         : 'text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
@@ -224,7 +224,7 @@ export default function Header() {
 
               <div className="mt-8 border-t border-gray-200 pt-8 dark:border-gray-700">
                 {!user && (
-                  <Link href="/auth" className="block">
+                  <Link href="/send-otp" className="block">
                     <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 w-full transform rounded-full px-6 py-2.5 text-white transition-all duration-200 hover:scale-105">
                       ورود / ثبت نام
                     </Button>
