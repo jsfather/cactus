@@ -5,6 +5,7 @@ import { verifyOTP } from '@/app/lib/api/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { KeyRound, ArrowLeft } from 'lucide-react';
+import { useUser } from '@/app/hooks/useUser';
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
@@ -13,6 +14,7 @@ export default function VerifyOtpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { refetch } = useUser();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +24,8 @@ export default function VerifyOtpPage() {
     try {
       const result = await verifyOTP(identifier, '1234567890', otp);
       localStorage.setItem('authToken', result.token);
-      router.push('/admin');
+      await refetch();
+      router.push('/admin/dashboard');
     } catch (err) {
       console.log(err);
       setError('کد تایید اشتباه است. دوباره تلاش کنید.');
