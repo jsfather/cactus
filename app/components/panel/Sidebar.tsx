@@ -21,21 +21,31 @@ interface SidebarProps {
   children?: React.ReactNode;
   isOpen?: boolean;
   onClose?: () => void;
+  loading?: boolean;
 }
 
 function SidebarSkeleton() {
   return (
-    <aside className="flex h-full w-64 flex-col bg-white shadow-lg">
+    <aside className="flex h-full w-64 flex-col bg-white shadow-lg dark:bg-gray-900 dark:border-l dark:border-gray-800">
+ <div className="flex h-[80px] items-center justify-between px-6  ">
+        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-80">
+          <Image src="/logo.svg" alt="logo" width={40} height={40} />
+          <span className="bg-gradient-to-l from-primary-600 to-primary-800 bg-clip-text text-xl font-black text-transparent dark:from-primary-400 dark:to-primary-600">
+            کاکتوس
+          </span>
+        </Link>
+      </div>
+      
       {/* Skeleton avatar section */}
-      <div className="flex items-center gap-3 border-b border-gray-100 p-3">
+      <div className="flex items-center gap-3 border-b border-gray-100 p-3 dark:border-gray-800">
         <div className="relative">
-          <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200">
+          <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700">
           </div>
-          <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-white bg-gray-300"></div>
+          <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-white bg-gray-300 dark:border-gray-900 dark:bg-gray-600"></div>
         </div>
         <div className="flex-1">
-          <div className="mb-1 h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-          <div className="h-3 w-12 animate-pulse rounded bg-gray-200"></div>
+          <div className="mb-1 h-4 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="h-3 w-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
       </div>
 
@@ -43,45 +53,75 @@ function SidebarSkeleton() {
       <div className="flex-1 space-y-6 overflow-y-auto p-3">
         {/* First group */}
         <div className="space-y-2">
-          <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
-          <div className="mr-2 space-y-2 border-r border-gray-200 pr-2">
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
+          <div className="h-4 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="mr-2 space-y-2 border-r border-gray-200 pr-2 dark:border-gray-700">
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
           </div>
         </div>
 
         {/* Second group */}
         <div className="space-y-2">
-          <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-          <div className="mr-2 space-y-2 border-r border-gray-200 pr-2">
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
+          <div className="h-4 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="mr-2 space-y-2 border-r border-gray-200 pr-2 dark:border-gray-700">
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
           </div>
         </div>
 
         {/* Third group */}
         <div className="space-y-2">
-          <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-          <div className="mr-2 space-y-2 border-r border-gray-200 pr-2">
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
-            <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
+          <div className="h-4 w-16 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          <div className="mr-2 space-y-2 border-r border-gray-200 pr-2 dark:border-gray-700">
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-8 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
           </div>
         </div>
-      </div>
-
-      {/* Skeleton footer */}
-      <div className="mt-4 border-t border-gray-100 p-4">
-        <div className="h-8 w-full animate-pulse rounded bg-gray-200"></div>
       </div>
     </aside>
   );
 }
 
-export default function Sidebar({ menuItems, user, children, isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ menuItems, user, children, isOpen, onClose, loading = false }: SidebarProps) {
   const pathname = usePathname();
+
+  if (loading) {
+    return (
+      <>
+        {/* Desktop skeleton */}
+        <div className="hidden lg:block">
+          <SidebarSkeleton />
+        </div>
+
+        {/* Mobile skeleton with overlay */}
+        <AnimatePresence>
+          {isOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={onClose}
+                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+              />
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'tween', duration: 0.3 }}
+                className="fixed inset-y-0 right-0 z-50 w-64 lg:hidden"
+              >
+                <SidebarSkeleton />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </>
+    );
+  }
 
   if (!user) return null;
 

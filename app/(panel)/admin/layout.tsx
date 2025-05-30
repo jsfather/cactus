@@ -69,7 +69,6 @@ export default function Layout({
 }: Readonly<{ children: React.ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
 
@@ -101,11 +100,13 @@ export default function Layout({
         menuItems={menuItems}
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
+        loading={loading}
       />
       <div className="flex flex-1 flex-col">
         <Header 
           user={user}
           onMenuClick={() => setIsMobileMenuOpen(true)}
+          loading={loading}
         />
         <main className="flex-1 overflow-y-auto p-4 dark:bg-gray-900">
           {children}
