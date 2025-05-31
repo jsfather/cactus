@@ -53,8 +53,6 @@ export default function Page() {
     }
   };
 
-
-
   const handleDeleteClick = (blog: Blog) => {
     setBlogToDelete(blog);
     setShowDeleteModal(true);
