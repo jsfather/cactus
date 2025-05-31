@@ -3,11 +3,11 @@
 import { Search, Menu } from 'lucide-react';
 import moment from 'jalali-moment';
 import { User } from '@/app/lib/types';
-import DarkModeToggle from '@/app/components/DarkModeToggle';
+import DarkModeToggle from '@/app/components/ui/DarkModeToggle';
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserMenu } from '@/app/components/UserMenu';
+import { UserMenu } from '@/app/components/layout/UserMenu';
 
 interface HeaderProps {
   user: User | null;

@@ -1,7 +1,7 @@
 'use client';
 
-import Header from '@/app/components/panel/Header';
-import Sidebar from '@/app/components/panel/Sidebar';
+import Header from '@/app/components/layout/panel/Header';
+import Sidebar from '@/app/components/layout/panel/Sidebar';
 import { useState } from 'react';
 import { useUser } from '@/app/hooks/useUser';
 

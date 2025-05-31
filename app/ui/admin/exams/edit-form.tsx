@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { updateExam } from '@/app/lib/api/admin/exams';
 import { getTerms } from '@/app/lib/api/admin/terms';
 import { useRouter } from 'next/navigation';

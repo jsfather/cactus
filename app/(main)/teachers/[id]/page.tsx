@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { MapPin, Calendar, Star, Users, BookOpen } from 'lucide-react';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/button';
 
 interface Skill {
   name: string;

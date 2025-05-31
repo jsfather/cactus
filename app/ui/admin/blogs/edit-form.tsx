@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { updateBlog } from '@/app/lib/api/admin/blogs';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';

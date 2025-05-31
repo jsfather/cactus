@@ -29,7 +29,7 @@ function SidebarSkeleton() {
     <aside className="flex h-full w-64 flex-col bg-white shadow-lg dark:border-l dark:border-gray-800 dark:bg-gray-900">
       <div className="flex h-[80px] items-center justify-between px-6">
         <Link
-          href="/"
+          href="/public"
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
         >
           <Image src="/logo.svg" alt="logo" width={40} height={40} />
@@ -187,7 +187,7 @@ export default function Sidebar({
       {/* Logo section */}
       <div className="flex h-[80px] items-center justify-between px-6">
         <Link
-          href="/"
+          href="/public"
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
         >
           <Image src="/logo.svg" alt="کاکتوس" width={40} height={40} priority />

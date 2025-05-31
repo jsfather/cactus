@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import LogoutButton from '@/app/ui/LogoutButton';
+import LogoutButton from '@/app/components/layout/LogoutButton';
 import { LayoutDashboard, GraduationCap, User, Settings } from 'lucide-react';
 import Link from 'next/link';
 

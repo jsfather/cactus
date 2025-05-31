@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Pagination from '@/app/components/Pagination';
-import Search from '@/app/components/Search';
-import Table from '@/app/components/Table';
+import Pagination from '@/app/components/ui/Pagination';
+import Search from '@/app/components/ui/Search';
+import Table from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getTerms } from '@/app/lib/api/student/terms';
 import { Term } from '@/app/lib/types';

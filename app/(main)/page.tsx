@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { motion } from 'framer-motion';
 import type { JSX } from 'react';
 import Link from 'next/link';
