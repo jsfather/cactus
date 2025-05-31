@@ -23,7 +23,10 @@ export default function SendOtpPage() {
         );
       });
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'مشکلی در ارسال کد تایید به وجود آمده است. دوباره تلاش کنید.'
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'مشکلی در ارسال کد تایید به وجود آمده است. دوباره تلاش کنید.';
       setError(errorMessage);
       setLoading(false);
     }

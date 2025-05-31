@@ -7,19 +7,23 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles = {
-  primary: 'bg-primary-600 hover:bg-primary-500 focus-visible:outline-primary-600 active:bg-primary-600',
-  danger: 'bg-red-600 hover:bg-red-500 focus-visible:outline-red-600 active:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600',
-  warning: 'bg-yellow-600 hover:bg-yellow-500 focus-visible:outline-yellow-600 active:bg-yellow-600 dark:bg-yellow-500 dark:hover:bg-yellow-600',
+  primary:
+    'bg-primary-600 hover:bg-primary-500 focus-visible:outline-primary-600 active:bg-primary-600',
+  danger:
+    'bg-red-600 hover:bg-red-500 focus-visible:outline-red-600 active:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600',
+  warning:
+    'bg-yellow-600 hover:bg-yellow-500 focus-visible:outline-yellow-600 active:bg-yellow-600 dark:bg-yellow-500 dark:hover:bg-yellow-600',
   info: 'bg-blue-600 hover:bg-blue-500 focus-visible:outline-blue-600 active:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-600',
-  white: 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-800',
+  white:
+    'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:bg-gray-900 dark:text-white dark:ring-gray-700 dark:hover:bg-gray-800',
 };
 
-export function Button({ 
-  children, 
-  className, 
-  loading, 
+export function Button({
+  children,
+  className,
+  loading,
   variant = 'primary',
-  ...rest 
+  ...rest
 }: ButtonProps) {
   return (
     <button

@@ -27,7 +27,10 @@ export default function VerifyOtpPage() {
       await refetch();
       router.push('/admin/dashboard');
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'کد تایید اشتباه است. دوباره تلاش کنید.';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'کد تایید اشتباه است. دوباره تلاش کنید.';
       setError(errorMessage);
       setLoading(false);
     }

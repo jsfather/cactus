@@ -41,7 +41,8 @@ export function DeleteExam({ id }: { id: string }) {
       toast.success('آزمون با موفقیت حذف شد');
       window.location.reload();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'خطا در حذف آزمون';
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در حذف آزمون';
       toast.error(errorMessage);
     } finally {
       setIsDeleting(false);

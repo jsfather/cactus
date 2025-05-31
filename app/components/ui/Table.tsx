@@ -257,7 +257,7 @@ export default function Table<T extends { id: string | number }>({
                               {onEdit && (
                                 <button
                                   onClick={() => onEdit(item)}
-                                  className="rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                                  className="cursor-pointer rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -278,7 +278,7 @@ export default function Table<T extends { id: string | number }>({
                               {onDelete && (
                                 <button
                                   onClick={() => onDelete(item)}
-                                  className="rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
+                                  className="cursor-pointer rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"

@@ -9,6 +9,7 @@ import { toast } from 'react-hot-toast';
 import { getBlog, createBlog, updateBlog } from '@/app/lib/api/admin/blogs';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
+import Textarea from '@/app/components/ui/Textarea';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
@@ -95,53 +96,61 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-        <Input
-          id="title"
-          label="عنوان"
-          placeholder="عنوان بلاگ را وارد کنید"
-          error={errors.title?.message}
-          {...register('title')}
-        />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Input
+            id="title"
+            label="عنوان"
+            placeholder="عنوان بلاگ را وارد کنید"
+            error={errors.title?.message}
+            {...register('title')}
+          />
 
-        <Input
-          id="little_description"
-          label="توضیحات کوتاه"
-          placeholder="توضیحات کوتاه بلاگ را وارد کنید"
-          error={errors.little_description?.message}
-          {...register('little_description')}
-        />
+          <Input
+            id="little_description"
+            label="توضیحات کوتاه"
+            placeholder="توضیحات کوتاه بلاگ را وارد کنید"
+            error={errors.little_description?.message}
+            {...register('little_description')}
+          />
+        </div>
 
-        <Input
-          id="description"
-          label="توضیحات"
-          placeholder="توضیحات کامل بلاگ را وارد کنید"
-          error={errors.description?.message}
-          {...register('description')}
-        />
+        <div className="w-full">
+          <Textarea
+            id="description"
+            label="توضیحات"
+            placeholder="توضیحات کامل بلاگ را وارد کنید"
+            error={errors.description?.message}
+            {...register('description')}
+          />
+        </div>
 
-<Input
-          id="meta_title"
-          label="عنوان متا"
-          placeholder="عنوان متا بلاگ را وارد کنید"
-          error={errors.meta_title?.message}
-          {...register('meta_title')}
-        />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <Input
+            id="meta_title"
+            label="عنوان متا"
+            placeholder="عنوان متا بلاگ را وارد کنید"
+            error={errors.meta_title?.message}
+            {...register('meta_title')}
+          />
 
-            <Input
+          <Input
+            id="slug"
+            label="اسلاگ"
+            placeholder="اسلاگ بلاگ را وارد کنید"
+            error={errors.slug?.message}
+            {...register('slug')}
+          />
+        </div>
+
+        <div className="w-full">
+          <Input
             id="meta_description"
             label="توضیحات متا"
             placeholder="توضیحات متا بلاگ را وارد کنید"
             error={errors.meta_description?.message}
             {...register('meta_description')}
-            />
-
-        <Input
-          id="slug"
-          label="اسلاگ"
-          placeholder="اسلاگ بلاگ را وارد کنید"
-          error={errors.slug?.message}
-          {...register('slug')}
-        />
+          />
+        </div>
 
         <div className="flex justify-end gap-3">
           <Button
@@ -158,4 +167,4 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       </form>
     </main>
   );
-} 
+}
