@@ -73,7 +73,6 @@ export default function Page() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
-
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div

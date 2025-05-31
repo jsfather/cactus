@@ -26,8 +26,6 @@ export default function Form() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setValue,
-    watch,
   } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {

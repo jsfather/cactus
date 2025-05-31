@@ -6,10 +6,7 @@ import { createAttendance } from '@/app/lib/api/teacher/attendances';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
 
-// You may want to fetch students and schedules for the selects
-// For now, use placeholder arrays
 const students = [
   { id: 1, name: 'دانش‌آموز ۱' },
   { id: 2, name: 'دانش‌آموز ۲' },
@@ -29,9 +26,6 @@ type FormData = {
 
 export default function Form() {
   const router = useRouter();
-  const [status, setStatus] = useState<'present' | 'absent' | 'late'>(
-    'present'
-  );
   const {
     register,
     handleSubmit,
@@ -139,7 +133,6 @@ export default function Form() {
               className={`peer block w-full rounded-md border py-2 pr-4 text-sm focus:outline-0 ${
                 errors.status ? 'border-red-500' : 'border-gray-300'
               }`}
-              onChange={(e) => setStatus(e.target.value as any)}
             >
               <option value="present">حضور</option>
               <option value="absent">غیاب</option>

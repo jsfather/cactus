@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import '@/app/globals.css';
 import { dana, danaFaNum } from '@/app/fonts';
+import Head from 'next/head';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
@@ -19,7 +20,7 @@ export default function RootLayout({
       className="scroll-smooth"
       suppressHydrationWarning
     >
-      <head>
+      <Head>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -44,7 +45,7 @@ export default function RootLayout({
             `,
           }}
         />
-      </head>
+      </Head>
       <body
         className={`${danaFaNum.variable} ${dana.variable} font-dana-fanum min-h-screen bg-white text-gray-900 antialiased transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100`}
         suppressHydrationWarning

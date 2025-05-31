@@ -12,7 +12,7 @@ export default function PanelLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const { loading, error, isAuthenticated, user } = useUser();
+  const { loading, error, isAuthenticated } = useUser();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
