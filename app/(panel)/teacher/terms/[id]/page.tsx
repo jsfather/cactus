@@ -1,13 +1,14 @@
 'use client';
 
 import { use, useEffect, useState } from 'react';
-import Breadcrumbs from '@/app/ui/breadcrumbs';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { getTerm } from '@/app/lib/api/admin/terms';
 import { notFound } from 'next/navigation';
 import { Toaster } from 'react-hot-toast';
+import { Term } from '@/app/lib/types';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const [term, setTerm] = useState<any>(null);
+  const [term, setTerm] = useState<Term>();
   const resolvedParams = use(params);
 
   useEffect(() => {
@@ -15,7 +16,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       try {
         const data = (await getTerm(resolvedParams.id)).data;
         setTerm(data);
-      } catch (error) {
+      } catch (error: unknown) {
         notFound();
       }
     };

@@ -1,13 +1,13 @@
 'use client';
 
 import Form from '@/app/ui/teacher/offline_sessions/edit-form';
-import Breadcrumbs from '@/app/ui/breadcrumbs';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { getOfflineSession } from '@/app/lib/api/teacher/offline_sessions';
 import { notFound } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { use } from 'react';
-import LoadingSpinner from '@/app/ui/loading-spinner';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { OfflineSession } from '@/app/lib/types';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {

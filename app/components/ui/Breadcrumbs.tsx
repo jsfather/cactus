@@ -20,12 +20,16 @@ export default function Breadcrumbs({
             key={breadcrumb.href}
             aria-current={breadcrumb.active}
             className={clsx(
-              breadcrumb.active ? 'text-gray-900' : 'text-gray-500'
+              breadcrumb.active
+                ? 'text-gray-900 dark:text-white'
+                : 'text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
             )}
           >
             <Link href={breadcrumb.href}>{breadcrumb.label}</Link>
             {index < breadcrumbs.length - 1 ? (
-              <span className="mx-3 inline-block">/</span>
+              <span className="mx-3 inline-block text-gray-400 dark:text-gray-600">
+                /
+              </span>
             ) : null}
           </li>
         ))}

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { updateOfflineSession } from '@/app/lib/api/teacher/offline_sessions';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
@@ -51,9 +51,10 @@ export default function EditOfflineSessionForm({
       await updateOfflineSession(offlineSession.id, data);
       toast.success('کلاس آفلاین با موفقیت بروزرسانی شد');
       router.push('/teacher/offline_sessions');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در بروزرسانی کلاس آفلاین');
-      console.error('Failed to update offline session:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در بروزرسانی کلاس آفلاین';
+      toast.error(errorMessage);
     }
   };
 

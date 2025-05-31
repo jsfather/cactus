@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Suspense, useEffect } from 'react';
-import DarkModeToggle from '@/app/components/DarkModeToggle';
+import DarkModeToggle from '@/app/components/ui/DarkModeToggle';
 import { useUser } from '@/app/hooks/useUser';
 import { useRouter } from 'next/navigation';
 
@@ -37,7 +37,6 @@ export default function Layout({
           />
         </Link>
 
-        {/* Welcome Text */}
         <div className="text-center">
           <h1 className="from-primary-600 to-primary-800 mb-2 bg-gradient-to-l bg-clip-text text-3xl font-bold text-transparent">
             به مجموعه کاکتوس خوش آمدید
@@ -47,7 +46,6 @@ export default function Layout({
           </p>
         </div>
 
-        {/* Auth Form Container */}
         <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white/50 p-8 shadow-lg backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/50">
           <Suspense
             fallback={
@@ -58,7 +56,6 @@ export default function Layout({
           </Suspense>
         </div>
 
-        {/* Back Link */}
         <Link
           href="/"
           className="flex items-center gap-2 rounded-full px-4 py-2 text-sm text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
@@ -68,7 +65,6 @@ export default function Layout({
         </Link>
       </div>
 
-      {/* Right Section - Background */}
       <div className="hidden lg:flex lg:w-1/2">
         <div className="bg-primary-200 dark:bg-primary-300 relative flex h-full w-full items-center justify-center">
           <div className="p-12">
@@ -83,7 +79,6 @@ export default function Layout({
         </div>
       </div>
 
-      {/* Dark Mode Toggle - Fixed Position */}
       <div className="fixed right-6 bottom-6 z-50">
         <DarkModeToggle />
       </div>

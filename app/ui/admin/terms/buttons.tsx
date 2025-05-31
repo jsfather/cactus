@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { deleteTerm } from '@/app/lib/api/admin/terms';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
-import Modal from '@/app/ui/modal';
+import Modal from '@/app/components/ui/ConfirmModal';
 
 export function CreateTerm() {
   return (

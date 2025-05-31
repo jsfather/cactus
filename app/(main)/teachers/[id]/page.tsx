@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { MapPin, Calendar, Star, Users, BookOpen } from 'lucide-react';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 
 interface Skill {
   name: string;
@@ -142,9 +142,10 @@ export default function Page() {
             <div className="lg:col-span-2">
               <div className="flex items-start gap-6">
                 <div className="relative h-32 w-32 overflow-hidden rounded-xl">
-                  <img
+                  <Image
                     src="https://randomuser.me/api/portraits/women/65.jpg"
                     alt="سارا محمدی"
+                    fill
                     className="object-cover"
                   />
                 </div>
@@ -349,9 +350,10 @@ export default function Page() {
                   >
                     <div className="mb-4 flex items-center gap-4">
                       <div className="relative h-12 w-12 overflow-hidden rounded-full">
-                        <img
+                        <Image
                           src={review.avatar}
                           alt={review.name}
+                          fill
                           className="object-cover"
                         />
                       </div>

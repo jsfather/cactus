@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Pagination from '@/app/components/Pagination';
-import Search from '@/app/components/Search';
-import Table from '@/app/components/Table';
+import Pagination from '@/app/components/ui/Pagination';
+import Search from '@/app/components/ui/Search';
+import Table from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getTerms } from '@/app/lib/api/student/terms';
 import { Term } from '@/app/lib/types';
@@ -40,19 +40,19 @@ export default function Page() {
     {
       header: 'تاریخ شروع',
       accessor: 'start_date' as const,
-      render: (value: string | number, _item: Term) =>
+      render: (value: string | number) =>
         new Date(value.toString()).toLocaleDateString('fa-IR'),
     },
     {
       header: 'تاریخ پایان',
       accessor: 'end_date' as const,
-      render: (value: string | number, _item: Term) =>
+      render: (value: string | number) =>
         new Date(value.toString()).toLocaleDateString('fa-IR'),
     },
     {
       header: 'نوع دوره',
       accessor: 'type' as const,
-      render: (value: string | number, _item: Term) => {
+      render: (value: string | number) => {
         const typeValue = value as Term['type'];
         const typeClasses = {
           normal:

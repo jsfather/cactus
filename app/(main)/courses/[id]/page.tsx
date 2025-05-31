@@ -1,8 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
 import {
   Clock,
   Calendar,
@@ -11,20 +9,6 @@ import {
   GraduationCap,
   BarChart,
 } from 'lucide-react';
-
-interface Instructor {
-  id: string;
-  name: string;
-  role: string;
-  avatar: string;
-  bio: string;
-}
-
-interface Schedule {
-  day: string;
-  time: string;
-  duration: string;
-}
 
 const courseData = {
   title: 'دوره جامع برنامه‌نویسی پایتون',

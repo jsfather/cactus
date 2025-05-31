@@ -1,13 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { createReport } from '@/app/lib/api/teacher/reports';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 
-// Placeholder arrays for terms and schedules
 const terms = [
   { id: '1', label: 'ترم ۱' },
   { id: '2', label: 'ترم ۲' },
@@ -36,8 +35,10 @@ export default function Form() {
       await createReport(data);
       toast.success('گزارش با موفقیت ثبت شد');
       router.push('/teacher/reports');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در ثبت گزارش');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در ثبت گزارش';
+      toast.error(errorMessage);
       console.error('Failed to create report:', error);
     }
   };

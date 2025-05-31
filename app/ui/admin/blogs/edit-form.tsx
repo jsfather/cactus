@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { updateBlog } from '@/app/lib/api/admin/blogs';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
@@ -37,8 +37,10 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
       await updateBlog(blog.id, data);
       toast.success('بلاگ با موفقیت بروزرسانی شد');
       router.push('/admin/blogs');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در ذخیره بلاگ');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در ذخیره بلاگ';
+      toast.error(errorMessage);
       console.error('Failed to save blog:', error);
     }
   };

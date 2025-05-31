@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { deleteReport } from '@/app/lib/api/teacher/reports';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
-import Modal from '@/app/ui/modal';
+import Modal from '@/app/components/ui/ConfirmModal';
 
 export function CreateReport() {
   return (
@@ -29,8 +29,10 @@ export function DeleteReport({ id }: { id: string }) {
       await deleteReport(id);
       toast.success('گزارش ترم با موفقیت حذف شد');
       window.location.reload();
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف گزارش ترم');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در حذف گزارش ترم';
+      toast.error(errorMessage);
       console.error('Failed to delete report:', error);
     } finally {
       setIsDeleting(false);

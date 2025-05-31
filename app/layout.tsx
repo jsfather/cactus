@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import '@/app/ui/globals.css';
-import { dana, danaFaNum } from '@/app/ui/fonts';
+import '@/app/globals.css';
+import { dana, danaFaNum } from '@/app/fonts';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',

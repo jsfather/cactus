@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { createExam } from '@/app/lib/api/admin/exams';
 import { getTerms } from '@/app/lib/api/admin/terms';
 import { useRouter } from 'next/navigation';
@@ -26,7 +26,6 @@ export default function Form() {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [terms, setTerms] = useState<Term[]>([]);
-  const [loading, setLoading] = useState(true);
   const {
     register,
     handleSubmit,
@@ -42,8 +41,6 @@ export default function Form() {
       } catch (error) {
         console.error('Failed to fetch terms:', error);
         toast.error('خطا در دریافت لیست ترم‌ها');
-      } finally {
-        setLoading(false);
       }
     };
 

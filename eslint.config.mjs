@@ -21,7 +21,7 @@ const eslintConfig = [
       'prettier/prettier': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
-      'react/jsx-key' : 'off'
+      'react/jsx-key': 'off',
     },
   },
 ];

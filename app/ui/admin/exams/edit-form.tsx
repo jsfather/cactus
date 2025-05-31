@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/components/ui/Button';
 import { updateExam } from '@/app/lib/api/admin/exams';
 import { getTerms } from '@/app/lib/api/admin/terms';
 import { useRouter } from 'next/navigation';
@@ -28,7 +28,6 @@ export default function EditExamForm({ exam }: { exam: Exam }) {
     exam.date ? moment(exam.date).format('jYYYY/jMM/jDD') : ''
   );
   const [terms, setTerms] = useState<Term[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedTermId, setSelectedTermId] = useState<string>(
     exam.term_id ? exam.term_id.toString() : ''
   );
@@ -61,8 +60,6 @@ export default function EditExamForm({ exam }: { exam: Exam }) {
       } catch (error) {
         console.error('Failed to fetch terms:', error);
         toast.error('خطا در دریافت لیست ترم‌ها');
-      } finally {
-        setLoading(false);
       }
     };
 

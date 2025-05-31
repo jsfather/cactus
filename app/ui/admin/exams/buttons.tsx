@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { deleteExam } from '@/app/lib/api/admin/exams';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
-import Modal from '@/app/ui/modal';
+import Modal from '@/app/components/ui/ConfirmModal';
 
 export function CreateExam() {
   return (
@@ -40,9 +40,10 @@ export function DeleteExam({ id }: { id: string }) {
       await deleteExam(id);
       toast.success('آزمون با موفقیت حذف شد');
       window.location.reload();
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف آزمون');
-      console.error('Failed to delete exam:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در حذف آزمون';
+      toast.error(errorMessage);
     } finally {
       setIsDeleting(false);
       setIsModalOpen(false);

@@ -3,13 +3,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { UserMenu } from '@/app/components/UserMenu';
-import { Button } from '@/app/ui/button';
+import { UserMenu } from '@/app/components/layout/UserMenu';
+import { Button } from '@/app/components/ui/Button';
 import { useEffect, useState } from 'react';
-import request from '@/app/lib/api/client';
 import { useRouter } from 'next/navigation';
-import { User } from '@/app/lib/types';
-import DarkModeToggle from '@/app/components/DarkModeToggle';
+import DarkModeToggle from '@/app/components/ui/DarkModeToggle';
 import { Menu, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@/app/hooks/useUser';
@@ -55,7 +53,7 @@ export default function Header() {
             </button>
 
             <div className="flex items-center gap-8">
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/public" className="flex items-center gap-2">
                 <Image
                   src="/logo.svg"
                   alt="کاکتوس"
@@ -174,7 +172,7 @@ export default function Header() {
               className="fixed top-0 right-0 bottom-0 z-50 w-80 overflow-y-auto bg-white p-6 shadow-xl dark:bg-gray-900"
             >
               <div className="flex items-center justify-between">
-                <Link href="/" className="flex items-center gap-2">
+                <Link href="/public" className="flex items-center gap-2">
                   <Image
                     src="/logo.png"
                     alt="لوگو کاکتوس"

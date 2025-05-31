@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
 import {
   MapPin,
   Phone,
@@ -74,7 +73,6 @@ export default function Page() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
-      {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -96,7 +94,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Stats Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -123,7 +120,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* About Section */}
       <section className="bg-gray-50 py-20 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl">
@@ -157,7 +153,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Mission & Vision Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl">
@@ -218,7 +213,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Contact Section */}
       <section className="bg-gray-50 py-20 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-6xl">
@@ -336,7 +330,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Map Section */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-6xl">
@@ -363,7 +356,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <section className="bg-gray-50 py-20 dark:bg-gray-800">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl">
