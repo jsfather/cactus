@@ -35,24 +35,12 @@ const menuItems = [
     ],
   },
   {
-    title: 'آموزش',
+    title: 'محتوا',
     isGroupTitle: true,
     subItems: [
       {
-        title: 'ترم ها',
-        href: '/admin/terms',
-      },
-      {
-        title: 'کلاس های آنلاین',
-        href: '/education/online-classes',
-      },
-      {
-        title: 'دوره های آفلاین',
-        href: '/admin/offline-courses',
-      },
-      {
-        title: 'سیستم آزمون',
-        href: '/education/exam-system',
+        title: 'بلاگ',
+        href: '/admin/blogs',
       },
     ],
   },

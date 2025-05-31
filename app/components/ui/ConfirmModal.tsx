@@ -3,7 +3,7 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { Button } from './Button';
+import { Button } from '@/app/components/ui/Button';
 
 interface ModalProps {
   isOpen: boolean;
@@ -14,9 +14,22 @@ interface ModalProps {
   confirmText?: string;
   cancelText?: string;
   loading?: boolean;
+  variant?: 'danger' | 'warning' | 'info';
 }
 
-export default function Modal({
+const variantStyles = {
+  danger: {
+    icon: 'text-red-600 dark:text-red-400',
+  },
+  warning: {
+    icon: 'text-yellow-600 dark:text-yellow-400',
+  },
+  info: {
+    icon: 'text-blue-600 dark:text-blue-400',
+  },
+};
+
+export default function ConfirmModal({
   isOpen,
   onClose,
   onConfirm,
@@ -25,10 +38,15 @@ export default function Modal({
   confirmText = 'تایید',
   cancelText = 'انصراف',
   loading = false,
+  variant = 'danger',
 }: ModalProps) {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Dialog
+        as="div"
+        className="relative z-50"
+        onClose={onClose}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -38,7 +56,7 @@ export default function Modal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-gray-500/30 backdrop-blur-sm transition-opacity" />
+          <div className="fixed inset-0 bg-gray-500/30 dark:bg-gray-950/30 backdrop-blur-sm transition-opacity" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-10 overflow-y-auto">
@@ -52,46 +70,52 @@ export default function Modal({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white/95 px-4 pt-5 pb-4 text-right shadow-xl backdrop-blur-sm transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div className="absolute top-0 left-0 hidden pt-4 pl-4 sm:block">
+              <Dialog.Panel className="relative transform overflow-hidden rounded-xl bg-white dark:bg-gray-900 px-4 pb-4 pt-5 text-right shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 ring-1 ring-gray-950/5 dark:ring-white/5">
+                <div className="absolute left-0 top-0 hidden pt-4 pl-4 sm:block">
                   <button
                     type="button"
-                    className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
+                    className={`rounded-lg cursor-pointer p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${variantStyles[variant].icon}`}
                     onClick={onClose}
                   >
                     <span className="sr-only">بستن</span>
-                    <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                    <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
+
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-right">
                     <Dialog.Title
                       as="h3"
-                      className="text-base leading-6 font-semibold text-gray-900"
+                      className="text-lg font-semibold leading-6 text-gray-900 dark:text-white"
                     >
                       {title}
                     </Dialog.Title>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">{description}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {description}
+                      </p>
                     </div>
                   </div>
                 </div>
-                <div className="mt-5 gap-2 sm:mt-4 sm:flex sm:flex-row-reverse">
+
+                <div className="mt-5 gap-3 sm:mt-4 sm:flex sm:flex-row-reverse">
                   <Button
                     type="button"
-                    className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+                    variant={variant}
+                    className="w-full sm:w-auto"
                     onClick={onConfirm}
                     loading={loading}
                   >
                     {confirmText}
                   </Button>
-                  <button
+                  <Button
                     type="button"
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    variant="white"
+                    className="mt-3 w-full sm:mt-0 sm:w-auto"
                     onClick={onClose}
                   >
                     {cancelText}
-                  </button>
+                  </Button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>

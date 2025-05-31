@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { deleteUser } from '@/app/lib/api/admin/users';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
-import Modal from '@/app/components/ui/Modal';
+import Modal from '@/app/components/ui/ConfirmModal';
 
 export function CreateUser() {
   return (

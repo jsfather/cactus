@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { deleteExam } from '@/app/lib/api/admin/exams';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
-import Modal from '@/app/components/ui/Modal';
+import Modal from '@/app/components/ui/ConfirmModal';
 
 export function CreateExam() {
   return (
