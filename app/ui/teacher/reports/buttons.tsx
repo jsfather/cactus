@@ -29,8 +29,10 @@ export function DeleteReport({ id }: { id: string }) {
       await deleteReport(id);
       toast.success('گزارش ترم با موفقیت حذف شد');
       window.location.reload();
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف گزارش ترم');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در حذف گزارش ترم';
+      toast.error(errorMessage);
       console.error('Failed to delete report:', error);
     } finally {
       setIsDeleting(false);

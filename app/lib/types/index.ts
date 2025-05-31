@@ -9,3 +9,4 @@ export * from './attendance';
 export * from './offline_session';
 export * from './report';
 export * from './ticket';
+export * from './error';

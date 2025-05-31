@@ -44,9 +44,10 @@ export default function Form() {
       await createUser({ ...data, profile_picture });
       toast.success('کاربر با موفقیت ایجاد شد');
       router.push('/admin/users');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در ایجاد کاربر');
-      console.error('Failed to create user:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در ایجاد کاربر';
+      toast.error(errorMessage);
     }
   };
 

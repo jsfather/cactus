@@ -38,8 +38,10 @@ export default function Form() {
       await createOfflineSession(data);
       toast.success('کلاس آفلاین با موفقیت ثبت شد');
       router.push('/teacher/offline_sessions');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در ثبت کلاس آفلاین');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در ثبت کلاس آفلاین';
+      toast.error(errorMessage);
       console.error('Failed to create offline session:', error);
     }
   };

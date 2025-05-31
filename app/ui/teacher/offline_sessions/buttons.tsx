@@ -40,9 +40,10 @@ export function DeleteOfflineSession({ id }: { id: string }) {
       await deleteOfflineSession(id);
       toast.success('کلاس آفلاین با موفقیت حذف شد');
       window.location.reload();
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف کلاس آفلاین');
-      console.error('Failed to delete offline session:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در حذف کلاس آفلاین';
+      toast.error(errorMessage);
     } finally {
       setIsDeleting(false);
       setIsModalOpen(false);

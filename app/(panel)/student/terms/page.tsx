@@ -40,19 +40,19 @@ export default function Page() {
     {
       header: 'تاریخ شروع',
       accessor: 'start_date' as const,
-      render: (value: string | number, _item: Term) =>
+      render: (value: string | number) =>
         new Date(value.toString()).toLocaleDateString('fa-IR'),
     },
     {
       header: 'تاریخ پایان',
       accessor: 'end_date' as const,
-      render: (value: string | number, _item: Term) =>
+      render: (value: string | number) =>
         new Date(value.toString()).toLocaleDateString('fa-IR'),
     },
     {
       header: 'نوع دوره',
       accessor: 'type' as const,
-      render: (value: string | number, _item: Term) => {
+      render: (value: string | number) => {
         const typeValue = value as Term['type'];
         const typeClasses = {
           normal:

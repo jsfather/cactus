@@ -37,8 +37,10 @@ export default function EditBlogForm({ blog }: { blog: BlogForm }) {
       await updateBlog(blog.id, data);
       toast.success('بلاگ با موفقیت بروزرسانی شد');
       router.push('/admin/blogs');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در ذخیره بلاگ');
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در ذخیره بلاگ';
+      toast.error(errorMessage);
       console.error('Failed to save blog:', error);
     }
   };

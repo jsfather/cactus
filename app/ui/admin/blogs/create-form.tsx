@@ -28,9 +28,10 @@ export default function Form() {
       await createBlog(data);
       toast.success('بلاگ با موفقیت ایجاد شد');
       router.push('/admin/blogs');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در ایجاد بلاگ');
-      console.error('Failed to create blog:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در ایجاد بلاگ';
+      toast.error(errorMessage);
     }
   };
 

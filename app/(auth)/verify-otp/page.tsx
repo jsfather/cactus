@@ -26,9 +26,9 @@ export default function VerifyOtpPage() {
       localStorage.setItem('authToken', result.token);
       await refetch();
       router.push('/admin/dashboard');
-    } catch (err) {
-      console.log(err);
-      setError('کد تایید اشتباه است. دوباره تلاش کنید.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'کد تایید اشتباه است. دوباره تلاش کنید.';
+      setError(errorMessage);
       setLoading(false);
     }
   };

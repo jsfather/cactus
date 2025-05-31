@@ -40,9 +40,10 @@ export function DeleteBlog({ id }: { id: string }) {
       await deleteBlog(id);
       toast.success('بلاگ با موفقیت حذف شد');
       window.location.reload();
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف بلاگ');
-      console.error('Failed to delete blog:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در حذف بلاگ';
+      toast.error(errorMessage);
     } finally {
       setIsDeleting(false);
       setIsModalOpen(false);

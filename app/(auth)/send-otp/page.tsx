@@ -22,9 +22,9 @@ export default function SendOtpPage() {
           `/verify-otp?identifier=${encodeURIComponent(identifier)}&otp=${encodeURIComponent(res.data.otp)}`
         );
       });
-    } catch (err) {
-      console.log(err);
-      setError('مشکلی در ارسال کد تایید به وجود آمده است. دوباره تلاش کنید.');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'مشکلی در ارسال کد تایید به وجود آمده است. دوباره تلاش کنید.'
+      setError(errorMessage);
       setLoading(false);
     }
   };

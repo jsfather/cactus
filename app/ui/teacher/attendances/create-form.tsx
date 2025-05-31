@@ -41,14 +41,15 @@ export default function Form() {
         status: data.status,
         absence_reason: data.status === 'absent' ? data.absence_reason : null,
         mark: data.mark,
-        student: { id: data.student_id } as any,
-        schedule: { id: data.schedule_id } as any,
+        student: { id: data.student_id } as never,
+        schedule: { id: data.schedule_id } as never,
       });
       toast.success('حضور و غیاب با موفقیت ثبت شد');
       router.push('/teacher/attendances');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در ثبت حضور و غیاب');
-      console.error('Failed to create attendance:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در ثبت حضور و غیاب';
+      toast.error(errorMessage);
     }
   };
 

@@ -40,9 +40,10 @@ export default function Form({ user }: { user: User }) {
       await updateUser(user.id, data);
       toast.success('کاربر با موفقیت بروزرسانی شد');
       router.push('/admin/users');
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در بروزرسانی کاربر');
-      console.error('Failed to update user:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در بروزرسانی کاربر';
+      toast.error(errorMessage);
     }
   };
 

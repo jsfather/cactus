@@ -64,9 +64,6 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState<
-    'all' | 'under-1m' | 'under-5m' | 'above-5m'
-  >('all');
   const [availability, setAvailability] = useState<'all' | 'in-stock'>('all');
 
   const filteredProducts = products.filter((product) => {

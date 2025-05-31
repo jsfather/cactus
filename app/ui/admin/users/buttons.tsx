@@ -40,9 +40,10 @@ export function DeleteUser({ id }: { id: string | number }) {
       await deleteUser(id);
       toast.success('کاربر با موفقیت حذف شد');
       window.location.reload();
-    } catch (error: any) {
-      toast.error(error.message || 'خطا در حذف کاربر');
-      console.error('Failed to delete user:', error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'خطا در حذف کاربر';
+      toast.error(errorMessage);
     } finally {
       setIsDeleting(false);
       setIsModalOpen(false);
