@@ -142,9 +142,10 @@ export default function Page() {
             <div className="lg:col-span-2">
               <div className="flex items-start gap-6">
                 <div className="relative h-32 w-32 overflow-hidden rounded-xl">
-                  <img
+                  <Image
                     src="https://randomuser.me/api/portraits/women/65.jpg"
                     alt="سارا محمدی"
+                    fill
                     className="object-cover"
                   />
                 </div>
@@ -349,9 +350,10 @@ export default function Page() {
                   >
                     <div className="mb-4 flex items-center gap-4">
                       <div className="relative h-12 w-12 overflow-hidden rounded-full">
-                        <img
+                        <Image
                           src={review.avatar}
                           alt={review.name}
+                          fill
                           className="object-cover"
                         />
                       </div>
