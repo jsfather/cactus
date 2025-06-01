@@ -19,7 +19,20 @@ const menuItems = [
   {
     title: 'کاربران',
     isGroupTitle: true,
-    subItems: [],
+    subItems: [
+      {
+        title: 'دانش پژوهان',
+        href: '/admin/students',
+      },
+      {
+        title: 'مدرسین',
+        href: '/admin/teachers',
+      },
+      {
+        title: 'کاربران',
+        href: '/admin/users',
+      },
+    ],
   },
   {
     title: 'آموزش',
@@ -28,6 +41,14 @@ const menuItems = [
       {
         title: 'ترم ها',
         href: '/admin/terms',
+      },
+      {
+        title: 'ترم مدرسین',
+        href: '/admin/term-teachers',
+      },
+      {
+        title: 'ترم دانش پژوهان',
+        href: '/admin/term-students',
       },
       {
         title: 'آزمون ها',

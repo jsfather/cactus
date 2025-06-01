@@ -3,66 +3,54 @@
 import { useState, useEffect } from 'react';
 import Table from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getUsers, deleteUser } from '@/app/lib/api/admin/users';
-import { User } from '@/app/lib/types';
+import { getTeachers, deleteTeacher } from '@/app/lib/api/admin/teachers';
+import { Teacher } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<User | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<Teacher | null>(null);
 
   const columns = [
     {
       header: 'نام',
-      accessor: 'first_name' as keyof User,
+      accessor: 'user.first_name' as keyof Teacher,
     },
     {
       header: 'نام خانوادگی',
-      accessor: 'last_name' as keyof User,
-    },
-    {
-      header: 'تلفن همراه',
-      accessor: 'phone' as keyof User,
-    },
-    {
-      header: 'ایمیل',
-      accessor: 'email' as keyof User,
-    },
-    {
-      header: 'کد ملی',
-      accessor: 'national_code' as keyof User,
+      accessor: 'user.last_name' as keyof Teacher,
     },
     {
       header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof User,
-      render: (value: string | null, item: User) =>
+      accessor: 'created_at' as keyof Teacher,
+      render: (value: string | null, item: Teacher) =>
         value ? new Date(value).toLocaleDateString('fa-IR') : '',
     },
   ];
 
-  const fetchUsers = async () => {
+  const fetchTeachers = async () => {
     try {
       setLoading(true);
-      const response = await getUsers();
+      const response = await getTeachers();
       if (response) {
-        setUsers(response.data);
+        setTeachers(response.data);
       }
     } catch (error) {
-      toast.error('خطا در دریافت لیست کاربران');
-      setUsers([]);
+      toast.error('خطا در دریافت لیست مدرسین');
+      setTeachers([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteClick = (user: User) => {
-    setItemToDelete(user);
+  const handleDeleteClick = (teacher: Teacher) => {
+    setItemToDelete(teacher);
     setShowDeleteModal(true);
   };
 
@@ -71,13 +59,13 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await deleteUser(itemToDelete.id);
-      toast.success('کاربر با موفقیت حذف شد');
+      await deleteTeacher(itemToDelete.user_id);
+      toast.success('مدرس با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchUsers();
+      await fetchTeachers();
     } catch (error) {
-      toast.error('خطا در حذف کاربر');
+      toast.error('خطا در حذف مدرس');
     } finally {
       setDeleteLoading(false);
     }
@@ -91,25 +79,25 @@ export default function Page() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchTeachers();
   }, []);
 
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          کاربران
+          مدرسین
         </h1>
-        <Button onClick={() => router.push('/admin/users/new')}>
-          ایجاد کاربر
+        <Button onClick={() => router.push('/admin/teachers/new')}>
+          ایجاد مدرس
         </Button>
       </div>
       <Table
-        data={users}
+        data={teachers}
         columns={columns}
         loading={loading}
-        emptyMessage="هیچ کاربری یافت نشد"
-        onEdit={(user) => router.push(`/admin/users/${user.id}`)}
+        emptyMessage="هیچ مدرسی یافت نشد"
+        onEdit={(teacher) => router.push(`/admin/teachers/${teacher.user_id}`)}
         onDelete={handleDeleteClick}
       />
 
@@ -117,8 +105,8 @@ export default function Page() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف کاربر"
-        description={`آیا از حذف کاربر "${itemToDelete?.first_name + ' ' + itemToDelete?.first_name}" اطمینان دارید؟`}
+        title="حذف مدرس"
+        description={`آیا از حذف مدرس "${itemToDelete?.user.first_name + ' ' + itemToDelete?.user.first_name}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

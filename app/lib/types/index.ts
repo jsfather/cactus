@@ -12,3 +12,6 @@ export * from './ticket';
 export * from './error';
 export * from './panel_guide';
 export * from './faq';
+export * from './term_teacher';
+export * from './student';
+export * from './teacher';
