@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { User2, X, Settings } from 'lucide-react';
 import { User } from '@/app/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 
 interface MenuItem {
   title: string;
@@ -29,7 +30,7 @@ function SidebarSkeleton() {
     <aside className="flex h-full w-64 flex-col bg-white shadow-lg dark:border-l dark:border-gray-800 dark:bg-gray-900">
       <div className="flex h-[80px] items-center justify-between px-6">
         <Link
-          href="/public"
+          href="/"
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
         >
           <Image src="/logo.svg" alt="logo" width={40} height={40} />
@@ -96,6 +97,15 @@ export default function Sidebar({
   loading = false,
 }: SidebarProps) {
   const pathname = usePathname();
+  const previousPathname = useRef(pathname);
+
+  // Close sidebar when route changes
+  useEffect(() => {
+    if (pathname !== previousPathname.current && isOpen && onClose) {
+      onClose();
+    }
+    previousPathname.current = pathname;
+  }, [pathname, isOpen, onClose]);
 
   if (loading) {
     return (
@@ -187,7 +197,7 @@ export default function Sidebar({
       {/* Logo section */}
       <div className="flex h-[80px] items-center justify-between px-6">
         <Link
-          href="/public"
+          href="/"
           className="flex items-center gap-2 transition-opacity hover:opacity-80"
         >
           <Image src="/logo.svg" alt="کاکتوس" width={40} height={40} priority />
