@@ -6,7 +6,6 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Clock,
-  Calendar,
   UserPlus,
   BookOpenCheck,
   MessagesSquare,

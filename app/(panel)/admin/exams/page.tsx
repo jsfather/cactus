@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table from '@/app/components/ui/Table';
+import Table , {Column} from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getExams, deleteExam } from '@/app/lib/api/admin/exams';
 import { Exam } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
+
 
 export default function Page() {
   const router = useRouter();
@@ -17,32 +18,34 @@ export default function Page() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Exam | null>(null);
 
-  const columns = [
+  const columns: Column<Exam>[] = [
     {
       header: 'عنوان',
-      accessor: 'title' as keyof Exam,
+      accessor: 'title',
     },
     {
       header: 'توضیحات',
-      accessor: 'description' as keyof Exam,
+      accessor: 'description',
     },
     {
       header: 'تاریخ آزمون',
-      accessor: 'date' as keyof Exam,
+      accessor: 'date',
     },
     {
       header: 'مدت زمان',
-      accessor: 'duration' as keyof Exam,
+      accessor: 'duration',
     },
     {
       header: 'ترم',
-      accessor: 'term_id' as keyof Exam,
+      accessor: 'term_id',
     },
     {
       header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof Exam,
-      render: (value: string | null, item: Exam) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
+      accessor: 'created_at',
+      render: (value) => {
+        if (!value || typeof value !== 'string') return '';
+        return new Date(value).toLocaleDateString('fa-IR');
+      },
     },
   ];
 

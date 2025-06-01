@@ -15,10 +15,11 @@ interface SelectProps
   error?: string;
   options: Option[];
   placeholder?: string;
+  required?: boolean;
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, className, placeholder, ...props }, ref) => {
+  ({ label, error, options, className, placeholder, required, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -27,6 +28,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
           >
             {label}
+            {required && <span className="text-red-500 mr-1">*</span>}
           </label>
         )}
         <div className="relative">
@@ -44,6 +46,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             )}
             aria-invalid={error ? 'true' : 'false'}
             aria-errormessage={error ? `${props.id}-error` : undefined}
+            aria-required={required}
           >
             {placeholder && (
               <option value="" disabled>

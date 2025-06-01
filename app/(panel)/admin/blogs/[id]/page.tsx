@@ -101,6 +101,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             id="title"
             label="عنوان"
             placeholder="عنوان بلاگ را وارد کنید"
+            required
             error={errors.title?.message}
             {...register('title')}
           />
@@ -109,6 +110,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             id="little_description"
             label="توضیحات کوتاه"
             placeholder="توضیحات کوتاه بلاگ را وارد کنید"
+            required
             error={errors.little_description?.message}
             {...register('little_description')}
           />

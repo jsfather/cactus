@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table from '@/app/components/ui/Table';
+import Table , {Column} from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getBlogs, deleteBlog } from '@/app/lib/api/admin/blogs';
 import { Blog } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
+
 
 export default function Page() {
   const router = useRouter();
@@ -17,24 +18,26 @@ export default function Page() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Blog | null>(null);
 
-  const columns = [
+  const columns: Column<Blog>[] = [
     {
       header: 'عنوان',
-      accessor: 'title' as keyof Blog,
+      accessor: 'title',
     },
     {
       header: 'توضیحات',
-      accessor: 'description' as keyof Blog,
+      accessor: 'description',
     },
     {
       header: 'توضیحات کوتاه',
-      accessor: 'little_description' as keyof Blog,
+      accessor: 'little_description',
     },
     {
       header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof Blog,
-      render: (value: string | null, item: Blog) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
+      accessor: 'created_at',
+      render: (value) => {
+        if (!value || typeof value !== 'string') return '';
+        return new Date(value).toLocaleDateString('fa-IR');
+      },
     },
   ];
 

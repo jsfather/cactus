@@ -7,10 +7,11 @@ interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
+  required?: boolean;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, error, className, ...props }, ref) => {
+  ({ label, error, className, required, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -19,6 +20,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
           >
             {label}
+            {required && <span className="text-red-500 mr-1">*</span>}
           </label>
         )}
         <textarea
@@ -36,6 +38,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           )}
           aria-invalid={error ? 'true' : 'false'}
           aria-errormessage={error ? `${props.id}-error` : undefined}
+          aria-required={required}
         />
         {error && (
           <p
