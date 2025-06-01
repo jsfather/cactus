@@ -34,7 +34,7 @@ export const createReport = async (data: Partial<Report>) => {
   return response;
 };
 
-export const deleteReport = async (id: string) => {
+export const deleteReport = async (id: string | number) => {
   const response = await request<Report>(`teacher/reports/${id}`, {
     method: 'DELETE',
   });

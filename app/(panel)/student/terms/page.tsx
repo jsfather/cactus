@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getTerms } from '@/app/lib/api/student/terms';
-import { Blog, Term } from '@/app/lib/types';
+import { Term } from '@/app/lib/types';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 
