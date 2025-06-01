@@ -1,5 +1,5 @@
 export interface Term {
-  id: string;
+  id: number | string;
   title: string;
   duration: string;
   number_of_sessions: string;
@@ -8,4 +8,7 @@ export interface Term {
   end_date: string;
   type: 'normal' | 'capacity_completion' | 'vip';
   capacity: string;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
 }

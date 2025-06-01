@@ -1,37 +1,136 @@
-import Pagination from '@/app/ui/pagination';
-import Search from '@/app/ui/search';
-import Table from '@/app/ui/admin/terms/table';
-import { CreateTerm } from '@/app/ui/admin/terms/buttons';
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'ترم ها',
-};
+import { useState, useEffect } from 'react';
+import Table from '@/app/components/ui/Table';
+import { toast } from 'react-hot-toast';
+import { getTerms, deleteTerm } from '@/app/lib/api/admin/terms';
+import { Term } from '@/app/lib/types';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
+import { Button } from '@/app/components/ui/Button';
+import { useRouter } from 'next/navigation';
 
-export default async function Page(props: {
-  searchParams?: Promise<{
-    query?: string;
-    page?: string;
-  }>;
-}) {
-  const searchParams = await props.searchParams;
-  const query = searchParams?.query || '';
-  const currentPage = Number(searchParams?.page) || 1;
-  const totalPages = 1;
+export default function Page() {
+  const router = useRouter();
+  const [terms, setTerms] = useState<Term[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<Term | null>(null);
+
+  const columns = [
+    {
+      header: 'عنوان',
+      accessor: 'title' as keyof Term,
+    },
+    {
+      header: 'مدت زمان',
+      accessor: 'duration' as keyof Term,
+    },
+    {
+      header: 'تعداد جلسات',
+      accessor: 'number_of_sessions' as keyof Term,
+    },
+    {
+      header: 'ظرفیت',
+      accessor: 'capacity' as keyof Term,
+    },
+    {
+      header: 'تاریخ شروع',
+      accessor: 'start_date' as keyof Term,
+      render: (value: string | null, item: Term) =>
+        value ? new Date(value).toLocaleDateString('fa-IR') : '',
+    },
+    {
+      header: 'تاریخ پایان',
+      accessor: 'end_date' as keyof Term,
+      render: (value: string | null, item: Term) =>
+        value ? new Date(value).toLocaleDateString('fa-IR') : '',
+    },
+    {
+      header: 'تاریخ ایجاد',
+      accessor: 'created_at' as keyof Term,
+      render: (value: string | null, item: Term) =>
+        value ? new Date(value).toLocaleDateString('fa-IR') : '',
+    },
+  ];
+
+  const fetchTerms = async () => {
+    try {
+      setLoading(true);
+      const response = await getTerms();
+      if (response) {
+        setTerms(response.data);
+      }
+    } catch (error) {
+      toast.error('خطا در دریافت لیست ترم ها');
+      setTerms([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteClick = (term: Term) => {
+    setItemToDelete(term);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      setDeleteLoading(true);
+      await deleteTerm(itemToDelete.id);
+      toast.success('ترم با موفقیت حذف شد');
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+      await fetchTerms();
+    } catch (error) {
+      toast.error('خطا در حذف ترم');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setTimeout(() => {
+      setItemToDelete(null);
+    }, 500);
+  };
+
+  useEffect(() => {
+    fetchTerms();
+  }, []);
 
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl">ترم‌ها</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          ترم ها
+        </h1>
+        <Button onClick={() => router.push('/admin/terms/new')}>
+          ایجاد ترم
+        </Button>
       </div>
-      <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="جستجوی ترم" />
-        <CreateTerm />
-      </div>
-      <Table query={query} currentPage={currentPage} />
-      <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
-      </div>
+      <Table
+        data={terms}
+        columns={columns}
+        loading={loading}
+        emptyMessage="هیچ ترمی یافت نشد"
+        onEdit={(term) => router.push(`/admin/terms/${term.id}`)}
+        onDelete={handleDeleteClick}
+      />
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="حذف ترم"
+        description={`آیا از حذف ترم "${itemToDelete?.title}" اطمینان دارید؟`}
+        confirmText="حذف"
+        loading={deleteLoading}
+        variant="danger"
+      />
     </div>
   );
 }

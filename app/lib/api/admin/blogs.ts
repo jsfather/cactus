@@ -11,7 +11,7 @@ export const getBlogs = async () => {
   return response;
 };
 
-export const getBlog = async (id: string) => {
+export const getBlog = async (id: number | string) => {
   const response = await request<Blog>(`admin/blogs/${id}`);
 
   if (!response) {
@@ -34,7 +34,7 @@ export const createBlog = async (data: Partial<Blog>) => {
   return response;
 };
 
-export const updateBlog = async (id: string, data: Partial<Blog>) => {
+export const updateBlog = async (id: number | string, data: Partial<Blog>) => {
   const response = await request<Blog>(`admin/blogs/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -47,7 +47,7 @@ export const updateBlog = async (id: string, data: Partial<Blog>) => {
   return response;
 };
 
-export const deleteBlog = async (id: string) => {
+export const deleteBlog = async (id: number | string) => {
   const response = await request<Blog>(`admin/blogs/${id}`, {
     method: 'DELETE',
   });

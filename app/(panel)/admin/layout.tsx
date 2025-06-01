@@ -19,18 +19,19 @@ const menuItems = [
   {
     title: 'کاربران',
     isGroupTitle: true,
+    subItems: [],
+  },
+  {
+    title: 'آموزش',
+    isGroupTitle: true,
     subItems: [
       {
-        title: 'دانش پژوهان',
-        href: '/admin/students',
+        title: 'ترم ها',
+        href: '/admin/terms',
       },
       {
-        title: 'مدرسین',
-        href: '/admin/teachers',
-      },
-      {
-        title: 'کاربران',
-        href: '/admin/users',
+        title: 'آزمون ها',
+        href: '/admin/exams',
       },
     ],
   },
@@ -41,6 +42,14 @@ const menuItems = [
       {
         title: 'بلاگ',
         href: '/admin/blogs',
+      },
+      {
+        title: 'سوالات متداول',
+        href: '/admin/faqs',
+      },
+      {
+        title: 'راهنماهای پنل',
+        href: '/admin/panel-guides',
       },
     ],
   },

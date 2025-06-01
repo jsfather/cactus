@@ -1,11 +1,9 @@
-export interface Blog {
+export interface PanelGuide {
   id: number | string;
+  type: 'student' | 'admin' | 'teacher';
   title: string;
-  little_description: string;
   description: string;
-  meta_title: string;
-  meta_description: string;
-  slug: string;
+  file: string;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

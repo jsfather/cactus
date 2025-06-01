@@ -15,7 +15,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [blogToDelete, setBlogToDelete] = useState<Blog | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<Blog | null>(null);
 
   const columns = [
     {
@@ -54,20 +54,20 @@ export default function Page() {
   };
 
   const handleDeleteClick = (blog: Blog) => {
-    setBlogToDelete(blog);
+    setItemToDelete(blog);
     setShowDeleteModal(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!blogToDelete) return;
+    if (!itemToDelete) return;
 
     try {
       setDeleteLoading(true);
-      await deleteBlog(blogToDelete.id);
+      await deleteBlog(itemToDelete.id);
       toast.success('بلاگ با موفقیت حذف شد');
       setShowDeleteModal(false);
-      setBlogToDelete(null);
-      fetchBlogs();
+      setItemToDelete(null);
+      await fetchBlogs();
     } catch (error) {
       toast.error('خطا در حذف بلاگ');
     } finally {
@@ -78,7 +78,7 @@ export default function Page() {
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
     setTimeout(() => {
-      setBlogToDelete(null);
+      setItemToDelete(null);
     }, 500);
   };
 
@@ -110,7 +110,7 @@ export default function Page() {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="حذف بلاگ"
-        description={`آیا از حذف بلاگ "${blogToDelete?.title}" اطمینان دارید؟`}
+        description={`آیا از حذف بلاگ "${itemToDelete?.title}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"
