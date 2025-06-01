@@ -123,11 +123,11 @@ const Page = async () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 ">
         {stats.map((stat) => (
           <div
             key={stat.title}
-            className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800"
+            className="group relative z-0 overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-[0.03] transition-all group-hover:opacity-[0.06]" 
                  style={{
