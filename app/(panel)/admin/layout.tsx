@@ -74,6 +74,16 @@ const menuItems = [
       },
     ],
   },
+  {
+    title: 'ارتباطات',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'تیکت ها',
+        href: '/admin/tickets',
+      }
+    ],
+  },
 ];
 
 export default function Layout({
