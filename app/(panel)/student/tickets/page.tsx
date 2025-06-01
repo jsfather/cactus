@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table , {Column} from '@/app/components/ui/Table';
+import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getTickets } from '@/app/lib/api/teacher/tickets';
+import { getTickets } from '@/app/lib/api/student/tickets';
 import { Ticket } from '@/app/lib/types';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
-
 
 export default function Page() {
   const router = useRouter();
@@ -54,7 +53,7 @@ export default function Page() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           تیکت ها
         </h1>
-        <Button onClick={() => router.push('/teacher/tickets/new')}>
+        <Button onClick={() => router.push('/student/tickets/new')}>
           ایجاد تیکت
         </Button>
       </div>
@@ -63,7 +62,6 @@ export default function Page() {
         columns={columns}
         loading={loading}
         emptyMessage="هیچ تیکتی یافت نشد"
-        onEdit={(ticket) => router.push(`/teacher/tickets/${ticket.id}`)}
       />
     </div>
   );

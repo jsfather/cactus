@@ -6,10 +6,11 @@ import clsx from 'clsx';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  required?: boolean;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, ...props }, ref) => {
+  ({ label, error, className, required, ...props }, ref) => {
     return (
       <div className="w-full">
         {label && (
@@ -18,6 +19,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
           >
             {label}
+            {required && <span className="text-red-500 mr-1">*</span>}
           </label>
         )}
         <input
@@ -34,6 +36,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
           aria-invalid={error ? 'true' : 'false'}
           aria-errormessage={error ? `${props.id}-error` : undefined}
+          aria-required={required}
         />
         {error && (
           <p

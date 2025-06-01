@@ -1,10 +1,10 @@
 'use client';
 
-interface Column<T> {
+export type Column<T> = {
   header: string;
   accessor: keyof T;
   render?: (value: T[keyof T], item: T) => React.ReactNode;
-}
+};
 
 interface TableProps<T> {
   data: T[];

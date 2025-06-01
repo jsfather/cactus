@@ -53,7 +53,7 @@ export default function Header() {
             </button>
 
             <div className="flex items-center gap-8">
-              <Link href="/public" className="flex items-center gap-2">
+              <Link href="/" className=" items-center gap-2 hidden lg:flex">
                 <Image
                   src="/logo.svg"
                   alt="کاکتوس"
@@ -172,7 +172,7 @@ export default function Header() {
               className="fixed top-0 right-0 bottom-0 z-50 w-80 overflow-y-auto bg-white p-6 shadow-xl dark:bg-gray-900"
             >
               <div className="flex items-center justify-between">
-                <Link href="/public" className="flex items-center gap-2">
+                <Link href="/" className="flex items-center gap-2">
                   <Image
                     src="/logo.png"
                     alt="لوگو کاکتوس"
