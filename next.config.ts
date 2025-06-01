@@ -1,10 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  typescript: {
-    // 🚫 Skip type checking during build
-    ignoreBuildErrors: true,
-  },
+  // typescript: {
+  //   // 🚫 Skip type checking during build
+  //   ignoreBuildErrors: true,
+  // },
   images: {
     remotePatterns: [
       {

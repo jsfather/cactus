@@ -121,6 +121,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             id="description"
             label="توضیحات"
             placeholder="توضیحات کامل بلاگ را وارد کنید"
+            required
             error={errors.description?.message}
             {...register('description')}
           />
@@ -131,6 +132,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             id="meta_title"
             label="عنوان متا"
             placeholder="عنوان متا بلاگ را وارد کنید"
+            required
             error={errors.meta_title?.message}
             {...register('meta_title')}
           />
@@ -139,6 +141,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             id="slug"
             label="اسلاگ"
             placeholder="اسلاگ بلاگ را وارد کنید"
+            required
             error={errors.slug?.message}
             {...register('slug')}
           />
@@ -149,7 +152,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             id="meta_description"
             label="توضیحات متا"
             placeholder="توضیحات متا بلاگ را وارد کنید"
-            error={errors.meta_description?.message}
+            required
+              error={errors.meta_description?.message}
             {...register('meta_description')}
           />
         </div>
