@@ -11,7 +11,7 @@ export const getTerms = async () => {
   return response;
 };
 
-export const getTerm = async (id: string) => {
+export const getTerm = async (id: number | string) => {
   const response = await request<{ data: Term }>(`admin/terms/${id}`);
 
   if (!response) {
@@ -34,7 +34,7 @@ export const createTerm = async (data: Partial<Term>) => {
   return response;
 };
 
-export const updateTerm = async (id: string, data: Partial<Term>) => {
+export const updateTerm = async (id: number | string, data: Partial<Term>) => {
   const response = await request<Term>(`admin/terms/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -47,7 +47,7 @@ export const updateTerm = async (id: string, data: Partial<Term>) => {
   return response;
 };
 
-export const deleteTerm = async (id: string) => {
+export const deleteTerm = async (id: number | string) => {
   const response = await request<Term>(`admin/terms/${id}`, {
     method: 'DELETE',
   });

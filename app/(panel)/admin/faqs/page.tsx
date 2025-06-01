@@ -3,66 +3,54 @@
 import { useState, useEffect } from 'react';
 import Table from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getExams, deleteExam } from '@/app/lib/api/admin/exams';
-import { Exam } from '@/app/lib/types';
+import { getFAQs, deleteFAQ } from '@/app/lib/api/admin/faqs';
+import { FAQ } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const router = useRouter();
-  const [exams, setExams] = useState<Exam[]>([]);
+  const [faqs, setFAQs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<Exam | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<FAQ | null>(null);
 
   const columns = [
     {
-      header: 'عنوان',
-      accessor: 'title' as keyof Exam,
+      header: 'سوال',
+      accessor: 'question' as keyof FAQ,
     },
     {
-      header: 'توضیحات',
-      accessor: 'description' as keyof Exam,
-    },
-    {
-      header: 'تاریخ آزمون',
-      accessor: 'date' as keyof Exam,
-    },
-    {
-      header: 'مدت زمان',
-      accessor: 'duration' as keyof Exam,
-    },
-    {
-      header: 'ترم',
-      accessor: 'term_id' as keyof Exam,
+      header: 'پاسخ',
+      accessor: 'answer' as keyof FAQ,
     },
     {
       header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof Exam,
-      render: (value: string | null, item: Exam) =>
+      accessor: 'created_at' as keyof FAQ,
+      render: (value: string | null, item: FAQ) =>
         value ? new Date(value).toLocaleDateString('fa-IR') : '',
     },
   ];
 
-  const fetchExams = async () => {
+  const fetchFAQs = async () => {
     try {
       setLoading(true);
-      const response = await getExams();
+      const response = await getFAQs();
       if (response) {
-        setExams(response.data);
+        setFAQs(response.data);
       }
     } catch (error) {
-      toast.error('خطا در دریافت لیست آزمون ها');
-      setExams([]);
+      toast.error('خطا در دریافت لیست سوالات متداول');
+      setFAQs([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteClick = (exam: Exam) => {
-    setItemToDelete(exam);
+  const handleDeleteClick = (faq: FAQ) => {
+    setItemToDelete(faq);
     setShowDeleteModal(true);
   };
 
@@ -71,13 +59,13 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await deleteExam(itemToDelete.id);
-      toast.success('آزمون با موفقیت حذف شد');
+      await deleteFAQ(itemToDelete.id);
+      toast.success('سوال متداول با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchExams();
+      await fetchFAQs();
     } catch (error) {
-      toast.error('خطا در حذف آزمون');
+      toast.error('خطا در حذف سوال متداول');
     } finally {
       setDeleteLoading(false);
     }
@@ -91,25 +79,25 @@ export default function Page() {
   };
 
   useEffect(() => {
-    fetchExams();
+    fetchFAQs();
   }, []);
 
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          آزمون ها
+          سوالات متداول
         </h1>
-        <Button onClick={() => router.push('/admin/exams/new')}>
-          ایجاد آزمون
+        <Button onClick={() => router.push('/admin/faqs/new')}>
+          ایجاد سوال متداول
         </Button>
       </div>
       <Table
-        data={exams}
+        data={faqs}
         columns={columns}
         loading={loading}
-        emptyMessage="هیچ آزمونی یافت نشد"
-        onEdit={(exam) => router.push(`/admin/exams/${exam.id}`)}
+        emptyMessage="هیچ سوال متداولی یافت نشد"
+        onEdit={(faq) => router.push(`/admin/faqs/${faq.id}`)}
         onDelete={handleDeleteClick}
       />
 
@@ -117,8 +105,8 @@ export default function Page() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف آزمون"
-        description={`آیا از حذف آزمون "${itemToDelete?.title}" اطمینان دارید؟`}
+        title="حذف سوال متداول"
+        description={`آیا از حذف سوال متداول اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

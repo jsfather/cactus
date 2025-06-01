@@ -11,7 +11,7 @@ export const getExams = async () => {
   return response;
 };
 
-export const getExam = async (id: string) => {
+export const getExam = async (id: number | string) => {
   const response = await request<{ data: Exam }>(`admin/exams/${id}`);
 
   if (!response) {
@@ -34,7 +34,7 @@ export const createExam = async (data: Partial<Exam>) => {
   return response;
 };
 
-export const updateExam = async (id: string, data: Partial<Exam>) => {
+export const updateExam = async (id: number | string, data: Partial<Exam>) => {
   const response = await request<Exam>(`admin/exams/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -47,7 +47,7 @@ export const updateExam = async (id: string, data: Partial<Exam>) => {
   return response;
 };
 
-export const deleteExam = async (id: string) => {
+export const deleteExam = async (id: number | string) => {
   const response = await request<Exam>(`admin/exams/${id}`, {
     method: 'DELETE',
   });

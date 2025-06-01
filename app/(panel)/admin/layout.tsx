@@ -35,12 +35,42 @@ const menuItems = [
     ],
   },
   {
+    title: 'آموزش',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'ترم ها',
+        href: '/admin/terms',
+      },
+      {
+        title: 'ترم مدرسین',
+        href: '/admin/term-teachers',
+      },
+      {
+        title: 'ترم دانش پژوهان',
+        href: '/admin/term-students',
+      },
+      {
+        title: 'آزمون ها',
+        href: '/admin/exams',
+      },
+    ],
+  },
+  {
     title: 'محتوا',
     isGroupTitle: true,
     subItems: [
       {
         title: 'بلاگ',
         href: '/admin/blogs',
+      },
+      {
+        title: 'سوالات متداول',
+        href: '/admin/faqs',
+      },
+      {
+        title: 'راهنماهای پنل',
+        href: '/admin/panel-guides',
       },
     ],
   },

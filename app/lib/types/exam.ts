@@ -1,5 +1,5 @@
 export interface Exam {
-  id: number;
+  id: number | string;
   title: string;
   description: string;
   date: string | null;
