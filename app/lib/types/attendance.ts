@@ -2,7 +2,7 @@ import { User, Term, Schedule } from '@/app/lib/types';
 
 export interface Attendance {
   id: number;
-  status: 'present' | 'absent' | string;
+  status: 'present' | 'absent';
   absence_reason: string | null;
   mark: string;
   created_at: string;
