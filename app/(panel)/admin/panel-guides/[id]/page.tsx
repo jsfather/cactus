@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getPanelGuide, createPanelGuide, updatePanelGuide } from '@/app/lib/api/admin/panel-guides';
+import { getPanelGuide, createPanelGuide, updatePanelGuide } from '@/app/lib/api/admin/panel_guides';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';

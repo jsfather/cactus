@@ -6,12 +6,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getFAQ, createFAQ, updateFAQ } from '@/app/lib/api/admin/faqs';
+import { createFAQ, updateFAQ } from '@/app/lib/api/admin/faqs';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
 import { Button } from '@/app/components/ui/Button';
-import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 const faqSchema = z.object({
   question: z.string().min(1, 'سوال الزامی است'),
@@ -24,7 +23,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
-  const [loading, setLoading] = useState(!isNew);
 
   const {
     register,
@@ -34,27 +32,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   } = useForm<FAQFormData>({
     resolver: zodResolver(faqSchema),
   });
-
-  useEffect(() => {
-    const fetchFAQ = async () => {
-      if (isNew) return;
-
-      try {
-        const response = await getFAQ(resolvedParams.id);
-        const faq = response.data;
-        reset({
-          question: faq.question,
-          answer: faq.answer,
-        });
-      } catch (error) {
-        router.push('/admin/faqs');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFAQ();
-  }, [isNew, resolvedParams.id, reset, router]);
 
   const onSubmit = async (data: FAQFormData) => {
     try {
@@ -71,9 +48,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     }
   };
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <main>

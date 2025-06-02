@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
+import { createTeacher , deleteTeacher , getTermTeacher } from '@/app/lib/api/admin/term-teachers';
 import { getTermStudent, createTermStudent, updateTermStudent } from '@/app/lib/api/admin/term-students';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
@@ -39,11 +40,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       if (isNew) return;
 
       try {
-        const response = await getTermStudent(resolvedParams.id);
+        const response = await getTermTeacher(resolvedParams.id);
         const termStudent = response.data;
         reset({
           term_id: termStudent.term_id.toString(),
-          student_id: termStudent.student_id.toString(),
+          student_id: termStudent.id.toString(),
         });
       } catch (error) {
         router.push('/admin/term-students');
