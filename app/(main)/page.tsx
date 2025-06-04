@@ -5,6 +5,10 @@ import { Button } from '@/app/components/ui/Button';
 import { motion } from 'framer-motion';
 import type { JSX } from 'react';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { VideoModal } from '@/app/components/ui/VideoModal';
+import { Play } from 'lucide-react';
+import { ClientVideo } from '@/app/components/ui/ClientVideo';
 
 interface Feature {
   title: string;
@@ -30,29 +34,128 @@ interface BlogPost {
   readTime: string;
 }
 
+interface VideoThumbnail {
+  videoSrc: string;
+  title: string;
+  aspectRatio: 'video' | 'square';
+}
+
 export default function Page() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowVideo(true);
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (showVideo && videoRef.current) {
+      videoRef.current.load();
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Video autoplay failed:', error);
+        });
+      }
+    }
+  }, [showVideo]);
+
+  const videoThumbnails: VideoThumbnail[] = [
+    {
+      videoSrc: '/intro-1.mp4',
+      title: 'فعالیت دانش پژوهان',
+      aspectRatio: 'square'
+    },
+    {
+      videoSrc: '/intro-2.mp4',
+      title: 'رضایت دانش آموزان',
+      aspectRatio: 'video'
+    },
+    {
+      videoSrc: '/intro-3.mp4',
+      title: 'معرفی کاکتوس',
+      aspectRatio: 'video'
+    }
+  ];
+
   return (
     <div
       dir="rtl"
-      className="min-h-screen p-4 text-gray-900 dark:bg-gray-900 dark:text-gray-100"
+      className="min-h-screen text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
-      <section className="px-4 pt-32 pb-20">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
+      <section className="relative min-h-screen w-full overflow-hidden pt-24 px-6 pb-12">
+        {/* Video/Image Container with curved frame and padding */}
+        <div className="absolute inset-x-6 top-24 bottom-12">
+          <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border border-white/10">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="space-y-6"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: showVideo ? 0 : 1 }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full"
             >
-              <h1 className="text-5xl leading-tight font-bold">
-                <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
+              <Image
+                src="/robot-video.png"
+                alt="آموزش رباتیک"
+                fill
+                priority
+                className="object-cover"
+              />
+              {/* Decorative Play Button */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center group">
+                  <svg
+                    className="w-10 h-10 fill-current text-white"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: showVideo ? 1 : 0 }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full"
+            >
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+                loop
+                preload="none"
+              >
+                <source src="/robocup-2024.mp4" type="video/mp4" />
+              </video>
+            </motion.div>
+          </div>
+          {/* Gradient overlay with curved edges */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/40 rounded-3xl" />
+        </div>
+
+        {/* Content Overlay - Adjusted positioning */}
+        <div className="relative z-10 h-full pt-12">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="max-w-2xl space-y-6"
+            >
+              <h1 className="text-5xl leading-tight font-bold text-white">
+                <span className="from-primary-400 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
                   آینده رباتیک
                 </span>
                 <br />
                 را با ما بسازید
               </h1>
-              <p className="text-xl leading-relaxed text-gray-600 dark:text-gray-300">
+              <p className="text-xl leading-relaxed text-gray-200">
                 با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
                 ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
               </p>
@@ -60,7 +163,7 @@ export default function Page() {
                 <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
                   شروع یادگیری
                 </Button>
-                <Button className="text-primary-600 dark:text-primary-400 rounded-full bg-gray-100 px-8 py-3 text-lg transition-all duration-200 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
+                <Button className="bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-full px-8 py-3 text-lg text-white transition-all duration-200">
                   مشاهده دوره‌ها
                 </Button>
               </div>
@@ -71,109 +174,15 @@ export default function Page() {
                   { number: '٪۹۵', label: 'رضایت' },
                 ].map((stat, index) => (
                   <div key={index} className="text-center">
-                    <div className="text-primary-600 dark:text-primary-400 text-2xl font-bold">
+                    <div className="text-primary-400 text-2xl font-bold">
                       {stat.number}
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="text-sm text-gray-300">
                       {stat.label}
                     </div>
                   </div>
                 ))}
               </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              className="relative"
-            >
-              <div className="group relative h-[500px] w-full">
-                <Image
-                  src="/robot-video.png"
-                  alt="آموزش رباتیک"
-                  fill
-                  sizes="(width: 100%)"
-                  className="rounded-2xl object-cover shadow-2xl dark:opacity-90"
-                  priority
-                />
-                <div className="from-primary-600/20 dark:from-primary-900/30 absolute inset-0 rounded-2xl bg-gradient-to-tr to-transparent" />
-                <button
-                  className="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 transform items-center justify-center rounded-full bg-white/30 backdrop-blur-sm transition-all duration-300 ease-in-out group-hover:scale-110 hover:bg-white/40"
-                  aria-label="Play video"
-                >
-                  <svg
-                    className="h-8 w-8 fill-current text-white"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </button>
-              </div>
-
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="absolute -right-6 -bottom-6 rounded-xl bg-white p-4 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary-100 dark:bg-primary-900/20 flex h-12 w-12 items-center justify-center rounded-full">
-                    <svg
-                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-semibold dark:text-gray-100">
-                      پروژه‌های عملی
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      یادگیری با تجربه
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ repeat: Infinity, duration: 2.5 }}
-                className="absolute -top-6 -left-6 rounded-xl bg-white p-4 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="bg-primary-100 dark:bg-primary-900/20 flex h-12 w-12 items-center justify-center rounded-full">
-                    <svg
-                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-semibold dark:text-gray-100">
-                      مرکز نوآوری
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      خلق و نوآوری
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -188,6 +197,7 @@ export default function Page() {
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
                 مدرسه رباتیک ما
+                {' '}
               </span>
               را انتخاب کنید؟
             </h2>
@@ -230,17 +240,15 @@ export default function Page() {
               className="space-y-6"
             >
               <h2 className="text-3xl font-bold">
-                درباره
                 <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
-                  {' '}
-                  کاکتوس
+                  آموزشگاه رباتیک کاکتوس
                 </span>
               </h2>
               <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                شرکت کاکتوس با بیش از یک دهه تجربه در زمینه آموزش رباتیک، پیشرو
-                در ارائه خدمات آموزشی و تجهیزات رباتیک در ایران است. ما با تیمی
-                متشکل از متخصصان و مدرسان مجرب، به دنبال گسترش دانش و مهارت‌های
-                رباتیک در کشور هستیم.
+                شرکت کاکتوس پویان گستر با شماره ثبت 7308
+              </p>
+              <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+                شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در دو بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد. شرکت کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال 1395 به طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395 به صورت حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با هوش مصنوعی در حیطه دانش آموزی و در عرصه جهانی و بین المللی فعالیت داشته است. در بخش تجارت الکترونیک، شخص مدیر عامل به صورت حقیقی در حال فعالیت می باشند. رشته فنی و مهندسی روباتیک تلفیقی از سه رشته مهندسی الکترونیک، مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس پویان گستر در حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و تربیت مهندسین واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها به صورت مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم افزارهایی چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش مکانیک با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس، کتیا و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش برنامه نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ، اتمل استودیو، ام بلاگ، پایتون و... آموزش داده می شود. پس از گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و نظارت شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
               </p>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {[
@@ -285,79 +293,96 @@ export default function Page() {
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <div className="h-48 overflow-hidden rounded-2xl">
-                    <Image
-                      src="/about-1.png"
-                      alt="تصویر آموزش رباتیک"
-                      width={300}
-                      height={200}
-                      className="h-full w-full object-cover"
+              <div className="lg:grid lg:grid-cols-2 gap-6 space-y-6 lg:space-y-0">
+                <div className="lg:h-[600px] h-[400px]">
+                  <div
+                    className="relative h-full overflow-hidden rounded-2xl group cursor-pointer"
+                    onClick={() => videoThumbnails[0].videoSrc ? setSelectedVideo(videoThumbnails[0].videoSrc) : null}
+                    onMouseEnter={(e) => {
+                      const videoEl = e.currentTarget.querySelector('video');
+                      if (videoEl) {
+                        videoEl.play().catch(err => console.log('Video play failed:', err));
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      const videoEl = e.currentTarget.querySelector('video');
+                      if (videoEl) {
+                        videoEl.pause();
+                        videoEl.currentTime = 0;
+                      }
+                    }}
+                  >
+                    <ClientVideo
+                      src={videoThumbnails[0].videoSrc}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      preload="metadata"
                     />
-                  </div>
-                  <div className="h-64 overflow-hidden rounded-2xl">
-                    <Image
-                      src="/about-2.png"
-                      alt="تصویر کارگاه رباتیک"
-                      width={300}
-                      height={400}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                </div>
-                <div className="mt-8 space-y-4">
-                  <div className="h-64 overflow-hidden rounded-2xl">
-                    <Image
-                      src="/about-3.png"
-                      alt="تصویر آزمایشگاه رباتیک"
-                      width={300}
-                      height={400}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="h-48 overflow-hidden rounded-2xl">
-                    <Image
-                      src="/about-4.png"
-                      alt="تصویر دانشجویان رباتیک"
-                      width={300}
-                      height={200}
-                      className="h-full w-full object-cover"
-                    />
+                    <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                      {videoThumbnails[0].videoSrc && (
+                        <div className="rounded-full bg-white/10 p-3 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110">
+                          <Play className="h-8 w-8 text-white opacity-75 group-hover:opacity-100" />
+                        </div>
+                      )}
+                      <span className="text-sm font-medium text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                        {videoThumbnails[0].title}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="absolute right-6 -bottom-6 rounded-xl bg-white p-6 shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50">
-                <div className="flex items-center gap-4">
-                  <div className="bg-primary-100 dark:bg-primary-900/20 flex h-12 w-12 items-center justify-center rounded-full">
-                    <svg
-                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                <div className="space-y-6">
+                  {videoThumbnails.slice(1).map((video, index) => (
+                    <div
+                      key={index}
+                      className="relative h-[290px] lg:h-[290px] overflow-hidden rounded-2xl group cursor-pointer"
+                      onClick={() => video.videoSrc ? setSelectedVideo(video.videoSrc) : null}
+                      onMouseEnter={(e) => {
+                        const videoEl = e.currentTarget.querySelector('video');
+                        if (videoEl) {
+                          videoEl.play().catch(err => console.log('Video play failed:', err));
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        const videoEl = e.currentTarget.querySelector('video');
+                        if (videoEl) {
+                          videoEl.pause();
+                          videoEl.currentTime = 0;
+                        }
+                      }}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
+                      <ClientVideo
+                        src={video.videoSrc}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        preload="metadata"
                       />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="font-bold dark:text-gray-100">
-                      گواهی‌نامه بین‌المللی
+                      <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                        {video.videoSrc && (
+                          <div className="rounded-full bg-white/10 p-3 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110">
+                            <Play className="h-8 w-8 text-white opacity-75 group-hover:opacity-100" />
+                          </div>
+                        )}
+                        <span className="text-sm font-medium text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                          {video.title}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      معتبر در سراسر دنیا
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
           </div>
         </div>
       </section>
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <VideoModal
+          isOpen={!!selectedVideo}
+          onClose={() => setSelectedVideo(null)}
+          videoSrc={selectedVideo}
+        />
+      )}
 
       <section id="shop" className="py-24 dark:bg-gray-900">
         <div className="container mx-auto px-4">
