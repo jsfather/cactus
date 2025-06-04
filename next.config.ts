@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
         pathname: '/api/portraits/**',
       },
     ],
-  },
+  }
 };
 
 export default nextConfig;
