@@ -20,7 +20,7 @@ export default function Footer() {
               توانمندسازی نسل آینده مهندسان رباتیک از طریق آموزش پیشرفته و تجربه
               عملی با تجهیزات مدرن.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 mb-6">
               {[
                 { name: 'توییتر', link: 'twitter' },
                 { name: 'فیسبوک', link: 'facebook' },
@@ -42,6 +42,22 @@ export default function Footer() {
                   </svg>
                 </a>
               ))}
+            </div>
+            <div className="mt-4 bg-white inline-block p-2 rounded-lg">
+              <a
+                referrerPolicy="origin"
+                target="_blank"
+                href="https://trustseal.enamad.ir/?id=549881&Code=dONYAVKcitgaJ4NHqPoTv5N3DtALESVs"
+                className="block"
+              >
+                <img
+                  referrerPolicy="origin"
+                  src="https://trustseal.enamad.ir/logo.aspx?id=549881&Code=dONYAVKcitgaJ4NHqPoTv5N3DtALESVs"
+                  alt="نماد اعتماد الکترونیکی"
+                  className="h-24 w-auto"
+                  code="dONYAVKcitgaJ4NHqPoTv5N3DtALESVs"
+                />
+              </a>
             </div>
           </div>
 
