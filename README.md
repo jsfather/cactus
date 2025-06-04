@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌵 Cactus
 
-## Getting Started
+A modern web application built with Next.js 15, React, and TypeScript, featuring a beautiful UI and excellent developer experience.
 
-First, run the development server:
+## 🚀 Features
+
+- **Modern Stack**: Built with Next.js 15.3.1 and React 19
+- **Type Safety**: Full TypeScript support
+- **Fast Development**: Powered by Turbopack for lightning-fast builds
+- **Beautiful UI**: Styled with modern design principles
+- **Authentication**: Secure user authentication system
+- **Panel Interface**: Administrative dashboard
+- **Responsive Design**: Works seamlessly on all devices
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15.3.1](https://nextjs.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components**: 
+  - [@headlessui/react](https://headlessui.com/)
+  - [@heroicons/react](https://heroicons.com/)
+  - [Framer Motion](https://www.framer.com/motion/)
+- **Form Handling**: [React Hook Form](https://react-hook-form.com/)
+- **Date Handling**: 
+  - [jalali-moment](https://github.com/jalaali/moment-jalaali)
+  - [react-multi-date-picker](https://github.com/shahabyazdi/react-multi-date-picker)
+- **Validation**: [Zod](https://github.com/colinhacks/zod)
+- **Development Tools**:
+  - ESLint
+  - Prettier
+  - Turbopack
+
+## 📦 Installation
+
+1. Clone the repository:
+```bash
+git clone [your-repository-url]
+cd cactus
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create necessary environment files:
+```bash
+cp .env.example .env.local
+```
+
+## 🚀 Development
+
+To start the development server with Turbopack:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Other available scripts:
+- `npm run build`: Create a production build
+- `npm run start`: Start the production server
+- `npm run lint`: Run ESLint
+- `npm run format`: Format code with Prettier
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 Project Structure
 
-## Learn More
+```
+cactus/
+├── app/                    # Next.js 13+ App Router
+│   ├── (auth)/            # Authentication routes
+│   ├── (main)/            # Main application routes
+│   ├── (panel)/           # Admin panel routes
+│   ├── components/        # Shared components
+│   ├── hooks/            # Custom React hooks
+│   ├── lib/              # Utility functions and configurations
+│   └── fonts/            # Font assets
+├── public/               # Static assets
+└── [Configuration files] # Various config files
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 🔧 Configuration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The project uses several configuration files:
+- `next.config.ts`: Next.js configuration
+- `tsconfig.json`: TypeScript configuration
+- `.prettierrc`: Prettier formatting rules
+- `eslint.config.mjs`: ESLint rules
+- `postcss.config.mjs`: PostCSS configuration for Tailwind
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🤝 Contributing
 
-## Deploy on Vercel
+1. Fork the repository
+2. Create your feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add some amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📝 License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License - see the LICENSE file for details.
