@@ -19,7 +19,7 @@ export function ClientVideo({
   muted = true,
   loop = true,
   playsInline = true,
-  preload = 'metadata'
+  preload = 'metadata',
 }: ClientVideoProps) {
   return (
     <video
@@ -34,4 +34,4 @@ export function ClientVideo({
       suppressHydrationWarning
     />
   );
-} 
+}

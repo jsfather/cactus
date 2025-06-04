@@ -46,21 +46,21 @@ export function VideoModal({ isOpen, onClose, videoSrc }: VideoModalProps) {
               leaveTo="opacity-0 scale-95 translate-y-4"
             >
               <Dialog.Panel className="relative w-full max-w-5xl transform overflow-hidden rounded-2xl bg-gradient-to-b from-gray-900 to-black p-1 shadow-xl transition-all">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 via-primary-500/10 to-primary-500/20 opacity-50" />
-                
-                <div className="relative rounded-xl bg-black overflow-hidden">
+                <div className="from-primary-500/20 via-primary-500/10 to-primary-500/20 absolute inset-0 bg-gradient-to-r opacity-50" />
+
+                <div className="relative overflow-hidden rounded-xl bg-black">
                   <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 z-10 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur-sm transition-all duration-200 hover:bg-black/70 hover:text-white hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500/60"
+                    className="focus:ring-primary-500/60 absolute top-4 right-4 z-10 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-black/70 hover:text-white focus:ring-2 focus:outline-none"
                   >
                     <X className="h-6 w-6" />
                   </button>
 
-                  <div className="aspect-video relative">
+                  <div className="relative aspect-video">
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary-500/30 border-t-primary-500" />
+                      <div className="border-primary-500/30 border-t-primary-500 h-12 w-12 animate-spin rounded-full border-4" />
                     </div>
-                    
+
                     {typeof window !== 'undefined' && (
                       <video
                         key={videoSrc}
@@ -91,4 +91,4 @@ export function VideoModal({ isOpen, onClose, videoSrc }: VideoModalProps) {
       </Dialog>
     </Transition>
   );
-} 
+}

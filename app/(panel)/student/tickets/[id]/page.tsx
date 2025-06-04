@@ -134,7 +134,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                       {message.created_at}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-700">{message.content}</p>
+                  <p className="mt-2 text-sm text-gray-700">
+                    {message.content}
+                  </p>
                 </div>
               ))}
             </div>

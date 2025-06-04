@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table , {Column} from '@/app/components/ui/Table';
+import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getTerms } from '@/app/lib/api/teacher/terms';
 import { Term } from '@/app/lib/types';

@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table , {Column} from '@/app/components/ui/Table';
+import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getOfflineSessions , deleteOfflineSession } from '@/app/lib/api/teacher/offline_sessions';
+import {
+  getOfflineSessions,
+  deleteOfflineSession,
+} from '@/app/lib/api/teacher/offline_sessions';
 import { OfflineSession } from '@/app/lib/types';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
-
 
 export default function Page() {
   const router = useRouter();
@@ -96,7 +98,9 @@ export default function Page() {
         columns={columns}
         loading={loading}
         emptyMessage="هیچ کلاس آفلاینی یافت نشد"
-        onEdit={(offlineSession) => router.push(`/teacher/offline_sessions/${offlineSession.id}`)}
+        onEdit={(offlineSession) =>
+          router.push(`/teacher/offline_sessions/${offlineSession.id}`)
+        }
       />
 
       <ConfirmModal

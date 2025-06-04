@@ -20,7 +20,7 @@ export default function Footer() {
               توانمندسازی نسل آینده مهندسان رباتیک از طریق آموزش پیشرفته و تجربه
               عملی با تجهیزات مدرن.
             </p>
-            <div className="flex gap-4 mb-6">
+            <div className="mb-6 flex gap-4">
               {[
                 { name: 'توییتر', link: 'twitter' },
                 { name: 'فیسبوک', link: 'facebook' },
@@ -43,7 +43,7 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-            <div className="mt-4 bg-white inline-block p-2 rounded-lg">
+            <div className="mt-4 inline-block rounded-lg bg-white p-2">
               <a
                 referrerPolicy="origin"
                 target="_blank"

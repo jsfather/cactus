@@ -1,13 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table , {Column} from '@/app/components/ui/Table';
+import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getTickets } from '@/app/lib/api/teacher/tickets';
 import { Ticket } from '@/app/lib/types';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
-
 
 export default function Page() {
   const router = useRouter();

@@ -58,7 +58,7 @@ export default function Page() {
       videoRef.current.load();
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
-        playPromise.catch(error => {
+        playPromise.catch((error) => {
           console.log('Video autoplay failed:', error);
         });
       }
@@ -69,18 +69,18 @@ export default function Page() {
     {
       videoSrc: '/intro-1.mp4',
       title: 'فعالیت دانش پژوهان',
-      aspectRatio: 'square'
+      aspectRatio: 'square',
     },
     {
       videoSrc: '/intro-2.mp4',
       title: 'رضایت دانش آموزان',
-      aspectRatio: 'video'
+      aspectRatio: 'video',
     },
     {
       videoSrc: '/intro-3.mp4',
       title: 'معرفی کاکتوس',
-      aspectRatio: 'video'
-    }
+      aspectRatio: 'video',
+    },
   ];
 
   return (
@@ -88,15 +88,15 @@ export default function Page() {
       dir="rtl"
       className="min-h-screen text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
-      <section className="relative min-h-screen w-full overflow-hidden pt-24 px-6 pb-12">
+      <section className="relative min-h-screen w-full overflow-hidden px-6 pt-24 pb-12">
         {/* Video/Image Container with curved frame and padding */}
         <div className="absolute inset-x-6 top-24 bottom-12">
-          <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+          <div className="relative h-full w-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
             <motion.div
               initial={{ opacity: 1 }}
               animate={{ opacity: showVideo ? 0 : 1 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full"
+              transition={{ duration: 1, ease: 'easeInOut' }}
+              className="absolute inset-0 h-full w-full"
             >
               <Image
                 src="/robot-video.png"
@@ -107,9 +107,9 @@ export default function Page() {
               />
               {/* Decorative Play Button */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center group">
+                <div className="group flex h-20 w-20 items-center justify-center rounded-full bg-white/30 backdrop-blur-sm">
                   <svg
-                    className="w-10 h-10 fill-current text-white"
+                    className="h-10 w-10 fill-current text-white"
                     viewBox="0 0 24 24"
                   >
                     <path d="M8 5v14l11-7z" />
@@ -120,12 +120,12 @@ export default function Page() {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: showVideo ? 1 : 0 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className="absolute inset-0 w-full h-full"
+              transition={{ duration: 1, ease: 'easeInOut' }}
+              className="absolute inset-0 h-full w-full"
             >
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 muted
                 playsInline
                 loop
@@ -136,7 +136,7 @@ export default function Page() {
             </motion.div>
           </div>
           {/* Gradient overlay with curved edges */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/40 rounded-3xl" />
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-black/60 via-black/50 to-black/40" />
         </div>
 
         {/* Content Overlay - Adjusted positioning */}
@@ -163,7 +163,7 @@ export default function Page() {
                 <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
                   شروع یادگیری
                 </Button>
-                <Button className="bg-white/10 backdrop-blur-sm hover:bg-white/20 rounded-full px-8 py-3 text-lg text-white transition-all duration-200">
+                <Button className="rounded-full bg-white/10 px-8 py-3 text-lg text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20">
                   مشاهده دوره‌ها
                 </Button>
               </div>
@@ -177,9 +177,7 @@ export default function Page() {
                     <div className="text-primary-400 text-2xl font-bold">
                       {stat.number}
                     </div>
-                    <div className="text-sm text-gray-300">
-                      {stat.label}
-                    </div>
+                    <div className="text-sm text-gray-300">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -196,8 +194,7 @@ export default function Page() {
               چرا
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                مدرسه رباتیک ما
-                {' '}
+                مدرسه رباتیک ما{' '}
               </span>
               را انتخاب کنید؟
             </h2>
@@ -248,7 +245,25 @@ export default function Page() {
                 شرکت کاکتوس پویان گستر با شماره ثبت 7308
               </p>
               <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در دو بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد. شرکت کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال 1395 به طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395 به صورت حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با هوش مصنوعی در حیطه دانش آموزی و در عرصه جهانی و بین المللی فعالیت داشته است. در بخش تجارت الکترونیک، شخص مدیر عامل به صورت حقیقی در حال فعالیت می باشند. رشته فنی و مهندسی روباتیک تلفیقی از سه رشته مهندسی الکترونیک، مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس پویان گستر در حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و تربیت مهندسین واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها به صورت مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم افزارهایی چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش مکانیک با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس، کتیا و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش برنامه نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ، اتمل استودیو، ام بلاگ، پایتون و... آموزش داده می شود. پس از گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و نظارت شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
+                شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در دو
+                بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد. شرکت
+                کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال 1395 به
+                طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395 به صورت
+                حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با هوش مصنوعی
+                در حیطه دانش آموزی و در عرصه جهانی و بین المللی فعالیت داشته
+                است. در بخش تجارت الکترونیک، شخص مدیر عامل به صورت حقیقی در حال
+                فعالیت می باشند. رشته فنی و مهندسی روباتیک تلفیقی از سه رشته
+                مهندسی الکترونیک، مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس
+                پویان گستر در حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و
+                تربیت مهندسین واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها
+                به صورت مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم
+                افزارهایی چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش
+                مکانیک با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس،
+                کتیا و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش
+                برنامه نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ،
+                اتمل استودیو، ام بلاگ، پایتون و... آموزش داده می شود. پس از
+                گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و نظارت
+                شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
               </p>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {[
@@ -293,15 +308,23 @@ export default function Page() {
               transition={{ duration: 0.5 }}
               className="relative"
             >
-              <div className="lg:grid lg:grid-cols-2 gap-6 space-y-6 lg:space-y-0">
-                <div className="lg:h-[600px] h-[400px]">
+              <div className="gap-6 space-y-6 lg:grid lg:grid-cols-2 lg:space-y-0">
+                <div className="h-[400px] lg:h-[600px]">
                   <div
-                    className="relative h-full overflow-hidden rounded-2xl group cursor-pointer"
-                    onClick={() => videoThumbnails[0].videoSrc ? setSelectedVideo(videoThumbnails[0].videoSrc) : null}
+                    className="group relative h-full cursor-pointer overflow-hidden rounded-2xl"
+                    onClick={() =>
+                      videoThumbnails[0].videoSrc
+                        ? setSelectedVideo(videoThumbnails[0].videoSrc)
+                        : null
+                    }
                     onMouseEnter={(e) => {
                       const videoEl = e.currentTarget.querySelector('video');
                       if (videoEl) {
-                        videoEl.play().catch(err => console.log('Video play failed:', err));
+                        videoEl
+                          .play()
+                          .catch((err) =>
+                            console.log('Video play failed:', err)
+                          );
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -314,13 +337,13 @@ export default function Page() {
                   >
                     <ClientVideo
                       src={videoThumbnails[0].videoSrc}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 h-full w-full object-cover"
                       preload="metadata"
                     />
                     <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                       {videoThumbnails[0].videoSrc && (
-                        <div className="rounded-full bg-white/10 p-3 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110">
+                        <div className="rounded-full bg-white/10 p-3 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-white/20">
                           <Play className="h-8 w-8 text-white opacity-75 group-hover:opacity-100" />
                         </div>
                       )}
@@ -334,12 +357,18 @@ export default function Page() {
                   {videoThumbnails.slice(1).map((video, index) => (
                     <div
                       key={index}
-                      className="relative h-[290px] lg:h-[290px] overflow-hidden rounded-2xl group cursor-pointer"
-                      onClick={() => video.videoSrc ? setSelectedVideo(video.videoSrc) : null}
+                      className="group relative h-[290px] cursor-pointer overflow-hidden rounded-2xl lg:h-[290px]"
+                      onClick={() =>
+                        video.videoSrc ? setSelectedVideo(video.videoSrc) : null
+                      }
                       onMouseEnter={(e) => {
                         const videoEl = e.currentTarget.querySelector('video');
                         if (videoEl) {
-                          videoEl.play().catch(err => console.log('Video play failed:', err));
+                          videoEl
+                            .play()
+                            .catch((err) =>
+                              console.log('Video play failed:', err)
+                            );
                         }
                       }}
                       onMouseLeave={(e) => {
@@ -352,13 +381,13 @@ export default function Page() {
                     >
                       <ClientVideo
                         src={video.videoSrc}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 h-full w-full object-cover"
                         preload="metadata"
                       />
                       <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
                         {video.videoSrc && (
-                          <div className="rounded-full bg-white/10 p-3 backdrop-blur-sm transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110">
+                          <div className="rounded-full bg-white/10 p-3 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:bg-white/20">
                             <Play className="h-8 w-8 text-white opacity-75 group-hover:opacity-100" />
                           </div>
                         )}

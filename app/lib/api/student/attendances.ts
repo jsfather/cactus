@@ -12,11 +12,13 @@ export const getAttendances = async () => {
 };
 
 export const getAttendance = async (id: string) => {
-  const response = await request<{ data: Attendance }>(`student/attendances/${id}`);
+  const response = await request<{ data: Attendance }>(
+    `student/attendances/${id}`
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت اطلاعات حضور و غیاب رخ داده است');
   }
 
   return response;
-}; 
+};

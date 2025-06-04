@@ -18,6 +18,7 @@ const menuItems = [
   { title: 'درباره ما', href: '/about' },
   { title: 'وبلاگ', href: '/blog' },
   { title: 'فروشگاه', href: '/shop' },
+  { title: 'گواهینامه ها و افتخارات', href: '/certifications' },
 ];
 
 export default function Header() {
@@ -53,7 +54,7 @@ export default function Header() {
             </button>
 
             <div className="flex items-center gap-8">
-              <Link href="/" className=" items-center gap-2 hidden lg:flex">
+              <Link href="/" className="hidden items-center gap-2 lg:flex">
                 <Image
                   src="/logo.svg"
                   alt="کاکتوس"

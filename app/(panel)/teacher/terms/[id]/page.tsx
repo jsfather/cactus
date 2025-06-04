@@ -68,7 +68,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
           <div>
             <h3 className="text-sm font-medium text-gray-500">تعداد جلسات</h3>
-            <p className="mt-1 text-sm text-gray-900">{term.number_of_sessions}</p>
+            <p className="mt-1 text-sm text-gray-900">
+              {term.number_of_sessions}
+            </p>
           </div>
         </div>
 

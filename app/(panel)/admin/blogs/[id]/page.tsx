@@ -153,7 +153,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             label="توضیحات متا"
             placeholder="توضیحات متا بلاگ را وارد کنید"
             required
-              error={errors.meta_description?.message}
+            error={errors.meta_description?.message}
             {...register('meta_description')}
           />
         </div>

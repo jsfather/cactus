@@ -6,7 +6,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getOfflineSession, createOfflineSession, updateOfflineSession } from '@/app/lib/api/teacher/offline_sessions';
+import {
+  getOfflineSession,
+  createOfflineSession,
+  updateOfflineSession,
+} from '@/app/lib/api/teacher/offline_sessions';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
@@ -72,7 +76,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/teacher/offline_sessions');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد کلاس آفلاین' : 'خطا در بروزرسانی کلاس آفلاین');
+      toast.error(
+        isNew ? 'خطا در ایجاد کلاس آفلاین' : 'خطا در بروزرسانی کلاس آفلاین'
+      );
     }
   };
 
