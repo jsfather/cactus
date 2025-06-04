@@ -19,7 +19,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
           >
             {label}
-            {required && <span className="text-red-500 mr-1">*</span>}
+            {required && <span className="mr-1 text-red-500">*</span>}
           </label>
         )}
         <input

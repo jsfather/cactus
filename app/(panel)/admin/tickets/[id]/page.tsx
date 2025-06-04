@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getTicket} from '@/app/lib/api/admin/tickets';
+import { getTicket } from '@/app/lib/api/admin/tickets';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import { Button } from '@/app/components/ui/Button';

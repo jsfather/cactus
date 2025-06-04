@@ -6,7 +6,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getTermTeacher, createTermTeacher, updateTermTeacher } from '@/app/lib/api/admin/term-teachers';
+import {
+  getTermTeacher,
+  createTermTeacher,
+  updateTermTeacher,
+} from '@/app/lib/api/admin/term-teachers';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import { Button } from '@/app/components/ui/Button';
@@ -32,20 +36,24 @@ const scheduleSchema = z.object({
 const termTeacherSchema = z.object({
   term_id: z.string().min(1, 'شناسه ترم الزامی است'),
   teacher_id: z.string().min(1, 'شناسه مدرس الزامی است'),
-  days: z.array(z.object({
-    day_of_week: z.string().min(1, 'روز هفته الزامی است'),
-    start_time: z.string().min(1, 'ساعت شروع الزامی است'),
-    end_time: z.string().min(1, 'ساعت پایان الزامی است'),
-  })),
-  schedules: z.array(z.object({
-    session_date: z.string().min(1, 'تاریخ جلسه الزامی است'),
-    start_time: z.string().min(1, 'ساعت شروع الزامی است'),
-    end_time: z.string().min(1, 'ساعت پایان الزامی است'),
-    sky_room_id: z.string().nullable(),
-    is_canceled: z.number(),
-    another_person: z.number(),
-    another_person_name: z.string().nullable(),
-  })),
+  days: z.array(
+    z.object({
+      day_of_week: z.string().min(1, 'روز هفته الزامی است'),
+      start_time: z.string().min(1, 'ساعت شروع الزامی است'),
+      end_time: z.string().min(1, 'ساعت پایان الزامی است'),
+    })
+  ),
+  schedules: z.array(
+    z.object({
+      session_date: z.string().min(1, 'تاریخ جلسه الزامی است'),
+      start_time: z.string().min(1, 'ساعت شروع الزامی است'),
+      end_time: z.string().min(1, 'ساعت پایان الزامی است'),
+      sky_room_id: z.string().nullable(),
+      is_canceled: z.number(),
+      another_person: z.number(),
+      another_person_name: z.string().nullable(),
+    })
+  ),
 });
 
 type TermTeacherFormData = z.infer<typeof termTeacherSchema>;
@@ -106,7 +114,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     try {
       const formattedData = {
         ...data,
-        days: data.days.map(day => ({
+        days: data.days.map((day) => ({
           ...day,
           term_teacher_id: '',
           id: '',
@@ -114,7 +122,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           updated_at: new Date().toISOString(),
           deleted_at: null,
         })),
-        schedules: data.schedules.map(schedule => ({
+        schedules: data.schedules.map((schedule) => ({
           ...schedule,
           term_teacher_id: '',
           id: '',
@@ -133,7 +141,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/admin/term-teachers');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد ترم مدرس' : 'خطا در بروزرسانی ترم مدرس');
+      toast.error(
+        isNew ? 'خطا در ایجاد ترم مدرس' : 'خطا در بروزرسانی ترم مدرس'
+      );
     }
   };
 

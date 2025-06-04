@@ -81,7 +81,7 @@ const menuItems = [
       {
         title: 'تیکت ها',
         href: '/admin/tickets',
-      }
+      },
     ],
   },
 ];

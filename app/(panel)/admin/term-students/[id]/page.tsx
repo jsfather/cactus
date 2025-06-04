@@ -6,8 +6,16 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { createTeacher , deleteTeacher , getTermTeacher } from '@/app/lib/api/admin/term-teachers';
-import { getTermStudent, createTermStudent, updateTermStudent } from '@/app/lib/api/admin/term-students';
+import {
+  createTeacher,
+  deleteTeacher,
+  getTermTeacher,
+} from '@/app/lib/api/admin/term-teachers';
+import {
+  getTermStudent,
+  createTermStudent,
+  updateTermStudent,
+} from '@/app/lib/api/admin/term-students';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import { Button } from '@/app/components/ui/Button';
@@ -67,7 +75,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/admin/term-students');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد ترم دانش پژوه' : 'خطا در بروزرسانی ترم دانش پژوه');
+      toast.error(
+        isNew ? 'خطا در ایجاد ترم دانش پژوه' : 'خطا در بروزرسانی ترم دانش پژوه'
+      );
     }
   };
 

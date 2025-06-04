@@ -150,7 +150,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             id="password"
             label="رمز عبور"
             type="password"
-            placeholder={isNew ? 'رمز عبور را وارد کنید' : 'برای تغییر رمز عبور وارد کنید'}
+            placeholder={
+              isNew ? 'رمز عبور را وارد کنید' : 'برای تغییر رمز عبور وارد کنید'
+            }
             required={isNew}
             error={errors.password?.message}
             {...register('password')}

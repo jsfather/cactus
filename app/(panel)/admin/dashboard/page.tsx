@@ -123,37 +123,41 @@ const Page = async () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 ">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
           <div
             key={stat.title}
             className="group relative z-0 overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-[0.03] transition-all group-hover:opacity-[0.06]" 
-                 style={{
-                   backgroundImage: stat.color === 'blue' 
-                     ? 'linear-gradient(to right, transparent, #60a5fa)' 
-                     : stat.color === 'purple'
-                     ? 'linear-gradient(to right, transparent, #a78bfa)'
-                     : stat.color === 'emerald'
-                     ? 'linear-gradient(to right, transparent, #34d399)'
-                     : 'linear-gradient(to right, transparent, #fbbf24)'
-                 }}
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-[0.03] transition-all group-hover:opacity-[0.06]"
+              style={{
+                backgroundImage:
+                  stat.color === 'blue'
+                    ? 'linear-gradient(to right, transparent, #60a5fa)'
+                    : stat.color === 'purple'
+                      ? 'linear-gradient(to right, transparent, #a78bfa)'
+                      : stat.color === 'emerald'
+                        ? 'linear-gradient(to right, transparent, #34d399)'
+                        : 'linear-gradient(to right, transparent, #fbbf24)',
+              }}
             />
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   {stat.title}
                 </p>
-                <div className={`rounded-full p-2.5 ${
-                  stat.color === 'blue' 
-                    ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                    : stat.color === 'purple'
-                    ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-                    : stat.color === 'emerald'
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
-                    : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
-                }`}>
+                <div
+                  className={`rounded-full p-2.5 ${
+                    stat.color === 'blue'
+                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                      : stat.color === 'purple'
+                        ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
+                        : stat.color === 'emerald'
+                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
+                          : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                  }`}
+                >
                   {stat.icon}
                 </div>
               </div>
@@ -199,27 +203,31 @@ const Page = async () => {
                   key={activity.title}
                   className="group relative overflow-hidden p-6 transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-0 transition-all group-hover:opacity-[0.03]" 
-                       style={{
-                         backgroundImage: activity.color === 'blue' 
-                           ? 'linear-gradient(to right, transparent, #60a5fa)' 
-                           : activity.color === 'purple'
-                           ? 'linear-gradient(to right, transparent, #a78bfa)'
-                           : activity.color === 'emerald'
-                           ? 'linear-gradient(to right, transparent, #34d399)'
-                           : 'linear-gradient(to right, transparent, #fbbf24)'
-                       }}
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-0 transition-all group-hover:opacity-[0.03]"
+                    style={{
+                      backgroundImage:
+                        activity.color === 'blue'
+                          ? 'linear-gradient(to right, transparent, #60a5fa)'
+                          : activity.color === 'purple'
+                            ? 'linear-gradient(to right, transparent, #a78bfa)'
+                            : activity.color === 'emerald'
+                              ? 'linear-gradient(to right, transparent, #34d399)'
+                              : 'linear-gradient(to right, transparent, #fbbf24)',
+                    }}
                   />
                   <div className="flex items-start gap-4">
-                    <div className={`shrink-0 rounded-full p-2 ${
-                      activity.color === 'blue' 
-                        ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                        : activity.color === 'purple'
-                        ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-                        : activity.color === 'emerald'
-                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
-                        : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
-                    }`}>
+                    <div
+                      className={`shrink-0 rounded-full p-2 ${
+                        activity.color === 'blue'
+                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                          : activity.color === 'purple'
+                            ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
+                            : activity.color === 'emerald'
+                              ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
+                              : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                      }`}
+                    >
                       {activity.icon}
                     </div>
                     <div className="flex-1">
@@ -255,29 +263,33 @@ const Page = async () => {
                   key={action.title}
                   className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-gray-50 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent opacity-0 transition-all group-hover:opacity-100" 
-                       style={{
-                         backgroundImage: action.color === 'blue'
-                           ? 'linear-gradient(to right, transparent, #60a5fa/10)'
-                           : action.color === 'purple'
-                           ? 'linear-gradient(to right, transparent, #a78bfa/10)'
-                           : action.color === 'emerald'
-                           ? 'linear-gradient(to right, transparent, #34d399/10)'
-                           : 'linear-gradient(to right, transparent, #fbbf24/10)'
-                       }}
+                  <div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent opacity-0 transition-all group-hover:opacity-100"
+                    style={{
+                      backgroundImage:
+                        action.color === 'blue'
+                          ? 'linear-gradient(to right, transparent, #60a5fa/10)'
+                          : action.color === 'purple'
+                            ? 'linear-gradient(to right, transparent, #a78bfa/10)'
+                            : action.color === 'emerald'
+                              ? 'linear-gradient(to right, transparent, #34d399/10)'
+                              : 'linear-gradient(to right, transparent, #fbbf24/10)',
+                    }}
                   />
                   <span className="font-medium text-gray-700 dark:text-gray-200">
                     {action.title}
                   </span>
-                  <div className={
-                    action.color === 'blue'
-                      ? 'text-blue-600 dark:text-blue-400'
-                      : action.color === 'purple'
-                      ? 'text-purple-600 dark:text-purple-400'
-                      : action.color === 'emerald'
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-amber-600 dark:text-amber-400'
-                  }>
+                  <div
+                    className={
+                      action.color === 'blue'
+                        ? 'text-blue-600 dark:text-blue-400'
+                        : action.color === 'purple'
+                          ? 'text-purple-600 dark:text-purple-400'
+                          : action.color === 'emerald'
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-amber-600 dark:text-amber-400'
+                    }
+                  >
                     {action.icon}
                   </div>
                 </button>

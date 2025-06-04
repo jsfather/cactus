@@ -156,7 +156,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
             {homework.attachment_url && (
               <div>
-                <h3 className="text-sm font-medium text-gray-500">فایل پیوست</h3>
+                <h3 className="text-sm font-medium text-gray-500">
+                  فایل پیوست
+                </h3>
                 <a
                   href={homework.attachment_url}
                   target="_blank"
@@ -182,4 +184,4 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       </div>
     </main>
   );
-} 
+}

@@ -3,7 +3,10 @@
 import { useState, useEffect } from 'react';
 import Table from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getPanelGuides, deletePanelGuide } from '@/app/lib/api/admin/panel_guides';
+import {
+  getPanelGuides,
+  deletePanelGuide,
+} from '@/app/lib/api/admin/panel_guides';
 import { PanelGuide } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
@@ -101,7 +104,9 @@ export default function Page() {
         columns={columns}
         loading={loading}
         emptyMessage="هیچ راهنمای پنلی یافت نشد"
-        onEdit={(panelGuide) => router.push(`/admin/panel-guides/${panelGuide.id}`)}
+        onEdit={(panelGuide) =>
+          router.push(`/admin/panel-guides/${panelGuide.id}`)
+        }
         onDelete={handleDeleteClick}
       />
 

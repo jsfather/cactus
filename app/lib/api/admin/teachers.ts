@@ -34,7 +34,10 @@ export const createTeacher = async (data: Partial<Teacher>) => {
   return response;
 };
 
-export const updateTeacher = async (id: number | string, data: Partial<Teacher>) => {
+export const updateTeacher = async (
+  id: number | string,
+  data: Partial<Teacher>
+) => {
   const response = await request<{ data: Teacher }>(`admin/teachers/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),

@@ -2,7 +2,7 @@ import request from '@/app/lib/api/client';
 import { Student } from '@/app/lib/types';
 
 export const getStudents = async () => {
-  const response = await request<{data: Student[]} >('admin/students');
+  const response = await request<{ data: Student[] }>('admin/students');
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست دانش پژوهان رخ داده است');
@@ -12,7 +12,7 @@ export const getStudents = async () => {
 };
 
 export const getStudent = async (id: number | string) => {
-  const response = await request<{data: Student}>(`admin/students/${id}`);
+  const response = await request<{ data: Student }>(`admin/students/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت دانش پژوه رخ داده است');
@@ -34,7 +34,10 @@ export const createStudent = async (data: Partial<Student>) => {
   return response;
 };
 
-export const updateStudent = async (id: number | string, data: Partial<Student>) => {
+export const updateStudent = async (
+  id: number | string,
+  data: Partial<Student>
+) => {
   const response = await request<Student>(`admin/students/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -60,7 +63,9 @@ export const deleteStudent = async (id: number | string) => {
 };
 
 export const getStudentExamPlacement = async (id: number | string) => {
-  const response = await request<{data: Student}>(`admin/students/placement-exam/${id}`);
+  const response = await request<{ data: Student }>(
+    `admin/students/placement-exam/${id}`
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت دانش پژوه رخ داده است');

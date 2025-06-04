@@ -17,7 +17,7 @@ Cactus is a comprehensive online robotics education platform that brings togethe
 
 - **Modern Interface**: Beautiful and user-friendly design with dark theme support
 - **Multilingual**: Full RTL support with Persian language and Jalali calendar
-- **Learning Management**: 
+- **Learning Management**:
   - Course creation and management
   - Student progress tracking
   - Assignment submission
@@ -45,12 +45,12 @@ Cactus is a comprehensive online robotics education platform that brings togethe
 - **Framework**: [Next.js 15.3.1](https://nextjs.org/)
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**: 
+- **UI Components**:
   - [@headlessui/react](https://headlessui.com/)
   - [@heroicons/react](https://heroicons.com/)
   - [Framer Motion](https://www.framer.com/motion/)
 - **Form Handling**: [React Hook Form](https://react-hook-form.com/)
-- **Date Handling**: 
+- **Date Handling**:
   - [jalali-moment](https://github.com/jalaali/moment-jalaali)
   - [react-multi-date-picker](https://github.com/shahabyazdi/react-multi-date-picker)
 - **Validation**: [Zod](https://github.com/colinhacks/zod)
@@ -62,17 +62,20 @@ Cactus is a comprehensive online robotics education platform that brings togethe
 ## 📦 Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/jsfather/cactus.git
 cd cactus
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Create necessary environment files:
+
 ```bash
 cp .env.example .env.local
 ```
@@ -88,6 +91,7 @@ npm run dev
 The application will be available at [http://localhost:3000](http://localhost:3000).
 
 Other available scripts:
+
 - `npm run build`: Create a production build
 - `npm run start`: Start the production server
 - `npm run lint`: Run ESLint
@@ -116,6 +120,7 @@ cactus/
 ## 🔧 Configuration
 
 The project uses several configuration files:
+
 - `next.config.ts`: Next.js configuration
 - `tsconfig.json`: TypeScript configuration
 - `.prettierrc`: Prettier formatting rules

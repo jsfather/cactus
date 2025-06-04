@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table , {Column} from '@/app/components/ui/Table';
+import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getReports , deleteReport } from '@/app/lib/api/teacher/reports';
+import { getReports, deleteReport } from '@/app/lib/api/teacher/reports';
 import { Report } from '@/app/lib/types';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
-
 
 export default function Page() {
   const router = useRouter();

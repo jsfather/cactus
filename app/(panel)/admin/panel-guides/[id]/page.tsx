@@ -6,7 +6,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getPanelGuide, createPanelGuide, updatePanelGuide } from '@/app/lib/api/admin/panel_guides';
+import {
+  getPanelGuide,
+  createPanelGuide,
+  updatePanelGuide,
+} from '@/app/lib/api/admin/panel_guides';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
@@ -80,7 +84,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/admin/panel-guides');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد راهنمای پنل' : 'خطا در بروزرسانی راهنمای پنل');
+      toast.error(
+        isNew ? 'خطا در ایجاد راهنمای پنل' : 'خطا در بروزرسانی راهنمای پنل'
+      );
     }
   };
 

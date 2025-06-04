@@ -1,5 +1,4 @@
-import {User} from "@/app/lib/types";
-
+import { User } from '@/app/lib/types';
 
 interface Day {
   id: number | string;

@@ -6,7 +6,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getStudent, createStudent, updateStudent } from '@/app/lib/api/admin/students';
+import {
+  getStudent,
+  createStudent,
+  updateStudent,
+} from '@/app/lib/api/admin/students';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import { Button } from '@/app/components/ui/Button';
@@ -100,7 +104,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/admin/students');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد دانش پژوه' : 'خطا در بروزرسانی دانش پژوه');
+      toast.error(
+        isNew ? 'خطا در ایجاد دانش پژوه' : 'خطا در بروزرسانی دانش پژوه'
+      );
     }
   };
 

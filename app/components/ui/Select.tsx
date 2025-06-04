@@ -19,7 +19,10 @@ interface SelectProps
 }
 
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, className, placeholder, required, ...props }, ref) => {
+  (
+    { label, error, options, className, placeholder, required, ...props },
+    ref
+  ) => {
     return (
       <div className="w-full">
         {label && (
@@ -28,7 +31,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
           >
             {label}
-            {required && <span className="text-red-500 mr-1">*</span>}
+            {required && <span className="mr-1 text-red-500">*</span>}
           </label>
         )}
         <div className="relative">

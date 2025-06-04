@@ -1,4 +1,4 @@
-import { User } from "@/app/lib/types";
+import { User } from '@/app/lib/types';
 
 export interface TermStudent {
   id: number | string;
@@ -8,4 +8,4 @@ export interface TermStudent {
   updated_at: string;
   deleted_at: string | null;
   user: User;
-} 
+}

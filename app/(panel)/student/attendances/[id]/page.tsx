@@ -74,7 +74,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
             <h3 className="text-sm font-medium text-gray-500">ترم</h3>
-            <p className="mt-1 text-sm text-gray-900">{attendance.term?.title}</p>
+            <p className="mt-1 text-sm text-gray-900">
+              {attendance.term?.title}
+            </p>
           </div>
 
           <div>
@@ -113,4 +115,4 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       </div>
     </main>
   );
-} 
+}

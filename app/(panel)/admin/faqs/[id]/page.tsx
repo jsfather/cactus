@@ -44,10 +44,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/admin/faqs');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد سوال متداول' : 'خطا در بروزرسانی سوال متداول');
+      toast.error(
+        isNew ? 'خطا در ایجاد سوال متداول' : 'خطا در بروزرسانی سوال متداول'
+      );
     }
   };
-
 
   return (
     <main>
