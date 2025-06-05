@@ -3,12 +3,14 @@ import clsx from 'clsx';
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   loading?: boolean;
-  variant?: 'primary' | 'danger' | 'warning' | 'info' | 'white';
+  variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'info' | 'white';
 }
 
 const variantStyles = {
   primary:
-    'bg-primary-600 hover:bg-primary-500 focus-visible:outline-primary-600 active:bg-primary-600',
+    'bg-primary-600 hover:bg-primary-500 focus-visible:outline-primary-600 active:bg-primary-600 dark:bg-primary-700 dark:hover:bg-primary-600',
+  secondary:
+    'bg-gray-500 text-white hover:bg-gray-600 focus-visible:outline-gray-500 active:bg-gray-700 dark:bg-white/10 dark:text-white dark:hover:bg-white/20',
   danger:
     'bg-red-600 hover:bg-red-500 focus-visible:outline-red-600 active:bg-red-600 dark:bg-red-500 dark:hover:bg-red-600',
   warning:
@@ -31,7 +33,7 @@ export function Button({
       disabled={loading || rest.disabled}
       className={clsx(
         'flex h-10 cursor-pointer items-center justify-center rounded-lg px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
-        variant === 'white' ? 'text-gray-900 dark:text-white' : 'text-white',
+        variant === 'white' ? 'text-gray-900 dark:text-white' : variant === 'secondary' ? 'text-white dark:text-white' : 'text-white',
         variantStyles[variant],
         className
       )}
