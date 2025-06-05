@@ -42,42 +42,29 @@ interface VideoThumbnail {
 
 export default function Page() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [showVideo, setShowVideo] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowVideo(true);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (showVideo && videoRef.current) {
-      videoRef.current.load();
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.log('Video autoplay failed:', error);
-        });
-      }
+    if (videoRef.current) {
+      videoRef.current.play().catch((error) => {
+        console.log('Video autoplay failed:', error);
+      });
     }
-  }, [showVideo]);
+  }, []);
 
   const videoThumbnails: VideoThumbnail[] = [
     {
-      videoSrc: '/intro-1.mp4',
+      videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-1.mp4',
       title: 'فعالیت دانش پژوهان',
       aspectRatio: 'square',
     },
     {
-      videoSrc: '/intro-2.mp4',
+      videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-2.mp4',
       title: 'رضایت دانش آموزان',
       aspectRatio: 'video',
     },
     {
-      videoSrc: '/intro-3.mp4',
+      videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-3.mp4',
       title: 'معرفی کاکتوس',
       aspectRatio: 'video',
     },
@@ -88,100 +75,121 @@ export default function Page() {
       dir="rtl"
       className="min-h-screen text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
-      <section className="relative min-h-screen w-full overflow-hidden px-6 pt-24 pb-12">
-        {/* Video/Image Container with curved frame and padding */}
-        <div className="absolute inset-x-6 top-24 bottom-12">
-          <div className="relative h-full w-full overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
-            <motion.div
-              initial={{ opacity: 1 }}
-              animate={{ opacity: showVideo ? 0 : 1 }}
-              transition={{ duration: 1, ease: 'easeInOut' }}
-              className="absolute inset-0 h-full w-full"
+      {/* Hero Section */}
+      <section className="relative mt-24">
+        {/* Full-width Video Container */}
+        <div className="container mx-auto px-4">
+          <div className="relative h-[70vh] w-full overflow-hidden rounded-3xl shadow-2xl">
+            <video
+              ref={videoRef}
+              className="h-full w-full object-cover"
+              muted
+              playsInline
+              loop
+              autoPlay
+              preload="auto"
             >
-              <Image
-                src="/robot-video.png"
-                alt="آموزش رباتیک"
-                fill
-                priority
-                className="object-cover"
-              />
-              {/* Decorative Play Button */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="group flex h-20 w-20 items-center justify-center rounded-full bg-white/30 backdrop-blur-sm">
-                  <svg
-                    className="h-10 w-10 fill-current text-white"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: showVideo ? 1 : 0 }}
-              transition={{ duration: 1, ease: 'easeInOut' }}
-              className="absolute inset-0 h-full w-full"
-            >
-              <video
-                ref={videoRef}
-                className="h-full w-full object-cover"
-                muted
-                playsInline
-                loop
-                preload="none"
-              >
-                <source src="/robocup-2024.mp4" type="video/mp4" />
-              </video>
-            </motion.div>
+              <source src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4" type="video/mp4" />
+            </video>
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/30 rounded-3xl" />
           </div>
-          {/* Gradient overlay with curved edges */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-b from-black/60 via-black/50 to-black/40" />
         </div>
 
-        {/* Content Overlay - Adjusted positioning */}
-        <div className="relative z-10 h-full pt-12">
+        {/* Content Section - Below Video */}
+        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-900 pb-24">
           <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="max-w-2xl space-y-6"
-            >
-              <h1 className="text-5xl leading-tight font-bold text-white">
-                <span className="from-primary-400 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
-                  آینده رباتیک
-                </span>
-                <br />
-                را با ما بسازید
-              </h1>
-              <p className="text-xl leading-relaxed text-gray-200">
-                با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
-                ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
-              </p>
-              <div className="flex gap-4">
+            {/* Main Content */}
+            <div className="mx-auto max-w-4xl text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-6"
+              >
+                <h1 className="text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
+                  <span className="from-primary-400 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
+                    آینده رباتیک
+                  </span>
+                  <br />
+                  را با ما بسازید
+                </h1>
+                <p className="mx-auto max-w-2xl text-lg text-gray-300 sm:text-xl">
+                  با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
+                  ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-8 flex flex-wrap items-center justify-center gap-4"
+              >
                 <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
                   شروع یادگیری
                 </Button>
                 <Button className="rounded-full bg-white/10 px-8 py-3 text-lg text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20">
                   مشاهده دوره‌ها
                 </Button>
-              </div>
-              <div className="flex items-center gap-8 pt-8">
-                {[
-                  { number: '+۵۰۰', label: 'دانشجو' },
-                  { number: '+۵۰', label: 'دوره' },
-                  { number: '٪۹۵', label: 'رضایت' },
-                ].map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-primary-400 text-2xl font-bold">
-                      {stat.number}
-                    </div>
-                    <div className="text-sm text-gray-300">{stat.label}</div>
+              </motion.div>
+
+              {/* Stats Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="mt-16"
+              >
+                <div className="relative">
+                  {/* Decorative blur effect */}
+                  <div className="absolute inset-0 -z-10">
+                    <div className="absolute right-1/2 top-0 h-[200px] w-[200px] -translate-y-1/2 translate-x-1/2 transform rounded-full bg-primary-600/20 blur-[100px]" />
+                    <div className="absolute left-1/2 top-0 h-[150px] w-[150px] -translate-y-1/2 -translate-x-1/2 transform rounded-full bg-blue-600/20 blur-[100px]" />
                   </div>
-                ))}
-              </div>
-            </motion.div>
+
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3">
+                    {[
+                      {
+                        number: '+۵۰۰',
+                        label: 'دانشجو',
+                        description: 'دانشجوی فعال',
+                      },
+                      {
+                        number: '+۵۰',
+                        label: 'دوره',
+                        description: 'دوره تخصصی',
+                      },
+                      {
+                        number: '٪۹۵',
+                        label: 'رضایت',
+                        description: 'رضایت دانشجویان',
+                      },
+                    ].map((stat, index) => (
+                      <div
+                        key={index}
+                        className="group relative"
+                      >
+                        <div className="relative space-y-2 text-center">
+                          <div className="text-primary-400 relative text-4xl font-bold sm:text-5xl">
+                            {stat.number}
+                            <div className="absolute -right-2 top-0 h-2 w-2 rounded-full bg-primary-400" />
+                          </div>
+                          <div className="text-sm font-medium text-gray-300 sm:text-base">
+                            {stat.label}
+                          </div>
+                          <p className="text-xs text-gray-400">
+                            {stat.description}
+                          </p>
+                        </div>
+                        {/* Hover effect line */}
+                        <div className="absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full bg-primary-500 transition-all duration-300 group-hover:w-1/2" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
