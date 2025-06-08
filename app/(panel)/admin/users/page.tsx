@@ -118,7 +118,7 @@ export default function Page() {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="حذف کاربر"
-        description={`آیا از حذف کاربر "${itemToDelete?.first_name + ' ' + itemToDelete?.first_name}" اطمینان دارید؟`}
+        description={`آیا از حذف کاربر "${itemToDelete?.first_name + ' ' + itemToDelete?.last_name}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

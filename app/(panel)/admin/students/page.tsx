@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table from '@/app/components/ui/Table';
+import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { getStudents, deleteStudent } from '@/app/lib/api/admin/students';
-import { Student } from '@/app/lib/types';
+import { Student, Teacher } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
@@ -17,24 +17,21 @@ export default function Page() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Student | null>(null);
 
-  const columns = [
+  const columns: Column<Student>[] = [
     {
       header: 'نام',
-      accessor: 'user.first_name' as keyof Student,
+      accessor: 'user',
+      render: (value, item: Student) => item.user?.first_name || '---',
     },
     {
       header: 'نام خانوادگی',
-      accessor: 'user.last_name' as keyof Student,
+      accessor: 'user',
+      render: (value, item: Student) => item.user?.last_name || '---',
     },
     {
       header: 'تاریخ تولد',
-      accessor: 'birth_date' as keyof Student,
-    },
-    {
-      header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof Student,
-      render: (value: string | null, item: Student) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
+      accessor: 'birth_date',
+      render: (value, item: Student) => item.birth_date || '---',
     },
   ];
 
