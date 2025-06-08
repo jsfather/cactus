@@ -37,13 +37,7 @@ export default function Page() {
     {
       header: 'کد ملی',
       accessor: 'national_code' as keyof User,
-    },
-    {
-      header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof User,
-      render: (value: string | null, item: User) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
-    },
+    }
   ];
 
   const fetchUsers = async () => {
