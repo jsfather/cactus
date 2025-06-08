@@ -37,13 +37,7 @@ export default function Page() {
     {
       header: 'کد ملی',
       accessor: 'national_code' as keyof User,
-    },
-    {
-      header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof User,
-      render: (value: string | null, item: User) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
-    },
+    }
   ];
 
   const fetchUsers = async () => {
@@ -118,7 +112,7 @@ export default function Page() {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="حذف کاربر"
-        description={`آیا از حذف کاربر "${itemToDelete?.first_name + ' ' + itemToDelete?.first_name}" اطمینان دارید؟`}
+        description={`آیا از حذف کاربر "${itemToDelete?.first_name + ' ' + itemToDelete?.last_name}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

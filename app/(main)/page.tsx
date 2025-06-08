@@ -92,12 +92,12 @@ export default function Page() {
               <source src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4" type="video/mp4" />
             </video>
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/30 rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30 rounded-3xl" />
           </div>
         </div>
 
         {/* Content Section - Below Video */}
-        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-900 pb-24">
+        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-100 dark:to-gray-900 pb-24">
           <div className="container mx-auto px-4">
             {/* Main Content */}
             <div className="mx-auto max-w-4xl text-center">
@@ -107,14 +107,14 @@ export default function Page() {
                 transition={{ duration: 0.5 }}
                 className="space-y-6"
               >
-                <h1 className="text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
+                <h1 className="text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl">
                   <span className="from-primary-400 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
                     آینده رباتیک
                   </span>
                   <br />
                   را با ما بسازید
                 </h1>
-                <p className="mx-auto max-w-2xl text-lg text-gray-300 sm:text-xl">
+                <p className="mx-auto max-w-2xl text-lg text-gray-700 dark:text-gray-300 sm:text-xl">
                   با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
                   ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
                 </p>
@@ -129,7 +129,7 @@ export default function Page() {
                 <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
                   شروع یادگیری
                 </Button>
-                <Button className="rounded-full bg-white/10 px-8 py-3 text-lg text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20">
+                <Button variant="secondary" className="rounded-full px-8 py-3 text-lg">
                   مشاهده دوره‌ها
                 </Button>
               </motion.div>
@@ -171,14 +171,14 @@ export default function Page() {
                         className="group relative"
                       >
                         <div className="relative space-y-2 text-center">
-                          <div className="text-primary-400 relative text-4xl font-bold sm:text-5xl">
+                          <div className="text-primary-600 dark:text-primary-400 relative text-4xl font-bold sm:text-5xl">
                             {stat.number}
                             <div className="absolute -right-2 top-0 h-2 w-2 rounded-full bg-primary-400" />
                           </div>
-                          <div className="text-sm font-medium text-gray-300 sm:text-base">
+                          <div className="text-sm font-medium text-gray-800 dark:text-gray-300 sm:text-base">
                             {stat.label}
                           </div>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
                             {stat.description}
                           </p>
                         </div>

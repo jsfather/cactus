@@ -14,9 +14,10 @@ interface TableProps<T> {
   emptyMessage?: string;
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  getRowId?: (item: T) => string;
 }
 
-export default function Table<T extends { id: string | number }>({
+export default function Table<T>({
   data,
   columns,
   loading = false,
@@ -24,6 +25,7 @@ export default function Table<T extends { id: string | number }>({
   emptyMessage = 'هیچ موردی یافت نشد',
   onEdit,
   onDelete,
+  getRowId = (item: any) => item.id,
 }: TableProps<T>) {
   if (loading) {
     return (
@@ -118,7 +120,7 @@ export default function Table<T extends { id: string | number }>({
             ) : (
               data.map((item) => (
                 <div
-                  key={item.id}
+                  key={getRowId(item)}
                   className="mb-2 w-full rounded-md bg-white p-4 dark:bg-gray-800"
                 >
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700">
@@ -233,7 +235,7 @@ export default function Table<T extends { id: string | number }>({
               ) : (
                 data.map((item) => (
                   <tr
-                    key={item.id}
+                    key={getRowId(item)}
                     className="w-full border-b border-gray-200 py-3 text-sm last-of-type:border-none dark:border-gray-700 [&:first-child>td:first-child]:rounded-tl-lg [&:first-child>td:last-child]:rounded-tr-lg [&:last-child>td:first-child]:rounded-bl-lg [&:last-child>td:last-child]:rounded-br-lg"
                   >
                     {columns.map((column, index) => (
@@ -257,7 +259,7 @@ export default function Table<T extends { id: string | number }>({
                               {onEdit && (
                                 <button
                                   onClick={() => onEdit(item)}
-                                  className="cursor-pointer rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                                  className="rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -278,7 +280,7 @@ export default function Table<T extends { id: string | number }>({
                               {onDelete && (
                                 <button
                                   onClick={() => onDelete(item)}
-                                  className="cursor-pointer rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
+                                  className="rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
