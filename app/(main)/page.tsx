@@ -80,17 +80,15 @@ export default function Page() {
         {/* Full-width Video Container */}
         <div className="container mx-auto px-4">
           <div className="relative h-[70vh] w-full overflow-hidden rounded-3xl shadow-2xl">
-            <video
-              ref={videoRef}
+            <ClientVideo
               className="h-full w-full object-cover"
+              src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4"
               muted
               playsInline
               loop
               autoPlay
               preload="auto"
-            >
-              <source src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4" type="video/mp4" />
-            </video>
+            />
             {/* Gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30 rounded-3xl" />
           </div>
