@@ -28,7 +28,6 @@ export default function Header() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -51,9 +50,9 @@ export default function Header() {
     if (href !== '/' && pathname.startsWith(href + '/')) return true;
 
     // Special case for index routes (e.g., /shop matches /shop)
-    if (href !== '/' && pathname === href.slice(0, -1)) return true;
+    return href !== '/' && pathname === href.slice(0, -1);
 
-    return false;
+
   };
 
   return (

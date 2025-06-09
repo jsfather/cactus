@@ -2,16 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  UserRound,
-  Mail,
-  Hash,
-  Users,
-  Heart,
-  Brain,
-  Calendar,
-} from 'lucide-react';
-import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
 import Textarea from '@/app/components/ui/Textarea';

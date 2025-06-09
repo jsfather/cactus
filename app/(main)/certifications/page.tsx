@@ -7,11 +7,9 @@ import {
   Trophy,
   Calendar,
   Tag,
-  Award,
   X,
   Share2,
   Download,
-  ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
 

@@ -127,7 +127,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const parsedCart = JSON.parse(savedCart);
       Object.assign(state, parsedCart);
     }
-  }, []);
+  }, [state]);
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(state));

@@ -154,9 +154,9 @@ export default function Sidebar({
     if (href !== '/' && pathname.startsWith(href + '/')) return true;
 
     // Special case for index routes (e.g., /shop matches /shop)
-    if (href !== '/' && pathname === href.slice(0, -1)) return true;
+    return href !== '/' && pathname === href.slice(0, -1);
 
-    return false;
+
   };
 
   // Check if avatar URL is valid
