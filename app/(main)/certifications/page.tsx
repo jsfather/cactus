@@ -236,7 +236,7 @@ export default function Page() {
 
                 <div className="flex gap-4">
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     className="flex-1"
                     onClick={() => {
                       // Handle share
@@ -246,7 +246,7 @@ export default function Page() {
                     اشتراک‌گذاری
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     className="flex-1"
                     onClick={() => {
                       // Handle download
