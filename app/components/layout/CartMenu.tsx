@@ -4,19 +4,14 @@ import { useState, useRef, useEffect } from 'react';
 import { ShoppingBasket, Minus, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface CartItem {
-  id: number;
-  title: string;
-  price: string;
-  image: string;
-  quantity: number;
-}
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/app/contexts/CartContext';
 
 export function CartMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const menuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const { state, removeItem, updateQuantity } = useCart();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -29,37 +24,6 @@ export function CartMenu() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const addToCart = (item: CartItem) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(i => i.id === item.id);
-      if (existingItem) {
-        return prev.map(i => 
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
-    });
-  };
-
-  const removeFromCart = (id: number) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const updateQuantity = (id: number, change: number) => {
-    setCartItems(prev => 
-      prev.map(item => {
-        if (item.id === id) {
-          const newQuantity = item.quantity + change;
-          return newQuantity > 0 ? { ...item, quantity: newQuantity } : item;
-        }
-        return item;
-      })
-    );
-  };
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce((sum, item) => sum + (parseInt(item.price.replace(/[^0-9]/g, '')) * item.quantity), 0);
-
   return (
     <div className="relative" ref={menuRef}>
       <button
@@ -67,9 +31,9 @@ export function CartMenu() {
         className="flex cursor-pointer items-center justify-center rounded-full bg-gray-100 p-2 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
       >
         <ShoppingBasket className="h-5 w-5" />
-        {totalItems > 0 && (
+        {state.totalItems > 0 && (
           <span className="bg-primary-600 absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs text-white">
-            {totalItems}
+            {state.totalItems}
           </span>
         )}
       </button>
@@ -87,7 +51,7 @@ export function CartMenu() {
               سبد خرید
             </div>
 
-            {cartItems.length === 0 ? (
+            {state.items.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <ShoppingBasket className="mb-2 h-12 w-12 text-gray-400 dark:text-gray-600" />
                 <p className="text-gray-500 dark:text-gray-400">سبد خرید شما خالی است</p>
@@ -95,7 +59,7 @@ export function CartMenu() {
             ) : (
               <>
                 <div className="mb-4 space-y-4">
-                  {cartItems.map((item) => (
+                  {state.items.map((item) => (
                     <div key={item.id} className="flex items-center gap-3">
                       <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">
                         <Image
@@ -129,7 +93,7 @@ export function CartMenu() {
                             </button>
                           </div>
                           <button
-                            onClick={() => removeFromCart(item.id)}
+                            onClick={() => removeItem(item.id)}
                             className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -143,12 +107,12 @@ export function CartMenu() {
                 <div className="border-t border-gray-200 pt-4 dark:border-gray-700">
                   <div className="flex items-center justify-between text-sm font-medium text-gray-900 dark:text-white">
                     <span>مجموع</span>
-                    <span>{totalPrice.toLocaleString()} تومان</span>
+                    <span>{state.totalPrice?.toLocaleString() || 0} تومان</span>
                   </div>
                   <button
                     onClick={() => {
-                      // Implement checkout logic
                       setIsOpen(false);
+                      router.push('/shop/checkout');
                     }}
                     className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 mt-4 w-full rounded-lg px-4 py-2 text-center text-sm font-medium text-white transition-colors"
                   >
