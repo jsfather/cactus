@@ -1,37 +1,30 @@
 'use client';
 
-interface ClientVideoProps {
+import { useRef, useEffect } from 'react';
+
+interface ClientVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string;
-  className?: string;
-  controls?: boolean;
-  autoPlay?: boolean;
-  muted?: boolean;
-  loop?: boolean;
-  playsInline?: boolean;
-  preload?: 'none' | 'metadata' | 'auto';
 }
 
-export function ClientVideo({
-  src,
-  className,
-  controls = false,
-  autoPlay = false,
-  muted = true,
-  loop = true,
-  playsInline = true,
-  preload = 'metadata',
-}: ClientVideoProps) {
+export function ClientVideo({ src, className, ...props }: ClientVideoProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      // Load just enough of the video to show a thumbnail
+      videoRef.current.currentTime = 0.1;
+      videoRef.current.load();
+    }
+  }, []);
+
   return (
     <video
-      src={src}
+      ref={videoRef}
       className={className}
-      controls={controls}
-      autoPlay={autoPlay}
-      muted={muted}
-      loop={loop}
-      playsInline={playsInline}
-      preload={preload}
       suppressHydrationWarning
-    />
+      {...props}
+    >
+      <source src={src} type="video/mp4" />
+    </video>
   );
 }

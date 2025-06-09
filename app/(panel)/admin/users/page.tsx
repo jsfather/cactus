@@ -37,7 +37,7 @@ export default function Page() {
     {
       header: 'کد ملی',
       accessor: 'national_code' as keyof User,
-    }
+    },
   ];
 
   const fetchUsers = async () => {

@@ -13,6 +13,7 @@ import {
   RefreshCw,
   ChevronLeft,
 } from 'lucide-react';
+import { useCart } from '@/app/contexts/CartContext';
 
 // Sample product data (replace with actual data fetching)
 const product = {
@@ -69,6 +70,7 @@ const product = {
 export default function Page() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
 
   const incrementQuantity = () => {
     if (quantity < product.stockCount) {
@@ -79,6 +81,19 @@ export default function Page() {
   const decrementQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (product.inStock) {
+      for (let i = 0; i < quantity; i++) {
+        addItem({
+          id: parseInt(product.id),
+          title: product.title,
+          price: product.discount || product.price,
+          image: product.images[0],
+        });
+      }
     }
   };
 
@@ -233,7 +248,11 @@ export default function Page() {
                     <Plus className="h-5 w-5" />
                   </button>
                 </div>
-                <button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 flex-1 rounded-lg px-6 py-3 text-white transition-colors">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!product.inStock}
+                  className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 flex-1 rounded-lg px-6 py-3 text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                >
                   افزودن به سبد خرید
                 </button>
               </div>

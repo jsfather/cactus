@@ -80,24 +80,21 @@ export default function Page() {
         {/* Full-width Video Container */}
         <div className="container mx-auto px-4">
           <div className="relative h-[70vh] w-full overflow-hidden rounded-3xl shadow-2xl">
-            <video
-              ref={videoRef}
+            <ClientVideo
               className="h-full w-full object-cover"
+              src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4"
               muted
               playsInline
-              loop
               autoPlay
-              preload="auto"
-            >
-              <source src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4" type="video/mp4" />
-            </video>
+              preload="metadata"
+            />
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30 rounded-3xl" />
+            <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30" />
           </div>
         </div>
 
         {/* Content Section - Below Video */}
-        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-100 dark:to-gray-900 pb-24">
+        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-100 pb-24 dark:to-gray-900">
           <div className="container mx-auto px-4">
             {/* Main Content */}
             <div className="mx-auto max-w-4xl text-center">
@@ -107,14 +104,14 @@ export default function Page() {
                 transition={{ duration: 0.5 }}
                 className="space-y-6"
               >
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl">
+                <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
                   <span className="from-primary-400 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
                     آینده رباتیک
                   </span>
                   <br />
                   را با ما بسازید
                 </h1>
-                <p className="mx-auto max-w-2xl text-lg text-gray-700 dark:text-gray-300 sm:text-xl">
+                <p className="mx-auto max-w-2xl text-lg text-gray-700 sm:text-xl dark:text-gray-300">
                   با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
                   ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
                 </p>
@@ -129,7 +126,10 @@ export default function Page() {
                 <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
                   شروع یادگیری
                 </Button>
-                <Button variant="secondary" className="rounded-full px-8 py-3 text-lg">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-8 py-3 text-lg"
+                >
                   مشاهده دوره‌ها
                 </Button>
               </motion.div>
@@ -144,8 +144,8 @@ export default function Page() {
                 <div className="relative">
                   {/* Decorative blur effect */}
                   <div className="absolute inset-0 -z-10">
-                    <div className="absolute right-1/2 top-0 h-[200px] w-[200px] -translate-y-1/2 translate-x-1/2 transform rounded-full bg-primary-600/20 blur-[100px]" />
-                    <div className="absolute left-1/2 top-0 h-[150px] w-[150px] -translate-y-1/2 -translate-x-1/2 transform rounded-full bg-blue-600/20 blur-[100px]" />
+                    <div className="bg-primary-600/20 absolute top-0 right-1/2 h-[200px] w-[200px] translate-x-1/2 -translate-y-1/2 transform rounded-full blur-[100px]" />
+                    <div className="absolute top-0 left-1/2 h-[150px] w-[150px] -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-blue-600/20 blur-[100px]" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3">
@@ -166,16 +166,13 @@ export default function Page() {
                         description: 'رضایت دانشجویان',
                       },
                     ].map((stat, index) => (
-                      <div
-                        key={index}
-                        className="group relative"
-                      >
+                      <div key={index} className="group relative">
                         <div className="relative space-y-2 text-center">
                           <div className="text-primary-600 dark:text-primary-400 relative text-4xl font-bold sm:text-5xl">
                             {stat.number}
-                            <div className="absolute -right-2 top-0 h-2 w-2 rounded-full bg-primary-400" />
+                            <div className="bg-primary-400 absolute top-0 -right-2 h-2 w-2 rounded-full" />
                           </div>
-                          <div className="text-sm font-medium text-gray-800 dark:text-gray-300 sm:text-base">
+                          <div className="text-sm font-medium text-gray-800 sm:text-base dark:text-gray-300">
                             {stat.label}
                           </div>
                           <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -183,7 +180,7 @@ export default function Page() {
                           </p>
                         </div>
                         {/* Hover effect line */}
-                        <div className="absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full bg-primary-500 transition-all duration-300 group-hover:w-1/2" />
+                        <div className="bg-primary-500 absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full transition-all duration-300 group-hover:w-1/2" />
                       </div>
                     ))}
                   </div>
@@ -249,30 +246,36 @@ export default function Page() {
                   آموزشگاه رباتیک کاکتوس
                 </span>
               </h2>
-              <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                شرکت کاکتوس پویان گستر با شماره ثبت 7308
-              </p>
-              <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در دو
-                بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد. شرکت
-                کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال 1395 به
-                طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395 به صورت
-                حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با هوش مصنوعی
-                در حیطه دانش آموزی و در عرصه جهانی و بین المللی فعالیت داشته
-                است. در بخش تجارت الکترونیک، شخص مدیر عامل به صورت حقیقی در حال
-                فعالیت می باشند. رشته فنی و مهندسی روباتیک تلفیقی از سه رشته
-                مهندسی الکترونیک، مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس
-                پویان گستر در حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و
-                تربیت مهندسین واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها
-                به صورت مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم
-                افزارهایی چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش
-                مکانیک با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس،
-                کتیا و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش
-                برنامه نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ،
-                اتمل استودیو، ام بلاگ، پایتون و... آموزش داده می شود. پس از
-                گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و نظارت
-                شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
-              </p>
+              <div className="space-y-4">
+                <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+                  شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در
+                  دو بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد.
+                  شرکت کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال
+                  1395 به طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395
+                  به صورت حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با
+                  هوش مصنوعی در حیطه دانش آموزی و در عرصه جهانی و بین المللی
+                  فعالیت داشته است. در بخش تجارت الکترونیک، شخص مدیر عامل به
+                  صورت حقیقی در حال فعالیت می باشند.
+                </p>
+
+                <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+                  رشته فنی و مهندسی روباتیک تلفیقی از سه رشته مهندسی الکترونیک،
+                  مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس پویان گستر در
+                  حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و تربیت مهندسین
+                  واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها به صورت
+                  مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم افزارهایی
+                  چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش مکانیک
+                  با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس، کتیا
+                  و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش برنامه
+                  نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ، اتمل
+                  استودیو، ام بلاگ، پایتون و... آموزش داده می شود.
+                </p>
+
+                <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+                  پس از گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و
+                  نظارت شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
+                </p>
+              </div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {[
                   { title: 'تجربه', value: '+۱۰ سال' },
@@ -325,28 +328,13 @@ export default function Page() {
                         ? setSelectedVideo(videoThumbnails[0].videoSrc)
                         : null
                     }
-                    onMouseEnter={(e) => {
-                      const videoEl = e.currentTarget.querySelector('video');
-                      if (videoEl) {
-                        videoEl
-                          .play()
-                          .catch((err) =>
-                            console.log('Video play failed:', err)
-                          );
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      const videoEl = e.currentTarget.querySelector('video');
-                      if (videoEl) {
-                        videoEl.pause();
-                        videoEl.currentTime = 0;
-                      }
-                    }}
                   >
                     <ClientVideo
                       src={videoThumbnails[0].videoSrc}
                       className="absolute inset-0 h-full w-full object-cover"
                       preload="metadata"
+                      muted
+                      playsInline
                     />
                     <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -369,28 +357,13 @@ export default function Page() {
                       onClick={() =>
                         video.videoSrc ? setSelectedVideo(video.videoSrc) : null
                       }
-                      onMouseEnter={(e) => {
-                        const videoEl = e.currentTarget.querySelector('video');
-                        if (videoEl) {
-                          videoEl
-                            .play()
-                            .catch((err) =>
-                              console.log('Video play failed:', err)
-                            );
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        const videoEl = e.currentTarget.querySelector('video');
-                        if (videoEl) {
-                          videoEl.pause();
-                          videoEl.currentTime = 0;
-                        }
-                      }}
                     >
                       <ClientVideo
                         src={video.videoSrc}
                         className="absolute inset-0 h-full w-full object-cover"
                         preload="metadata"
+                        muted
+                        playsInline
                       />
                       <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -492,91 +465,109 @@ export default function Page() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
               >
-                <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
-                  />
-                  {product.discount && (
-                    <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
-                      تخفیف
-                    </div>
-                  )}
-                  <button className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800">
-                    <svg
-                      className="text-primary-600 dark:text-primary-400 h-6 w-6"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                <Link href={`/shop/${product.id}`}>
+                  <div className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
+                    <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
+                      <Image
+                        src={product.image || '/placeholder-image.jpg'}
+                        alt={product.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
                       />
-                    </svg>
-                  </button>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
-                    {product.category}
-                  </div>
-                  <h3 className="font-bold dark:text-gray-100">
-                    {product.title}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <svg
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(product.rating)
-                              ? 'text-yellow-400 dark:text-yellow-500'
-                              : 'text-gray-300 dark:text-gray-600'
-                          }`}
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      ({product.reviews})
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      {product.discount ? (
-                        <>
-                          <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
-                            {product.discount}
-                          </span>
-                          <span className="mr-2 text-sm text-gray-500 line-through dark:text-gray-400">
-                            {product.price}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
-                          {product.price}
-                        </span>
+                      {product.discount && (
+                        <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
+                          تخفیف
+                        </div>
                       )}
-                      <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
-                        تومان
-                      </span>
-                    </div>
-                    <Link href="/shop/1">
-                      <button className="text-primary-600 dark:text-primary-400 cursor-pointer rounded-lg bg-gray-100 px-3 py-1 text-sm font-medium transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                        جزئیات
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Add to cart logic will be implemented
+                        }}
+                        className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
+                      >
+                        <svg
+                          className="text-primary-600 dark:text-primary-400 h-6 w-6"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                          />
+                        </svg>
                       </button>
-                    </Link>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
+                        {product.category}
+                      </div>
+                      <h3 className="font-bold dark:text-gray-100">
+                        {product.title}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <svg
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(product.rating)
+                                  ? 'text-yellow-400 dark:text-yellow-500'
+                                  : 'text-gray-300 dark:text-gray-600'
+                              }`}
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          ({product.reviews})
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          {product.discount ? (
+                            <>
+                              <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
+                                {product.discount}
+                              </span>
+                              <span className="mr-2 text-sm text-gray-500 line-through dark:text-gray-400">
+                                {product.price}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
+                              {product.price}
+                            </span>
+                          )}
+                          <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
+                            تومان
+                          </span>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            // Add to cart logic will be implemented
+                          }}
+                          className={`rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
+                            product.inStock
+                              ? 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white'
+                              : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
+                          }`}
+                          disabled={!product.inStock}
+                        >
+                          {product.inStock ? 'افزودن به سبد' : 'ناموجود'}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -617,7 +608,7 @@ export default function Page() {
               >
                 <div className="relative h-48">
                   <Image
-                    src={course.image}
+                    src={course.image || '/placeholder-image.jpg'}
                     alt={course.title}
                     fill
                     className="object-cover dark:opacity-90"
@@ -690,7 +681,7 @@ export default function Page() {
               >
                 <div className="relative h-48">
                   <Image
-                    src={post.image}
+                    src={post.image || '/placeholder-image.jpg'}
                     alt={post.title}
                     fill
                     className="object-cover dark:opacity-90"

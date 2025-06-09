@@ -33,7 +33,11 @@ export function Button({
       disabled={loading || rest.disabled}
       className={clsx(
         'flex h-10 cursor-pointer items-center justify-center rounded-lg px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
-        variant === 'white' ? 'text-gray-900 dark:text-white' : variant === 'secondary' ? 'text-white dark:text-white' : 'text-white',
+        variant === 'white'
+          ? 'text-gray-900 dark:text-white'
+          : variant === 'secondary'
+            ? 'text-white dark:text-white'
+            : 'text-white',
         variantStyles[variant],
         className
       )}

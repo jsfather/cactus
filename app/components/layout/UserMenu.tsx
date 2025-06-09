@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import LogoutButton from '@/app/components/layout/LogoutButton';
 import { LayoutDashboard, GraduationCap, User, Settings } from 'lucide-react';
 import Link from 'next/link';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
 
 interface UserMenuProps {
   userName: string;
@@ -12,6 +13,8 @@ interface UserMenuProps {
 
 export function UserMenu({ userName }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -25,6 +28,19 @@ export function UserMenu({ userName }: UserMenuProps) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      setIsLoggingOut(true);
+      localStorage.removeItem('authToken');
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
+  };
 
   return (
     <div className="relative" ref={menuRef}>
@@ -98,10 +114,24 @@ export function UserMenu({ userName }: UserMenuProps) {
             <div className="px-3">
               <div className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
             </div>
-            <LogoutButton />
+            <div onClick={() => setShowLogoutConfirm(true)}>
+              <LogoutButton />
+            </div>
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogout}
+        title="خروج از حساب کاربری"
+        description="آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟"
+        confirmText="خروج"
+        cancelText="انصراف"
+        loading={isLoggingOut}
+        variant="danger"
+      />
     </div>
   );
 }

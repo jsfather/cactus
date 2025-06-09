@@ -11,6 +11,7 @@ import DarkModeToggle from '@/app/components/ui/DarkModeToggle';
 import { Menu, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@/app/hooks/useUser';
+import { CartMenu } from '@/app/components/layout/CartMenu';
 
 const menuItems = [
   { title: 'دوره‌ها', href: '/courses' },
@@ -27,6 +28,7 @@ export default function Header() {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     if (error?.message.includes('401')) {
@@ -40,9 +42,26 @@ export default function Header() {
     setShowMobileSearch(false);
   }, [pathname]);
 
+  const isActive = (href: string) => {
+    // Exact match
+    if (pathname === href) return true;
+
+    // Parent path match (e.g., /shop matches /shop/123)
+    if (href !== '/' && pathname.startsWith(href + '/')) return true;
+
+    // Special case for index routes (e.g., /shop matches /shop)
+    return href !== '/' && pathname === href.slice(0, -1);
+
+
+  };
+
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-700 dark:bg-gray-900/80">
+      <header
+        className={`fixed inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-lg transition-colors duration-200 dark:border-gray-800 dark:bg-gray-900/80 ${
+          isScrolled ? 'shadow-lg' : ''
+        }`}
+      >
         <div className="container mx-auto h-20 px-4">
           <div className="flex h-full items-center justify-between">
             {/* Mobile Menu Button */}
@@ -73,7 +92,7 @@ export default function Header() {
                     key={item.title}
                     href={item.href}
                     className={`font-medium transition-colors duration-200 ${
-                      pathname === item.href
+                      isActive(item.href)
                         ? 'text-primary-600 dark:text-primary-400'
                         : 'hover:text-primary-600 dark:hover:text-primary-400 text-gray-900 dark:text-gray-100'
                     }`}
@@ -106,6 +125,7 @@ export default function Header() {
               </div>
 
               <DarkModeToggle />
+              <CartMenu />
 
               {/* Auth Section */}
               <div className="flex justify-end">
@@ -199,7 +219,7 @@ export default function Header() {
                     key={item.title}
                     href={item.href}
                     className={`block rounded-lg px-4 py-2.5 font-medium transition-colors duration-200 ${
-                      pathname === item.href
+                      isActive(item.href)
                         ? 'bg-primary-200 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
                         : 'text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800'
                     }`}
