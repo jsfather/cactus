@@ -85,12 +85,11 @@ export default function Page() {
               src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4"
               muted
               playsInline
-              loop
               autoPlay
-              preload="auto"
+              preload="metadata"
             />
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30 rounded-3xl" />
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30 rounded-3xl pointer-events-none" />
           </div>
         </div>
 
@@ -329,28 +328,13 @@ export default function Page() {
                         ? setSelectedVideo(videoThumbnails[0].videoSrc)
                         : null
                     }
-                    onMouseEnter={(e) => {
-                      const videoEl = e.currentTarget.querySelector('video');
-                      if (videoEl) {
-                        videoEl
-                          .play()
-                          .catch((err) =>
-                            console.log('Video play failed:', err)
-                          );
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      const videoEl = e.currentTarget.querySelector('video');
-                      if (videoEl) {
-                        videoEl.pause();
-                        videoEl.currentTime = 0;
-                      }
-                    }}
                   >
                     <ClientVideo
                       src={videoThumbnails[0].videoSrc}
                       className="absolute inset-0 h-full w-full object-cover"
                       preload="metadata"
+                      muted
+                      playsInline
                     />
                     <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -373,28 +357,13 @@ export default function Page() {
                       onClick={() =>
                         video.videoSrc ? setSelectedVideo(video.videoSrc) : null
                       }
-                      onMouseEnter={(e) => {
-                        const videoEl = e.currentTarget.querySelector('video');
-                        if (videoEl) {
-                          videoEl
-                            .play()
-                            .catch((err) =>
-                              console.log('Video play failed:', err)
-                            );
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        const videoEl = e.currentTarget.querySelector('video');
-                        if (videoEl) {
-                          videoEl.pause();
-                          videoEl.currentTime = 0;
-                        }
-                      }}
                     >
                       <ClientVideo
                         src={video.videoSrc}
                         className="absolute inset-0 h-full w-full object-cover"
                         preload="metadata"
+                        muted
+                        playsInline
                       />
                       <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -500,7 +469,7 @@ export default function Page() {
               >
                 <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
                   <Image
-                    src={product.image}
+                    src={product.image || '/placeholder-image.jpg'}
                     alt={product.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
@@ -621,7 +590,7 @@ export default function Page() {
               >
                 <div className="relative h-48">
                   <Image
-                    src={course.image}
+                    src={course.image || '/placeholder-image.jpg'}
                     alt={course.title}
                     fill
                     className="object-cover dark:opacity-90"
@@ -694,7 +663,7 @@ export default function Page() {
               >
                 <div className="relative h-48">
                   <Image
-                    src={post.image}
+                    src={post.image || '/placeholder-image.jpg'}
                     alt={post.title}
                     fill
                     className="object-cover dark:opacity-90"
