@@ -11,6 +11,7 @@ import DarkModeToggle from '@/app/components/ui/DarkModeToggle';
 import { Menu, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@/app/hooks/useUser';
+import { CartMenu } from '@/app/components/layout/CartMenu';
 
 const menuItems = [
   { title: 'دوره‌ها', href: '/courses' },
@@ -106,6 +107,7 @@ export default function Header() {
               </div>
 
               <DarkModeToggle />
+              <CartMenu />
 
               {/* Auth Section */}
               <div className="flex justify-end">

@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search, Filter, Star } from 'lucide-react';
-import { useCart } from '@/app/contexts/CartContext';
 
 const categories = [
   { id: 'all', name: 'همه محصولات', count: 42 },
@@ -67,7 +66,6 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [availability, setAvailability] = useState<'all' | 'in-stock'>('all');
-  const { addItem } = useCart();
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.title
@@ -225,13 +223,7 @@ export default function Page() {
                       onClick={(e) => {
                         e.preventDefault();
                         if (product.inStock) {
-                          addItem({
-                            id: product.id,
-                            title: product.title,
-                            price: product.price,
-                            discount: product.discount,
-                            image: product.image,
-                          });
+                          // Cart functionality will be handled by CartMenu component
                         }
                       }}
                       className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
@@ -299,13 +291,7 @@ export default function Page() {
                         onClick={(e) => {
                           e.preventDefault();
                           if (product.inStock) {
-                            addItem({
-                              id: product.id,
-                              title: product.title,
-                              price: product.price,
-                              discount: product.discount,
-                              image: product.image,
-                            });
+                            // Cart functionality will be handled by CartMenu component
                           }
                         }}
                         className={`rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
