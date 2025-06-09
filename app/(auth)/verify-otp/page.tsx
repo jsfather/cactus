@@ -4,13 +4,17 @@ import { useSearchParams } from 'next/navigation';
 import { verifyOTP } from '@/app/lib/api/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { KeyRound, ArrowLeft } from 'lucide-react';
+import { KeyRound, ArrowLeft, Lock } from 'lucide-react';
 import { useUser } from '@/app/hooks/useUser';
+
+// Get the password feature flag from environment
+const isPasswordAuthEnabled = process.env.NEXT_PUBLIC_PASSWORD_AUTH_ENABLED === 'true';
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
   const identifier = searchParams.get('identifier') || '';
   const [otp, setOtp] = useState(searchParams.get('otp') || '');
+  const [password, setPassword] = useState('1234567890');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -22,7 +26,12 @@ export default function VerifyOtpPage() {
     setError('');
 
     try {
-      const result = await verifyOTP(identifier, '1234567890', otp);
+      // If password auth is enabled, send the password, otherwise send empty string
+      const result = await verifyOTP(
+        identifier, 
+        isPasswordAuthEnabled ? password : '', 
+        otp
+      );
       localStorage.setItem('authToken', result.token);
       await refetch();
       router.push('/admin/dashboard');
@@ -71,6 +80,32 @@ export default function VerifyOtpPage() {
             />
           </div>
         </div>
+
+        {isPasswordAuthEnabled && (
+          <div className="space-y-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              رمز عبور
+            </label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 placeholder-gray-500 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white dark:placeholder-gray-400"
+                required
+                placeholder="رمز عبور را وارد کنید"
+                dir="ltr"
+              />
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-500 dark:bg-red-900/50 dark:text-red-200">
