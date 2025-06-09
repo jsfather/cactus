@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { UserRound, Mail, Hash, Users, Heart, Brain, Calendar } from 'lucide-react';
+import {
+  UserRound,
+  Mail,
+  Hash,
+  Users,
+  Heart,
+  Brain,
+  Calendar,
+} from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
@@ -15,7 +23,7 @@ export default function UserInfoPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // TODO: Implement API call
     // For now, just navigate to next step
     router.push('/onboarding/document-upload');
@@ -35,7 +43,9 @@ export default function UserInfoPage() {
       <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8">
         {/* Personal Information */}
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800/50">
-          <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">اطلاعات شخصی</h2>
+          <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
+            اطلاعات شخصی
+          </h2>
           <div className="space-y-6">
             <Input
               id="first_name"
@@ -59,7 +69,6 @@ export default function UserInfoPage() {
               label="نام کاربری"
               placeholder="نام کاربری خود را وارد کنید"
               required
-           
             />
 
             <Input
@@ -69,7 +78,6 @@ export default function UserInfoPage() {
               label="ایمیل"
               placeholder="ایمیل خود را وارد کنید"
               required
-            
             />
 
             <Input
@@ -78,7 +86,6 @@ export default function UserInfoPage() {
               label="کد ملی"
               placeholder="کد ملی خود را وارد کنید"
               required
-             
             />
 
             <Input
@@ -119,14 +126,15 @@ export default function UserInfoPage() {
               type="date"
               label="تاریخ تولد"
               required
-             
             />
           </div>
         </div>
 
         {/* Health Information */}
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800/50">
-          <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">اطلاعات سلامت</h2>
+          <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
+            اطلاعات سلامت
+          </h2>
           <div className="space-y-6">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -140,7 +148,9 @@ export default function UserInfoPage() {
                     value="true"
                     className="text-primary-600 focus:ring-primary-500/20 h-4 w-4"
                   />
-                  <span className="mr-2 text-sm text-gray-700 dark:text-gray-300">بله</span>
+                  <span className="mr-2 text-sm text-gray-700 dark:text-gray-300">
+                    بله
+                  </span>
                 </label>
                 <label className="flex items-center">
                   <input
@@ -150,7 +160,9 @@ export default function UserInfoPage() {
                     defaultChecked
                     className="text-primary-600 focus:ring-primary-500/20 h-4 w-4"
                   />
-                  <span className="mr-2 text-sm text-gray-700 dark:text-gray-300">خیر</span>
+                  <span className="mr-2 text-sm text-gray-700 dark:text-gray-300">
+                    خیر
+                  </span>
                 </label>
               </div>
             </div>
@@ -166,7 +178,9 @@ export default function UserInfoPage() {
 
         {/* Learning Characteristics */}
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800/50">
-          <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">ویژگی‌های یادگیری</h2>
+          <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
+            ویژگی‌های یادگیری
+          </h2>
           <div className="space-y-6">
             <Select
               id="interest_level"
@@ -196,7 +210,6 @@ export default function UserInfoPage() {
           </div>
         </div>
 
-       
         <button
           type="submit"
           disabled={loading}

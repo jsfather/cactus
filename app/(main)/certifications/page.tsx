@@ -3,7 +3,16 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Calendar, Tag, Award, X, Share2, Download, ExternalLink } from 'lucide-react';
+import {
+  Trophy,
+  Calendar,
+  Tag,
+  Award,
+  X,
+  Share2,
+  Download,
+  ExternalLink,
+} from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
 
 interface Certificate {
@@ -38,7 +47,7 @@ const certifications: Certificate[] = [
     description: 'کسب مقام اول در مسابقات ایران اپن 2024',
     organization: 'ایران اپن',
     location: 'ایران',
-    rank: 'مقام اول'
+    rank: 'مقام اول',
   },
   {
     id: 'gitex-2023',
@@ -48,7 +57,7 @@ const certifications: Certificate[] = [
     issuedDate: '2023',
     description: 'حضور در نمایشگاه جیتکس امارات',
     organization: 'GITEX',
-    location: 'امارات متحده عربی'
+    location: 'امارات متحده عربی',
   },
   // ... Add the rest of the certificates with proper data structure
 ];
@@ -56,12 +65,14 @@ const certifications: Certificate[] = [
 const categories = ['همه', 'بین المللی', 'ملی', 'منطقه‌ای'];
 
 export default function Page() {
-  const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
+  const [selectedCertificate, setSelectedCertificate] =
+    useState<Certificate | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('همه');
 
-  const filteredCertifications = selectedCategory === 'همه'
-    ? certifications
-    : certifications.filter(cert => cert.category === selectedCategory);
+  const filteredCertifications =
+    selectedCategory === 'همه'
+      ? certifications
+      : certifications.filter((cert) => cert.category === selectedCategory);
 
   return (
     <div className="min-h-screen w-full bg-gray-50 pt-24 dark:bg-gray-900">
@@ -87,7 +98,7 @@ export default function Page() {
               onClick={() => setSelectedCategory(category)}
               className={`rounded-full px-6 py-2 text-sm font-medium transition-all ${
                 selectedCategory === category
-                  ? 'bg-primary-600 text-white dark:bg-primary-500'
+                  ? 'bg-primary-600 dark:bg-primary-500 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
               }`}
             >
@@ -121,22 +132,26 @@ export default function Page() {
               {/* Certificate Details */}
               <div className="relative h-2/5 p-6">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1">
+                  <h3 className="line-clamp-1 text-xl font-bold text-gray-900 dark:text-white">
                     {cert.title}
                   </h3>
                   <Trophy className="h-5 w-5 text-amber-500" />
                 </div>
-                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
                   {cert.description}
                 </p>
-                <div className="absolute bottom-6 left-6 right-6 flex flex-wrap items-center gap-4 text-sm">
+                <div className="absolute right-6 bottom-6 left-6 flex flex-wrap items-center gap-4 text-sm">
                   <div className="flex items-center gap-1.5">
-                    <Tag className="h-4 w-4 text-primary-500" />
-                    <span className="text-gray-600 dark:text-gray-400">{cert.category}</span>
+                    <Tag className="text-primary-500 h-4 w-4" />
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {cert.category}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Calendar className="h-4 w-4 text-primary-500" />
-                    <span className="text-gray-600 dark:text-gray-400">{cert.issuedDate}</span>
+                    <Calendar className="text-primary-500 h-4 w-4" />
+                    <span className="text-gray-600 dark:text-gray-400">
+                      {cert.issuedDate}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -164,10 +179,12 @@ export default function Page() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 shadow-2xl dark:bg-gray-800 sm:max-w-xl md:max-w-2xl lg:max-w-3xl"
+              className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white p-6 shadow-2xl sm:max-w-xl md:max-w-2xl lg:max-w-3xl dark:bg-gray-800"
             >
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">جزئیات گواهینامه</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  جزئیات گواهینامه
+                </h2>
                 <button
                   onClick={() => setSelectedCertificate(null)}
                   className="rounded-full p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
@@ -197,20 +214,26 @@ export default function Page() {
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
-                    <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">دسته‌بندی</div>
+                    <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                      دسته‌بندی
+                    </div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {selectedCertificate.category}
                     </div>
                   </div>
                   <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
-                    <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">تاریخ صدور</div>
+                    <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                      تاریخ صدور
+                    </div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {selectedCertificate.issuedDate}
                     </div>
                   </div>
                   {selectedCertificate.organization && (
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
-                      <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">سازمان صادرکننده</div>
+                      <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                        سازمان صادرکننده
+                      </div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {selectedCertificate.organization}
                       </div>
@@ -218,16 +241,20 @@ export default function Page() {
                   )}
                   {selectedCertificate.location && (
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
-                      <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">محل برگزاری</div>
+                      <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                        محل برگزاری
+                      </div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {selectedCertificate.location}
                       </div>
                     </div>
                   )}
                   {selectedCertificate.rank && (
-                    <div className="col-span-2 rounded-xl bg-primary-50 p-4 dark:bg-primary-900/20">
-                      <div className="mb-2 text-sm text-primary-600 dark:text-primary-400">رتبه کسب شده</div>
-                      <div className="font-medium text-primary-700 dark:text-primary-300">
+                    <div className="bg-primary-50 dark:bg-primary-900/20 col-span-2 rounded-xl p-4">
+                      <div className="text-primary-600 dark:text-primary-400 mb-2 text-sm">
+                        رتبه کسب شده
+                      </div>
+                      <div className="text-primary-700 dark:text-primary-300 font-medium">
                         {selectedCertificate.rank}
                       </div>
                     </div>

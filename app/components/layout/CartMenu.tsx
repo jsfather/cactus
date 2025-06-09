@@ -45,7 +45,7 @@ export function CartMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="absolute left-0 top-full mt-2 w-80 origin-top-left rounded-2xl bg-white p-4 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
+            className="absolute top-full left-0 mt-2 w-80 origin-top-left rounded-2xl bg-white p-4 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
           >
             <div className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               سبد خرید
@@ -54,7 +54,9 @@ export function CartMenu() {
             {state.items.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <ShoppingBasket className="mb-2 h-12 w-12 text-gray-400 dark:text-gray-600" />
-                <p className="text-gray-500 dark:text-gray-400">سبد خرید شما خالی است</p>
+                <p className="text-gray-500 dark:text-gray-400">
+                  سبد خرید شما خالی است
+                </p>
               </div>
             ) : (
               <>
@@ -126,4 +128,4 @@ export function CartMenu() {
       </AnimatePresence>
     </div>
   );
-} 
+}

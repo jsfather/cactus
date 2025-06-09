@@ -146,16 +146,16 @@ export default function Sidebar({
 
   const isActive = (href?: string) => {
     if (!href) return false;
-    
+
     // Exact match
     if (pathname === href) return true;
-    
+
     // Parent path match (e.g., /shop matches /shop/123)
     if (href !== '/' && pathname.startsWith(href + '/')) return true;
-    
+
     // Special case for index routes (e.g., /shop matches /shop)
     if (href !== '/' && pathname === href.slice(0, -1)) return true;
-    
+
     return false;
   };
 

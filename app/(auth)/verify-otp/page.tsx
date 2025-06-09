@@ -8,7 +8,8 @@ import { KeyRound, ArrowLeft, Lock } from 'lucide-react';
 import { useUser } from '@/app/hooks/useUser';
 
 // Get the password feature flag from environment
-const isPasswordAuthEnabled = process.env.NEXT_PUBLIC_PASSWORD_AUTH_ENABLED === 'true';
+const isPasswordAuthEnabled =
+  process.env.NEXT_PUBLIC_PASSWORD_AUTH_ENABLED === 'true';
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
@@ -28,8 +29,8 @@ export default function VerifyOtpPage() {
     try {
       // If password auth is enabled, send the password, otherwise send empty string
       const result = await verifyOTP(
-        identifier, 
-        isPasswordAuthEnabled ? password : '', 
+        identifier,
+        isPasswordAuthEnabled ? password : '',
         otp
       );
       localStorage.setItem('authToken', result.token);

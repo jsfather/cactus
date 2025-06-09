@@ -89,12 +89,12 @@ export default function Page() {
               preload="metadata"
             />
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30 rounded-3xl pointer-events-none" />
+            <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30" />
           </div>
         </div>
 
         {/* Content Section - Below Video */}
-        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-100 dark:to-gray-900 pb-24">
+        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-100 pb-24 dark:to-gray-900">
           <div className="container mx-auto px-4">
             {/* Main Content */}
             <div className="mx-auto max-w-4xl text-center">
@@ -104,14 +104,14 @@ export default function Page() {
                 transition={{ duration: 0.5 }}
                 className="space-y-6"
               >
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-white sm:text-5xl lg:text-6xl">
+                <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
                   <span className="from-primary-400 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
                     آینده رباتیک
                   </span>
                   <br />
                   را با ما بسازید
                 </h1>
-                <p className="mx-auto max-w-2xl text-lg text-gray-700 dark:text-gray-300 sm:text-xl">
+                <p className="mx-auto max-w-2xl text-lg text-gray-700 sm:text-xl dark:text-gray-300">
                   با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
                   ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
                 </p>
@@ -126,7 +126,10 @@ export default function Page() {
                 <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
                   شروع یادگیری
                 </Button>
-                <Button variant="secondary" className="rounded-full px-8 py-3 text-lg">
+                <Button
+                  variant="secondary"
+                  className="rounded-full px-8 py-3 text-lg"
+                >
                   مشاهده دوره‌ها
                 </Button>
               </motion.div>
@@ -141,8 +144,8 @@ export default function Page() {
                 <div className="relative">
                   {/* Decorative blur effect */}
                   <div className="absolute inset-0 -z-10">
-                    <div className="absolute right-1/2 top-0 h-[200px] w-[200px] -translate-y-1/2 translate-x-1/2 transform rounded-full bg-primary-600/20 blur-[100px]" />
-                    <div className="absolute left-1/2 top-0 h-[150px] w-[150px] -translate-y-1/2 -translate-x-1/2 transform rounded-full bg-blue-600/20 blur-[100px]" />
+                    <div className="bg-primary-600/20 absolute top-0 right-1/2 h-[200px] w-[200px] translate-x-1/2 -translate-y-1/2 transform rounded-full blur-[100px]" />
+                    <div className="absolute top-0 left-1/2 h-[150px] w-[150px] -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-blue-600/20 blur-[100px]" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3">
@@ -163,16 +166,13 @@ export default function Page() {
                         description: 'رضایت دانشجویان',
                       },
                     ].map((stat, index) => (
-                      <div
-                        key={index}
-                        className="group relative"
-                      >
+                      <div key={index} className="group relative">
                         <div className="relative space-y-2 text-center">
                           <div className="text-primary-600 dark:text-primary-400 relative text-4xl font-bold sm:text-5xl">
                             {stat.number}
-                            <div className="absolute -right-2 top-0 h-2 w-2 rounded-full bg-primary-400" />
+                            <div className="bg-primary-400 absolute top-0 -right-2 h-2 w-2 rounded-full" />
                           </div>
-                          <div className="text-sm font-medium text-gray-800 dark:text-gray-300 sm:text-base">
+                          <div className="text-sm font-medium text-gray-800 sm:text-base dark:text-gray-300">
                             {stat.label}
                           </div>
                           <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -180,7 +180,7 @@ export default function Page() {
                           </p>
                         </div>
                         {/* Hover effect line */}
-                        <div className="absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full bg-primary-500 transition-all duration-300 group-hover:w-1/2" />
+                        <div className="bg-primary-500 absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full transition-all duration-300 group-hover:w-1/2" />
                       </div>
                     ))}
                   </div>
@@ -248,32 +248,32 @@ export default function Page() {
               </h2>
               <div className="space-y-4">
                 <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                  شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در دو
-                  بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد. شرکت
-                  کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال 1395 به
-                  طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395 به صورت
-                  حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با هوش مصنوعی
-                  در حیطه دانش آموزی و در عرصه جهانی و بین المللی فعالیت داشته
-                  است. در بخش تجارت الکترونیک، شخص مدیر عامل به صورت حقیقی در حال
-                  فعالیت می باشند.
+                  شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در
+                  دو بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد.
+                  شرکت کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال
+                  1395 به طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395
+                  به صورت حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با
+                  هوش مصنوعی در حیطه دانش آموزی و در عرصه جهانی و بین المللی
+                  فعالیت داشته است. در بخش تجارت الکترونیک، شخص مدیر عامل به
+                  صورت حقیقی در حال فعالیت می باشند.
                 </p>
 
                 <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                  رشته فنی و مهندسی روباتیک تلفیقی از سه رشته مهندسی الکترونیک، 
-                  مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس پویان گستر در 
-                  حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و تربیت مهندسین 
-                  واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها به صورت 
-                  مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم افزارهایی 
-                  چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش مکانیک 
-                  با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس، کتیا 
-                  و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش برنامه 
-                  نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ، اتمل 
+                  رشته فنی و مهندسی روباتیک تلفیقی از سه رشته مهندسی الکترونیک،
+                  مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس پویان گستر در
+                  حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و تربیت مهندسین
+                  واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها به صورت
+                  مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم افزارهایی
+                  چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش مکانیک
+                  با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس، کتیا
+                  و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش برنامه
+                  نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ، اتمل
                   استودیو، ام بلاگ، پایتون و... آموزش داده می شود.
                 </p>
 
                 <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                  پس از گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و نظارت
-                  شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
+                  پس از گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و
+                  نظارت شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -480,11 +480,11 @@ export default function Page() {
                           تخفیف
                         </div>
                       )}
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.preventDefault();
                           // Add to cart logic will be implemented
-                        }} 
+                        }}
                         className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
                       >
                         <svg

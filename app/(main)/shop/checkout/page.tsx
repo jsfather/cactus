@@ -84,7 +84,7 @@ export default function CheckoutPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, fullName: e.target.value })
                 }
-                className="w-full rounded-lg border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
               />
             </div>
             <div>
@@ -102,7 +102,7 @@ export default function CheckoutPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
-                className="w-full rounded-lg border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
               />
             </div>
             <div>
@@ -120,7 +120,7 @@ export default function CheckoutPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className="w-full rounded-lg border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
               />
             </div>
             <div>
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
                   setFormData({ ...formData, address: e.target.value })
                 }
                 rows={3}
-                className="w-full rounded-lg border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -157,7 +157,7 @@ export default function CheckoutPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, city: e.target.value })
                   }
-                  className="w-full rounded-lg border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                  className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
                 />
               </div>
               <div>
@@ -175,7 +175,7 @@ export default function CheckoutPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, postalCode: e.target.value })
                   }
-                  className="w-full rounded-lg border border-gray-300 p-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700"
+                  className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-300 p-2 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700"
                 />
               </div>
             </div>
@@ -269,4 +269,4 @@ export default function CheckoutPage() {
       </div>
     </div>
   );
-} 
+}

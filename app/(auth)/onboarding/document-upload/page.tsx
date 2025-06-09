@@ -26,7 +26,7 @@ export default function DocumentUploadPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // TODO: Implement API call to upload document
     // For now, just navigate to dashboard
     router.push('/admin/dashboard');
@@ -53,7 +53,7 @@ export default function DocumentUploadPage() {
               onChange={handleFileChange}
               className="hidden"
             />
-            
+
             {!preview ? (
               <label
                 htmlFor="document"
@@ -62,7 +62,8 @@ export default function DocumentUploadPage() {
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                   <Upload className="mb-3 h-12 w-12 text-gray-400 transition-colors group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400" />
                   <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <span className="font-medium">برای آپلود کلیک کنید</span> یا فایل را اینجا رها کنید
+                    <span className="font-medium">برای آپلود کلیک کنید</span> یا
+                    فایل را اینجا رها کنید
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     PNG, JPG یا JPEG (حداکثر 5MB)
@@ -131,4 +132,4 @@ export default function DocumentUploadPage() {
       </form>
     </div>
   );
-} 
+}

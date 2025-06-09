@@ -35,18 +35,22 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
-      const existingItem = state.items.find(item => item.id === action.payload.id);
-      
+      const existingItem = state.items.find(
+        (item) => item.id === action.payload.id
+      );
+
       if (existingItem) {
         return {
           ...state,
-          items: state.items.map(item =>
+          items: state.items.map((item) =>
             item.id === action.payload.id
               ? { ...item, quantity: item.quantity + 1 }
               : item
           ),
           totalItems: state.totalItems + 1,
-          totalPrice: state.totalPrice + parseInt(action.payload.price.replace(/[^0-9]/g, '')),
+          totalPrice:
+            state.totalPrice +
+            parseInt(action.payload.price.replace(/[^0-9]/g, '')),
         };
       }
 
@@ -54,24 +58,31 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         ...state,
         items: [...state.items, { ...action.payload, quantity: 1 }],
         totalItems: state.totalItems + 1,
-        totalPrice: state.totalPrice + parseInt(action.payload.price.replace(/[^0-9]/g, '')),
+        totalPrice:
+          state.totalPrice +
+          parseInt(action.payload.price.replace(/[^0-9]/g, '')),
       };
     }
 
     case 'REMOVE_ITEM': {
-      const itemToRemove = state.items.find(item => item.id === action.payload.id);
+      const itemToRemove = state.items.find(
+        (item) => item.id === action.payload.id
+      );
       if (!itemToRemove) return state;
 
       return {
         ...state,
-        items: state.items.filter(item => item.id !== action.payload.id),
+        items: state.items.filter((item) => item.id !== action.payload.id),
         totalItems: state.totalItems - itemToRemove.quantity,
-        totalPrice: state.totalPrice - (parseInt(itemToRemove.price.replace(/[^0-9]/g, '')) * itemToRemove.quantity),
+        totalPrice:
+          state.totalPrice -
+          parseInt(itemToRemove.price.replace(/[^0-9]/g, '')) *
+            itemToRemove.quantity,
       };
     }
 
     case 'UPDATE_QUANTITY': {
-      const item = state.items.find(item => item.id === action.payload.id);
+      const item = state.items.find((item) => item.id === action.payload.id);
       if (!item) return state;
 
       const newQuantity = item.quantity + action.payload.change;
@@ -79,13 +90,15 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 
       return {
         ...state,
-        items: state.items.map(item =>
+        items: state.items.map((item) =>
           item.id === action.payload.id
             ? { ...item, quantity: newQuantity }
             : item
         ),
         totalItems: state.totalItems + action.payload.change,
-        totalPrice: state.totalPrice + (parseInt(item.price.replace(/[^0-9]/g, '')) * action.payload.change),
+        totalPrice:
+          state.totalPrice +
+          parseInt(item.price.replace(/[^0-9]/g, '')) * action.payload.change,
       };
     }
 
@@ -151,4 +164,4 @@ export function useCart() {
     throw new Error('useCart must be used within a CartProvider');
   }
   return context;
-} 
+}
