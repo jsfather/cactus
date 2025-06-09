@@ -200,7 +200,7 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Link href={`/shop/product/${product.id}`}>
+              <Link href={`/shop/${product.id}`}>
                 <div className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
                   <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
                     <Image
