@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Search, Filter, Star } from 'lucide-react';
+import { useCart } from '@/app/contexts/CartContext';
 
 const categories = [
   { id: 'all', name: 'همه محصولات', count: 42 },
@@ -65,6 +67,7 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [availability, setAvailability] = useState<'all' | 'in-stock'>('all');
+  const { addItem } = useCart();
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.title
@@ -196,99 +199,128 @@ export default function Page() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
             >
-              <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
-                />
-                {product.discount && (
-                  <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
-                    تخفیف
-                  </div>
-                )}
-                {!product.inStock && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                    <span className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white">
-                      ناموجود
-                    </span>
-                  </div>
-                )}
-                <button className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800">
-                  <svg
-                    className="text-primary-600 dark:text-primary-400 h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+              <Link href={`/shop/product/${product.id}`}>
+                <div className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
+                  <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
                     />
-                  </svg>
-                </button>
-              </div>
-              <div className="space-y-2">
-                <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
-                  {product.category}
-                </div>
-                <h3 className="font-bold dark:text-gray-100">
-                  {product.title}
-                </h3>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < Math.floor(product.rating)
-                            ? 'fill-current text-yellow-400 dark:text-yellow-500'
-                            : 'text-gray-300 dark:text-gray-600'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    ({product.reviews})
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    {product.discount ? (
-                      <>
-                        <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
-                          {product.discount}
-                        </span>
-                        <span className="mr-2 text-sm text-gray-500 line-through dark:text-gray-400">
-                          {product.price}
-                        </span>
-                      </>
-                    ) : (
-                      <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
-                        {product.price}
-                      </span>
+                    {product.discount && (
+                      <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
+                        تخفیف
+                      </div>
                     )}
-                    <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
-                      تومان
-                    </span>
+                    {!product.inStock && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                        <span className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white">
+                          ناموجود
+                        </span>
+                      </div>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (product.inStock) {
+                          addItem({
+                            id: product.id,
+                            title: product.title,
+                            price: product.price,
+                            discount: product.discount,
+                            image: product.image,
+                          });
+                        }
+                      }}
+                      className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
+                    >
+                      <svg
+                        className="text-primary-600 dark:text-primary-400 h-6 w-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                    </button>
                   </div>
-                  <button
-                    className={`rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
-                      product.inStock
-                        ? 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white'
-                        : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
-                    }`}
-                    disabled={!product.inStock}
-                  >
-                    {product.inStock ? 'افزودن به سبد' : 'ناموجود'}
-                  </button>
+                  <div className="space-y-2">
+                    <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
+                      {product.category}
+                    </div>
+                    <h3 className="font-bold dark:text-gray-100">
+                      {product.title}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < Math.floor(product.rating)
+                                ? 'fill-current text-yellow-400 dark:text-yellow-500'
+                                : 'text-gray-300 dark:text-gray-600'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        ({product.reviews})
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        {product.discount ? (
+                          <>
+                            <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
+                              {product.discount}
+                            </span>
+                            <span className="mr-2 text-sm text-gray-500 line-through dark:text-gray-400">
+                              {product.price}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
+                            {product.price}
+                          </span>
+                        )}
+                        <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
+                          تومان
+                        </span>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (product.inStock) {
+                            addItem({
+                              id: product.id,
+                              title: product.title,
+                              price: product.price,
+                              discount: product.discount,
+                              image: product.image,
+                            });
+                          }
+                        }}
+                        className={`rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
+                          product.inStock
+                            ? 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white'
+                            : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
+                        }`}
+                        disabled={!product.inStock}
+                      >
+                        {product.inStock ? 'افزودن به سبد' : 'ناموجود'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </div>
