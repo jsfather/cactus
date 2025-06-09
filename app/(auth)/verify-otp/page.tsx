@@ -34,7 +34,7 @@ export default function VerifyOtpPage() {
       );
       localStorage.setItem('authToken', result.token);
       await refetch();
-      router.push('/admin/dashboard');
+      router.push('/onboarding/user-info');
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
