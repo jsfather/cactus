@@ -1,26 +1,14 @@
 'use client';
 
 import { Power } from 'lucide-react';
-import { useState } from 'react';
 
-export default function LogoutButton() {
-  const [loading, setLoading] = useState(false);
+interface LogoutButtonProps {
+  loading?: boolean;
+}
 
-  const handleLogout = async () => {
-    try {
-      setLoading(true);
-      localStorage.removeItem('authToken');
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Logout failed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+export default function LogoutButton({ loading = false }: LogoutButtonProps) {
   return (
     <button
-      onClick={handleLogout}
       disabled={loading}
       className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-800 transition-colors hover:bg-gray-50/80 active:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
     >
