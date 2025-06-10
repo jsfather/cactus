@@ -20,7 +20,8 @@ type CartAction =
   | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
   | { type: 'REMOVE_ITEM'; payload: { id: number } }
   | { type: 'UPDATE_QUANTITY'; payload: { id: number; change: number } }
-  | { type: 'CLEAR_CART' };
+  | { type: 'CLEAR_CART' }
+  | { type: 'LOAD_CART'; payload: CartState };
 
 interface CartContextType {
   state: CartState;
@@ -109,25 +110,42 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         totalPrice: 0,
       };
 
+    case 'LOAD_CART':
+      return action.payload;
+
     default:
       return state;
   }
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(cartReducer, {
+// Get initial state from localStorage or use default
+function getInitialState(): CartState {
+  if (typeof window === 'undefined') {
+    return {
+      items: [],
+      totalItems: 0,
+      totalPrice: 0,
+    };
+  }
+
+  const savedCart = localStorage.getItem('cart');
+  if (savedCart) {
+    try {
+      return JSON.parse(savedCart);
+    } catch (error) {
+      console.error('Failed to parse cart from localStorage:', error);
+    }
+  }
+
+  return {
     items: [],
     totalItems: 0,
     totalPrice: 0,
-  });
+  };
+}
 
-  useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      const parsedCart = JSON.parse(savedCart);
-      Object.assign(state, parsedCart);
-    }
-  }, [state]);
+export function CartProvider({ children }: { children: React.ReactNode }) {
+  const [state, dispatch] = useReducer(cartReducer, getInitialState());
 
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(state));
