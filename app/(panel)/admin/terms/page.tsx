@@ -43,14 +43,10 @@ export default function Page() {
     {
       header: 'تاریخ شروع',
       accessor: 'start_date' as keyof Term,
-      render: (value: any) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
     },
     {
       header: 'تاریخ پایان',
       accessor: 'end_date' as keyof Term,
-      render: (value: any) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
     },
   ];
 
