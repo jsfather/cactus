@@ -35,21 +35,21 @@ export default function Page() {
       accessor: 'capacity' as keyof Term,
     },
     {
+      header: 'سطح',
+      accessor: 'level' as keyof Term,
+      render: (value: any) =>
+        value?.label || '',
+    },
+    {
       header: 'تاریخ شروع',
       accessor: 'start_date' as keyof Term,
-      render: (value: string | null, item: Term) =>
+      render: (value: any) =>
         value ? new Date(value).toLocaleDateString('fa-IR') : '',
     },
     {
       header: 'تاریخ پایان',
       accessor: 'end_date' as keyof Term,
-      render: (value: string | null, item: Term) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '',
-    },
-    {
-      header: 'تاریخ ایجاد',
-      accessor: 'created_at' as keyof Term,
-      render: (value: string | null, item: Term) =>
+      render: (value: any) =>
         value ? new Date(value).toLocaleDateString('fa-IR') : '',
     },
   ];
