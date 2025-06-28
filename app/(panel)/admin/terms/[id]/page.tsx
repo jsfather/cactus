@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
@@ -12,6 +12,7 @@ import Input from '@/app/components/ui/Input';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import Select from '@/app/components/ui/Select';
+import DatePicker from '@/app/components/ui/DatePicker';
 
 const termSchema = z.object({
   title: z.string().min(1, 'عنوان الزامی است'),
@@ -49,10 +50,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<TermFormData>({
     resolver: zodResolver(termSchema),
+    defaultValues: {
+      title: '',
+      duration: '',
+      number_of_sessions: '',
+      level_id: 1,
+      start_date: '',
+      end_date: '',
+      type: 'normal',
+      capacity: '',
+    }
   });
 
   useEffect(() => {
@@ -83,6 +95,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }, [isNew, resolvedParams.id, reset, router]);
 
   const onSubmit = async (data: TermFormData) => {
+    console.log('Form data before submit:', data);
     try {
       if (isNew) {
         await createTerm(data);
@@ -180,24 +193,40 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="start_date"
-            label="تاریخ شروع"
-            type="date"
-            placeholder="تاریخ شروع را وارد کنید"
-            required
-            error={errors.start_date?.message}
-            {...register('start_date')}
+          <Controller
+            name="start_date"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                id="start_date"
+                label="تاریخ شروع"
+                placeholder="تاریخ شروع را وارد کنید"
+                required
+                error={errors.start_date?.message}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+              />
+            )}
           />
 
-          <Input
-            id="end_date"
-            label="تاریخ پایان"
-            type="date"
-            placeholder="تاریخ پایان را وارد کنید"
-            required
-            error={errors.end_date?.message}
-            {...register('end_date')}
+          <Controller
+            name="end_date"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                id="end_date"
+                label="تاریخ پایان"
+                placeholder="تاریخ پایان را وارد کنید"
+                required
+                error={errors.end_date?.message}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+              />
+            )}
           />
         </div>
 

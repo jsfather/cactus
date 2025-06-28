@@ -1,0 +1,118 @@
+.custom-rmdp.rmdp-wrapper,
+.custom-rmdp .rmdp-month-picker,
+.custom-rmdp .rmdp-year-picker,
+.custom-rmdp .rmdp-time-picker div input,
+.rmdp-container .custom-rmdp.ep-arrow::after {
+    background-color: #3b3b3b;
+    color: #c4c7ca;
+}
+
+.custom-rmdp .rmdp-day:not(.rmdp-deactive),
+.custom-rmdp .rmdp-time-picker div .rmdp-am,
+.custom-rmdp .rmdp-header-values,
+.custom-rmdp .rmdp-panel-header {
+    color: #c4c7ca;
+}
+
+.custom-rmdp .rmdp-day.rmdp-range {
+    color: white;
+}
+
+.custom-rmdp .rmdp-panel-body li {
+    color: #f5f5f5;
+}
+
+.custom-rmdp .rmdp-day.rmdp-deactive,
+.custom-rmdp .rmdp-day.rmdp-disabled {
+    color: #87898b;
+}
+
+.rmdp-container .custom-rmdp.ep-arrow[direction="top"] {
+    border-bottom: 1px solid #3b3b3b;
+}
+
+.rmdp-container .custom-rmdp.ep-arrow[direction="left"] {
+    border-right: 1px solid #3b3b3b;
+}
+
+.rmdp-container .custom-rmdp.ep-arrow[direction="right"] {
+    border-left: 1px solid #3b3b3b;
+}
+
+.rmdp-container .custom-rmdp.ep-arrow[direction="bottom"] {
+    border-top: 1px solid #3b3b3b;
+}
+
+.custom-rmdp .rmdp-wrapper {
+    border: 1px solid var(--color-primary-500);
+    box-shadow: 0 0 5px var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-panel-body li {
+    background-color: var(--color-primary-400);
+    box-shadow: 0 0 2px var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-week-day {
+    color: var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-day.rmdp-deactive {
+    color: var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-range {
+    background-color: var(--color-primary-400);
+    box-shadow: 0 0 3px var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-arrow {
+    border: solid var(--color-primary-500);
+    border-width: 0 2px 2px 0;
+}
+
+.custom-rmdp .rmdp-arrow-container:hover {
+    background-color: var(--color-primary-400);
+    box-shadow: 0 0 3px var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-panel-body::-webkit-scrollbar-thumb {
+    background: var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-day.rmdp-today span {
+    background-color: var(--color-primary-500);
+    color: white;
+}
+
+.custom-rmdp .rmdp-rtl .rmdp-panel {
+    border-left: unset;
+    border-right: 1px solid var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-day.rmdp-selected span:not(.highlight) {
+    background-color: var(--color-primary-400);
+    box-shadow: 0 0 3px var(--color-primary-500);
+    color: #a89f91;
+}
+
+.custom-rmdp .rmdp-day:not(.rmdp-day-hidden) span:hover {
+    background-color: var(--color-primary-400) !important;
+}
+
+.custom-rmdp .b-deselect {
+    color: var(--color-primary-500);
+    background-color: white;
+}
+
+.custom-rmdp .rmdp-action-button {
+    color: var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-button:not(.rmdp-action-button) {
+    background-color: var(--color-primary-500);
+}
+
+.custom-rmdp .rmdp-button:not(.rmdp-action-button):hover {
+    background-color: var(--color-primary-500);
+}
