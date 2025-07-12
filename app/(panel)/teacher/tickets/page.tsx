@@ -31,10 +31,8 @@ export default function Page() {
   const fetchTickets = async () => {
     try {
       setLoading(true);
-      const response = await getTickets();
-      if (response) {
-        setTickets(response.data);
-      }
+      const tickets = await getTickets();
+      setTickets(tickets);
     } catch (error) {
       toast.error('خطا در دریافت لیست تیکت ها');
       setTickets([]);

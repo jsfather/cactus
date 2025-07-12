@@ -38,10 +38,8 @@ export default function Page() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await getStudents();
-      if (response) {
-        setStudents(response.data);
-      }
+      const students = await getStudents();
+      setStudents(students);
     } catch (error) {
       toast.error('خطا در دریافت لیست دانش پژوهان');
       setStudents([]);

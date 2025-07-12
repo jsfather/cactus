@@ -2,8 +2,8 @@ import request from '@/app/lib/api/client';
 import { TermStudent } from '@/app/lib/types';
 
 export const getTermStudents = async () => {
-  const response = await request<{ data: TermStudent[] }>(
-    'admin/term-students'
+  const response = await request<TermStudent[]>(
+    '/api/admin/term-students'
   );
 
   if (!response) {
@@ -14,8 +14,8 @@ export const getTermStudents = async () => {
 };
 
 export const getTermStudent = async (id: number | string) => {
-  const response = await request<{ data: TermStudent }>(
-    `admin/term-students/${id}`
+  const response = await request<TermStudent>(
+    `/api/admin/term-students/${id}`
   );
 
   if (!response) {
@@ -26,7 +26,7 @@ export const getTermStudent = async (id: number | string) => {
 };
 
 export const createTermStudent = async (data: Partial<TermStudent>) => {
-  const response = await request<{ data: TermStudent }>('admin/term-students', {
+  const response = await request<TermStudent>('/api/admin/term-students', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -42,8 +42,8 @@ export const updateTermStudent = async (
   id: number | string,
   data: Partial<TermStudent>
 ) => {
-  const response = await request<{ data: TermStudent }>(
-    `admin/term-students/${id}`,
+  const response = await request<TermStudent>(
+    `/api/admin/term-students/${id}`,
     {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -58,8 +58,8 @@ export const updateTermStudent = async (
 };
 
 export const deleteTermStudent = async (id: number | string) => {
-  const response = await request<{ data: TermStudent }>(
-    `admin/term-students/${id}`,
+  const response = await request<TermStudent>(
+    `/api/admin/term-students/${id}`,
     {
       method: 'DELETE',
     }

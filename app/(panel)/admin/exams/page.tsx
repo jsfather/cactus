@@ -51,10 +51,8 @@ export default function Page() {
   const fetchExams = async () => {
     try {
       setLoading(true);
-      const response = await getExams();
-      if (response) {
-        setExams(response.data);
-      }
+      const data = await getExams();
+      setExams(data);
     } catch (error) {
       toast.error('خطا در دریافت لیست آزمون ها');
       setExams([]);

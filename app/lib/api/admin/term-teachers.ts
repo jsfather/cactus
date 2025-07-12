@@ -2,8 +2,8 @@ import request from '@/app/lib/api/client';
 import { TermTeacher } from '@/app/lib/types';
 
 export const getTermTeachers = async () => {
-  const response = await request<{ data: TermTeacher[] }>(
-    'admin/term-teachers'
+  const response = await request<TermTeacher[]>(
+    '/api/admin/term-teachers'
   );
 
   if (!response) {
@@ -14,8 +14,8 @@ export const getTermTeachers = async () => {
 };
 
 export const getTermTeacher = async (id: number | string) => {
-  const response = await request<{ data: TermTeacher }>(
-    `admin/term-teachers/${id}`
+  const response = await request<TermTeacher>(
+    `/api/admin/term-teachers/${id}`
   );
 
   if (!response) {
@@ -26,7 +26,7 @@ export const getTermTeacher = async (id: number | string) => {
 };
 
 export const createTermTeacher = async (data: Partial<TermTeacher>) => {
-  const response = await request<{ data: TermTeacher }>('admin/term-teachers', {
+  const response = await request<TermTeacher>('/api/admin/term-teachers', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -42,8 +42,8 @@ export const updateTermTeacher = async (
   id: number | string,
   data: Partial<TermTeacher>
 ) => {
-  const response = await request<{ data: TermTeacher }>(
-    `admin/term-teachers/${id}`,
+  const response = await request<TermTeacher>(
+    `/api/admin/term-teachers/${id}`,
     {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -58,8 +58,8 @@ export const updateTermTeacher = async (
 };
 
 export const deleteTermTeacher = async (id: number | string) => {
-  const response = await request<{ data: TermTeacher }>(
-    `admin/term-teachers/${id}`,
+  const response = await request<TermTeacher>(
+    `/api/admin/term-teachers/${id}`,
     {
       method: 'DELETE',
     }

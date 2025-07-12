@@ -2,7 +2,7 @@ import request from '@/app/lib/api/client';
 import { PanelGuide } from '@/app/lib/types';
 
 export const getPanelGuides = async () => {
-  const response = await request<{ data: PanelGuide[] }>('admin/panel-guides');
+  const response = await request<PanelGuide[]>('/api/admin/panel-guides');
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست راهنماهای پنل رخ داده است');
@@ -12,8 +12,8 @@ export const getPanelGuides = async () => {
 };
 
 export const getPanelGuide = async (id: number | string) => {
-  const response = await request<{ data: PanelGuide }>(
-    `admin/panel-guides/${id}`
+  const response = await request<PanelGuide>(
+    `/api/admin/panel-guides/${id}`
   );
 
   if (!response) {
@@ -24,7 +24,7 @@ export const getPanelGuide = async (id: number | string) => {
 };
 
 export const createPanelGuide = async (data: Partial<PanelGuide>) => {
-  const response = await request<{ data: PanelGuide }>('admin/panel-guides', {
+  const response = await request<PanelGuide>('/api/admin/panel-guides', {
     method: 'POST',
     body: JSON.stringify(data),
   });
@@ -40,8 +40,8 @@ export const updatePanelGuide = async (
   id: number | string,
   data: Partial<PanelGuide>
 ) => {
-  const response = await request<{ data: PanelGuide }>(
-    `admin/panel-guides/${id}`,
+  const response = await request<PanelGuide>(
+    `/api/admin/panel-guides/${id}`,
     {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -56,8 +56,8 @@ export const updatePanelGuide = async (
 };
 
 export const deletePanelGuide = async (id: number | string) => {
-  const response = await request<{ data: PanelGuide }>(
-    `admin/panel-guides/${id}`,
+  const response = await request<PanelGuide>(
+    `/api/admin/panel-guides/${id}`,
     {
       method: 'DELETE',
     }

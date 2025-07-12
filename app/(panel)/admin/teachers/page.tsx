@@ -33,10 +33,8 @@ export default function Page() {
   const fetchTeachers = async () => {
     try {
       setLoading(true);
-      const response = await getTeachers();
-      if (response) {
-        setTeachers(response.data);
-      }
+      const teachers = await getTeachers();
+      setTeachers(teachers);
     } catch (error) {
       toast.error('خطا در دریافت لیست مدرسین');
       setTeachers([]);

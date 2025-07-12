@@ -44,10 +44,8 @@ export default function Page() {
   const fetchPanelGuides = async () => {
     try {
       setLoading(true);
-      const response = await getPanelGuides();
-      if (response) {
-        setPanelGuides(response.data);
-      }
+      const panelGuides = await getPanelGuides();
+      setPanelGuides(panelGuides);
     } catch (error) {
       toast.error('خطا در دریافت لیست راهنماهای پنل');
       setPanelGuides([]);

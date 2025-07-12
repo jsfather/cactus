@@ -1,6 +1,7 @@
 'use client';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// For local Next.js API routes, we don't need the external API URL
+const API_URL = '';
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = {
@@ -21,7 +22,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}/${path}`, {
+  // For Next.js API routes, we use the path directly
+  const url = path.startsWith('/api') ? path : `${API_URL}/${path}`;
+
+  const response = await fetch(url, {
     ...options,
     headers,
   });

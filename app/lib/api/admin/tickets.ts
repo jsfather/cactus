@@ -2,7 +2,7 @@ import request from '@/app/lib/api/client';
 import { Ticket } from '@/app/lib/types';
 
 export const getTickets = async () => {
-  const response = await request<{ data: Ticket[] }>('admin/tickets');
+  const response = await request<Ticket[]>('/api/admin/tickets');
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست تیکت ها رخ داده است');
@@ -12,7 +12,7 @@ export const getTickets = async () => {
 };
 
 export const getTeacherTickets = async () => {
-  const response = await request<{ data: Ticket[] }>('admin/teacher_tickets');
+  const response = await request<Ticket[]>('/api/admin/teacher-tickets');
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست تیکت های مدرس رخ داده است');
@@ -22,7 +22,7 @@ export const getTeacherTickets = async () => {
 };
 
 export const getTicket = async (id: number | string) => {
-  const response = await request<{ data: Ticket }>(`admin/tickets/${id}`);
+  const response = await request<Ticket>(`/api/admin/tickets/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت تیکت رخ داده است');
@@ -32,7 +32,7 @@ export const getTicket = async (id: number | string) => {
 };
 
 export const closeTicket = async (id: number | string) => {
-  const response = await request<{ data: Ticket }>(`admin/ticket/${id}/close`, {
+  const response = await request<Ticket>(`/api/admin/tickets/${id}/close`, {
     method: 'POST',
   });
 
@@ -44,9 +44,9 @@ export const closeTicket = async (id: number | string) => {
 };
 
 export const replyTicket = async (id: number | string, message: string) => {
-  const response = await request<{ data: Ticket }>(`admin/ticket/${id}/reply`, {
+  const response = await request<Ticket>(`/api/admin/tickets/${id}/reply`, {
     method: 'POST',
-    body: JSON.stringify(message),
+    body: JSON.stringify({ message }),
   });
 
   if (!response) {
@@ -57,9 +57,9 @@ export const replyTicket = async (id: number | string, message: string) => {
 };
 
 export const getTicketDepartments = async () => {
-  const response = await request<{
-    data: { id: number | string; title: string };
-  }>('admin/tickets/departments');
+  const response = await request<{ id: number | string; title: string }[]>(
+    '/api/admin/tickets/departments'
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست بخش های تیکت رخ داده است');
@@ -69,12 +69,13 @@ export const getTicketDepartments = async () => {
 };
 
 export const createTicketDepartment = async (title: string) => {
-  const response = await request<{
-    data: { id: number | string; title: string };
-  }>('admin/tickets/departments', {
-    method: 'POST',
-    body: JSON.stringify(title),
-  });
+  const response = await request<{ id: number | string; title: string }>(
+    '/api/admin/tickets/departments',
+    {
+      method: 'POST',
+      body: JSON.stringify({ title }),
+    }
+  );
 
   if (!response) {
     throw new Error('خطایی در ساخت بخش تیکت رخ داده است');
@@ -84,11 +85,12 @@ export const createTicketDepartment = async (title: string) => {
 };
 
 export const deleteTicketDepartment = async (id: number | string) => {
-  const response = await request<{
-    data: { id: number | string; title: string };
-  }>(`admin/tickets/departments/${id}`, {
-    method: 'DELETE',
-  });
+  const response = await request<{ id: number | string; title: string }>(
+    `/api/admin/tickets/departments/${id}`,
+    {
+      method: 'DELETE',
+    }
+  );
 
   if (!response) {
     throw new Error('خطایی در حذف بخش تیکت رخ داده است');
