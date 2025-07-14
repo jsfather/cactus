@@ -2,14 +2,18 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
 import { getExam, createExam, updateExam } from '@/app/lib/api/admin/exams';
+import { getTerms } from '@/app/lib/api/admin/terms';
+import { Term } from '@/app/lib/types';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
+import Select from '@/app/components/ui/Select';
+import DatePicker from '@/app/components/ui/DatePicker';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
@@ -28,10 +32,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
   const [loading, setLoading] = useState(!isNew);
+  const [terms, setTerms] = useState<Term[]>([]);
+  const [termsLoading, setTermsLoading] = useState(true);
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<ExamFormData>({
@@ -39,6 +46,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   });
 
   useEffect(() => {
+    const fetchTerms = async () => {
+      try {
+        setTermsLoading(true);
+        const response = await getTerms();
+        if (response) {
+          setTerms(response.data);
+        }
+      } catch (error) {
+        toast.error('خطا در دریافت لیست ترم‌ها');
+        setTerms([]);
+      } finally {
+        setTermsLoading(false);
+      }
+    };
+
     const fetchExam = async () => {
       if (isNew) return;
 
@@ -59,6 +81,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
     };
 
+    fetchTerms();
     fetchExam();
   }, [isNew, resolvedParams.id, reset, router]);
 
@@ -77,7 +100,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     }
   };
 
-  if (loading) {
+  // Create term options for the select dropdown
+  const termOptions = terms.map(term => ({
+    value: term.id.toString(),
+    label: term.title
+  }));
+
+  if (loading || termsLoading) {
     return <LoadingSpinner />;
   }
 
@@ -105,13 +134,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             {...register('title')}
           />
 
-          <Input
-            id="date"
-            label="تاریخ"
-            type="datetime-local"
-            placeholder="تاریخ آزمون را وارد کنید"
-            error={errors.date?.message}
-            {...register('date')}
+          <Controller
+            name="date"
+            control={control}
+            render={({ field }) => (
+              <DatePicker
+                id="date"
+                label="تاریخ"
+                placeholder="تاریخ آزمون را وارد کنید"
+                error={errors.date?.message}
+                value={field.value || ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+              />
+            )}
           />
         </div>
 
@@ -138,11 +175,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             })}
           />
 
-          <Input
+          <Select
             id="term_id"
-            label="شناسه ترم"
-            type="number"
-            placeholder="شناسه ترم را وارد کنید"
+            label="ترم"
+            placeholder="ترم را انتخاب کنید"
+            options={termOptions}
             error={errors.term_id?.message}
             {...register('term_id', {
               setValueAs: (value: string) => (value ? parseInt(value) : null),
