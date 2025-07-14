@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getBlogs, deleteBlog } from '@/app/lib/api/admin/blogs';
+import { blogService } from '@/app/lib/api/admin/blogs';
 import { Blog } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
@@ -43,7 +43,7 @@ export default function Page() {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const response = await getBlogs();
+      const response = await blogService.getBlogs();
       if (response) {
         setBlogs(response);
       }
@@ -65,7 +65,7 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await deleteBlog(itemToDelete.id);
+      await blogService.deleteBlog(itemToDelete.id);
       toast.success('بلاگ با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);

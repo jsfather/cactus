@@ -1,60 +1,24 @@
-import request from '@/app/lib/api/client';
+import { ApiService } from '@/app/lib/api/client';
 import { Blog } from '@/app/lib/types';
 
-export const getBlogs = async () => {
-  const response = await request<Blog[]>('admin/blogs');
+export const blogService = {
+  getBlogs: async (): Promise<Blog[]> => {
+    return await ApiService.get<Blog[]>('admin/blogs');
+  },
 
-  if (!response) {
-    throw new Error('خطایی در دریافت لیست بلاگ‌ها رخ داده است');
-  }
+  getBlog: async (id: number | string): Promise<Blog> => {
+    return await ApiService.get<Blog>(`admin/blogs/${id}`);
+  },
 
-  return response;
-};
+  createBlog: async (data: Partial<Blog>): Promise<Blog> => {
+    return await ApiService.post<Blog>('admin/blogs', data);
+  },
 
-export const getBlog = async (id: number | string) => {
-  const response = await request<Blog>(`admin/blogs/${id}`);
+  updateBlog: async (id: number | string, data: Partial<Blog>): Promise<Blog> => {
+    return await ApiService.put<Blog>(`admin/blogs/${id}`, data);
+  },
 
-  if (!response) {
-    throw new Error('خطایی در دریافت بلاگ رخ داده است');
-  }
-
-  return response;
-};
-
-export const createBlog = async (data: Partial<Blog>) => {
-  const response = await request<Blog>('admin/blogs', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-
-  if (!response) {
-    throw new Error('خطایی در ایجاد بلاگ رخ داده است');
-  }
-
-  return response;
-};
-
-export const updateBlog = async (id: number | string, data: Partial<Blog>) => {
-  const response = await request<Blog>(`admin/blogs/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
-
-  if (!response) {
-    throw new Error('خطایی در بروزرسانی بلاگ رخ داده است');
-  }
-
-  return response;
-};
-
-export const deleteBlog = async (id: number | string) => {
-  const response = await request<Blog>(`admin/blogs/${id}`, {
-    method: 'DELETE',
-  });
-
-  if (!response) {
-    throw new Error('خطایی در حذف بلاگ رخ داده است');
-  }
-
-  return response;
+  deleteBlog: async (id: number | string): Promise<Blog> => {
+    return await ApiService.delete<Blog>(`admin/blogs/${id}`);
+  },
 };

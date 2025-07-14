@@ -2,27 +2,28 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getBlog, createBlog, updateBlog } from '@/app/lib/api/admin/blogs';
+import  {blogService} from '@/app/lib/api/admin/blogs';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
-const blogSchema = z.object({
-  title: z.string().min(1, 'عنوان الزامی است'),
-  little_description: z.string().min(1, 'توضیحات کوتاه الزامی است'),
-  description: z.string().min(1, 'توضیحات الزامی است'),
-  meta_title: z.string().min(1, 'عنوان متا الزامی است'),
-  meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
-  slug: z.string().min(1, 'اسلاگ الزامی است'),
+import {z} from "zod";
+import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
+
+
+const schema = z.object({
+  title: z.string().optional(),
+  little_description: z.string().min(1),
+  description: z.string().min(1),
+  meta_title: z.string().min(1),
+  meta_description: z.string().min(1),
+  slug: z.string().min(1),
 });
 
-type BlogFormData = z.infer<typeof blogSchema>;
+type FormData = z.infer<typeof schema>;
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -34,26 +35,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    reset,
-  } = useForm<BlogFormData>({
-    resolver: zodResolver(blogSchema),
-  });
+    submitWithErrorHandling,
+  } = useFormWithBackendErrors<FormData>(schema);
 
   useEffect(() => {
     const fetchBlog = async () => {
       if (isNew) return;
 
       try {
-        const blog = await getBlog(resolvedParams.id);
-        reset({
-          title: blog.title,
-          description: blog.description,
-          little_description: blog.little_description,
-          meta_title: blog.meta_title,
-          meta_description: blog.meta_description,
-          slug: blog.slug,
-        });
+       await blogService.getBlog(resolvedParams.id);
       } catch (error) {
+        toast.success('بلاگ با موفقیت ایجاد شد');
         router.push('/admin/blogs');
       } finally {
         setLoading(false);
@@ -61,21 +53,25 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     fetchBlog();
-  }, [isNew, resolvedParams.id, reset, router]);
+  }, [isNew, resolvedParams.id, router]);
 
-  const onSubmit = async (data: BlogFormData) => {
+  const onSubmit = async (data: FormData) => {
     try {
       if (isNew) {
-        await createBlog(data);
+        await blogService.createBlog(data);
         toast.success('بلاگ با موفقیت ایجاد شد');
       } else {
-        await updateBlog(resolvedParams.id, data);
+        await blogService.updateBlog(resolvedParams.id, data);
         toast.success('بلاگ با موفقیت بروزرسانی شد');
       }
       router.push('/admin/blogs');
     } catch (error) {
       toast.error(isNew ? 'خطا در ایجاد بلاگ' : 'خطا در بروزرسانی بلاگ');
     }
+  };
+
+   const handleError = (error: any) => {
+    console.error('Blog form submission error:', error);
   };
 
   if (loading) {
@@ -95,7 +91,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+      <form onSubmit={handleSubmit(submitWithErrorHandling(onSubmit , handleError))}  className="mt-8 space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
             id="title"
