@@ -52,6 +52,7 @@ export default function Page() {
       accessor: 'created_by',
       render: (value, item) => {
         if (!value || !item.created_by) return '-';
+        
         const name =
           users.find((t) => t.id.toString() === value.toString())?.first_name +
           ' ' +
