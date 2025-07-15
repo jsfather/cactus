@@ -34,18 +34,38 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
     submitWithErrorHandling,
+    globalError,
+    setGlobalError,
   } = useFormWithBackendErrors<FormData>(schema);
+
+  // Watch for global error changes and show toast
+  useEffect(() => {
+    if (globalError) {
+      toast.error(globalError);
+      setGlobalError(null); // Clear after showing
+    }
+  }, [globalError, setGlobalError]);
 
   useEffect(() => {
     const fetchBlog = async () => {
       if (isNew) return;
 
       try {
-       await blogService.getBlog(resolvedParams.id);
+        const blog = await blogService.getBlog(resolvedParams.id);
+        
+        // Set form values with the fetched blog data
+        setValue('title', blog.title || '');
+        setValue('little_description', blog.little_description || '');
+        setValue('description', blog.description || '');
+        setValue('meta_title', blog.meta_title || '');
+        setValue('meta_description', blog.meta_description || '');
+        setValue('slug', blog.slug || '');
+        
       } catch (error) {
-        toast.success('بلاگ با موفقیت ایجاد شد');
+        toast.error('خطا در بارگیری اطلاعات بلاگ');
         router.push('/admin/blogs');
       } finally {
         setLoading(false);
@@ -53,7 +73,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     fetchBlog();
-  }, [isNew, resolvedParams.id, router]);
+  }, [isNew, resolvedParams.id, router, setValue]);
 
   const onSubmit = async (data: FormData) => {
     if (isNew) {
@@ -68,10 +88,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const handleError = (error: any) => {
     console.error('Blog form submission error:', error);
-    
-    // Show the global error message in toast
-    const message = error.message || (isNew ? 'خطا در ایجاد بلاگ' : 'خطا در بروزرسانی بلاگ');
-    toast.error(message);
+    // The useEffect will handle showing the toast when globalError changes
   };
 
   if (loading) {

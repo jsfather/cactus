@@ -93,7 +93,11 @@ export function useFormWithBackendErrors<T extends FieldValues>(
           
           // Handle validation errors (422) - your ApiError.errors contains the field errors
           if (error.status === 422 && error.errors) {
+             setGlobalError(error.message);
             setBackendErrors(error.errors as any); // error.errors is the object format from backend
+          } else {
+            // Handle other API errors - set global error for toast
+            setGlobalError(error.message);
           }
           
           // Always call onError for toast message
