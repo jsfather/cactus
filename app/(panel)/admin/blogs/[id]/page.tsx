@@ -3,24 +3,24 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import  {blogService} from '@/app/lib/api/admin/blogs';
+import { blogService } from '@/app/lib/api/admin/blogs';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
-import {z} from "zod";
+import { z } from 'zod';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-
+import { FormErrorAlert } from '@/app/components/FormErrorAlert';
 
 const schema = z.object({
   title: z.string().optional(),
-  little_description: z.string().min(1, 'توضیحات کوتاه الزامی است'),
-  description: z.string().min(1, 'توضیحات الزامی است'),
-  meta_title: z.string().min(1, 'عنوان متا الزامی است'),
-  meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
-  slug: z.string().min(1, 'اسلاگ الزامی است'),
+  little_description: z.string().min(1),
+  description: z.string().min(1),
+  meta_title: z.string().min(1),
+  meta_description: z.string().min(1),
+  slug: z.string().min(1),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -34,38 +34,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors, isSubmitting },
     submitWithErrorHandling,
     globalError,
     setGlobalError,
   } = useFormWithBackendErrors<FormData>(schema);
 
-  // Watch for global error changes and show toast
-  useEffect(() => {
-    if (globalError) {
-      toast.error(globalError);
-      setGlobalError(null); // Clear after showing
-    }
-  }, [globalError, setGlobalError]);
-
   useEffect(() => {
     const fetchBlog = async () => {
       if (isNew) return;
 
       try {
-        const blog = await blogService.getBlog(resolvedParams.id);
-        
-        // Set form values with the fetched blog data
-        setValue('title', blog.title || '');
-        setValue('little_description', blog.little_description || '');
-        setValue('description', blog.description || '');
-        setValue('meta_title', blog.meta_title || '');
-        setValue('meta_description', blog.meta_description || '');
-        setValue('slug', blog.slug || '');
-        
+        await blogService.getBlog(resolvedParams.id);
       } catch (error) {
-        toast.error('خطا در بارگیری اطلاعات بلاگ');
+        toast.success('بلاگ با موفقیت ایجاد شد');
         router.push('/admin/blogs');
       } finally {
         setLoading(false);
@@ -73,22 +55,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     fetchBlog();
-  }, [isNew, resolvedParams.id, router, setValue]);
+  }, [isNew, resolvedParams.id, router]);
 
   const onSubmit = async (data: FormData) => {
     if (isNew) {
-      await blogService.createBlog(data);
-      toast.success('بلاگ با موفقیت ایجاد شد');
+      const result = await blogService.createBlog(data);
+      console.log('User created successfully:', result);
     } else {
-      await blogService.updateBlog(resolvedParams.id, data);
-      toast.success('بلاگ با موفقیت بروزرسانی شد');
+      const result = await blogService.updateBlog(resolvedParams.id, data);
+      console.log('User created successfully:', result);
     }
-    router.push('/admin/blogs');
   };
+  
 
-  const handleError = (error: any) => {
+   const handleError = (error: any) => {
     console.error('Blog form submission error:', error);
-    // The useEffect will handle showing the toast when globalError changes
   };
 
   if (loading) {
@@ -108,7 +89,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form onSubmit={handleSubmit(submitWithErrorHandling(onSubmit , handleError))}  className="mt-8 space-y-6">
+      <FormErrorAlert
+        error={globalError} 
+        onClose={() => setGlobalError(null)} 
+      />
+
+      <form
+        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
+        className="mt-8 space-y-6"
+      >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
             id="title"
