@@ -1,60 +1,111 @@
-// hooks/useFormWithBackendErrors.ts
 import { useForm, UseFormReturn, FieldValues, Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
+import { ApiError, BackendError } from '@/app/lib/api/client';
 
-// Type for backend error response
-interface BackendError {
-  field: string;
-  message: string;
+// hooks/useAuthErrorHandler.ts
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
+export function useAuthErrorHandler() {
+  const router = useRouter();
+
+  const handleAuthError = (error: ApiError) => {
+    if (error.status === 401) {
+      // Clear any stored auth data
+      localStorage.removeItem('authToken');
+      
+      // Redirect to login page
+      router.push('/login');
+      
+      // Optionally show a toast notification
+      // toast.error('جلسه شما منقضی شده است. لطفاً مجدداً وارد شوید');
+    }
+  };
+
+  return { handleAuthError };
 }
 
-interface BackendErrorResponse {
-  errors: BackendError[];
-}
-
-// Generic hook for forms with backend error handling
+// Enhanced hook with auth error handling
 export function useFormWithBackendErrors<T extends FieldValues>(
   schema: z.ZodSchema<T>
 ): UseFormReturn<T> & {
-  setBackendErrors: (errors: BackendError[]) => void;
+  setBackendErrors: (errors: BackendError[] | Record<string, string[]>) => void;
   clearBackendErrors: () => void;
   submitWithErrorHandling: (
     onSubmit: (data: T) => Promise<void>,
-    onError?: (error: any) => void
+    onError?: (error: ApiError) => void
   ) => (data: T) => Promise<void>;
+  globalError: string | null;
+  setGlobalError: (error: string | null) => void;
 } {
   const form = useForm<T>({
     resolver: zodResolver(schema),
   });
 
-  const setBackendErrors = (errors: BackendError[]) => {
-    errors.forEach((error) => {
-      form.setError(error.field as Path<T>, {
-        type: 'server',
-        message: error.message,
+  const [globalError, setGlobalError] = useState<string | null>(null);
+  const { handleAuthError } = useAuthErrorHandler();
+
+  const setBackendErrors = (errors: BackendError[] | Record<string, string[]>) => {
+    // Handle array format: [{field: "title", message: "error"}]
+    if (Array.isArray(errors)) {
+      errors.forEach((error) => {
+        form.setError(error.field as Path<T>, {
+          type: 'server',
+          message: error.message,
+        });
       });
-    });
+    } 
+    // Handle object format: {title: ["error1", "error2"], slug: ["error"]}
+    else if (typeof errors === 'object') {
+      Object.entries(errors).forEach(([field, messages]) => {
+        if (Array.isArray(messages) && messages.length > 0) {
+          form.setError(field as Path<T>, {
+            type: 'server',
+            message: messages[0], // Use first error message
+          });
+        }
+      });
+    }
   };
 
   const clearBackendErrors = () => {
     form.clearErrors();
+    setGlobalError(null);
   };
 
   const submitWithErrorHandling = (
     onSubmit: (data: T) => Promise<void>,
-    onError?: (error: any) => void
+    onError?: (error: ApiError) => void
   ) => {
     return async (data: T) => {
       try {
         clearBackendErrors();
         await onSubmit(data);
       } catch (error: any) {
-        if (error.response?.data?.errors) {
-          setBackendErrors(error.response.data.errors);
-        } else if (onError) {
-          onError(error);
+        if (error instanceof ApiError) {
+          // Handle authentication errors globally
+          if (error.status === 401) {
+            handleAuthError(error);
+            return;
+          }
+          
+          // Handle validation errors (422) - your ApiError.errors contains the field errors
+          if (error.status === 422 && error.errors) {
+            setBackendErrors(error.errors as any); // error.errors is the object format from backend
+          }
+          
+          // Always call onError for toast message
+          if (onError) {
+            onError(error);
+          }
+        } else {
+          // Handle non-API errors
+          setGlobalError('خطای غیرمنتظره‌ای رخ داده است');
+          if (onError) {
+            onError(error);
+          }
         }
       }
     };
@@ -65,29 +116,7 @@ export function useFormWithBackendErrors<T extends FieldValues>(
     setBackendErrors,
     clearBackendErrors,
     submitWithErrorHandling,
+    globalError,
+    setGlobalError,
   };
-}
-
-// API service helper
-export class ApiService {
-  static async post<T>(url: string, data: any): Promise<T> {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw {
-        response: {
-          data: errorData,
-        },
-      };
-    }
-
-    return response.json();
-  }
 }

@@ -16,11 +16,11 @@ import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
 
 const schema = z.object({
   title: z.string().optional(),
-  little_description: z.string().min(1),
-  description: z.string().min(1),
-  meta_title: z.string().min(1),
-  meta_description: z.string().min(1),
-  slug: z.string().min(1),
+  little_description: z.string().min(1, 'توضیحات کوتاه الزامی است'),
+  description: z.string().min(1, 'توضیحات الزامی است'),
+  meta_title: z.string().min(1, 'عنوان متا الزامی است'),
+  meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
+  slug: z.string().min(1, 'اسلاگ الزامی است'),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -56,22 +56,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }, [isNew, resolvedParams.id, router]);
 
   const onSubmit = async (data: FormData) => {
-    try {
-      if (isNew) {
-        await blogService.createBlog(data);
-        toast.success('بلاگ با موفقیت ایجاد شد');
-      } else {
-        await blogService.updateBlog(resolvedParams.id, data);
-        toast.success('بلاگ با موفقیت بروزرسانی شد');
-      }
-      router.push('/admin/blogs');
-    } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد بلاگ' : 'خطا در بروزرسانی بلاگ');
+    if (isNew) {
+      await blogService.createBlog(data);
+      toast.success('بلاگ با موفقیت ایجاد شد');
+    } else {
+      await blogService.updateBlog(resolvedParams.id, data);
+      toast.success('بلاگ با موفقیت بروزرسانی شد');
     }
+    router.push('/admin/blogs');
   };
 
-   const handleError = (error: any) => {
+  const handleError = (error: any) => {
     console.error('Blog form submission error:', error);
+    
+    // Show the global error message in toast
+    const message = error.message || (isNew ? 'خطا در ایجاد بلاگ' : 'خطا در بروزرسانی بلاگ');
+    toast.error(message);
   };
 
   if (loading) {
