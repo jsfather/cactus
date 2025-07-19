@@ -64,7 +64,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       end_date: '',
       type: 'normal',
       capacity: '',
-    }
+    },
   });
 
   useEffect(() => {

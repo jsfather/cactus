@@ -157,37 +157,170 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input id="first_name" label="نام" required error={errors.first_name?.message} {...register('first_name')} />
-          <Input id="last_name" label="نام خانوادگی" required error={errors.last_name?.message} {...register('last_name')} />
-          <Input id="username" label="نام کاربری" required error={errors.username?.message} {...register('username')} />
-          <Input id="phone" label="شماره موبایل" required error={errors.phone?.message} {...register('phone')} />
-          <Input id="email" label="ایمیل" error={errors.email?.message} {...register('email')} />
-          <Input id="national_code" label="کد ملی" required error={errors.national_code?.message} {...register('national_code')} />
-          <Input id="password" label="رمز عبور" type="password" required error={errors.password?.message} {...register('password')} />
-          <Input id="level_id" label="سطح" required error={errors.level_id?.message} {...register('level_id')} />
-          <Input id="father_name" label="نام پدر" required error={errors.father_name?.message} {...register('father_name')} />
-          <Input id="mother_name" label="نام مادر" required error={errors.mother_name?.message} {...register('mother_name')} />
-          <Input id="father_job" label="شغل پدر" required error={errors.father_job?.message} {...register('father_job')} />
-          <Input id="mother_job" label="شغل مادر" required error={errors.mother_job?.message} {...register('mother_job')} />
-          <Input id="has_allergy" label="آلرژی دارد؟ (۰/۱)" required error={errors.has_allergy?.message} {...register('has_allergy')} />
-          <Input id="allergy_details" label="توضیحات آلرژی" error={errors.allergy_details?.message} {...register('allergy_details')} />
-          <Input id="interest_level" label="سطح علاقه" required error={errors.interest_level?.message} {...register('interest_level')} />
-          <Input id="focus_level" label="سطح تمرکز" required error={errors.focus_level?.message} {...register('focus_level')} />
+          <Input
+            id="first_name"
+            label="نام"
+            required
+            error={errors.first_name?.message}
+            {...register('first_name')}
+          />
+          <Input
+            id="last_name"
+            label="نام خانوادگی"
+            required
+            error={errors.last_name?.message}
+            {...register('last_name')}
+          />
+          <Input
+            id="username"
+            label="نام کاربری"
+            required
+            error={errors.username?.message}
+            {...register('username')}
+          />
+          <Input
+            id="phone"
+            label="شماره موبایل"
+            required
+            error={errors.phone?.message}
+            {...register('phone')}
+          />
+          <Input
+            id="email"
+            label="ایمیل"
+            error={errors.email?.message}
+            {...register('email')}
+          />
+          <Input
+            id="national_code"
+            label="کد ملی"
+            required
+            error={errors.national_code?.message}
+            {...register('national_code')}
+          />
+          <Input
+            id="password"
+            label="رمز عبور"
+            type="password"
+            required
+            error={errors.password?.message}
+            {...register('password')}
+          />
+          <Input
+            id="level_id"
+            label="سطح"
+            required
+            error={errors.level_id?.message}
+            {...register('level_id')}
+          />
+          <Input
+            id="father_name"
+            label="نام پدر"
+            required
+            error={errors.father_name?.message}
+            {...register('father_name')}
+          />
+          <Input
+            id="mother_name"
+            label="نام مادر"
+            required
+            error={errors.mother_name?.message}
+            {...register('mother_name')}
+          />
+          <Input
+            id="father_job"
+            label="شغل پدر"
+            required
+            error={errors.father_job?.message}
+            {...register('father_job')}
+          />
+          <Input
+            id="mother_job"
+            label="شغل مادر"
+            required
+            error={errors.mother_job?.message}
+            {...register('mother_job')}
+          />
+          <Input
+            id="has_allergy"
+            label="آلرژی دارد؟ (۰/۱)"
+            required
+            error={errors.has_allergy?.message}
+            {...register('has_allergy')}
+          />
+          <Input
+            id="allergy_details"
+            label="توضیحات آلرژی"
+            error={errors.allergy_details?.message}
+            {...register('allergy_details')}
+          />
+          <Input
+            id="interest_level"
+            label="سطح علاقه"
+            required
+            error={errors.interest_level?.message}
+            {...register('interest_level')}
+          />
+          <Input
+            id="focus_level"
+            label="سطح تمرکز"
+            required
+            error={errors.focus_level?.message}
+            {...register('focus_level')}
+          />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <FileUpload id="profile_picture" label="عکس پروفایل" accept="image/*" error={errors.profile_picture?.message} register={register('profile_picture')} />
-          <FileUpload id="national_card" label="کارت ملی" accept="image/*" error={errors.national_card?.message} register={register('national_card')} />
-          <FileUpload id="certificate" label="مدرک" accept="image/*,.pdf" error={errors.certificate?.message} register={register('certificate')} />
+          <FileUpload
+            id="profile_picture"
+            label="عکس پروفایل"
+            accept="image/*"
+            error={errors.profile_picture?.message}
+            register={register('profile_picture')}
+          />
+          <FileUpload
+            id="national_card"
+            label="کارت ملی"
+            accept="image/*"
+            error={errors.national_card?.message}
+            register={register('national_card')}
+          />
+          <FileUpload
+            id="certificate"
+            label="مدرک"
+            accept="image/*,.pdf"
+            error={errors.certificate?.message}
+            register={register('certificate')}
+          />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input id="birth_date" label="تاریخ تولد" required error={errors.birth_date?.message} {...register('birth_date')} />
+          <Input
+            id="birth_date"
+            label="تاریخ تولد"
+            required
+            error={errors.birth_date?.message}
+            {...register('birth_date')}
+          />
         </div>
         <div className="w-full">
-          <Textarea id="bio" label="بیوگرافی" required error={errors.bio?.message} {...register('bio')} />
+          <Textarea
+            id="bio"
+            label="بیوگرافی"
+            required
+            error={errors.bio?.message}
+            {...register('bio')}
+          />
         </div>
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="white" onClick={() => router.push('/admin/teachers')}>انصراف</Button>
-          <Button type="submit" loading={isSubmitting}>{isNew ? 'ایجاد مدرس' : 'بروزرسانی مدرس'}</Button>
+          <Button
+            type="button"
+            variant="white"
+            onClick={() => router.push('/admin/teachers')}
+          >
+            انصراف
+          </Button>
+          <Button type="submit" loading={isSubmitting}>
+            {isNew ? 'ایجاد مدرس' : 'بروزرسانی مدرس'}
+          </Button>
         </div>
       </form>
     </main>

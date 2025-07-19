@@ -54,7 +54,7 @@ export function useFormWithBackendErrors<T extends FieldValues>(
             // Handle other API errors
             setGlobalError(error.message);
           }
-          
+
           if (onError) {
             onError(error);
           }

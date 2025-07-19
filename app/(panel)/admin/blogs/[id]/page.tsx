@@ -66,9 +66,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       console.log('User created successfully:', result);
     }
   };
-  
 
-   const handleError = (error: any) => {
+  const handleError = (error: any) => {
     console.error('Blog form submission error:', error);
   };
 
@@ -90,8 +89,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       />
 
       <FormErrorAlert
-        error={globalError} 
-        onClose={() => setGlobalError(null)} 
+        error={globalError}
+        onClose={() => setGlobalError(null)}
       />
 
       <form

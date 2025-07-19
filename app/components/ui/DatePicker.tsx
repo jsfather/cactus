@@ -2,10 +2,10 @@
 
 import { forwardRef } from 'react';
 import clsx from 'clsx';
-import DatePicker from "react-multi-date-picker";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
-import DateObject from "react-date-object";
+import DatePicker from 'react-multi-date-picker';
+import persian from 'react-date-object/calendars/persian';
+import persian_fa from 'react-date-object/locales/persian_fa';
+import DateObject from 'react-date-object';
 
 interface DatePickerProps {
   label?: string;
@@ -22,19 +22,22 @@ interface DatePickerProps {
 }
 
 const DatePickerComponent = forwardRef<HTMLInputElement, DatePickerProps>(
-  ({ 
-    label, 
-    error, 
-    required, 
-    value, 
-    onChange, 
-    onBlur,
-    name,
-    placeholder = "تاریخ را انتخاب کنید",
-    className,
-    disabled,
-    id,
-  }, ref) => {
+  (
+    {
+      label,
+      error,
+      required,
+      value,
+      onChange,
+      onBlur,
+      name,
+      placeholder = 'تاریخ را انتخاب کنید',
+      className,
+      disabled,
+      id,
+    },
+    ref
+  ) => {
     console.log('DatePicker value prop:', value);
 
     const handleDateChange = (date: any) => {
@@ -45,7 +48,7 @@ const DatePickerComponent = forwardRef<HTMLInputElement, DatePickerProps>(
         const day = String(date.day).padStart(2, '0');
         const formattedDate = `${year}-${month}-${day}`;
         console.log('DatePicker onChange:', formattedDate);
-        
+
         // Call react-hook-form onChange
         if (onChange) {
           onChange(formattedDate);
@@ -72,7 +75,7 @@ const DatePickerComponent = forwardRef<HTMLInputElement, DatePickerProps>(
         month: month,
         day,
         calendar: persian,
-        locale: persian_fa
+        locale: persian_fa,
       });
     };
 
@@ -96,7 +99,7 @@ const DatePickerComponent = forwardRef<HTMLInputElement, DatePickerProps>(
             onChange={() => {}} // Controlled by DatePicker
             style={{ display: 'none' }}
           />
-          
+
           <DatePicker
             calendar={persian}
             locale={persian_fa}
@@ -106,8 +109,8 @@ const DatePickerComponent = forwardRef<HTMLInputElement, DatePickerProps>(
             placeholder={placeholder}
             disabled={disabled}
             className={'custom-rmdp'}
-            calendarPosition='bottom-end'
-            containerClassName='w-full'
+            calendarPosition="bottom-end"
+            containerClassName="w-full"
             inputClass={clsx(
               'w-full rounded-lg border px-4 py-3 text-sm transition-all outline-none',
               'bg-white dark:bg-gray-900',

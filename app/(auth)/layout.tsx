@@ -39,7 +39,7 @@ export default function Layout({
 
         <div className="text-center">
           <h1 className="from-primary-600 to-primary-800 mb-2 bg-gradient-to-l bg-clip-text text-3xl font-bold text-transparent">
-            به مجموعه کاکتوس خوش آمدید
+            به شرکت کاکتوس خوش آمدید
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             برای ادامه وارد حساب کاربری خود شوید

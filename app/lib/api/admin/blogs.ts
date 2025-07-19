@@ -14,7 +14,10 @@ export const blogService = {
     return await ApiService.post<Blog>('admin/blogs', data);
   },
 
-  updateBlog: async (id: number | string, data: Partial<Blog>): Promise<Blog> => {
+  updateBlog: async (
+    id: number | string,
+    data: Partial<Blog>
+  ): Promise<Blog> => {
     return await ApiService.put<Blog>(`admin/blogs/${id}`, data);
   },
 

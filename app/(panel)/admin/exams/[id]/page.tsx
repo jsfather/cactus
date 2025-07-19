@@ -101,9 +101,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   };
 
   // Create term options for the select dropdown
-  const termOptions = terms.map(term => ({
+  const termOptions = terms.map((term) => ({
     value: term.id.toString(),
-    label: term.title
+    label: term.title,
   }));
 
   if (loading || termsLoading) {

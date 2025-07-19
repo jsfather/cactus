@@ -19,7 +19,12 @@ export class ApiError extends Error {
   public errors?: BackendError[];
   public response: Response;
 
-  constructor(message: string, status: number, response: Response, errors?: BackendError[]) {
+  constructor(
+    message: string,
+    status: number,
+    response: Response,
+    errors?: BackendError[]
+  ) {
     super(message);
     this.name = 'ApiError';
     this.status = status;
@@ -49,12 +54,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}/${path}`, {
     ...options,
     headers,
-    redirect: 'manual'
+    redirect: 'manual',
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    
+
     // Handle validation errors (422) vs other errors
     if (response.status === 422 && errorData.errors) {
       throw new ApiError(
@@ -64,7 +69,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         errorData.errors
       );
     }
-    
+
     throw new ApiError(
       errorData.message || 'خطایی رخ داده است',
       response.status,
@@ -81,7 +86,11 @@ export class ApiService {
     return request<T>(path, { ...options, method: 'GET' });
   }
 
-  static async post<T>(path: string, data?: any, options: RequestInit = {}): Promise<T> {
+  static async post<T>(
+    path: string,
+    data?: any,
+    options: RequestInit = {}
+  ): Promise<T> {
     return request<T>(path, {
       ...options,
       method: 'POST',
@@ -89,7 +98,11 @@ export class ApiService {
     });
   }
 
-  static async put<T>(path: string, data?: any, options: RequestInit = {}): Promise<T> {
+  static async put<T>(
+    path: string,
+    data?: any,
+    options: RequestInit = {}
+  ): Promise<T> {
     return request<T>(path, {
       ...options,
       method: 'PUT',
@@ -97,7 +110,11 @@ export class ApiService {
     });
   }
 
-  static async patch<T>(path: string, data?: any, options: RequestInit = {}): Promise<T> {
+  static async patch<T>(
+    path: string,
+    data?: any,
+    options: RequestInit = {}
+  ): Promise<T> {
     return request<T>(path, {
       ...options,
       method: 'PATCH',

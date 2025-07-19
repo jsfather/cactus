@@ -37,8 +37,7 @@ export default function Page() {
     {
       header: 'سطح',
       accessor: 'level' as keyof Term,
-      render: (value: any) =>
-        value?.label || '',
+      render: (value: any) => value?.label || '',
     },
     {
       header: 'تاریخ شروع',
