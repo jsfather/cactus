@@ -74,7 +74,7 @@ export default function Page() {
   return (
     <div
       dir="rtl"
-      className="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100"
+      className="min-h-screen bg-white pt-20 text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
       {/* Breadcrumb */}
       <div className="border-b dark:border-gray-800">

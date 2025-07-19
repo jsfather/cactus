@@ -7,10 +7,10 @@ export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 overflow-y-auto p-4">{children}</main>
+      <main className="flex-1">{children}</main>
       <Footer />
-    </>
+    </div>
   );
 }

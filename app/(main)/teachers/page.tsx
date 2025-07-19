@@ -89,30 +89,28 @@ const teachers: Teacher[] = [
 export default function Page() {
   return (
     <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-gray-50 to-white py-12 dark:from-gray-800 dark:to-gray-900">
+      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-3xl text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <h1 className="mb-4 text-4xl font-bold">
-                مربیان برتر آکادمی کاکتوس
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300">
-                با بهترین اساتید و متخصصان در حوزه‌های مختلف فناوری آشنا شوید.
-                مربیان ما با تجربه عملی و دانش تخصصی، مسیر یادگیری شما را هموار
-                می‌کنند.
-              </p>
-            </motion.div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mx-auto max-w-4xl text-center"
+          >
+            <h1 className="mb-6 text-4xl font-bold">
+              مربیان
+              <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
+                {' '}
+                کاکتوس
+              </span>
+            </h1>
+            <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
+              با بهترین اساتید و متخصصان در حوزه‌های مختلف فناوری آشنا شوید
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* Teachers Grid */}
-      <section className="py-16">
+      <section className="py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {teachers.map((teacher, index) => (

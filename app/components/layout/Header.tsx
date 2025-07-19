@@ -20,6 +20,7 @@ const menuItems = [
   { title: 'وبلاگ', href: '/blog' },
   { title: 'فروشگاه', href: '/shop' },
   { title: 'گواهینامه ها و افتخارات', href: '/certifications' },
+  { title: 'نرم‌افزارهای مورد نیاز', href: '/requirements' },
 ];
 
 export default function Header() {
@@ -51,8 +52,6 @@ export default function Header() {
 
     // Special case for index routes (e.g., /shop matches /shop)
     return href !== '/' && pathname === href.slice(0, -1);
-
-
   };
 
   return (
@@ -67,7 +66,7 @@ export default function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsDrawerOpen(true)}
-              className="cursor-pointer text-gray-600 hover:text-gray-900 lg:hidden dark:text-gray-300 dark:hover:text-white"
+              className="cursor-pointer rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:hidden dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
             >
               <Menu className="h-6 w-6" />
             </button>
@@ -80,18 +79,19 @@ export default function Header() {
                   width={56}
                   height={56}
                   priority
+                  className="transition-all duration-300 dark:brightness-0 dark:invert"
                 />
                 <span className="from-primary-600 to-primary-800 mx-2 hidden bg-gradient-to-l bg-clip-text text-2xl font-black text-transparent lg:block">
                   کاکتوس
                 </span>
               </Link>
 
-              <nav className="hidden items-center gap-6 lg:flex">
-                {menuItems.map((item) => (
+              <nav className="hidden items-center gap-4 lg:flex xl:gap-6">
+                {menuItems.slice(0, 5).map((item) => (
                   <Link
                     key={item.title}
                     href={item.href}
-                    className={`font-medium transition-colors duration-200 ${
+                    className={`text-sm font-medium transition-colors duration-200 xl:text-base ${
                       isActive(item.href)
                         ? 'text-primary-600 dark:text-primary-400'
                         : 'hover:text-primary-600 dark:hover:text-primary-400 text-gray-900 dark:text-gray-100'
@@ -100,6 +100,47 @@ export default function Header() {
                     {item.title}
                   </Link>
                 ))}
+
+                {/* More menu for additional items */}
+                {menuItems.length > 5 && (
+                  <div className="group relative">
+                    <button className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm font-medium text-gray-900 transition-colors duration-200 xl:text-base dark:text-gray-100">
+                      بیشتر
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+
+                    {/* Dropdown menu */}
+                    <div className="invisible absolute top-full right-0 z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
+                      <div className="py-2">
+                        {menuItems.slice(5).map((item) => (
+                          <Link
+                            key={item.title}
+                            href={item.href}
+                            className={`block px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                              isActive(item.href)
+                                ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                                : 'text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-700'
+                            }`}
+                          >
+                            {item.title}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </nav>
             </div>
 

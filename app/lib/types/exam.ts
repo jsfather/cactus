@@ -7,4 +7,5 @@ export interface Exam {
   term_id: number | null;
   created_at: string;
   updated_at: string;
+  created_by: number;
 }

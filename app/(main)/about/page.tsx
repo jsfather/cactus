@@ -9,6 +9,8 @@ import {
   Instagram,
   Twitter,
   Facebook,
+  Linkedin,
+  Youtube,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -246,7 +248,7 @@ export default function Page() {
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-start space-x-4 space-x-reverse"
+                    className="flex items-start space-x-4"
                   >
                     <div className="text-primary-600 dark:text-primary-400 mt-1">
                       {info.icon}
@@ -267,16 +269,18 @@ export default function Page() {
                   </motion.div>
                 ))}
 
-                <div className="flex gap-2 space-x-reverse">
-                  {[Instagram, Twitter, Facebook].map((Icon, index) => (
-                    <a
-                      key={index}
-                      href="#"
-                      className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
-                    >
-                      <Icon className="h-6 w-6" />
-                    </a>
-                  ))}
+                <div className="flex items-center justify-around gap-2">
+                  {[Instagram, Twitter, Facebook, Linkedin, Youtube].map(
+                    (Icon, index) => (
+                      <a
+                        key={index}
+                        href="#"
+                        className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+                      >
+                        <Icon className="h-6 w-6" />
+                      </a>
+                    )
+                  )}
                 </div>
               </div>
 

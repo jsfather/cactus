@@ -155,8 +155,6 @@ export default function Sidebar({
 
     // Special case for index routes (e.g., /shop matches /shop)
     return href !== '/' && pathname === href.slice(0, -1);
-
-
   };
 
   // Check if avatar URL is valid
