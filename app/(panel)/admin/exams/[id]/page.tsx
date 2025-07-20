@@ -187,17 +187,30 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           />
         </div>
 
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="white"
-            onClick={() => router.push('/admin/exams')}
-          >
-            انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            {isNew ? 'ایجاد آزمون' : 'بروزرسانی آزمون'}
-          </Button>
+        <div className="flex justify-between">
+          <div>
+            {!isNew && (
+              <Button
+                type="button"
+                variant="info"
+                onClick={() => router.push(`/admin/exams/${resolvedParams.id}/questions`)}
+              >
+                مدیریت سوالات
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              variant="white"
+              onClick={() => router.push('/admin/exams')}
+            >
+              انصراف
+            </Button>
+            <Button type="submit" loading={isSubmitting}>
+              {isNew ? 'ایجاد آزمون' : 'بروزرسانی آزمون'}
+            </Button>
+          </div>
         </div>
       </form>
     </main>

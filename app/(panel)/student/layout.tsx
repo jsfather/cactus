@@ -35,6 +35,16 @@ const menuItems = [
     ],
   },
   {
+    title: 'آزمون‌ها',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'آزمون تعیین سطح',
+        href: '/student/placement-exam',
+      },
+    ],
+  },
+  {
     title: 'ارتباطات',
     isGroupTitle: true,
     subItems: [

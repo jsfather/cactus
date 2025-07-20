@@ -1,5 +1,6 @@
 export * from './blog';
 export * from './exam';
+export * from './placement-exam';
 export * from './file';
 export * from './homework';
 export * from './term';
