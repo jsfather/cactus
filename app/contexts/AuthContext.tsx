@@ -102,6 +102,9 @@ const PUBLIC_ROUTES = [
   '/send-otp',
   '/verify-otp',
   '/onboarding',
+  '/onboarding/user-info',
+  '/onboarding/document-upload',
+  '/unauthorized',
 ];
 
 interface AuthProviderProps {

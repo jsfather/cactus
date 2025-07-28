@@ -35,6 +35,9 @@ export default function VerifyOtpPage() {
       );
       localStorage.setItem('authToken', result.token);
       await refetch();
+
+      // کاربر را به صفحه onboarding هدایت می‌کنیم
+      // AuthContext خودش کاربر را به صفحه مناسب هدایت خواهد کرد
       router.push('/onboarding/user-info');
     } catch (error: unknown) {
       const errorMessage =

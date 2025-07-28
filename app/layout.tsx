@@ -3,6 +3,7 @@ import '@/app/globals.css';
 import { dana, danaFaNum } from '@/app/fonts';
 import { CartProvider } from '@/app/contexts/CartContext';
 import { AuthProvider } from '@/app/contexts/AuthContext';
+import { AuthRedirectHandler } from '@/app/components/AuthRedirectHandler';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
@@ -52,6 +53,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
+          <AuthRedirectHandler />
           <CartProvider>{children}</CartProvider>
         </AuthProvider>
       </body>
