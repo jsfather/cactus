@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import '@/app/globals.css';
 import { dana, danaFaNum } from '@/app/fonts';
 import { CartProvider } from '@/app/contexts/CartContext';
+import { AuthProvider } from '@/app/contexts/AuthContext';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
@@ -50,7 +51,9 @@ export default function RootLayout({
         className={`${danaFaNum.variable} ${dana.variable} font-dana-fanum min-h-screen bg-white text-gray-900 antialiased transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100`}
         suppressHydrationWarning
       >
-        <CartProvider>{children}</CartProvider>
+        <AuthProvider>
+          <CartProvider>{children}</CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

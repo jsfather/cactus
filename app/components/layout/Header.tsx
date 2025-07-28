@@ -11,25 +11,69 @@ import DarkModeToggle from '@/app/components/ui/DarkModeToggle';
 import { Menu, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@/app/hooks/useUser';
+import { useAuth } from '@/app/contexts/AuthContext';
 import { CartMenu } from '@/app/components/layout/CartMenu';
+import { RoleBasedComponent } from '@/app/components/RoleBasedComponent';
 
-const menuItems = [
+interface MenuItem {
+  title: string;
+  href: string;
+}
+
+// منوهای عمومی که همه می‌توانند ببینند
+const publicMenuItems: MenuItem[] = [
   { title: 'دوره‌ها', href: '/courses' },
   { title: 'مربیان', href: '/teachers' },
   { title: 'درباره ما', href: '/about' },
   { title: 'وبلاگ', href: '/blog' },
+];
+
+// منوهای خاص دانشجویان
+const studentMenuItems: MenuItem[] = [
+  ...publicMenuItems,
   { title: 'فروشگاه', href: '/shop' },
   { title: 'گواهینامه ها و افتخارات', href: '/certifications' },
   { title: 'نرم‌افزارهای مورد نیاز', href: '/requirements' },
 ];
 
+// منوهای خاص مدیران
+const adminMenuItems: MenuItem[] = [
+  ...publicMenuItems,
+  { title: 'پنل مدیریت', href: '/admin' },
+];
+
+// منوهای خاص مدیران محدود
+const managerMenuItems: MenuItem[] = [
+  ...publicMenuItems,
+  { title: 'پنل مدیریت', href: '/manager' },
+];
+
 export default function Header() {
   const { user, loading, error } = useUser();
+  const { role, isAuthenticated } = useAuth();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // انتخاب منوهای مناسب بر اساس نقش کاربر
+  const getMenuItems = () => {
+    if (!isAuthenticated) return publicMenuItems;
+
+    switch (role) {
+      case 'admin':
+        return adminMenuItems;
+      case 'manager':
+        return managerMenuItems;
+      case 'student':
+        return studentMenuItems;
+      default:
+        return publicMenuItems;
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   useEffect(() => {
     if (error?.message.includes('401')) {

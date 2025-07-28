@@ -13,7 +13,21 @@ const menuItems = [
     subItems: [
       {
         title: 'خلاصه عملکرد',
-        href: '/student/dashboard',
+        href: '/manager/dashboard',
+      },
+    ],
+  },
+  {
+    title: 'کاربران',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'دانش پژوهان',
+        href: '/manager/students',
+      },
+      {
+        title: 'مدرسین',
+        href: '/manager/teachers',
       },
     ],
   },
@@ -22,26 +36,22 @@ const menuItems = [
     isGroupTitle: true,
     subItems: [
       {
+        title: 'دوره ها',
+        href: '/manager/courses',
+      },
+      {
         title: 'ترم ها',
-        href: '/student/terms',
-      },
-      {
-        title: 'تکلیف ها',
-        href: '/student/homeworks',
-      },
-      {
-        title: 'حضور و غیاب',
-        href: '/student/attendances',
+        href: '/manager/terms',
       },
     ],
   },
   {
-    title: 'آزمون‌ها',
+    title: 'گزارش‌ها',
     isGroupTitle: true,
     subItems: [
       {
-        title: 'آزمون تعیین سطح',
-        href: '/student/placement-exam',
+        title: 'آنالیتیکس',
+        href: '/manager/analytics',
       },
     ],
   },
@@ -51,7 +61,7 @@ const menuItems = [
     subItems: [
       {
         title: 'تیکت ها',
-        href: '/student/tickets',
+        href: '/manager/tickets',
       },
     ],
   },
@@ -64,7 +74,7 @@ export default function Layout({
   const { user, loading } = useUser();
 
   return (
-    <RouteGuard requiredRole="student">
+    <RouteGuard requiredRole="manager">
       <div className="flex h-screen">
         <Sidebar
           user={user || undefined}
