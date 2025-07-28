@@ -14,6 +14,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  env: {
+    NEXT_PUBLIC_API_URL:
+      process.env.NEXT_PUBLIC_API_URL || 'https://kaktos.kanoonbartarha.ir/api',
+    NEXT_PUBLIC_PASSWORD_AUTH_ENABLED:
+      process.env.NEXT_PUBLIC_PASSWORD_AUTH_ENABLED || 'true',
+  },
 };
 
 export default nextConfig;

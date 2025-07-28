@@ -1,7 +1,8 @@
 // lib/api-client.ts
 'use client';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'https://kaktos.kanoonbartarha.ir/api';
 
 // Enhanced error types for better error handling
 export interface BackendError {
@@ -34,6 +35,13 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // اطمینان از وجود API_URL
+  if (!API_URL) {
+    throw new Error(
+      'API URL is not configured. Please set NEXT_PUBLIC_API_URL environment variable.'
+    );
+  }
+
   const headers: Record<string, string> = {};
 
   // Only set Content-Type for non-FormData requests
@@ -54,7 +62,13 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}/${path}`, {
+  // اطمینان از صحت URL
+  const baseUrl = API_URL?.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+  const fullUrl = `${baseUrl}/${path}`;
+
+  console.log('API Request URL:', fullUrl); // Debug log
+
+  const response = await fetch(fullUrl, {
     ...options,
     headers,
     redirect: 'manual',
