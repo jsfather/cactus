@@ -1,3 +1,5 @@
+'use client';
+
 import { ApiService } from '@/app/lib/api/client';
 import { PlacementExamQuestion } from '@/app/lib/types/placement-exam';
 
@@ -17,7 +19,7 @@ export const getExamQuestions = async (examId: number | string) => {
 // Create a new question for an exam
 export const createExamQuestion = async (
   examId: number | string,
-  data: {
+  data: FormData | {
     text: string;
     options: Array<{
       text: string;
@@ -26,12 +28,25 @@ export const createExamQuestion = async (
     file?: File;
   }
 ) => {
-  const formData = new FormData();
-  formData.append('text', data.text);
-  formData.append('options', JSON.stringify(data.options));
+  let formData: FormData;
   
-  if (data.file) {
-    formData.append('file', data.file);
+  if (data instanceof FormData) {
+    // If already FormData, use it directly
+    formData = data;
+  } else {
+    // Convert object to FormData
+    formData = new FormData();
+    formData.append('text', data.text);
+    
+    // Add options in the format server expects
+    data.options.forEach((option, index) => {
+      formData.append(`options[${index}][text]`, option.text);
+      formData.append(`options[${index}][is_correct]`, option.is_correct.toString());
+    });
+    
+    if (data.file) {
+      formData.append('file', data.file);
+    }
   }
 
   const response = await ApiService.post<{ data: PlacementExamQuestion }>(
