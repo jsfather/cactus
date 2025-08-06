@@ -1,34 +1,31 @@
-import request from '@/app/lib/api/client';
+import { ApiService } from '@/app/lib/api/client';
 import { Student } from '@/app/lib/types';
 
 export const getStudents = async () => {
-  const response = await request<{ data: Student[] }>('admin/students');
+  const response = await ApiService.get<{ data: Student[] }>('admin/students');
 
   if (!response) {
-    throw new Error('خطایی در دریافت لیست دانش پژوهان رخ داده است');
+    throw new Error('خطایی در دریافت لیست دانش‌آموزان رخ داده است');
   }
 
   return response;
 };
 
 export const getStudent = async (id: number | string) => {
-  const response = await request<{ data: Student }>(`admin/students/${id}`);
+  const response = await ApiService.get<{ data: Student }>(`admin/students/${id}`);
 
   if (!response) {
-    throw new Error('خطایی در دریافت دانش پژوه رخ داده است');
+    throw new Error('خطایی در دریافت دانش‌آموز رخ داده است');
   }
 
   return response;
 };
 
-export const createStudent = async (data: Partial<Student>) => {
-  const response = await request<Student>('admin/students', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+export const createStudent = async (data: FormData) => {
+  const response = await ApiService.post<{ data: Student }>('admin/students', data);
 
   if (!response) {
-    throw new Error('خطایی در ایجاد دانش پژوه رخ داده است');
+    throw new Error('خطایی در ایجاد دانش‌آموز رخ داده است');
   }
 
   return response;
@@ -36,39 +33,31 @@ export const createStudent = async (data: Partial<Student>) => {
 
 export const updateStudent = async (
   id: number | string,
-  data: Partial<Student>
+  data: FormData
 ) => {
-  const response = await request<Student>(`admin/students/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
+  const response = await ApiService.put<{ data: Student }>(`admin/students/${id}`, data);
 
   if (!response) {
-    throw new Error('خطایی در بروزرسانی دانش پژوه رخ داده است');
+    throw new Error('خطایی در بروزرسانی دانش‌آموز رخ داده است');
   }
 
   return response;
 };
 
 export const deleteStudent = async (id: number | string) => {
-  const response = await request<Student>(`admin/students/${id}`, {
-    method: 'DELETE',
-  });
-
-  if (!response) {
-    throw new Error('خطایی در حذف دانش پژوه رخ داده است');
-  }
-
-  return response;
+  await ApiService.delete(`admin/students/${id}`);
+  
+  // If no error was thrown, the deletion was successful
+  return { success: true };
 };
 
 export const getStudentExamPlacement = async (id: number | string) => {
-  const response = await request<{ data: Student }>(
+  const response = await ApiService.get<{ data: Student }>(
     `admin/students/placement-exam/${id}`
   );
 
   if (!response) {
-    throw new Error('خطایی در دریافت دانش پژوه رخ داده است');
+    throw new Error('خطایی در دریافت دانش‌آموز رخ داده است');
   }
 
   return response;

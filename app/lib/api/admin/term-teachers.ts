@@ -1,8 +1,8 @@
-import request from '@/app/lib/api/client';
+import { ApiService } from '@/app/lib/api/client';
 import { TermTeacher } from '@/app/lib/types';
 
 export const getTermTeachers = async () => {
-  const response = await request<{ data: TermTeacher[] }>(
+  const response = await ApiService.get<{ data: TermTeacher[] }>(
     'admin/term-teachers'
   );
 
@@ -14,7 +14,7 @@ export const getTermTeachers = async () => {
 };
 
 export const getTermTeacher = async (id: number | string) => {
-  const response = await request<{ data: TermTeacher }>(
+  const response = await ApiService.get<{ data: TermTeacher }>(
     `admin/term-teachers/${id}`
   );
 
@@ -25,11 +25,16 @@ export const getTermTeacher = async (id: number | string) => {
   return response;
 };
 
-export const createTermTeacher = async (data: Partial<TermTeacher>) => {
-  const response = await request<{ data: TermTeacher }>('admin/term-teachers', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+export const createTermTeacher = async (data: {
+  term_id: number;
+  teacher_id: number;
+  days: Array<{
+    day_of_week: string;
+    start_time: string;
+    end_time: string;
+  }>;
+}) => {
+  const response = await ApiService.post<{ data: TermTeacher }>('admin/term-teachers', data);
 
   if (!response) {
     throw new Error('خطایی در ایجاد مدرس ترم رخ داده است');
@@ -40,14 +45,19 @@ export const createTermTeacher = async (data: Partial<TermTeacher>) => {
 
 export const updateTermTeacher = async (
   id: number | string,
-  data: Partial<TermTeacher>
+  data: {
+    term_id: number;
+    teacher_id: number;
+    days: Array<{
+      day_of_week: string;
+      start_time: string;
+      end_time: string;
+    }>;
+  }
 ) => {
-  const response = await request<{ data: TermTeacher }>(
+  const response = await ApiService.put<{ data: TermTeacher }>(
     `admin/term-teachers/${id}`,
-    {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    }
+    data
   );
 
   if (!response) {
@@ -58,16 +68,8 @@ export const updateTermTeacher = async (
 };
 
 export const deleteTermTeacher = async (id: number | string) => {
-  const response = await request<{ data: TermTeacher }>(
-    `admin/term-teachers/${id}`,
-    {
-      method: 'DELETE',
-    }
-  );
-
-  if (!response) {
-    throw new Error('خطایی در حذف مدرس ترم رخ داده است');
-  }
-
-  return response;
+  await ApiService.delete(`admin/term-teachers/${id}`);
+  
+  // If no error was thrown, the deletion was successful
+  return { success: true };
 };
