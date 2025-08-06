@@ -1,3 +1,5 @@
+'use client';
+
 import { ApiService } from '@/app/lib/api/client';
 import { Blog } from '@/app/lib/types';
 

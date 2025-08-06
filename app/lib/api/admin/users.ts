@@ -21,11 +21,21 @@ export const getUser = async (id: string) => {
   return response;
 };
 
-export const createUser = async (data: Partial<User>) => {
-  const response = await request<User>('admin/users', {
+export const createUser = async (data: FormData | Partial<User>) => {
+  const options: RequestInit = {
     method: 'POST',
-    body: JSON.stringify(data),
-  });
+  };
+
+  if (data instanceof FormData) {
+    options.body = data;
+  } else {
+    options.body = JSON.stringify(data);
+    options.headers = {
+      'Content-Type': 'application/json',
+    };
+  }
+
+  const response = await request<User>('admin/users', options);
 
   if (!response) {
     throw new Error('خطایی در ایجاد کاربر رخ داده است');
@@ -34,11 +44,24 @@ export const createUser = async (data: Partial<User>) => {
   return response;
 };
 
-export const updateUser = async (id: string | number, data: Partial<User>) => {
-  const response = await request<User>(`admin/users/${id}`, {
+export const updateUser = async (
+  id: string | number,
+  data: FormData | Partial<User>
+) => {
+  const options: RequestInit = {
     method: 'PUT',
-    body: JSON.stringify(data),
-  });
+  };
+
+  if (data instanceof FormData) {
+    options.body = data;
+  } else {
+    options.body = JSON.stringify(data);
+    options.headers = {
+      'Content-Type': 'application/json',
+    };
+  }
+
+  const response = await request<User>(`admin/users/${id}`, options);
 
   if (!response) {
     throw new Error('خطایی در بروزرسانی کاربر رخ داده است');
@@ -48,13 +71,11 @@ export const updateUser = async (id: string | number, data: Partial<User>) => {
 };
 
 export const deleteUser = async (id: string | number) => {
-  const response = await request<User>(`admin/users/${id}`, {
+  const response = await request<User | null>(`admin/users/${id}`, {
     method: 'DELETE',
   });
 
-  if (!response) {
-    throw new Error('خطایی در حذف کاربر رخ داده است');
-  }
-
+  // For delete operations, we don't expect a response body
+  // Success is determined by the absence of an error
   return response;
 };

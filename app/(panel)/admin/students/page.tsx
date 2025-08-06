@@ -43,7 +43,7 @@ export default function Page() {
         setStudents(response.data);
       }
     } catch (error) {
-      toast.error('خطا در دریافت لیست دانش پژوهان');
+      toast.error('خطا در دریافت لیست دانش‌آموزان');
       setStudents([]);
     } finally {
       setLoading(false);
@@ -61,12 +61,12 @@ export default function Page() {
     try {
       setDeleteLoading(true);
       await deleteStudent(itemToDelete.user_id);
-      toast.success('دانش پژوه با موفقیت حذف شد');
+      toast.success('دانش‌آموز با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
       await fetchStudents();
     } catch (error) {
-      toast.error('خطا در حذف دانش پژوه');
+      toast.error('خطا در حذف دانش‌آموز');
     } finally {
       setDeleteLoading(false);
     }
@@ -74,9 +74,7 @@ export default function Page() {
 
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
-    setTimeout(() => {
-      setItemToDelete(null);
-    }, 500);
+    setItemToDelete(null);
   };
 
   useEffect(() => {
@@ -87,17 +85,17 @@ export default function Page() {
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          دانش پژوهان
+          دانش‌آموزان
         </h1>
         <Button onClick={() => router.push('/admin/students/new')}>
-          ایجاد دانش پژوه
+          ایجاد دانش‌آموز
         </Button>
       </div>
       <Table
         data={students}
         columns={columns}
         loading={loading}
-        emptyMessage="هیچ دانش پژوهی یافت نشد"
+        emptyMessage="هیچ دانش‌آموزی یافت نشد"
         onEdit={(student) => router.push(`/admin/students/${student.user_id}`)}
         onDelete={handleDeleteClick}
       />
@@ -106,8 +104,8 @@ export default function Page() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف دانش پژوه"
-        description={`آیا از حذف دانش پژوه "${itemToDelete?.user.first_name + ' ' + itemToDelete?.user.first_name}" اطمینان دارید؟`}
+        title="حذف دانش‌آموز"
+        description={`آیا از حذف دانش‌آموز "${itemToDelete?.user.first_name} ${itemToDelete?.user.last_name}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

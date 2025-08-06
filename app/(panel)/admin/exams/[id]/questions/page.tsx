@@ -2,9 +2,6 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { toast } from 'react-hot-toast';
 import { Plus, Trash2, Upload, X } from 'lucide-react';
 import {
@@ -19,6 +16,10 @@ import Textarea from '@/app/components/ui/Textarea';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import FileUpload from '@/app/components/ui/FileUpload';
+
+import { z } from 'zod';
+import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
+import { ApiError } from '@/app/lib/api/client';
 
 const questionSchema = z.object({
   text: z.string().min(1, 'متن سوال الزامی است'),
@@ -48,21 +49,13 @@ export default function ExamQuestionsPage({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    submitWithErrorHandling,
+    globalError,
+    setGlobalError,
     reset,
     watch,
     setValue,
-  } = useForm<QuestionFormData>({
-    resolver: zodResolver(questionSchema),
-    defaultValues: {
-      text: '',
-      options: [
-        { text: '', is_correct: 0 },
-        { text: '', is_correct: 0 },
-        { text: '', is_correct: 0 },
-        { text: '', is_correct: 0 },
-      ],
-    },
-  });
+  } = useFormWithBackendErrors<QuestionFormData>(questionSchema);
 
   const watchedOptions = watch('options');
 
@@ -104,24 +97,58 @@ export default function ExamQuestionsPage({
   };
 
   const onSubmit = async (data: QuestionFormData) => {
-    try {
-      await createExamQuestion(examId, {
-        text: data.text,
-        options: data.options,
-        file: selectedFile || undefined,
-      });
+    console.log('Form data before FormData creation:', data);
+    
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('text', data.text);
+    
+    // Add options as form fields
+    data.options.forEach((option, index) => {
+      console.log(`Adding option ${index}:`, option);
+      formData.append(`options[${index}][text]`, option.text);
+      formData.append(`options[${index}][is_correct]`, option.is_correct.toString());
+    });
+    
+    // Add file if selected
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
 
-      toast.success('سوال با موفقیت اضافه شد');
-      setShowAddForm(false);
-      setSelectedFile(null);
-      reset();
+    // Log FormData contents
+    console.log('FormData contents:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
 
-      // Refresh questions list
-      const response = await getExamQuestions(examId);
-      setQuestions(response.data);
-    } catch (error: any) {
-      console.error('Error creating question:', error);
-      toast.error(error.message || 'خطا در اضافه کردن سوال');
+    await createExamQuestion(examId, formData);
+    
+    toast.success('سوال با موفقیت اضافه شد');
+    setShowAddForm(false);
+    setSelectedFile(null);
+    reset({
+      text: '',
+      options: [
+        { text: '', is_correct: 0 },
+        { text: '', is_correct: 0 },
+        { text: '', is_correct: 0 },
+        { text: '', is_correct: 0 },
+      ],
+    });
+
+    // Refresh questions list
+    const response = await getExamQuestions(examId);
+    setQuestions(response.data);
+  };
+
+  const handleError = (error: ApiError) => {
+    console.log('Question form submission error:', error);
+    
+    // Show toast error message
+    if (error?.message) {
+      toast.error(error.message);
+    } else {
+      toast.error('خطا در اضافه کردن سوال');
     }
   };
 
@@ -171,7 +198,19 @@ export default function ExamQuestionsPage({
           </p>
         </div>
         <Button
-          onClick={() => setShowAddForm(true)}
+          onClick={() => {
+            setShowAddForm(true);
+            // Reset form when showing add form
+            reset({
+              text: '',
+              options: [
+                { text: '', is_correct: 0 },
+                { text: '', is_correct: 0 },
+                { text: '', is_correct: 0 },
+                { text: '', is_correct: 0 },
+              ],
+            });
+          }}
           className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
@@ -194,7 +233,15 @@ export default function ExamQuestionsPage({
             </button>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
+            className="space-y-6"
+          >
+            {globalError && (
+              <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+                {globalError}
+              </div>
+            )}
             <Textarea
               id="text"
               label="متن سوال"
@@ -375,7 +422,19 @@ export default function ExamQuestionsPage({
               برای این آزمون هنوز سوالی اضافه نشده است.
             </p>
             <Button
-              onClick={() => setShowAddForm(true)}
+              onClick={() => {
+                setShowAddForm(true);
+                // Reset form when showing add form
+                reset({
+                  text: '',
+                  options: [
+                    { text: '', is_correct: 0 },
+                    { text: '', is_correct: 0 },
+                    { text: '', is_correct: 0 },
+                    { text: '', is_correct: 0 },
+                  ],
+                });
+              }}
               className="mt-4 flex items-center gap-2"
             >
               <Plus className="h-4 w-4" />

@@ -12,15 +12,15 @@ import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 import { z } from 'zod';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-import { FormErrorAlert } from '@/app/components/FormErrorAlert';
+import { ApiError } from '@/app/lib/api/client';
 
 const schema = z.object({
-  title: z.string().optional(),
-  little_description: z.string().min(1),
-  description: z.string().min(1),
-  meta_title: z.string().min(1),
-  meta_description: z.string().min(1),
-  slug: z.string().min(1),
+  title: z.string().min(1, 'عنوان الزامی است'),
+  little_description: z.string().min(1, 'توضیحات کوتاه الزامی است'),
+  description: z.string().min(1, 'توضیحات الزامی است'),
+  meta_title: z.string().min(1, 'عنوان متا الزامی است'),
+  meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
+  slug: z.string().min(1, 'اسلاگ الزامی است'),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -38,6 +38,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     submitWithErrorHandling,
     globalError,
     setGlobalError,
+    reset,
   } = useFormWithBackendErrors<FormData>(schema);
 
   useEffect(() => {
@@ -45,9 +46,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       if (isNew) return;
 
       try {
-        await blogService.getBlog(resolvedParams.id);
+        const blog = await blogService.getBlog(resolvedParams.id);
+        // Pre-fill form with existing blog data
+        reset(blog);
       } catch (error) {
-        toast.success('بلاگ با موفقیت ایجاد شد');
+        toast.error('خطا در بارگذاری بلاگ');
         router.push('/admin/blogs');
       } finally {
         setLoading(false);
@@ -55,20 +58,29 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     fetchBlog();
-  }, [isNew, resolvedParams.id, router]);
+  }, [isNew, resolvedParams.id, router, reset]);
 
   const onSubmit = async (data: FormData) => {
     if (isNew) {
       const result = await blogService.createBlog(data);
-      console.log('User created successfully:', result);
+      toast.success('بلاگ با موفقیت ایجاد شد');
+      router.push('/admin/blogs');
     } else {
       const result = await blogService.updateBlog(resolvedParams.id, data);
-      console.log('User created successfully:', result);
+      toast.success('بلاگ با موفقیت بروزرسانی شد');
+      router.push('/admin/blogs');
     }
   };
 
-  const handleError = (error: any) => {
-    console.error('Blog form submission error:', error);
+  const handleError = (error: ApiError) => {
+    console.log('Blog form submission error:', error);
+    
+    // Show toast error message
+    if (error?.message) {
+      toast.error(error.message);
+    } else {
+      toast.error('خطا در ثبت بلاگ');
+    }
   };
 
   if (loading) {
@@ -88,15 +100,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <FormErrorAlert
-        error={globalError}
-        onClose={() => setGlobalError(null)}
-      />
-
       <form
         onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
         className="mt-8 space-y-6"
       >
+        {globalError && (
+          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+            {globalError}
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
             id="title"

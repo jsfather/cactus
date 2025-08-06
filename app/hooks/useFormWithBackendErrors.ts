@@ -23,13 +23,26 @@ export function useFormWithBackendErrors<T extends FieldValues>(
 
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  const setBackendErrors = (errors: BackendError[]) => {
-    errors.forEach((error) => {
-      form.setError(error.field as Path<T>, {
-        type: 'server',
-        message: error.message,
+  const setBackendErrors = (errors: BackendError[] | Record<string, string[]> | any) => {
+    // Handle different error formats
+    if (Array.isArray(errors)) {
+      // Format: [{field: "name", message: "error"}]
+      errors.forEach((error) => {
+        form.setError(error.field as Path<T>, {
+          type: 'server',
+          message: error.message,
+        });
       });
-    });
+    } else if (errors && typeof errors === 'object') {
+      // Format: {field: ["error1", "error2"]} or {field: "error"}
+      Object.entries(errors).forEach(([field, messages]) => {
+        const message = Array.isArray(messages) ? messages[0] : messages;
+        form.setError(field as Path<T>, {
+          type: 'server',
+          message: typeof message === 'string' ? message : 'خطای اعتبارسنجی',
+        });
+      });
+    }
   };
 
   const clearBackendErrors = () => {
