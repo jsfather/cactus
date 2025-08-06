@@ -36,7 +36,7 @@ export default function Page() {
     {
       header: 'تاریخ ایجاد',
       accessor: 'created_at' as keyof PanelGuide,
-      render: (value: string | null, item: PanelGuide) =>
+      render: (value: string | number | null, item: PanelGuide) =>
         value ? new Date(value).toLocaleDateString('fa-IR') : '',
     },
   ];
@@ -45,10 +45,13 @@ export default function Page() {
     try {
       setLoading(true);
       const response = await getPanelGuides();
-      if (response) {
+      if (response && response.data) {
         setPanelGuides(response.data);
+      } else {
+        setPanelGuides([]);
       }
     } catch (error) {
+      console.error('Fetch panel guides error:', error);
       toast.error('خطا در دریافت لیست راهنماهای پنل');
       setPanelGuides([]);
     } finally {
@@ -68,10 +71,15 @@ export default function Page() {
       setDeleteLoading(true);
       await deletePanelGuide(itemToDelete.id);
       toast.success('راهنمای پنل با موفقیت حذف شد');
+      
+      // Close modal and clear item first
       setShowDeleteModal(false);
       setItemToDelete(null);
+      
+      // Then refresh the list
       await fetchPanelGuides();
     } catch (error) {
+      console.error('Delete error:', error);
       toast.error('خطا در حذف راهنمای پنل');
     } finally {
       setDeleteLoading(false);

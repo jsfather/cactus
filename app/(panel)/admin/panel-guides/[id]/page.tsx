@@ -2,9 +2,6 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
 import { toast } from 'react-hot-toast';
 import {
   getPanelGuide,
@@ -17,6 +14,11 @@ import Textarea from '@/app/components/ui/Textarea';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import Select from '@/app/components/ui/Select';
+import FileUpload from '@/app/components/ui/FileUpload';
+
+import { z } from 'zod';
+import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
+import { ApiError } from '@/app/lib/api/client';
 
 const panelGuideSchema = z.object({
   title: z.string().min(1, 'عنوان الزامی است'),
@@ -24,7 +26,6 @@ const panelGuideSchema = z.object({
   type: z.enum(['student', 'admin', 'teacher'], {
     required_error: 'نوع راهنما الزامی است',
   }),
-  file: z.string().min(1, 'فایل الزامی است'),
 });
 
 type PanelGuideFormData = z.infer<typeof panelGuideSchema>;
@@ -39,20 +40,31 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
-  const [loading, setLoading] = useState(!isNew);
+  const [loading, setLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    submitWithErrorHandling,
+    globalError,
+    setGlobalError,
     reset,
-  } = useForm<PanelGuideFormData>({
-    resolver: zodResolver(panelGuideSchema),
-  });
+  } = useFormWithBackendErrors<PanelGuideFormData>(panelGuideSchema);
 
   useEffect(() => {
     const fetchPanelGuide = async () => {
-      if (isNew) return;
+      if (isNew) {
+        // Set default values for new guides
+        reset({
+          title: '',
+          description: '',
+          type: 'student',
+        });
+        setLoading(false);
+        return;
+      }
 
       try {
         const response = await getPanelGuide(resolvedParams.id);
@@ -61,9 +73,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           title: guide.title,
           description: guide.description,
           type: guide.type,
-          file: guide.file,
         });
       } catch (error) {
+        toast.error('خطا در بارگذاری راهنمای پنل');
         router.push('/admin/panel-guides');
       } finally {
         setLoading(false);
@@ -74,19 +86,44 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }, [isNew, resolvedParams.id, reset, router]);
 
   const onSubmit = async (data: PanelGuideFormData) => {
-    try {
-      if (isNew) {
-        await createPanelGuide(data);
-        toast.success('راهنمای پنل با موفقیت ایجاد شد');
-      } else {
-        await updatePanelGuide(resolvedParams.id, data);
-        toast.success('راهنمای پنل با موفقیت بروزرسانی شد');
-      }
-      router.push('/admin/panel-guides');
-    } catch (error) {
-      toast.error(
-        isNew ? 'خطا در ایجاد راهنمای پنل' : 'خطا در بروزرسانی راهنمای پنل'
-      );
+    console.log('Form data before FormData creation:', data);
+    console.log('Selected file:', selectedFile);
+    
+    // Create FormData for file upload
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+    formData.append('type', data.type);
+    
+    // Add file if selected
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
+
+    // Log FormData contents
+    console.log('FormData contents:');
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    if (isNew) {
+      await createPanelGuide(formData);
+      toast.success('راهنمای پنل با موفقیت ایجاد شد');
+    } else {
+      await updatePanelGuide(resolvedParams.id, formData);
+      toast.success('راهنمای پنل با موفقیت بروزرسانی شد');
+    }
+    router.push('/admin/panel-guides');
+  };
+
+  const handleError = (error: ApiError) => {
+    console.log('Panel guide form submission error:', error);
+    
+    // Show toast error message
+    if (error?.message) {
+      toast.error(error.message);
+    } else {
+      toast.error(isNew ? 'خطا در ایجاد راهنمای پنل' : 'خطا در بروزرسانی راهنمای پنل');
     }
   };
 
@@ -107,7 +144,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+      <form 
+        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))} 
+        className="mt-8 space-y-6"
+      >
+        {globalError && (
+          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+            {globalError}
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
             id="title"
@@ -141,15 +186,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="w-full">
-          <Input
+          <FileUpload
             id="file"
             label="فایل"
-            type="file"
             accept=".pdf,.doc,.docx"
             placeholder="فایل راهنما را انتخاب کنید"
-            required
-            error={errors.file?.message}
-            {...register('file')}
+            required={isNew}
+            onChange={(file) => setSelectedFile(file)}
           />
         </div>
 
