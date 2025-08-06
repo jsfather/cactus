@@ -67,20 +67,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const onSubmit = async (data: UserFormData) => {
     setApiError('');
-    
+
     try {
       const formData = new FormData();
-      
+
       // افزودن فیلدهای متنی
       formData.append('first_name', data.first_name);
       formData.append('last_name', data.last_name);
       formData.append('username', data.username);
       formData.append('phone', data.phone);
       formData.append('password', data.password);
-      
+
       if (data.email) formData.append('email', data.email);
-      if (data.national_code) formData.append('national_code', data.national_code);
-      
+      if (data.national_code)
+        formData.append('national_code', data.national_code);
+
       // افزودن فایل عکس پروفایل
       if (profilePicture) {
         formData.append('profile_picture', profilePicture);
@@ -95,7 +96,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/admin/users');
     } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || 
+      const errorMessage =
+        error?.response?.data?.message ||
         (isNew ? 'خطا در ایجاد کاربر' : 'خطا در بروزرسانی کاربر');
       setApiError(errorMessage);
       toast.error(errorMessage);
@@ -126,7 +128,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
         {apiError && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+          <div className="rounded-md border border-red-200 bg-red-50 p-4">
             <p className="text-sm text-red-600">{apiError}</p>
           </div>
         )}
@@ -200,8 +202,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             }
             required={isNew}
             error={errors.password?.message}
-            {...register('password', { 
-              required: isNew ? 'رمز عبور الزامی است' : false 
+            {...register('password', {
+              required: isNew ? 'رمز عبور الزامی است' : false,
             })}
           />
         </div>

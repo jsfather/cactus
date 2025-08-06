@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Table from '@/app/components/ui/Table';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { getUsers, deleteUser } from '@/app/lib/api/admin/users';
 import { User } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
@@ -44,14 +44,31 @@ export default function Page() {
     try {
       setLoading(true);
       const response = await getUsers();
-      if (response) {
+      if (response && response.data) {
         setUsers(response.data);
+      } else {
+        setUsers([]);
       }
     } catch (error) {
+      console.error('Error fetching users:', error);
       toast.error('خطا در دریافت لیست کاربران');
       setUsers([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const refreshUserList = async () => {
+    try {
+      const response = await getUsers();
+      if (response && response.data) {
+        setUsers(response.data);
+      } else {
+        setUsers([]);
+      }
+    } catch (error) {
+      console.error('Error refreshing users:', error);
+      toast.error('خطا در بروزرسانی لیست کاربران');
     }
   };
 
@@ -66,22 +83,36 @@ export default function Page() {
     try {
       setDeleteLoading(true);
       await deleteUser(itemToDelete.id);
-      toast.success('کاربر با موفقیت حذف شد');
-      setShowDeleteModal(false);
-      setItemToDelete(null);
-      await fetchUsers();
-    } catch (error) {
-      toast.error('خطا در حذف کاربر');
-    } finally {
-      setDeleteLoading(false);
+      
+      // نمایش پیام موفقیت
+      toast.success(`کاربر "${itemToDelete.first_name} ${itemToDelete.last_name}" با موفقیت حذف شد`);
+      
+      // بستن مدال
+      closeDeleteModal();
+      
+      // بروزرسانی لیست کاربران بدون loading
+      await refreshUserList();
+      
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      const errorMessage = error?.message || 'خطا در حذف کاربر';
+      toast.error(errorMessage);
+      
+      // در صورت خطا هم مدال رو ببند
+      closeDeleteModal();
     }
   };
 
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
-    setTimeout(() => {
-      setItemToDelete(null);
-    }, 500);
+    setItemToDelete(null);
+    setDeleteLoading(false); // اطمینان از reset شدن loading state
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setItemToDelete(null);
+    setDeleteLoading(false);
   };
 
   useEffect(() => {

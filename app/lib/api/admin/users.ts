@@ -44,7 +44,10 @@ export const createUser = async (data: FormData | Partial<User>) => {
   return response;
 };
 
-export const updateUser = async (id: string | number, data: FormData | Partial<User>) => {
+export const updateUser = async (
+  id: string | number,
+  data: FormData | Partial<User>
+) => {
   const options: RequestInit = {
     method: 'PUT',
   };
@@ -68,13 +71,11 @@ export const updateUser = async (id: string | number, data: FormData | Partial<U
 };
 
 export const deleteUser = async (id: string | number) => {
-  const response = await request<User>(`admin/users/${id}`, {
+  const response = await request<User | null>(`admin/users/${id}`, {
     method: 'DELETE',
   });
 
-  if (!response) {
-    throw new Error('خطایی در حذف کاربر رخ داده است');
-  }
-
+  // For delete operations, we don't expect a response body
+  // Success is determined by the absence of an error
   return response;
 };
