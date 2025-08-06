@@ -83,21 +83,22 @@ export default function Page() {
     try {
       setDeleteLoading(true);
       await deleteUser(itemToDelete.id);
-      
+
       // نمایش پیام موفقیت
-      toast.success(`کاربر "${itemToDelete.first_name} ${itemToDelete.last_name}" با موفقیت حذف شد`);
-      
+      toast.success(
+        `کاربر "${itemToDelete.first_name} ${itemToDelete.last_name}" با موفقیت حذف شد`
+      );
+
       // بستن مدال
       closeDeleteModal();
-      
+
       // بروزرسانی لیست کاربران بدون loading
       await refreshUserList();
-      
     } catch (error: any) {
       console.error('Error deleting user:', error);
       const errorMessage = error?.message || 'خطا در حذف کاربر';
       toast.error(errorMessage);
-      
+
       // در صورت خطا هم مدال رو ببند
       closeDeleteModal();
     }

@@ -83,7 +83,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   // Check if response has content
   const contentType = response.headers.get('content-type');
   const contentLength = response.headers.get('content-length');
-  
+
   // If status is 204 (No Content) or content-length is 0, return null
   if (response.status === 204 || contentLength === '0') {
     return null as T;
