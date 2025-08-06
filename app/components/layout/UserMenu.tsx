@@ -6,6 +6,7 @@ import LogoutButton from '@/app/components/layout/LogoutButton';
 import { LayoutDashboard, GraduationCap, User, Settings } from 'lucide-react';
 import Link from 'next/link';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
+import { useUser } from '@/app/hooks/useUser';
 
 interface UserMenuProps {
   userName: string;
@@ -17,6 +18,7 @@ export function UserMenu({ userName }: UserMenuProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { user } = useUser();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -72,45 +74,51 @@ export function UserMenu({ userName }: UserMenuProps) {
                 </Link>
               </div>
             </div>
-            <button
-              onClick={() => {
-                router.push('/admin/dashboard');
-                setIsOpen(false);
-              }}
-              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
-            >
-              <LayoutDashboard
-                className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
-                strokeWidth={1.7}
-              />
-              <span>داشبورد ادمین</span>
-            </button>
-            <button
-              onClick={() => {
-                router.push('/teacher/dashboard');
-                setIsOpen(false);
-              }}
-              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
-            >
-              <GraduationCap
-                className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
-                strokeWidth={1.7}
-              />
-              <span>داشبورد مدرس</span>
-            </button>
-            <button
-              onClick={() => {
-                router.push('/student/dashboard');
-                setIsOpen(false);
-              }}
-              className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
-            >
-              <User
-                className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
-                strokeWidth={1.7}
-              />
-              <span>داشبورد دانش آموز</span>
-            </button>
+            {user?.role === 'admin' && (
+              <button
+                onClick={() => {
+                  router.push('/admin/dashboard');
+                  setIsOpen(false);
+                }}
+                className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+              >
+                <LayoutDashboard
+                  className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
+                  strokeWidth={1.7}
+                />
+                <span>داشبورد ادمین</span>
+              </button>
+            )}
+            {user?.role === 'teacher' && (
+              <button
+                onClick={() => {
+                  router.push('/teacher/dashboard');
+                  setIsOpen(false);
+                }}
+                className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+              >
+                <GraduationCap
+                  className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
+                  strokeWidth={1.7}
+                />
+                <span>داشبورد مدرس</span>
+              </button>
+            )}
+            {user?.role === 'student' && (
+              <button
+                onClick={() => {
+                  router.push('/student/dashboard');
+                  setIsOpen(false);
+                }}
+                className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+              >
+                <User
+                  className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
+                  strokeWidth={1.7}
+                />
+                <span>داشبورد دانش آموز</span>
+              </button>
+            )}
             <div className="px-3">
               <div className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
             </div>
