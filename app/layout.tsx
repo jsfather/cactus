@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import '@/app/globals.css';
 import { dana, danaFaNum } from '@/app/fonts';
 import { CartProvider } from '@/app/contexts/CartContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
@@ -50,7 +52,20 @@ export default function RootLayout({
         className={`${danaFaNum.variable} ${dana.variable} font-dana-fanum min-h-screen bg-white text-gray-900 antialiased transition-colors duration-200 dark:bg-gray-900 dark:text-gray-100`}
         suppressHydrationWarning
       >
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          {children}
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={true}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+        </CartProvider>
       </body>
     </html>
   );
