@@ -1,8 +1,10 @@
-import request from '@/app/lib/api/client';
+'use client';
+
+import { ApiService } from '@/app/lib/api/client';
 import { Term } from '@/app/lib/types';
 
 export const getTerms = async () => {
-  const response = await request<{ data: Term[] }>('admin/terms');
+  const response = await ApiService.get<{ data: Term[] }>('admin/terms');
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست ترم‌ها رخ داده است');
@@ -12,7 +14,7 @@ export const getTerms = async () => {
 };
 
 export const getTerm = async (id: number | string) => {
-  const response = await request<{ data: Term }>(`admin/terms/${id}`);
+  const response = await ApiService.get<{ data: Term }>(`admin/terms/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت ترم رخ داده است');
@@ -22,10 +24,7 @@ export const getTerm = async (id: number | string) => {
 };
 
 export const createTerm = async (data: Partial<Term>) => {
-  const response = await request<Term>('admin/terms', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  const response = await ApiService.post<Term>('admin/terms', data);
 
   if (!response) {
     throw new Error('خطایی در ایجاد ترم رخ داده است');
@@ -35,10 +34,7 @@ export const createTerm = async (data: Partial<Term>) => {
 };
 
 export const updateTerm = async (id: number | string, data: Partial<Term>) => {
-  const response = await request<Term>(`admin/terms/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
+  const response = await ApiService.put<Term>(`admin/terms/${id}`, data);
 
   if (!response) {
     throw new Error('خطایی در بروزرسانی ترم رخ داده است');
@@ -48,9 +44,7 @@ export const updateTerm = async (id: number | string, data: Partial<Term>) => {
 };
 
 export const deleteTerm = async (id: number | string) => {
-  const response = await request<Term>(`admin/terms/${id}`, {
-    method: 'DELETE',
-  });
+  const response = await ApiService.delete<Term>(`admin/terms/${id}`);
 
   if (!response) {
     throw new Error('خطایی در حذف ترم رخ داده است');

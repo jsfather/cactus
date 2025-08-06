@@ -2,15 +2,34 @@
 
 import { forwardRef } from 'react';
 import clsx from 'clsx';
+import { convertToEnglishNumbers } from '@/app/lib/utils/persian';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   required?: boolean;
+  convertNumbers?: boolean; // New prop to enable number conversion
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, required, ...props }, ref) => {
+  ({ label, error, className, required, convertNumbers = false, onChange, ...props }, ref) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (convertNumbers) {
+        // Convert Persian/Arabic numbers to English
+        const englishValue = convertToEnglishNumbers(e.target.value);
+        // Create new event with converted value
+        const newEvent = {
+          ...e,
+          target: {
+            ...e.target,
+            value: englishValue,
+          },
+        };
+        onChange?.(newEvent as React.ChangeEvent<HTMLInputElement>);
+      } else {
+        onChange?.(e);
+      }
+    };
     return (
       <div className="w-full">
         {label && (
@@ -25,6 +44,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           {...props}
+          onChange={handleChange}
           className={clsx(
             'block w-full rounded-lg border px-4 py-3 text-sm transition-all outline-none',
             'bg-white dark:bg-gray-900',

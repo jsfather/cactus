@@ -34,7 +34,9 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = {
+    'Accept': 'application/json',
+  };
 
   // Only set Content-Type for non-FormData requests
   if (!(options.body instanceof FormData)) {
@@ -54,14 +56,40 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_URL}/${path}`, {
+  const requestUrl = `${API_URL}/${path}`;
+  const requestOptions = {
     ...options,
     headers,
-    redirect: 'manual',
-  });
+    redirect: 'follow' as RequestRedirect,
+  };
+
+  let response;
+  try {
+    response = await fetch(requestUrl, requestOptions);
+  } catch (error) {
+    throw new ApiError(
+      'خطای شبکه: عدم اتصال به سرور',
+      0,
+      new Response()
+    );
+  }
+
+  // Handle network errors (status 0)
+  if (response.status === 0) {
+    throw new ApiError(
+      'خطای شبکه: عدم دسترسی به سرور',
+      0,
+      response
+    );
+  }
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch (e) {
+      errorData = {};
+    }
 
     // Handle validation errors (422) vs other errors
     if (response.status === 422 && errorData.errors) {
@@ -71,10 +99,18 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
         response,
         errorData.errors
       );
+    } else if (response.status === 422 && errorData) {
+      // Handle Laravel-style validation errors where errors might be in different format
+      throw new ApiError(
+        errorData.message || 'خطای اعتبارسنجی',
+        response.status,
+        response,
+        errorData.errors || errorData
+      );
     }
 
     throw new ApiError(
-      errorData.message || 'خطایی رخ داده است',
+      errorData.message || `خطای ${response.status}: ${response.statusText}`,
       response.status,
       response
     );
