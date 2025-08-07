@@ -18,24 +18,25 @@ import {
   GraduationCap,
   Calendar,
   Filter,
-  Eye
+  Eye,
+  Building2
 } from 'lucide-react';
 
 type TicketType = 'all' | 'students' | 'teachers';
 
-const statusColors = {
+const statusColors: Record<string, string> = {
   open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   closed: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
   pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
 };
 
-const priorityColors = {
+const priorityColors: Record<string, string> = {
   low: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
   medium: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
   high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
-const statusIcons = {
+const statusIcons: Record<string, React.ReactElement> = {
   open: <Clock className="h-4 w-4" />,
   closed: <CheckCircle className="h-4 w-4" />,
   pending: <AlertCircle className="h-4 w-4" />,
@@ -136,7 +137,7 @@ export default function TicketsPage() {
       />
 
       <div className="mt-8">
-        <div className="sm:flex sm:items-center">
+        <div className="sm:flex sm:items-center sm:justify-between">
           <div className="sm:flex-auto">
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               مدیریت تیکت‌ها
@@ -144,6 +145,14 @@ export default function TicketsPage() {
             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
               مدیریت و پاسخگویی به تیکت‌های دانش‌آموزان و مدرسین
             </p>
+          </div>
+          <div className="mt-4 sm:mt-0">
+            <Link href="/admin/tickets/departments">
+              <Button variant="white" className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                مدیریت دپارتمان‌ها
+              </Button>
+            </Link>
           </div>
         </div>
 
