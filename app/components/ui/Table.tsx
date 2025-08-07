@@ -69,7 +69,7 @@ export default function Table<T>({
                       </th>
                     ))}
                     {(actions || onEdit || onDelete || onView) && (
-                      <th scope="col" className="relative py-3 pr-3 pl-6">
+                      <th scope="col" className="relative py-3 pl-3 pr-6">
                         <span className="sr-only">Actions</span>
                       </th>
                     )}
@@ -90,8 +90,8 @@ export default function Table<T>({
                         </td>
                       ))}
                       {(actions || onEdit || onDelete || onView) && (
-                        <td className="py-3 pr-3 pl-6 whitespace-nowrap">
-                          <div className="flex justify-end gap-3">
+                        <td className="py-3 pl-3 pr-6 whitespace-nowrap">
+                          <div className="flex justify-start gap-3">
                             <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
                             <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
                           </div>
@@ -151,7 +151,7 @@ export default function Table<T>({
                         </p>
                       ))}
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-start gap-2">
                       {actions?.(item)}
                       {(onEdit || onDelete || onView) && (
                         <div className="flex gap-2">
@@ -240,7 +240,7 @@ export default function Table<T>({
                   </th>
                 ))}
                 {(actions || onEdit || onDelete || onView) && (
-                  <th scope="col" className="relative py-3 pr-3 pl-6">
+                  <th scope="col" className="relative py-3 pl-3 pr-6">
                     <span className="sr-only">Actions</span>
                   </th>
                 )}
@@ -279,8 +279,8 @@ export default function Table<T>({
                       </td>
                     ))}
                     {(actions || onEdit || onDelete || onView) && (
-                      <td className="py-3 pr-3 pl-6 whitespace-nowrap">
-                        <div className="flex justify-end gap-3">
+                      <td className="py-3 pl-3 pr-6 whitespace-nowrap">
+                        <div className="flex justify-start gap-3">
                           {actions?.(item)}
                           {(onEdit || onDelete || onView) && (
                             <div className="flex gap-2">

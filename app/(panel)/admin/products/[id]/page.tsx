@@ -161,12 +161,6 @@ export default function ProductDetailPage({
                 </div>
               </div>
               <div className="flex gap-3">
-                <Link href={`/admin/products/${product.id}/edit`}>
-                  <Button variant="primary" className="flex items-center gap-2">
-                    <Edit className="h-4 w-4" />
-                    ویرایش
-                  </Button>
-                </Link>
                 <Button
                   variant="danger"
                   onClick={handleDelete}
@@ -176,6 +170,12 @@ export default function ProductDetailPage({
                   <Trash2 className="h-4 w-4" />
                   حذف
                 </Button>
+                <Link href={`/admin/products/${product.id}/edit`}>
+                  <Button variant="primary" className="flex items-center gap-2">
+                    <Edit className="h-4 w-4" />
+                    ویرایش
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

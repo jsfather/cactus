@@ -162,7 +162,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <Package className="h-6 w-6 text-indigo-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل محصولات
@@ -182,7 +182,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <Boxes className="h-6 w-6 text-green-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل موجودی
@@ -205,7 +205,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <DollarSign className="h-6 w-6 text-yellow-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       ارزش کل انبار
@@ -225,7 +225,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <AlertTriangle className="h-6 w-6 text-red-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       موجودی کم
@@ -241,38 +241,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Filters */}
-        <div className="mt-6 rounded-lg bg-white shadow dark:bg-gray-800">
-          <div className="px-6 py-4">
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="جستجو در محصولات..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 pl-10 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                  />
-                </div>
-              </div>
-              <div className="sm:w-64">
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                >
-                  <option value="all">همه دسته‌بندی‌ها</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id.toString()}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Products Table */}
         <div className="mt-6">
@@ -376,8 +345,8 @@ export default function ProductsPage() {
                             {product.stock} عدد
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
-                          <div className="flex items-center gap-2">
+                        <td className="px-6 py-4 text-left text-sm font-medium whitespace-nowrap">
+                          <div className="flex items-center gap-2 justify-start">
                             <Link href={`/admin/products/${product.id}`}>
                               <Button
                                 variant="white"

@@ -227,20 +227,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="white"
-            onClick={() => router.push('/admin/term-teachers')}
-          >
-            بازگشت
-          </Button>
+        <div className="flex justify-start gap-3">
           <Button
             onClick={() => router.push(`/admin/term-teachers/${resolvedParams.id}`)}
             className="flex items-center gap-2"
           >
             <Edit className="h-4 w-4" />
             ویرایش
+          </Button>
+          <Button
+            type="button"
+            variant="white"
+            onClick={() => router.push('/admin/term-teachers')}
+          >
+            بازگشت
           </Button>
         </div>
       </div>

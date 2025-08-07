@@ -340,16 +340,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </div>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-start gap-3">
+          <Button type="submit" loading={isSubmitting}>
+            {isNew ? 'ایجاد ترم مدرس' : 'بروزرسانی ترم مدرس'}
+          </Button>
           <Button
             type="button"
             variant="white"
             onClick={() => router.push('/admin/term-teachers')}
           >
             انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            {isNew ? 'ایجاد ترم مدرس' : 'بروزرسانی ترم مدرس'}
           </Button>
         </div>
       </form>
