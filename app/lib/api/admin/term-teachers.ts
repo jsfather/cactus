@@ -1,8 +1,8 @@
 import { ApiService } from '@/app/lib/api/client';
-import { TermTeacher } from '@/app/lib/types';
+import { SessionRecord } from '@/app/lib/types/term_teacher';
 
 export const getTermTeachers = async () => {
-  const response = await ApiService.get<{ data: TermTeacher[] }>(
+  const response = await ApiService.get<{ data: SessionRecord[] }>(
     'admin/term-teachers'
   );
 
@@ -14,7 +14,7 @@ export const getTermTeachers = async () => {
 };
 
 export const getTermTeacher = async (id: number | string) => {
-  const response = await ApiService.get<{ data: TermTeacher }>(
+  const response = await ApiService.get<{ data: SessionRecord }>(
     `admin/term-teachers/${id}`
   );
 
@@ -34,7 +34,7 @@ export const createTermTeacher = async (data: {
     end_time: string;
   }>;
 }) => {
-  const response = await ApiService.post<{ data: TermTeacher }>(
+  const response = await ApiService.post<{ data: SessionRecord }>(
     'admin/term-teachers',
     data
   );
@@ -58,7 +58,7 @@ export const updateTermTeacher = async (
     }>;
   }
 ) => {
-  const response = await ApiService.put<{ data: TermTeacher }>(
+  const response = await ApiService.put<{ data: SessionRecord }>(
     `admin/term-teachers/${id}`,
     data
   );
