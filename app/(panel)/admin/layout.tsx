@@ -65,6 +65,14 @@ const menuItems = [
         title: 'بلاگ',
         href: '/admin/blogs',
       },
+       {
+        title: 'محصولات',
+        href: '/admin/products',
+      },
+        {
+        title: 'سفارشات',
+        href: '/admin/orders',
+      },
       {
         title: 'سوالات متداول',
         href: '/admin/faqs',
