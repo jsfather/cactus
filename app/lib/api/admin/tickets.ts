@@ -22,7 +22,7 @@ export const getTeacherTickets = async () => {
 };
 
 export const getTicket = async (id: number | string) => {
-  const response = await request<{ data: Ticket }>(`admin/tickets/${id}`);
+  const response = await request<{ data: Ticket }>(`admin/ticket/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت تیکت رخ داده است');
@@ -46,7 +46,7 @@ export const closeTicket = async (id: number | string) => {
 export const replyTicket = async (id: number | string, message: string) => {
   const response = await request<{ data: Ticket }>(`admin/ticket/${id}/reply`, {
     method: 'POST',
-    body: JSON.stringify(message),
+    body: JSON.stringify({ message }),
   });
 
   if (!response) {
