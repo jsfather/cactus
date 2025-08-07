@@ -72,8 +72,8 @@ const TimePickerComponent = forwardRef<HTMLInputElement, TimePickerProps>(
       const [hour, minute] = timeString.split(':').map(Number);
       return new DateObject({
         year: 1400, // Default year
-        month: 1,   // Default month
-        day: 1,     // Default day
+        month: 1, // Default month
+        day: 1, // Default day
         hour: hour || 0,
         minute: minute || 0,
         calendar: persian,

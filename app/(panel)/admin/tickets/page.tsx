@@ -9,17 +9,17 @@ import { Ticket } from '@/app/lib/types';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { 
-  MessageCircle, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  MessageCircle,
+  Clock,
+  CheckCircle,
+  AlertCircle,
   User,
   GraduationCap,
   Calendar,
   Filter,
   Eye,
-  Building2
+  Building2,
 } from 'lucide-react';
 
 type TicketType = 'all' | 'students' | 'teachers';
@@ -27,12 +27,14 @@ type TicketType = 'all' | 'students' | 'teachers';
 const statusColors: Record<string, string> = {
   open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   closed: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-  pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  pending:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
 };
 
 const priorityColors: Record<string, string> = {
   low: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-  medium: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
+  medium:
+    'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300',
   high: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
 };
 
@@ -54,26 +56,36 @@ export default function TicketsPage() {
     const fetchTickets = async () => {
       try {
         setLoading(true);
-        
+
         if (ticketType === 'all') {
           // Fetch both student and teacher tickets
           const [studentsResponse, teachersResponse] = await Promise.all([
             getTickets(),
             getTeacherTickets(),
           ]);
-          
+
           const allTickets = [
-            ...studentsResponse.data.map((ticket: any) => ({ ...ticket, type: 'student' })),
-            ...teachersResponse.data.map((ticket: any) => ({ ...ticket, type: 'teacher' })),
+            ...studentsResponse.data.map((ticket: any) => ({
+              ...ticket,
+              type: 'student',
+            })),
+            ...teachersResponse.data.map((ticket: any) => ({
+              ...ticket,
+              type: 'teacher',
+            })),
           ];
-          
+
           setTickets(allTickets);
         } else if (ticketType === 'students') {
           const response = await getTickets();
-          setTickets(response.data.map((ticket: any) => ({ ...ticket, type: 'student' })));
+          setTickets(
+            response.data.map((ticket: any) => ({ ...ticket, type: 'student' }))
+          );
         } else {
           const response = await getTeacherTickets();
-          setTickets(response.data.map((ticket: any) => ({ ...ticket, type: 'teacher' })));
+          setTickets(
+            response.data.map((ticket: any) => ({ ...ticket, type: 'teacher' }))
+          );
         }
       } catch (error) {
         console.error('Error fetching tickets:', error);
@@ -88,11 +100,11 @@ export default function TicketsPage() {
 
   useEffect(() => {
     let filtered = tickets;
-    
+
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(ticket => ticket.status === statusFilter);
+      filtered = filtered.filter((ticket) => ticket.status === statusFilter);
     }
-    
+
     setFilteredTickets(filtered);
   }, [tickets, statusFilter]);
 
@@ -116,10 +128,14 @@ export default function TicketsPage() {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'open': return 'باز';
-      case 'closed': return 'بسته';
-      case 'pending': return 'در انتظار';
-      default: return status;
+      case 'open':
+        return 'باز';
+      case 'closed':
+        return 'بسته';
+      case 'pending':
+        return 'در انتظار';
+      default:
+        return status;
     }
   };
 
@@ -158,7 +174,7 @@ export default function TicketsPage() {
 
         {/* Stats */}
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -166,7 +182,7 @@ export default function TicketsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل تیکت‌ها
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -178,7 +194,7 @@ export default function TicketsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -186,11 +202,11 @@ export default function TicketsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       تیکت‌های باز
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {tickets.filter(t => t.status === 'open').length}
+                      {tickets.filter((t) => t.status === 'open').length}
                     </dd>
                   </dl>
                 </div>
@@ -198,7 +214,7 @@ export default function TicketsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -206,11 +222,11 @@ export default function TicketsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       تیکت‌های دانش‌آموزان
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {tickets.filter(t => t.type === 'student').length}
+                      {tickets.filter((t) => t.type === 'student').length}
                     </dd>
                   </dl>
                 </div>
@@ -218,7 +234,7 @@ export default function TicketsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -226,11 +242,11 @@ export default function TicketsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       تیکت‌های مدرسین
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {tickets.filter(t => t.type === 'teacher').length}
+                      {tickets.filter((t) => t.type === 'teacher').length}
                     </dd>
                   </dl>
                 </div>
@@ -240,7 +256,7 @@ export default function TicketsPage() {
         </div>
 
         {/* Filters */}
-        <div className="mt-6 flex flex-col sm:flex-row gap-4">
+        <div className="mt-6 flex flex-col gap-4 sm:flex-row">
           <div className="flex gap-2">
             <Button
               variant={ticketType === 'all' ? 'primary' : 'white'}
@@ -252,7 +268,7 @@ export default function TicketsPage() {
             <Button
               variant={ticketType === 'students' ? 'primary' : 'white'}
               onClick={() => setTicketType('students')}
-              className="text-sm flex items-center gap-2"
+              className="flex items-center gap-2 text-sm"
             >
               <User className="h-4 w-4" />
               دانش‌آموزان
@@ -260,7 +276,7 @@ export default function TicketsPage() {
             <Button
               variant={ticketType === 'teachers' ? 'primary' : 'white'}
               onClick={() => setTicketType('teachers')}
-              className="text-sm flex items-center gap-2"
+              className="flex items-center gap-2 text-sm"
             >
               <GraduationCap className="h-4 w-4" />
               مدرسین
@@ -271,7 +287,7 @@ export default function TicketsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
             >
               <option value="all">همه وضعیت‌ها</option>
               <option value="open">باز</option>
@@ -284,8 +300,8 @@ export default function TicketsPage() {
         {/* Tickets Grid */}
         <div className="mt-6 grid gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {filteredTickets.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <div className="col-span-full py-12 text-center">
+              <MessageCircle className="mx-auto mb-4 h-12 w-12 text-gray-400" />
               <p className="text-gray-500 dark:text-gray-400">
                 هیچ تیکتی یافت نشد
               </p>
@@ -295,7 +311,7 @@ export default function TicketsPage() {
               <Link
                 key={ticket.id}
                 href={`/admin/tickets/${ticket.id}`}
-                className="group relative rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:border-gray-300 hover:shadow-md transition-all duration-200 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
+                className="group relative rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-gray-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
@@ -317,10 +333,10 @@ export default function TicketsPage() {
                 </div>
 
                 <div className="mt-4">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <h3 className="text-lg font-medium text-gray-900 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
                     {ticket.subject}
                   </h3>
-                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+                  <p className="mt-2 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
                     {ticket.department || 'بدون بخش'}
                   </p>
                 </div>

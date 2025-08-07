@@ -37,7 +37,7 @@ export default function PlacementExamInvitation({
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="mb-4 flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
               <BookOpen className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
@@ -52,9 +52,9 @@ export default function PlacementExamInvitation({
           </div>
 
           <p className="mb-6 text-gray-700 dark:text-gray-300">
-            برای شروع یادگیری در سطح مناسب خود، ابتدا آزمون تعیین سطح را بگذرانید.
-            این آزمون کوتاه به ما کمک می‌کند تا بهترین دوره‌ها را برای شما پیشنهاد
-            دهیم.
+            برای شروع یادگیری در سطح مناسب خود، ابتدا آزمون تعیین سطح را
+            بگذرانید. این آزمون کوتاه به ما کمک می‌کند تا بهترین دوره‌ها را برای
+            شما پیشنهاد دهیم.
           </p>
 
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">

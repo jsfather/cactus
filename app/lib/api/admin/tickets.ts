@@ -83,7 +83,10 @@ export const createTicketDepartment = async (title: string) => {
   return response;
 };
 
-export const updateTicketDepartment = async (id: number | string, title: string) => {
+export const updateTicketDepartment = async (
+  id: number | string,
+  title: string
+) => {
   const response = await request<{
     data: { id: number | string; title: string };
   }>(`admin/tickets/departments/${id}`, {

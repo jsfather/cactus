@@ -2,7 +2,9 @@ import { ApiService } from '@/app/lib/api/client';
 import { PanelGuide } from '@/app/lib/types';
 
 export const getPanelGuides = async () => {
-  const response = await ApiService.get<{ data: PanelGuide[] }>('admin/panel-guides');
+  const response = await ApiService.get<{ data: PanelGuide[] }>(
+    'admin/panel-guides'
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست راهنماهای پنل رخ داده است');
@@ -24,15 +26,17 @@ export const getPanelGuide = async (id: number | string) => {
 };
 
 export const createPanelGuide = async (
-  data: FormData | {
-    title: string;
-    description: string;
-    type: string;
-    file?: File;
-  }
+  data:
+    | FormData
+    | {
+        title: string;
+        description: string;
+        type: string;
+        file?: File;
+      }
 ) => {
   let formData: FormData;
-  
+
   if (data instanceof FormData) {
     // If already FormData, use it directly
     formData = data;
@@ -42,13 +46,16 @@ export const createPanelGuide = async (
     formData.append('title', data.title);
     formData.append('description', data.description);
     formData.append('type', data.type);
-    
+
     if (data.file) {
       formData.append('file', data.file);
     }
   }
 
-  const response = await ApiService.post<{ data: PanelGuide }>('admin/panel-guides', formData);
+  const response = await ApiService.post<{ data: PanelGuide }>(
+    'admin/panel-guides',
+    formData
+  );
 
   if (!response) {
     throw new Error('خطایی در ایجاد راهنمای پنل رخ داده است');
@@ -59,15 +66,17 @@ export const createPanelGuide = async (
 
 export const updatePanelGuide = async (
   id: number | string,
-  data: FormData | {
-    title: string;
-    description: string;
-    type: string;
-    file?: File;
-  }
+  data:
+    | FormData
+    | {
+        title: string;
+        description: string;
+        type: string;
+        file?: File;
+      }
 ) => {
   let formData: FormData;
-  
+
   if (data instanceof FormData) {
     // If already FormData, use it directly
     formData = data;
@@ -77,7 +86,7 @@ export const updatePanelGuide = async (
     formData.append('title', data.title);
     formData.append('description', data.description);
     formData.append('type', data.type);
-    
+
     if (data.file) {
       formData.append('file', data.file);
     }
@@ -99,7 +108,7 @@ export const deletePanelGuide = async (id: number | string) => {
   // For delete operations, we just need to know if it was successful
   // Status 204 indicates successful deletion, even with null response
   await ApiService.delete(`admin/panel-guides/${id}`);
-  
+
   // If no error was thrown, the deletion was successful
   return { success: true };
 };

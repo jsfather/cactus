@@ -71,11 +71,11 @@ export default function Page() {
       setDeleteLoading(true);
       await deletePanelGuide(itemToDelete.id);
       toast.success('راهنمای پنل با موفقیت حذف شد');
-      
+
       // Close modal and clear item first
       setShowDeleteModal(false);
       setItemToDelete(null);
-      
+
       // Then refresh the list
       await fetchPanelGuides();
     } catch (error) {

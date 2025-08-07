@@ -12,7 +12,18 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className, required, convertNumbers = false, onChange, ...props }, ref) => {
+  (
+    {
+      label,
+      error,
+      className,
+      required,
+      convertNumbers = false,
+      onChange,
+      ...props
+    },
+    ref
+  ) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       if (convertNumbers) {
         // Convert Persian/Arabic numbers to English

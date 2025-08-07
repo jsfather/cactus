@@ -2,22 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { 
-  getTicketDepartments, 
-  createTicketDepartment, 
+import {
+  getTicketDepartments,
+  createTicketDepartment,
   updateTicketDepartment,
-  deleteTicketDepartment 
+  deleteTicketDepartment,
 } from '@/app/lib/api/admin/tickets';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { 
-  Plus, 
-  Building2, 
-  Trash2, 
-  Edit, 
+import {
+  Plus,
+  Building2,
+  Trash2,
+  Edit,
   AlertTriangle,
-  Users
+  Users,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +38,9 @@ export default function TicketDepartmentsPage() {
   const [loading, setLoading] = useState(true);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
+  const [editingDepartment, setEditingDepartment] = useState<Department | null>(
+    null
+  );
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
 
   const {
@@ -90,7 +92,11 @@ export default function TicketDepartmentsPage() {
       fetchDepartments();
     } catch (error) {
       console.error('Error saving department:', error);
-      toast.error(editingDepartment ? 'خطا در بروزرسانی دپارتمان' : 'خطا در ایجاد دپارتمان');
+      toast.error(
+        editingDepartment
+          ? 'خطا در بروزرسانی دپارتمان'
+          : 'خطا در ایجاد دپارتمان'
+      );
     }
   };
 
@@ -133,7 +139,11 @@ export default function TicketDepartmentsPage() {
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت تیکت‌ها', href: '/admin/tickets' },
-          { label: 'مدیریت دپارتمان‌ها', href: '/admin/tickets/departments', active: true },
+          {
+            label: 'مدیریت دپارتمان‌ها',
+            href: '/admin/tickets/departments',
+            active: true,
+          },
         ]}
       />
 
@@ -159,7 +169,7 @@ export default function TicketDepartmentsPage() {
 
         {/* Stats */}
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -167,7 +177,7 @@ export default function TicketDepartmentsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل دپارتمان‌ها
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -179,7 +189,7 @@ export default function TicketDepartmentsPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -187,7 +197,7 @@ export default function TicketDepartmentsPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       دپارتمان‌های فعال
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -202,15 +212,15 @@ export default function TicketDepartmentsPage() {
 
         {/* Add Form */}
         {showAddForm && (
-          <div className="mt-6 bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div className="mt-6 rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="px-6 py-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                 {editingDepartment ? 'ویرایش دپارتمان' : 'افزودن دپارتمان جدید'}
               </h3>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
-                  <label 
-                    htmlFor="title" 
+                  <label
+                    htmlFor="title"
                     className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                   >
                     نام دپارتمان
@@ -220,10 +230,16 @@ export default function TicketDepartmentsPage() {
                     id="title"
                     {...register('title')}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                    placeholder={editingDepartment ? editingDepartment.title : "نام دپارتمان را وارد کنید..."}
+                    placeholder={
+                      editingDepartment
+                        ? editingDepartment.title
+                        : 'نام دپارتمان را وارد کنید...'
+                    }
                   />
                   {errors.title && (
-                    <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.title.message}
+                    </p>
                   )}
                 </div>
                 <div className="flex justify-end gap-3">
@@ -260,18 +276,18 @@ export default function TicketDepartmentsPage() {
         {/* Departments List */}
         <div className="mt-6">
           {departments.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div className="rounded-lg bg-white shadow dark:bg-gray-800">
               <div className="px-6 py-12 text-center">
-                <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <Building2 className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">
                   هیچ دپارتمانی یافت نشد
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-6">
+                <p className="mb-6 text-gray-500 dark:text-gray-400">
                   برای شروع، اولین دپارتمان خود را ایجاد کنید
                 </p>
                 <Button
                   onClick={() => setShowAddForm(true)}
-                  className="flex items-center gap-2 mx-auto"
+                  className="mx-auto flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
                   افزودن دپارتمان
@@ -279,14 +295,14 @@ export default function TicketDepartmentsPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+            <div className="overflow-hidden bg-white shadow sm:rounded-md dark:bg-gray-800">
               <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                 {departments.map((department, index) => (
                   <li key={department.id} className="px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900">
                             <Building2 className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                           </div>
                         </div>
@@ -308,16 +324,18 @@ export default function TicketDepartmentsPage() {
                         <Button
                           variant="white"
                           onClick={() => handleEdit(department)}
-                          className="flex items-center gap-1 text-sm px-3 py-1"
+                          className="flex items-center gap-1 px-3 py-1 text-sm"
                         >
                           <Edit className="h-4 w-4" />
                           ویرایش
                         </Button>
                         <Button
                           variant="danger"
-                          onClick={() => handleDelete(department.id, department.title)}
+                          onClick={() =>
+                            handleDelete(department.id, department.title)
+                          }
                           loading={deletingId === department.id}
-                          className="flex items-center gap-1 text-sm px-3 py-1"
+                          className="flex items-center gap-1 px-3 py-1 text-sm"
                         >
                           <Trash2 className="h-4 w-4" />
                           حذف
@@ -333,7 +351,7 @@ export default function TicketDepartmentsPage() {
 
         {/* Warning */}
         {departments.length > 0 && (
-          <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+          <div className="mt-6 rounded-md border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <div className="flex">
               <div className="flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-yellow-400" />
@@ -344,8 +362,9 @@ export default function TicketDepartmentsPage() {
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                   <p>
-                    حذف یک دپارتمان ممکن است بر تیکت‌های موجود تأثیر بگذارد. 
-                    قبل از حذف، مطمئن شوید که هیچ تیکت فعالی به این دپارتمان وابسته نیست.
+                    حذف یک دپارتمان ممکن است بر تیکت‌های موجود تأثیر بگذارد. قبل
+                    از حذف، مطمئن شوید که هیچ تیکت فعالی به این دپارتمان وابسته
+                    نیست.
                   </p>
                 </div>
               </div>

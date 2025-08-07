@@ -6,8 +6,16 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getProduct, createProduct, updateProduct, ProductFormData } from '@/app/lib/api/admin/products';
-import { getProductCategories, ProductCategory } from '@/app/lib/api/admin/product-categories';
+import {
+  getProduct,
+  createProduct,
+  updateProduct,
+  ProductFormData,
+} from '@/app/lib/api/admin/products';
+import {
+  getProductCategories,
+  ProductCategory,
+} from '@/app/lib/api/admin/product-categories';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
@@ -20,13 +28,18 @@ const productSchema = z.object({
   price: z.number().min(0, 'قیمت باید مثبت باشد'),
   stock: z.number().min(0, 'موجودی باید مثبت باشد'),
   image: z.string().optional(),
-  attributes: z.array(z.object({
-    key: z.string().min(1, 'نام ویژگی الزامی است'),
-    value: z.string().min(1, 'مقدار ویژگی الزامی است'),
-  })),
+  attributes: z.array(
+    z.object({
+      key: z.string().min(1, 'نام ویژگی الزامی است'),
+      value: z.string().min(1, 'مقدار ویژگی الزامی است'),
+    })
+  ),
 });
 
-type ProductFormDataWithStringCategory = Omit<ProductFormData, 'category_id'> & {
+type ProductFormDataWithStringCategory = Omit<
+  ProductFormData,
+  'category_id'
+> & {
   category_id: string;
 };
 
@@ -74,7 +87,10 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
           price: product.price,
           stock: product.stock,
           image: product.image || '',
-          attributes: product.attributes.length > 0 ? product.attributes : [{ key: '', value: '' }],
+          attributes:
+            product.attributes.length > 0
+              ? product.attributes
+              : [{ key: '', value: '' }],
         });
       }
     } catch (error) {
@@ -95,7 +111,7 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
       const formData: ProductFormData = {
         ...data,
         category_id: parseInt(data.category_id),
-        attributes: data.attributes.filter(attr => attr.key && attr.value),
+        attributes: data.attributes.filter((attr) => attr.key && attr.value),
       };
 
       if (isNew) {
@@ -141,7 +157,7 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
       />
 
       <div className="mt-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               {isNew ? 'افزودن محصول جدید' : 'ویرایش محصول'}
@@ -162,16 +178,19 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           {/* Basic Information */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+            <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                 اطلاعات اصلی
               </h3>
             </div>
-            <div className="px-6 py-4 space-y-6">
+            <div className="space-y-6 px-6 py-4">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     نام محصول *
                   </label>
                   <input
@@ -182,12 +201,17 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                     placeholder="نام محصول را وارد کنید"
                   />
                   {errors.title && (
-                    <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.title.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="category_id"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     دسته‌بندی *
                   </label>
                   <select
@@ -203,13 +227,18 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                     ))}
                   </select>
                   {errors.category_id && (
-                    <p className="mt-1 text-sm text-red-600">{errors.category_id.message}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.category_id.message}
+                    </p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
                   توضیحات *
                 </label>
                 <textarea
@@ -220,12 +249,17 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                   placeholder="توضیحات محصول را وارد کنید"
                 />
                 {errors.description && (
-                  <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.description.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="image" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label
+                  htmlFor="image"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
                   تصویر محصول
                 </label>
                 <input
@@ -236,15 +270,17 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                   placeholder="آدرس تصویر محصول"
                 />
                 {errors.image && (
-                  <p className="mt-1 text-sm text-red-600">{errors.image.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.image.message}
+                  </p>
                 )}
               </div>
             </div>
           </div>
 
           {/* Price and Stock */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+            <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
               <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                 قیمت و موجودی
               </h3>
@@ -252,7 +288,10 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
             <div className="px-6 py-4">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <label htmlFor="price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="price"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     قیمت (تومان) *
                   </label>
                   <input
@@ -263,12 +302,17 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                     placeholder="0"
                   />
                   {errors.price && (
-                    <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.price.message}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="stock" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="stock"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     موجودی *
                   </label>
                   <input
@@ -279,7 +323,9 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                     placeholder="0"
                   />
                   {errors.stock && (
-                    <p className="mt-1 text-sm text-red-600">{errors.stock.message}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.stock.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -287,8 +333,8 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
           </div>
 
           {/* Attributes */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+            <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                   ویژگی‌های محصول
@@ -304,7 +350,7 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                 </Button>
               </div>
             </div>
-            <div className="px-6 py-4 space-y-4">
+            <div className="space-y-4 px-6 py-4">
               {fields.map((field, index) => (
                 <div key={field.id} className="flex items-center gap-4">
                   <div className="flex-1">
@@ -315,7 +361,9 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                       placeholder="نام ویژگی (مثل: رنگ، سایز)"
                     />
                     {errors.attributes?.[index]?.key && (
-                      <p className="mt-1 text-sm text-red-600">{errors.attributes[index]?.key?.message}</p>
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.attributes[index]?.key?.message}
+                      </p>
                     )}
                   </div>
                   <div className="flex-1">
@@ -326,7 +374,9 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
                       placeholder="مقدار ویژگی (مثل: آبی، بزرگ)"
                     />
                     {errors.attributes?.[index]?.value && (
-                      <p className="mt-1 text-sm text-red-600">{errors.attributes[index]?.value?.message}</p>
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.attributes[index]?.value?.message}
+                      </p>
                     )}
                   </div>
                   <Button

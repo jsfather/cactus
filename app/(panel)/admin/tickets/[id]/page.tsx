@@ -3,23 +3,27 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { getTicket, closeTicket, replyTicket } from '@/app/lib/api/admin/tickets';
+import {
+  getTicket,
+  closeTicket,
+  replyTicket,
+} from '@/app/lib/api/admin/tickets';
 import { Ticket, Message } from '@/app/lib/types';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { 
-  MessageCircle, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  MessageCircle,
+  Clock,
+  CheckCircle,
+  AlertCircle,
   User,
   GraduationCap,
   Calendar,
   Send,
   X,
   FileText,
-  ArrowLeft
+  ArrowLeft,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +38,8 @@ type ReplyFormData = z.infer<typeof replySchema>;
 const statusColors = {
   open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
   closed: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-  pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  pending:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
 };
 
 const statusIcons = {
@@ -43,7 +48,11 @@ const statusIcons = {
   pending: <AlertCircle className="h-4 w-4" />,
 };
 
-export default function TicketDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function TicketDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const resolvedParams = use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -102,7 +111,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
       toast.success('پاسخ با موفقیت ارسال شد');
       reset();
       setIsReplying(false);
-      
+
       // Refresh ticket to get updated messages
       const response = await getTicket(resolvedParams.id);
       setTicket(response.data);
@@ -124,10 +133,14 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'open': return 'باز';
-      case 'closed': return 'بسته';
-      case 'pending': return 'در انتظار';
-      default: return status;
+      case 'open':
+        return 'باز';
+      case 'closed':
+        return 'بسته';
+      case 'pending':
+        return 'در انتظار';
+      default:
+        return status;
     }
   };
 
@@ -137,8 +150,8 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
   if (!ticket) {
     return (
-      <div className="text-center py-12">
-        <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+      <div className="py-12 text-center">
+        <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
         <p className="text-gray-500 dark:text-gray-400">تیکت یافت نشد</p>
       </div>
     );
@@ -150,17 +163,21 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت تیکت‌ها', href: '/admin/tickets' },
-          { label: `تیکت #${ticket.id}`, href: `/admin/tickets/${ticket.id}`, active: true },
+          {
+            label: `تیکت #${ticket.id}`,
+            href: `/admin/tickets/${ticket.id}`,
+            active: true,
+          },
         ]}
       />
 
       <div className="mt-8">
         {/* Header */}
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div className="rounded-lg bg-white shadow dark:bg-gray-800">
           <div className="px-6 py-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
+                <div className="mb-2 flex items-center gap-3">
                   <Button
                     variant="white"
                     onClick={() => router.push('/admin/tickets')}
@@ -197,7 +214,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                 </div>
                 {ticket.department && (
                   <div className="mt-2">
-                    <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900 dark:text-blue-300">
+                    <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/10 ring-inset dark:bg-blue-900 dark:text-blue-300">
                       {ticket.department}
                     </span>
                   </div>
@@ -232,12 +249,15 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
         {/* Reply Form */}
         {isReplying && ticket.status !== 'closed' && (
-          <div className="mt-6 bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div className="mt-6 rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="px-6 py-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                 ارسال پاسخ
               </h3>
-              <form onSubmit={handleSubmit(onSubmitReply)} className="space-y-4">
+              <form
+                onSubmit={handleSubmit(onSubmitReply)}
+                className="space-y-4"
+              >
                 <div>
                   <textarea
                     {...register('message')}
@@ -246,7 +266,9 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                     placeholder="پاسخ خود را بنویسید..."
                   />
                   {errors.message && (
-                    <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                    <p className="mt-1 text-sm text-red-600">
+                      {errors.message.message}
+                    </p>
                   )}
                 </div>
                 <div className="flex justify-end gap-3">
@@ -280,12 +302,12 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
             ticket.messages.map((message, index) => (
               <div
                 key={index}
-                className={`bg-white dark:bg-gray-800 shadow rounded-lg ${
+                className={`rounded-lg bg-white shadow dark:bg-gray-800 ${
                   message.is_student ? 'ml-12' : 'mr-12'
                 }`}
               >
                 <div className="px-6 py-4">
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="mb-3 flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       {message.is_student ? (
                         <User className="h-5 w-5 text-blue-500" />
@@ -304,12 +326,12 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                     </span>
                   </div>
                   <div className="prose dark:prose-invert max-w-none">
-                    <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                    <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
                       {message.message}
                     </p>
                   </div>
                   {message.attachment && (
-                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <div className="mt-3 border-t border-gray-200 pt-3 dark:border-gray-700">
                       <a
                         href={message.attachment}
                         target="_blank"
@@ -325,9 +347,9 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
               </div>
             ))
           ) : (
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div className="rounded-lg bg-white shadow dark:bg-gray-800">
               <div className="px-6 py-8 text-center">
-                <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <MessageCircle className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                 <p className="text-gray-500 dark:text-gray-400">
                   هنوز هیچ پیامی ارسال نشده است
                 </p>

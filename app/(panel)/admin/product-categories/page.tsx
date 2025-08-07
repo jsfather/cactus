@@ -2,25 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { 
-  getProductCategories, 
-  createProductCategory, 
+import {
+  getProductCategories,
+  createProductCategory,
   updateProductCategory,
   deleteProductCategory,
   ProductCategory,
-  ProductCategoryFormData
+  ProductCategoryFormData,
 } from '@/app/lib/api/admin/product-categories';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { 
-  Plus, 
-  Package, 
-  Trash2, 
-  Edit, 
-  AlertTriangle,
-  Tag
-} from 'lucide-react';
+import { Plus, Package, Trash2, Edit, AlertTriangle, Tag } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -34,7 +27,8 @@ export default function ProductCategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
+  const [editingCategory, setEditingCategory] =
+    useState<ProductCategory | null>(null);
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
 
   const {
@@ -65,9 +59,9 @@ export default function ProductCategoriesPage() {
 
   useEffect(() => {
     if (editingCategory) {
-      reset({ 
+      reset({
         name: editingCategory.name,
-        description: editingCategory.description || ''
+        description: editingCategory.description || '',
       });
     } else {
       reset({ name: '', description: '' });
@@ -89,7 +83,11 @@ export default function ProductCategoriesPage() {
       fetchCategories();
     } catch (error) {
       console.error('Error saving category:', error);
-      toast.error(editingCategory ? 'خطا در بروزرسانی دسته‌بندی' : 'خطا در ایجاد دسته‌بندی');
+      toast.error(
+        editingCategory
+          ? 'خطا در بروزرسانی دسته‌بندی'
+          : 'خطا در ایجاد دسته‌بندی'
+      );
     }
   };
 
@@ -132,7 +130,11 @@ export default function ProductCategoriesPage() {
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت محصولات', href: '/admin/products' },
-          { label: 'مدیریت دسته‌بندی‌ها', href: '/admin/product-categories', active: true },
+          {
+            label: 'مدیریت دسته‌بندی‌ها',
+            href: '/admin/product-categories',
+            active: true,
+          },
         ]}
       />
 
@@ -158,7 +160,7 @@ export default function ProductCategoriesPage() {
 
         {/* Stats */}
         <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -166,7 +168,7 @@ export default function ProductCategoriesPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل دسته‌بندی‌ها
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -178,7 +180,7 @@ export default function ProductCategoriesPage() {
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -186,7 +188,7 @@ export default function ProductCategoriesPage() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       دسته‌بندی‌های فعال
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -201,16 +203,16 @@ export default function ProductCategoriesPage() {
 
         {/* Add Form */}
         {showAddForm && (
-          <div className="mt-6 bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div className="mt-6 rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="px-6 py-4">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                 {editingCategory ? 'ویرایش دسته‌بندی' : 'افزودن دسته‌بندی جدید'}
               </h3>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <label 
-                      htmlFor="name" 
+                    <label
+                      htmlFor="name"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       نام دسته‌بندی *
@@ -220,15 +222,21 @@ export default function ProductCategoriesPage() {
                       id="name"
                       {...register('name')}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                      placeholder={editingCategory ? editingCategory.name : "نام دسته‌بندی را وارد کنید..."}
+                      placeholder={
+                        editingCategory
+                          ? editingCategory.name
+                          : 'نام دسته‌بندی را وارد کنید...'
+                      }
                     />
                     {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.name.message}
+                      </p>
                     )}
                   </div>
                   <div>
-                    <label 
-                      htmlFor="description" 
+                    <label
+                      htmlFor="description"
                       className="block text-sm font-medium text-gray-700 dark:text-gray-300"
                     >
                       توضیحات
@@ -241,7 +249,9 @@ export default function ProductCategoriesPage() {
                       placeholder="توضیحات دسته‌بندی (اختیاری)"
                     />
                     {errors.description && (
-                      <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                      <p className="mt-1 text-sm text-red-600">
+                        {errors.description.message}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -279,18 +289,18 @@ export default function ProductCategoriesPage() {
         {/* Categories List */}
         <div className="mt-6">
           {categories.length === 0 ? (
-            <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
+            <div className="rounded-lg bg-white shadow dark:bg-gray-800">
               <div className="px-6 py-12 text-center">
-                <Tag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                <Tag className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">
                   هیچ دسته‌بندی یافت نشد
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-6">
+                <p className="mb-6 text-gray-500 dark:text-gray-400">
                   برای شروع، اولین دسته‌بندی خود را ایجاد کنید
                 </p>
                 <Button
                   onClick={() => setShowAddForm(true)}
-                  className="flex items-center gap-2 mx-auto"
+                  className="mx-auto flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
                   افزودن دسته‌بندی
@@ -298,14 +308,14 @@ export default function ProductCategoriesPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+            <div className="overflow-hidden bg-white shadow sm:rounded-md dark:bg-gray-800">
               <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                 {categories.map((category, index) => (
                   <li key={category.id} className="px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="flex-shrink-0">
-                          <div className="h-10 w-10 rounded-lg bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900">
                             <Tag className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                           </div>
                         </div>
@@ -319,7 +329,8 @@ export default function ProductCategoriesPage() {
                             </span>
                           </div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {category.description || 'بدون توضیحات'} • شناسه: {category.id}
+                            {category.description || 'بدون توضیحات'} • شناسه:{' '}
+                            {category.id}
                           </p>
                         </div>
                       </div>
@@ -327,16 +338,18 @@ export default function ProductCategoriesPage() {
                         <Button
                           variant="white"
                           onClick={() => handleEdit(category)}
-                          className="flex items-center gap-1 text-sm px-3 py-1"
+                          className="flex items-center gap-1 px-3 py-1 text-sm"
                         >
                           <Edit className="h-4 w-4" />
                           ویرایش
                         </Button>
                         <Button
                           variant="danger"
-                          onClick={() => handleDelete(category.id, category.name)}
+                          onClick={() =>
+                            handleDelete(category.id, category.name)
+                          }
                           loading={deletingId === category.id}
-                          className="flex items-center gap-1 text-sm px-3 py-1"
+                          className="flex items-center gap-1 px-3 py-1 text-sm"
                         >
                           <Trash2 className="h-4 w-4" />
                           حذف
@@ -352,7 +365,7 @@ export default function ProductCategoriesPage() {
 
         {/* Warning */}
         {categories.length > 0 && (
-          <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-4">
+          <div className="mt-6 rounded-md border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
             <div className="flex">
               <div className="flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-yellow-400" />
@@ -363,8 +376,9 @@ export default function ProductCategoriesPage() {
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                   <p>
-                    حذف یک دسته‌بندی ممکن است بر محصولات موجود تأثیر بگذارد. 
-                    قبل از حذف، مطمئن شوید که هیچ محصولی به این دسته‌بندی وابسته نیست.
+                    حذف یک دسته‌بندی ممکن است بر محصولات موجود تأثیر بگذارد. قبل
+                    از حذف، مطمئن شوید که هیچ محصولی به این دسته‌بندی وابسته
+                    نیست.
                   </p>
                 </div>
               </div>

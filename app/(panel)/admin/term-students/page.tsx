@@ -6,9 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import {
-  createTermStudent,
-} from '@/app/lib/api/admin/term-students';
+import { createTermStudent } from '@/app/lib/api/admin/term-students';
 import { getTerms } from '@/app/lib/api/admin/terms';
 import { getStudents } from '@/app/lib/api/admin/students';
 import { getTermTeachers } from '@/app/lib/api/admin/term-teachers';
@@ -30,9 +28,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
   const [loading, setLoading] = useState(!isNew);
-  const [terms, setTerms] = useState<Array<{ label: string; value: string }>>([]);
-  const [students, setStudents] = useState<Array<{ label: string; value: string }>>([]);
-  const [termTeachers, setTermTeachers] = useState<Array<{ label: string; value: string }>>([]);
+  const [terms, setTerms] = useState<Array<{ label: string; value: string }>>(
+    []
+  );
+  const [students, setStudents] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
+  const [termTeachers, setTermTeachers] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
 
   const {
     register,
@@ -47,11 +51,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const fetchData = async () => {
       try {
         // Load all dropdown data
-        const [termsResponse, studentsResponse, termTeachersResponse] = await Promise.all([
-          getTerms(),
-          getStudents(),
-          getTermTeachers(),
-        ]);
+        const [termsResponse, studentsResponse, termTeachersResponse] =
+          await Promise.all([getTerms(), getStudents(), getTermTeachers()]);
 
         setTerms(
           termsResponse.data.map((term: any) => ({
@@ -62,7 +63,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
         setStudents(
           studentsResponse.data.map((student: any) => ({
-            label: student.user?.name || student.name || `دانش آموز ${student.id}`,
+            label:
+              student.user?.name || student.name || `دانش آموز ${student.id}`,
             value: student.user?.id?.toString() || student.id.toString(),
           }))
         );
@@ -71,7 +73,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           termTeachersResponse.data
             .filter((termTeacher: any) => termTeacher.id)
             .map((termTeacher: any) => ({
-              label: `${termTeacher.teacher?.user?.first_name || ''} ${termTeacher.teacher?.user?.last_name || ''}`.trim() || termTeacher.teacher?.user?.name || `مدرس ترم ${termTeacher.id}`,
+              label:
+                `${termTeacher.teacher?.user?.first_name || ''} ${termTeacher.teacher?.user?.last_name || ''}`.trim() ||
+                termTeacher.teacher?.user?.name ||
+                `مدرس ترم ${termTeacher.id}`,
               value: termTeacher.id.toString(),
             }))
         );
@@ -90,15 +95,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const onSubmit = async (data: TermStudentFormData) => {
     try {
-     
-        await createTermStudent(data);
-        toast.success('دانش آموز با موفقیت به ترم اضافه شد');
-      
+      await createTermStudent(data);
+      toast.success('دانش آموز با موفقیت به ترم اضافه شد');
+
       router.push('/admin/term-students');
     } catch (error) {
-      toast.error(
-    'خطا در اضافه کردن دانش آموز به ترم'
-      );
+      toast.error('خطا در اضافه کردن دانش آموز به ترم');
     }
   };
 
@@ -112,7 +114,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         breadcrumbs={[
           { label: 'ترم دانش آموزان', href: '/admin/term-students' },
           {
-            label: isNew ? 'اضافه کردن دانش آموز به ترم' : 'ویرایش ترم دانش آموز',
+            label: isNew
+              ? 'اضافه کردن دانش آموز به ترم'
+              : 'ویرایش ترم دانش آموز',
             href: `/admin/term-students/${resolvedParams.id}`,
             active: true,
           },

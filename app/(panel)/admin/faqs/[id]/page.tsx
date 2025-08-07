@@ -80,12 +80,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const handleError = (error: ApiError) => {
     console.log('FAQ form submission error:', error);
-    
+
     // Show toast error message
     if (error?.message) {
       toast.error(error.message);
     } else {
-      toast.error(isNew ? 'خطا در ایجاد سوال متداول' : 'خطا در بروزرسانی سوال متداول');
+      toast.error(
+        isNew ? 'خطا در ایجاد سوال متداول' : 'خطا در بروزرسانی سوال متداول'
+      );
     }
   };
 
@@ -106,12 +108,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form 
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))} 
+      <form
+        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
         className="mt-8 space-y-6"
       >
         {globalError && (
-          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
             {globalError}
           </div>
         )}

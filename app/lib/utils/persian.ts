@@ -9,20 +9,20 @@ const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
  */
 export function convertToEnglishNumbers(str: string | number): string {
   if (str === null || str === undefined) return '';
-  
+
   // Convert to string first
   let result = String(str);
-  
+
   // Convert Persian numbers
   persianNumbers.forEach((persianNum, index) => {
     result = result.replace(new RegExp(persianNum, 'g'), englishNumbers[index]);
   });
-  
+
   // Convert Arabic numbers
   arabicNumbers.forEach((arabicNum, index) => {
     result = result.replace(new RegExp(arabicNum, 'g'), englishNumbers[index]);
   });
-  
+
   return result;
 }
 
@@ -31,13 +31,13 @@ export function convertToEnglishNumbers(str: string | number): string {
  */
 export function convertToPersianNumbers(str: string): string {
   if (!str) return str;
-  
+
   let result = str;
-  
+
   englishNumbers.forEach((englishNum, index) => {
     result = result.replace(new RegExp(englishNum, 'g'), persianNumbers[index]);
   });
-  
+
   return result;
 }
 
@@ -46,7 +46,7 @@ export function convertToPersianNumbers(str: string): string {
  */
 export function isNumeric(str: string | number): boolean {
   if (str === null || str === undefined) return false;
-  
+
   const stringValue = String(str);
   const numericRegex = /^[0-9۰-۹٠-٩]+$/;
   return numericRegex.test(stringValue);

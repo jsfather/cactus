@@ -60,7 +60,10 @@ export const createProduct = async (data: ProductFormData) => {
   return response;
 };
 
-export const updateProduct = async (id: number | string, data: ProductFormData) => {
+export const updateProduct = async (
+  id: number | string,
+  data: ProductFormData
+) => {
   const response = await request<{ data: Product }>(`admin/products/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),

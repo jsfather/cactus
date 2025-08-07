@@ -19,17 +19,19 @@ export const getExamQuestions = async (examId: number | string) => {
 // Create a new question for an exam
 export const createExamQuestion = async (
   examId: number | string,
-  data: FormData | {
-    text: string;
-    options: Array<{
-      text: string;
-      is_correct: number;
-    }>;
-    file?: File;
-  }
+  data:
+    | FormData
+    | {
+        text: string;
+        options: Array<{
+          text: string;
+          is_correct: number;
+        }>;
+        file?: File;
+      }
 ) => {
   let formData: FormData;
-  
+
   if (data instanceof FormData) {
     // If already FormData, use it directly
     formData = data;
@@ -37,13 +39,16 @@ export const createExamQuestion = async (
     // Convert object to FormData
     formData = new FormData();
     formData.append('text', data.text);
-    
+
     // Add options in the format server expects
     data.options.forEach((option, index) => {
       formData.append(`options[${index}][text]`, option.text);
-      formData.append(`options[${index}][is_correct]`, option.is_correct.toString());
+      formData.append(
+        `options[${index}][is_correct]`,
+        option.is_correct.toString()
+      );
     });
-    
+
     if (data.file) {
       formData.append('file', data.file);
     }
@@ -78,7 +83,7 @@ export const updateExamQuestion = async (
   const formData = new FormData();
   formData.append('text', data.text);
   formData.append('options', JSON.stringify(data.options));
-  
+
   if (data.file) {
     formData.append('file', data.file);
   }
@@ -135,16 +140,13 @@ export const importExamQuestions = async (
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await ApiService.post<{ 
-    data: { 
-      imported: number; 
-      failed: number; 
-      questions: PlacementExamQuestion[] 
-    } 
-  }>(
-    `admin/exams/${examId}/questions/import`,
-    formData
-  );
+  const response = await ApiService.post<{
+    data: {
+      imported: number;
+      failed: number;
+      questions: PlacementExamQuestion[];
+    };
+  }>(`admin/exams/${examId}/questions/import`, formData);
 
   if (!response) {
     throw new Error('خطایی در وارد کردن سوالات رخ داده است');
@@ -160,7 +162,7 @@ export const exportExamQuestions = async (examId: number | string) => {
     {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
       },
     }
   );

@@ -3,7 +3,10 @@ import { UserRole } from '@/app/lib/types';
 /**
  * Utility function to check if a user has permission to access a resource
  */
-export function hasPermission(userRole: UserRole | undefined, allowedRoles: UserRole[]): boolean {
+export function hasPermission(
+  userRole: UserRole | undefined,
+  allowedRoles: UserRole[]
+): boolean {
   if (!userRole) return false;
   return allowedRoles.includes(userRole);
 }
@@ -40,7 +43,7 @@ export const ROLE_ROUTES = {
   },
   student: {
     dashboard: '/student/dashboard',
-    prefix: '/student', 
+    prefix: '/student',
     allowedRoles: ['student'] as UserRole[],
   },
 } as const;
@@ -49,13 +52,17 @@ export const ROLE_ROUTES = {
  * Check if a path is protected and requires authentication
  */
 export function isProtectedRoute(pathname: string): boolean {
-  return Object.values(ROLE_ROUTES).some(route => pathname.startsWith(route.prefix));
+  return Object.values(ROLE_ROUTES).some((route) =>
+    pathname.startsWith(route.prefix)
+  );
 }
 
 /**
  * Get required roles for a given path
  */
 export function getRequiredRoles(pathname: string): UserRole[] {
-  const route = Object.values(ROLE_ROUTES).find(route => pathname.startsWith(route.prefix));
+  const route = Object.values(ROLE_ROUTES).find((route) =>
+    pathname.startsWith(route.prefix)
+  );
   return route?.allowedRoles || [];
 }

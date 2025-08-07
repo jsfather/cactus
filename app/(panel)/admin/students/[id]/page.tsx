@@ -117,12 +117,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           email: student.user.email || '',
           national_code: student.user.national_code || '',
           password: '', // Don't pre-fill password
-          level_id: typeof student.level_id === 'string' ? parseInt(student.level_id) : student.level_id || 1,
+          level_id:
+            typeof student.level_id === 'string'
+              ? parseInt(student.level_id)
+              : student.level_id || 1,
           father_name: student.father_name || '',
           mother_name: student.mother_name || '',
           father_job: student.father_job || '',
           mother_job: student.mother_job || '',
-          has_allergy: typeof student.has_allergy === 'string' ? parseInt(student.has_allergy) : student.has_allergy || 0,
+          has_allergy:
+            typeof student.has_allergy === 'string'
+              ? parseInt(student.has_allergy)
+              : student.has_allergy || 0,
           allergy_details: student.allergy_details || '',
           interest_level: String(student.interest_level || ''),
           focus_level: String(student.focus_level || ''),
@@ -141,10 +147,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const onSubmit = async (data: StudentFormData) => {
     console.log('Form data before FormData creation:', data);
-    
+
     // Create FormData for file upload
     const formData = new FormData();
-    
+
     // Add basic fields
     formData.append('first_name', data.first_name);
     formData.append('last_name', data.last_name);
@@ -160,10 +166,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     formData.append('mother_job', data.mother_job);
     formData.append('has_allergy', data.has_allergy.toString());
     formData.append('allergy_details', data.allergy_details || '');
-    formData.append('interest_level', convertToEnglishNumbers(data.interest_level));
+    formData.append(
+      'interest_level',
+      convertToEnglishNumbers(data.interest_level)
+    );
     formData.append('focus_level', convertToEnglishNumbers(data.focus_level));
     formData.append('birth_date', data.birth_date);
-    
+
     // Add files if selected
     if (profilePicture) {
       formData.append('profile_picture', profilePicture);
@@ -193,12 +202,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const handleError = (error: ApiError) => {
     console.log('Student form submission error:', error);
-    
+
     // Show toast error message
     if (error?.message) {
       toast.error(error.message);
     } else {
-      toast.error(isNew ? 'خطا در ایجاد دانش‌آموز' : 'خطا در بروزرسانی دانش‌آموز');
+      toast.error(
+        isNew ? 'خطا در ایجاد دانش‌آموز' : 'خطا در بروزرسانی دانش‌آموز'
+      );
     }
   };
 
@@ -219,12 +230,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form 
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))} 
+      <form
+        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
         className="mt-8 space-y-6"
       >
         {globalError && (
-          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
             {globalError}
           </div>
         )}

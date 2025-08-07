@@ -50,14 +50,20 @@ export const getOrder = async (id: number | string) => {
   return response;
 };
 
-export const updateOrderStatus = async (id: number | string, status: string) => {
+export const updateOrderStatus = async (
+  id: number | string,
+  status: string
+) => {
   const formData = new FormData();
   formData.append('status', status);
 
-  const response = await request<{ data: Order }>(`admin/orders/update-status/${id}`, {
-    method: 'POST',
-    body: formData,
-  });
+  const response = await request<{ data: Order }>(
+    `admin/orders/update-status/${id}`,
+    {
+      method: 'POST',
+      body: formData,
+    }
+  );
 
   if (!response) {
     throw new Error('خطایی در بروزرسانی وضعیت سفارش رخ داده است');

@@ -232,83 +232,83 @@ export default function PlacementExamPage({
           ]}
         />
 
-      {/* Header with timer and progress */}
-      <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              آزمون تعیین سطح
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              سوال {currentQuestionIndex + 1} از {questions.length}
-            </p>
+        {/* Header with timer and progress */}
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                آزمون تعیین سطح
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                سوال {currentQuestionIndex + 1} از {questions.length}
+              </p>
+            </div>
+
+            {timeRemaining !== null && (
+              <div className="flex items-center gap-2 rounded-lg bg-orange-50 px-4 py-2 dark:bg-orange-900/20">
+                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                <span className="font-mono text-lg font-semibold text-orange-600 dark:text-orange-400">
+                  {formatTime(timeRemaining)}
+                </span>
+              </div>
+            )}
           </div>
 
-          {timeRemaining !== null && (
-            <div className="flex items-center gap-2 rounded-lg bg-orange-50 px-4 py-2 dark:bg-orange-900/20">
-              <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-              <span className="font-mono text-lg font-semibold text-orange-600 dark:text-orange-400">
-                {formatTime(timeRemaining)}
-              </span>
-            </div>
+          <div className="mt-4">
+            <ProgressBar
+              current={currentQuestionIndex + 1}
+              total={questions.length}
+            />
+          </div>
+        </div>
+
+        {/* Question */}
+        <QuestionCard
+          question={currentQuestion}
+          questionNumber={currentQuestionIndex + 1}
+          selectedOptionId={answers[currentQuestion.id]}
+          onOptionSelect={handleOptionSelect}
+          disabled={submitting}
+        />
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <Button
+            variant="secondary"
+            onClick={handlePreviousQuestion}
+            disabled={currentQuestionIndex === 0 || submitting}
+            className="flex items-center gap-2"
+          >
+            <ChevronRight className="h-4 w-4" />
+            سوال قبلی
+          </Button>
+
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            <CheckCircle className="h-4 w-4" />
+            {answeredQuestions} از {questions.length} پاسخ داده شده
+          </div>
+
+          {isLastQuestion ? (
+            <Button
+              onClick={handleFinishExam}
+              loading={submitting}
+              className="flex items-center gap-2"
+            >
+              <CheckCircle className="h-4 w-4" />
+              پایان آزمون
+            </Button>
+          ) : (
+            <Button
+              onClick={handleNextQuestion}
+              disabled={submitting}
+              className="flex items-center gap-2"
+            >
+              سوال بعدی
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
           )}
         </div>
-
-        <div className="mt-4">
-          <ProgressBar
-            current={currentQuestionIndex + 1}
-            total={questions.length}
-          />
-        </div>
-      </div>
-
-      {/* Question */}
-      <QuestionCard
-        question={currentQuestion}
-        questionNumber={currentQuestionIndex + 1}
-        selectedOptionId={answers[currentQuestion.id]}
-        onOptionSelect={handleOptionSelect}
-        disabled={submitting}
-      />
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="secondary"
-          onClick={handlePreviousQuestion}
-          disabled={currentQuestionIndex === 0 || submitting}
-          className="flex items-center gap-2"
-        >
-          <ChevronRight className="h-4 w-4" />
-          سوال قبلی
-        </Button>
-
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-          <CheckCircle className="h-4 w-4" />
-          {answeredQuestions} از {questions.length} پاسخ داده شده
-        </div>
-
-        {isLastQuestion ? (
-          <Button
-            onClick={handleFinishExam}
-            loading={submitting}
-            className="flex items-center gap-2"
-          >
-            <CheckCircle className="h-4 w-4" />
-            پایان آزمون
-          </Button>
-        ) : (
-          <Button
-            onClick={handleNextQuestion}
-            disabled={submitting}
-            className="flex items-center gap-2"
-          >
-            سوال بعدی
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-    </main>
+      </main>
     </ExamErrorBoundary>
   );
 }

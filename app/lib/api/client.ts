@@ -35,7 +35,7 @@ export class ApiError extends Error {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = {
-    'Accept': 'application/json',
+    Accept: 'application/json',
   };
 
   // Only set Content-Type for non-FormData requests
@@ -67,20 +67,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   try {
     response = await fetch(requestUrl, requestOptions);
   } catch (error) {
-    throw new ApiError(
-      'خطای شبکه: عدم اتصال به سرور',
-      0,
-      new Response()
-    );
+    throw new ApiError('خطای شبکه: عدم اتصال به سرور', 0, new Response());
   }
 
   // Handle network errors (status 0)
   if (response.status === 0) {
-    throw new ApiError(
-      'خطای شبکه: عدم دسترسی به سرور',
-      0,
-      response
-    );
+    throw new ApiError('خطای شبکه: عدم دسترسی به سرور', 0, response);
   }
 
   if (!response.ok) {
@@ -153,7 +145,12 @@ export class ApiService {
     return request<T>(path, {
       ...options,
       method: 'POST',
-      body: data instanceof FormData ? data : (data ? JSON.stringify(data) : undefined),
+      body:
+        data instanceof FormData
+          ? data
+          : data
+            ? JSON.stringify(data)
+            : undefined,
     });
   }
 
@@ -165,7 +162,12 @@ export class ApiService {
     return request<T>(path, {
       ...options,
       method: 'PUT',
-      body: data instanceof FormData ? data : (data ? JSON.stringify(data) : undefined),
+      body:
+        data instanceof FormData
+          ? data
+          : data
+            ? JSON.stringify(data)
+            : undefined,
     });
   }
 
@@ -177,7 +179,12 @@ export class ApiService {
     return request<T>(path, {
       ...options,
       method: 'PATCH',
-      body: data instanceof FormData ? data : (data ? JSON.stringify(data) : undefined),
+      body:
+        data instanceof FormData
+          ? data
+          : data
+            ? JSON.stringify(data)
+            : undefined,
     });
   }
 

@@ -21,7 +21,10 @@ export default function PlacementExamCompletedPage({
       <Breadcrumbs
         breadcrumbs={[
           { label: 'داشبورد', href: '/student/dashboard' },
-          { label: 'آزمون تعیین سطح', href: `/student/placement-exam/${examId}` },
+          {
+            label: 'آزمون تعیین سطح',
+            href: `/student/placement-exam/${examId}`,
+          },
           {
             label: 'تکمیل آزمون',
             href: `/student/placement-exam/${examId}/completed`,
@@ -69,7 +72,7 @@ export default function PlacementExamCompletedPage({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
           >
-            <div className="flex items-center gap-3 mb-4">
+            <div className="mb-4 flex items-center gap-3">
               <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 مراحل بعدی
@@ -77,15 +80,15 @@ export default function PlacementExamCompletedPage({
             </div>
             <div className="space-y-3 text-right text-sm text-gray-600 dark:text-gray-400">
               <div className="flex items-start gap-2">
-                <div className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
                 <span>نتایج آزمون ظرف ۲۴ ساعت آینده اعلام خواهد شد</span>
               </div>
               <div className="flex items-start gap-2">
-                <div className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
                 <span>بر اساس نتایج، سطح مناسب برای شما تعیین می‌شود</span>
               </div>
               <div className="flex items-start gap-2">
-                <div className="mt-1.5 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                <div className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
                 <span>می‌توانید در دوره‌های مناسب سطح خود ثبت‌نام کنید</span>
               </div>
             </div>

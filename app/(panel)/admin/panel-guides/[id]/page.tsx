@@ -88,13 +88,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const onSubmit = async (data: PanelGuideFormData) => {
     console.log('Form data before FormData creation:', data);
     console.log('Selected file:', selectedFile);
-    
+
     // Create FormData for file upload
     const formData = new FormData();
     formData.append('title', data.title);
     formData.append('description', data.description);
     formData.append('type', data.type);
-    
+
     // Add file if selected
     if (selectedFile) {
       formData.append('file', selectedFile);
@@ -118,12 +118,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const handleError = (error: ApiError) => {
     console.log('Panel guide form submission error:', error);
-    
+
     // Show toast error message
     if (error?.message) {
       toast.error(error.message);
     } else {
-      toast.error(isNew ? 'خطا در ایجاد راهنمای پنل' : 'خطا در بروزرسانی راهنمای پنل');
+      toast.error(
+        isNew ? 'خطا در ایجاد راهنمای پنل' : 'خطا در بروزرسانی راهنمای پنل'
+      );
     }
   };
 
@@ -144,12 +146,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form 
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))} 
+      <form
+        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
         className="mt-8 space-y-6"
       >
         {globalError && (
-          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
             {globalError}
           </div>
         )}

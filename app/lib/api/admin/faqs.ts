@@ -32,7 +32,10 @@ export const createFAQ = async (data: Partial<FAQ>) => {
 };
 
 export const updateFAQ = async (id: number | string, data: Partial<FAQ>) => {
-  const response = await ApiService.put<{ data: FAQ }>(`admin/faqs/${id}`, data);
+  const response = await ApiService.put<{ data: FAQ }>(
+    `admin/faqs/${id}`,
+    data
+  );
 
   if (!response) {
     throw new Error('خطایی در بروزرسانی سوال متداول رخ داده است');
@@ -44,7 +47,7 @@ export const updateFAQ = async (id: number | string, data: Partial<FAQ>) => {
 export const deleteFAQ = async (id: number | string) => {
   // For delete operations, we just need to know if it was successful
   await ApiService.delete(`admin/faqs/${id}`);
-  
+
   // If no error was thrown, the deletion was successful
   return { success: true };
 };

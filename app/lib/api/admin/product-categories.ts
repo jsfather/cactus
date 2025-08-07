@@ -14,7 +14,9 @@ export interface ProductCategoryFormData {
 }
 
 export const getProductCategories = async () => {
-  const response = await request<{ data: ProductCategory[] }>('admin/product-categories');
+  const response = await request<{ data: ProductCategory[] }>(
+    'admin/product-categories'
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست دسته‌بندی محصولات رخ داده است');
@@ -24,7 +26,9 @@ export const getProductCategories = async () => {
 };
 
 export const getProductCategory = async (id: number | string) => {
-  const response = await request<{ data: ProductCategory }>(`admin/product-categories/${id}`);
+  const response = await request<{ data: ProductCategory }>(
+    `admin/product-categories/${id}`
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت دسته‌بندی محصول رخ داده است');
@@ -34,10 +38,13 @@ export const getProductCategory = async (id: number | string) => {
 };
 
 export const createProductCategory = async (data: ProductCategoryFormData) => {
-  const response = await request<{ data: ProductCategory }>('admin/product-categories', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  const response = await request<{ data: ProductCategory }>(
+    'admin/product-categories',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response) {
     throw new Error('خطایی در ساخت دسته‌بندی محصول رخ داده است');
@@ -46,11 +53,17 @@ export const createProductCategory = async (data: ProductCategoryFormData) => {
   return response;
 };
 
-export const updateProductCategory = async (id: number | string, data: ProductCategoryFormData) => {
-  const response = await request<{ data: ProductCategory }>(`admin/product-categories/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
+export const updateProductCategory = async (
+  id: number | string,
+  data: ProductCategoryFormData
+) => {
+  const response = await request<{ data: ProductCategory }>(
+    `admin/product-categories/${id}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }
+  );
 
   if (!response) {
     throw new Error('خطایی در بروزرسانی دسته‌بندی محصول رخ داده است');
@@ -60,9 +73,12 @@ export const updateProductCategory = async (id: number | string, data: ProductCa
 };
 
 export const deleteProductCategory = async (id: number | string) => {
-  const response = await request<{ data: ProductCategory }>(`admin/product-categories/${id}`, {
-    method: 'DELETE',
-  });
+  const response = await request<{ data: ProductCategory }>(
+    `admin/product-categories/${id}`,
+    {
+      method: 'DELETE',
+    }
+  );
 
   if (!response) {
     throw new Error('خطایی در حذف دسته‌بندی محصول رخ داده است');

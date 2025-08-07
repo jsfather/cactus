@@ -9,7 +9,11 @@ interface UseRoleGuardOptions {
   loading?: boolean;
 }
 
-export function useRoleGuard({ allowedRoles, redirectTo, loading }: UseRoleGuardOptions) {
+export function useRoleGuard({
+  allowedRoles,
+  redirectTo,
+  loading,
+}: UseRoleGuardOptions) {
   const { user, loading: userLoading } = useUser();
   const router = useRouter();
 
@@ -34,7 +38,7 @@ export function useRoleGuard({ allowedRoles, redirectTo, loading }: UseRoleGuard
   return {
     user,
     loading: loading || userLoading,
-    hasAccess: user ? allowedRoles.includes(user.role) : false
+    hasAccess: user ? allowedRoles.includes(user.role) : false,
   };
 }
 
@@ -51,6 +55,6 @@ export function useRoleRedirect() {
   return {
     user,
     loading,
-    redirectToRoleDashboard
+    redirectToRoleDashboard,
   };
 }

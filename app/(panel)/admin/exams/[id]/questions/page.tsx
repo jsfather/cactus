@@ -7,7 +7,7 @@ import { Plus, Trash2, Upload, X } from 'lucide-react';
 import {
   getExamQuestions,
   createExamQuestion,
-  deleteExamQuestion
+  deleteExamQuestion,
 } from '@/app/lib/api/admin/questions';
 import { PlacementExamQuestion } from '@/app/lib/types/placement-exam';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
@@ -23,10 +23,14 @@ import { ApiError } from '@/app/lib/api/client';
 
 const questionSchema = z.object({
   text: z.string().min(1, 'متن سوال الزامی است'),
-  options: z.array(z.object({
-    text: z.string().min(1, 'متن گزینه الزامی است'),
-    is_correct: z.number(),
-  })).min(2, 'حداقل دو گزینه الزامی است'),
+  options: z
+    .array(
+      z.object({
+        text: z.string().min(1, 'متن گزینه الزامی است'),
+        is_correct: z.number(),
+      })
+    )
+    .min(2, 'حداقل دو گزینه الزامی است'),
 });
 
 type QuestionFormData = z.infer<typeof questionSchema>;
@@ -98,18 +102,21 @@ export default function ExamQuestionsPage({
 
   const onSubmit = async (data: QuestionFormData) => {
     console.log('Form data before FormData creation:', data);
-    
+
     // Create FormData for file upload
     const formData = new FormData();
     formData.append('text', data.text);
-    
+
     // Add options as form fields
     data.options.forEach((option, index) => {
       console.log(`Adding option ${index}:`, option);
       formData.append(`options[${index}][text]`, option.text);
-      formData.append(`options[${index}][is_correct]`, option.is_correct.toString());
+      formData.append(
+        `options[${index}][is_correct]`,
+        option.is_correct.toString()
+      );
     });
-    
+
     // Add file if selected
     if (selectedFile) {
       formData.append('file', selectedFile);
@@ -122,7 +129,7 @@ export default function ExamQuestionsPage({
     }
 
     await createExamQuestion(examId, formData);
-    
+
     toast.success('سوال با موفقیت اضافه شد');
     setShowAddForm(false);
     setSelectedFile(null);
@@ -143,7 +150,7 @@ export default function ExamQuestionsPage({
 
   const handleError = (error: ApiError) => {
     console.log('Question form submission error:', error);
-    
+
     // Show toast error message
     if (error?.message) {
       toast.error(error.message);
@@ -234,11 +241,13 @@ export default function ExamQuestionsPage({
           </div>
 
           <form
-            onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
+            onSubmit={handleSubmit(
+              submitWithErrorHandling(onSubmit, handleError)
+            )}
             className="space-y-6"
           >
             {globalError && (
-              <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+              <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
                 {globalError}
               </div>
             )}
@@ -262,7 +271,7 @@ export default function ExamQuestionsPage({
                   const file = e.target.files?.[0];
                   setSelectedFile(file || null);
                 }}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:text-gray-400 dark:file:bg-primary-900/20 dark:file:text-primary-400"
+                className="file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 dark:file:bg-primary-900/20 dark:file:text-primary-400 block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:px-4 file:py-2 file:text-sm file:font-semibold dark:text-gray-400"
               />
               {selectedFile && (
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -286,7 +295,7 @@ export default function ExamQuestionsPage({
                       name="correctAnswer"
                       checked={option.is_correct === 1}
                       onChange={() => handleCorrectAnswerChange(index)}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500"
+                      className="text-primary-600 focus:ring-primary-500 h-4 w-4"
                     />
                     <div className="flex-1">
                       <Input
@@ -307,12 +316,12 @@ export default function ExamQuestionsPage({
                   </div>
                 ))}
               </div>
-              
+
               {watchedOptions.length < 6 && (
                 <button
                   type="button"
                   onClick={addOption}
-                  className="mt-3 flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400"
+                  className="text-primary-600 hover:text-primary-700 dark:text-primary-400 mt-3 flex items-center gap-2 text-sm"
                 >
                   <Plus className="h-4 w-4" />
                   افزودن گزینه
@@ -346,7 +355,7 @@ export default function ExamQuestionsPage({
             >
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+                  <div className="bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300 flex h-8 w-8 items-center justify-center rounded-full">
                     <span className="text-sm font-bold">{index + 1}</span>
                   </div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -362,7 +371,9 @@ export default function ExamQuestionsPage({
               </div>
 
               <div className="mb-4 rounded-lg bg-gray-50 p-4 dark:bg-gray-700/50">
-                <p className="text-gray-900 dark:text-gray-100">{question.text}</p>
+                <p className="text-gray-900 dark:text-gray-100">
+                  {question.text}
+                </p>
               </div>
 
               {question.file && (
@@ -384,8 +395,8 @@ export default function ExamQuestionsPage({
                     key={option.id}
                     className={`flex items-center gap-3 rounded-lg p-3 ${
                       option.is_correct
-                        ? 'bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                        : 'bg-gray-50 border border-gray-200 dark:bg-gray-700/50 dark:border-gray-600'
+                        ? 'border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+                        : 'border border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700/50'
                     }`}
                   >
                     <div
@@ -411,7 +422,7 @@ export default function ExamQuestionsPage({
             </div>
           ))
         ) : (
-          <div className="text-center py-12">
+          <div className="py-12 text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
               <Plus className="h-8 w-8 text-gray-400" />
             </div>
