@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, X, Image as ImageIcon, Check } from 'lucide-react';
 import Image from 'next/image';
+import { useRoleRedirect } from '@/app/hooks/useRoleGuard';
 
 export default function DocumentUploadPage() {
   const router = useRouter();
+  const { redirectToRoleDashboard } = useRoleRedirect();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -28,8 +30,8 @@ export default function DocumentUploadPage() {
     setLoading(true);
 
     // TODO: Implement API call to upload document
-    // For now, just navigate to dashboard
-    router.push('/admin/dashboard');
+    // For now, just redirect to appropriate dashboard based on user role
+    redirectToRoleDashboard();
   };
 
   return (

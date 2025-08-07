@@ -22,7 +22,7 @@ export const getTeacherTickets = async () => {
 };
 
 export const getTicket = async (id: number | string) => {
-  const response = await request<{ data: Ticket }>(`admin/tickets/${id}`);
+  const response = await request<{ data: Ticket }>(`admin/ticket/${id}`);
 
   if (!response) {
     throw new Error('خطایی در دریافت تیکت رخ داده است');
@@ -46,7 +46,7 @@ export const closeTicket = async (id: number | string) => {
 export const replyTicket = async (id: number | string, message: string) => {
   const response = await request<{ data: Ticket }>(`admin/ticket/${id}/reply`, {
     method: 'POST',
-    body: JSON.stringify(message),
+    body: JSON.stringify({ message }),
   });
 
   if (!response) {
@@ -58,7 +58,7 @@ export const replyTicket = async (id: number | string, message: string) => {
 
 export const getTicketDepartments = async () => {
   const response = await request<{
-    data: { id: number | string; title: string };
+    data: { id: number | string; title: string }[];
   }>('admin/tickets/departments');
 
   if (!response) {
@@ -73,11 +73,29 @@ export const createTicketDepartment = async (title: string) => {
     data: { id: number | string; title: string };
   }>('admin/tickets/departments', {
     method: 'POST',
-    body: JSON.stringify(title),
+    body: JSON.stringify({ title }),
   });
 
   if (!response) {
     throw new Error('خطایی در ساخت بخش تیکت رخ داده است');
+  }
+
+  return response;
+};
+
+export const updateTicketDepartment = async (
+  id: number | string,
+  title: string
+) => {
+  const response = await request<{
+    data: { id: number | string; title: string };
+  }>(`admin/tickets/departments/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ title }),
+  });
+
+  if (!response) {
+    throw new Error('خطایی در بروزرسانی بخش تیکت رخ داده است');
   }
 
   return response;

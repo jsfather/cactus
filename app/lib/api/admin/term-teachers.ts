@@ -34,7 +34,10 @@ export const createTermTeacher = async (data: {
     end_time: string;
   }>;
 }) => {
-  const response = await ApiService.post<{ data: TermTeacher }>('admin/term-teachers', data);
+  const response = await ApiService.post<{ data: TermTeacher }>(
+    'admin/term-teachers',
+    data
+  );
 
   if (!response) {
     throw new Error('خطایی در ایجاد مدرس ترم رخ داده است');
@@ -69,7 +72,7 @@ export const updateTermTeacher = async (
 
 export const deleteTermTeacher = async (id: number | string) => {
   await ApiService.delete(`admin/term-teachers/${id}`);
-  
+
   // If no error was thrown, the deletion was successful
   return { success: true };
 };

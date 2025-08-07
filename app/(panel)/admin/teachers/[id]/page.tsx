@@ -119,12 +119,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           email: teacher.user.email || '',
           national_code: teacher.user.national_code || '',
           password: '', // Don't pre-fill password
-          level_id: typeof teacher.level_id === 'string' ? parseInt(teacher.level_id) : teacher.level_id,
+          level_id:
+            typeof teacher.level_id === 'string'
+              ? parseInt(teacher.level_id)
+              : teacher.level_id,
           father_name: teacher.father_name || '',
           mother_name: teacher.mother_name || '',
           father_job: teacher.father_job || '',
           mother_job: teacher.mother_job || '',
-          has_allergy: typeof teacher.has_allergy === 'string' ? parseInt(teacher.has_allergy) : teacher.has_allergy || 0,
+          has_allergy:
+            typeof teacher.has_allergy === 'string'
+              ? parseInt(teacher.has_allergy)
+              : teacher.has_allergy || 0,
           allergy_details: teacher.allergy_details || '',
           interest_level: String(teacher.interest_level || ''),
           focus_level: String(teacher.focus_level || ''),
@@ -144,10 +150,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const onSubmit = async (data: TeacherFormData) => {
     console.log('Form data before FormData creation:', data);
-    
+
     // Create FormData for file upload
     const formData = new FormData();
-    
+
     // Add basic fields
     formData.append('first_name', data.first_name);
     formData.append('last_name', data.last_name);
@@ -163,11 +169,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     formData.append('mother_job', data.mother_job);
     formData.append('has_allergy', data.has_allergy.toString());
     formData.append('allergy_details', data.allergy_details || '');
-    formData.append('interest_level', convertToEnglishNumbers(data.interest_level));
+    formData.append(
+      'interest_level',
+      convertToEnglishNumbers(data.interest_level)
+    );
     formData.append('focus_level', convertToEnglishNumbers(data.focus_level));
     formData.append('birth_date', data.birth_date);
     formData.append('bio', data.bio);
-    
+
     // Add files if selected
     if (profilePicture) {
       formData.append('profile_picture', profilePicture);
@@ -197,7 +206,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const handleError = (error: ApiError) => {
     console.log('Teacher form submission error:', error);
-    
+
     // Show toast error message
     if (error?.message) {
       toast.error(error.message);

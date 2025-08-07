@@ -193,7 +193,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               <Button
                 type="button"
                 variant="info"
-                onClick={() => router.push(`/admin/exams/${resolvedParams.id}/questions`)}
+                onClick={() =>
+                  router.push(`/admin/exams/${resolvedParams.id}/questions`)
+                }
               >
                 مدیریت سوالات
               </Button>

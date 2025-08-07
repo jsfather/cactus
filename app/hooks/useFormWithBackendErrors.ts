@@ -23,7 +23,9 @@ export function useFormWithBackendErrors<T extends FieldValues>(
 
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  const setBackendErrors = (errors: BackendError[] | Record<string, string[]> | any) => {
+  const setBackendErrors = (
+    errors: BackendError[] | Record<string, string[]> | any
+  ) => {
     // Handle different error formats
     if (Array.isArray(errors)) {
       // Format: [{field: "name", message: "error"}]

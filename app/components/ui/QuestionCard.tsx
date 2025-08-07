@@ -36,7 +36,7 @@ export default function QuestionCard({
       {/* Question Header */}
       <div className="mb-6">
         <div className="mb-4 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300">
+          <div className="bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-300 flex h-10 w-10 items-center justify-center rounded-full">
             <span className="text-lg font-bold">{questionNumber}</span>
           </div>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

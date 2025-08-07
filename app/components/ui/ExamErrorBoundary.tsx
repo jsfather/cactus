@@ -39,10 +39,14 @@ class ExamErrorBoundary extends React.Component<
     if (this.state.hasError) {
       if (this.props.fallback) {
         const FallbackComponent = this.props.fallback;
-        return <FallbackComponent error={this.state.error} retry={this.retry} />;
+        return (
+          <FallbackComponent error={this.state.error} retry={this.retry} />
+        );
       }
 
-      return <DefaultErrorFallback error={this.state.error} retry={this.retry} />;
+      return (
+        <DefaultErrorFallback error={this.state.error} retry={this.retry} />
+      );
     }
 
     return this.props.children;

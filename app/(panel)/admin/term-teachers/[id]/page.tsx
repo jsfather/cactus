@@ -26,13 +26,15 @@ import { Plus, Trash2 } from 'lucide-react';
 const termTeacherSchema = z.object({
   term_id: z.number({ required_error: 'ترم الزامی است' }),
   teacher_id: z.number({ required_error: 'مدرس الزامی است' }),
-  days: z.array(
-    z.object({
-      day_of_week: z.string().min(1, 'روز هفته الزامی است'),
-      start_time: z.string().min(1, 'ساعت شروع الزامی است'),
-      end_time: z.string().min(1, 'ساعت پایان الزامی است'),
-    })
-  ).min(1, 'حداقل یک روز الزامی است'),
+  days: z
+    .array(
+      z.object({
+        day_of_week: z.string().min(1, 'روز هفته الزامی است'),
+        start_time: z.string().min(1, 'ساعت شروع الزامی است'),
+        end_time: z.string().min(1, 'ساعت پایان الزامی است'),
+      })
+    )
+    .min(1, 'حداقل یک روز الزامی است'),
 });
 
 type TermTeacherFormData = z.infer<typeof termTeacherSchema>;
@@ -52,8 +54,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
   const [loading, setLoading] = useState(true);
-  const [termOptions, setTermOptions] = useState<Array<{ value: string; label: string }>>([]);
-  const [teacherOptions, setTeacherOptions] = useState<Array<{ value: string; label: string }>>([]);
+  const [termOptions, setTermOptions] = useState<
+    Array<{ value: string; label: string }>
+  >([]);
+  const [teacherOptions, setTeacherOptions] = useState<
+    Array<{ value: string; label: string }>
+  >([]);
 
   const {
     register,
@@ -75,24 +81,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch terms and teachers in parallel
         const [termsResponse, teachersResponse] = await Promise.all([
           getTerms(),
-          getTeachers()
+          getTeachers(),
         ]);
 
         // Set terms options
-        const termOptions = termsResponse.data.map(term => ({
+        const termOptions = termsResponse.data.map((term) => ({
           value: term.id.toString(),
-          label: term.title
+          label: term.title,
         }));
         setTermOptions(termOptions);
 
         // Set teachers options
-        const teacherOptions = teachersResponse.data.map(teacher => ({
+        const teacherOptions = teachersResponse.data.map((teacher) => ({
           value: teacher.user_id.toString(),
-          label: `${teacher.user.first_name} ${teacher.user.last_name}`
+          label: `${teacher.user.first_name} ${teacher.user.last_name}`,
         }));
         setTeacherOptions(teacherOptions);
 
@@ -101,15 +107,23 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           const response = await getTermTeacher(resolvedParams.id);
           const termTeacher = response.data;
           reset({
-            term_id: typeof termTeacher.term_id === 'string' ? parseInt(termTeacher.term_id) : termTeacher.term_id,
-            teacher_id: typeof termTeacher.teacher_id === 'string' ? parseInt(termTeacher.teacher_id) : termTeacher.teacher_id,
+            term_id:
+              typeof termTeacher.term_id === 'string'
+                ? parseInt(termTeacher.term_id)
+                : termTeacher.term_id,
+            teacher_id:
+              typeof termTeacher.teacher_id === 'string'
+                ? parseInt(termTeacher.teacher_id)
+                : termTeacher.teacher_id,
             days: termTeacher.days || [],
           });
         } else {
           // Set default values for new term-teachers after options are loaded
           reset({
-            term_id: termOptions.length > 0 ? parseInt(termOptions[0].value) : 0,
-            teacher_id: teacherOptions.length > 0 ? parseInt(teacherOptions[0].value) : 0,
+            term_id:
+              termOptions.length > 0 ? parseInt(termOptions[0].value) : 0,
+            teacher_id:
+              teacherOptions.length > 0 ? parseInt(teacherOptions[0].value) : 0,
             days: [
               {
                 day_of_week: 'شنبه',
@@ -138,7 +152,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const onSubmit = async (data: TermTeacherFormData) => {
     console.log('Form data before submission:', data);
     console.log('term_id type:', typeof data.term_id, 'value:', data.term_id);
-    console.log('teacher_id type:', typeof data.teacher_id, 'value:', data.teacher_id);
+    console.log(
+      'teacher_id type:',
+      typeof data.teacher_id,
+      'value:',
+      data.teacher_id
+    );
 
     if (isNew) {
       await createTermTeacher(data);
@@ -152,12 +171,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const handleError = (error: ApiError) => {
     console.log('Term teacher form submission error:', error);
-    
+
     // Show toast error message
     if (error?.message) {
       toast.error(error.message);
     } else {
-      toast.error(isNew ? 'خطا در ایجاد ترم مدرس' : 'خطا در بروزرسانی ترم مدرس');
+      toast.error(
+        isNew ? 'خطا در ایجاد ترم مدرس' : 'خطا در بروزرسانی ترم مدرس'
+      );
     }
   };
 
@@ -192,12 +213,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form 
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))} 
+      <form
+        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
         className="mt-8 space-y-6"
       >
         {globalError && (
-          <div className="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg border border-red-200">
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
             {globalError}
           </div>
         )}
@@ -239,14 +260,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               افزودن روز
             </Button>
           </div>
-          
+
           {errors.days?.message && (
             <p className="text-sm text-red-600">{errors.days.message}</p>
           )}
 
           <div className="space-y-4">
             {fields.map((field, index) => (
-              <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-gray-200 rounded-lg dark:border-gray-700">
+              <div
+                key={field.id}
+                className="grid grid-cols-1 gap-4 rounded-lg border border-gray-200 p-4 md:grid-cols-4 dark:border-gray-700"
+              >
                 <Controller
                   name={`days.${index}.day_of_week`}
                   control={control}

@@ -1,5 +1,7 @@
 import { File } from '@/app/lib/types/file';
 
+export type UserRole = 'admin' | 'teacher' | 'student';
+
 export interface User {
   id: number;
   username: string;
@@ -9,5 +11,6 @@ export interface User {
   email?: string | null;
   national_code?: string | null;
   profile_picture?: string | null;
+  role: UserRole;
   files?: File[];
 }

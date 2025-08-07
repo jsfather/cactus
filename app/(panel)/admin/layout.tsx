@@ -2,6 +2,7 @@
 
 import Header from '@/app/components/layout/panel/Header';
 import Sidebar from '@/app/components/layout/panel/Sidebar';
+import { RoleGuard } from '@/app/components/RoleGuard';
 import { useState } from 'react';
 import { useUser } from '@/app/hooks/useUser';
 
@@ -65,6 +66,14 @@ const menuItems = [
         href: '/admin/blogs',
       },
       {
+        title: 'محصولات',
+        href: '/admin/products',
+      },
+      {
+        title: 'سفارشات',
+        href: '/admin/orders',
+      },
+      {
         title: 'سوالات متداول',
         href: '/admin/faqs',
       },
@@ -93,24 +102,26 @@ export default function Layout({
   const { user, loading } = useUser();
 
   return (
-    <div className="flex h-screen">
-      <Sidebar
-        user={user || undefined}
-        menuItems={menuItems}
-        isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
-        loading={loading}
-      />
-      <div className="flex flex-1 flex-col">
-        <Header
-          user={user}
-          onMenuClick={() => setIsMobileMenuOpen(true)}
+    <RoleGuard allowedRoles={['admin']}>
+      <div className="flex h-screen">
+        <Sidebar
+          user={user || undefined}
+          menuItems={menuItems}
+          isOpen={isMobileMenuOpen}
+          onClose={() => setIsMobileMenuOpen(false)}
           loading={loading}
         />
-        <main className="flex-1 overflow-y-auto p-4 dark:bg-gray-900">
-          {children}
-        </main>
+        <div className="flex flex-1 flex-col">
+          <Header
+            user={user}
+            onMenuClick={() => setIsMobileMenuOpen(true)}
+            loading={loading}
+          />
+          <main className="flex-1 overflow-y-auto p-4 dark:bg-gray-900">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </RoleGuard>
   );
 }

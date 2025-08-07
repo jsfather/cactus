@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { KeyRound, ArrowLeft, Lock } from 'lucide-react';
 import { useUser } from '@/app/hooks/useUser';
+import { useRoleRedirect } from '@/app/hooks/useRoleGuard';
 
 // Get the password feature flag from environment
 const isPasswordAuthEnabled =
@@ -20,6 +21,7 @@ export default function VerifyOtpPage() {
   const [error, setError] = useState('');
   const router = useRouter();
   const { refetch } = useUser();
+  const { redirectToRoleDashboard } = useRoleRedirect();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

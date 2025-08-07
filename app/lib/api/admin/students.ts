@@ -12,7 +12,9 @@ export const getStudents = async () => {
 };
 
 export const getStudent = async (id: number | string) => {
-  const response = await ApiService.get<{ data: Student }>(`admin/students/${id}`);
+  const response = await ApiService.get<{ data: Student }>(
+    `admin/students/${id}`
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت دانش‌آموز رخ داده است');
@@ -22,7 +24,10 @@ export const getStudent = async (id: number | string) => {
 };
 
 export const createStudent = async (data: FormData) => {
-  const response = await ApiService.post<{ data: Student }>('admin/students', data);
+  const response = await ApiService.post<{ data: Student }>(
+    'admin/students',
+    data
+  );
 
   if (!response) {
     throw new Error('خطایی در ایجاد دانش‌آموز رخ داده است');
@@ -31,11 +36,11 @@ export const createStudent = async (data: FormData) => {
   return response;
 };
 
-export const updateStudent = async (
-  id: number | string,
-  data: FormData
-) => {
-  const response = await ApiService.put<{ data: Student }>(`admin/students/${id}`, data);
+export const updateStudent = async (id: number | string, data: FormData) => {
+  const response = await ApiService.put<{ data: Student }>(
+    `admin/students/${id}`,
+    data
+  );
 
   if (!response) {
     throw new Error('خطایی در بروزرسانی دانش‌آموز رخ داده است');
@@ -46,7 +51,7 @@ export const updateStudent = async (
 
 export const deleteStudent = async (id: number | string) => {
   await ApiService.delete(`admin/students/${id}`);
-  
+
   // If no error was thrown, the deletion was successful
   return { success: true };
 };

@@ -29,7 +29,7 @@ export default function OptionButton({
       disabled={disabled}
       className={clsx(
         'w-full rounded-lg border-2 p-4 text-right transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+        'focus:ring-primary-500 focus:ring-2 focus:ring-offset-2 focus:outline-none',
         'dark:focus:ring-offset-gray-900',
         isSelected
           ? 'border-primary-500 bg-primary-50 text-primary-900 dark:border-primary-400 dark:bg-primary-900/20 dark:text-primary-100'
@@ -47,7 +47,7 @@ export default function OptionButton({
           className={clsx(
             'flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold',
             isSelected
-              ? 'bg-primary-500 text-white dark:bg-primary-400'
+              ? 'bg-primary-500 dark:bg-primary-400 text-white'
               : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
           )}
         >
