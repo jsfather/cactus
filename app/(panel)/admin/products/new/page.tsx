@@ -1,21 +1,19 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
 import {
-  getProduct,
-  createProduct,
-  updateProduct,
-  ProductFormData,
-} from '@/app/lib/api/admin/products';
-import {
   getProductCategories,
   ProductCategory,
 } from '@/app/lib/api/admin/product-categories';
+import {
+  createProduct,
+  ProductFormData,
+} from '@/app/lib/api/admin/products';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
@@ -36,22 +34,11 @@ const productSchema = z.object({
   ),
 });
 
-type ProductFormDataWithStringCategory = Omit<
-  ProductFormData,
-  'category_id'
-> & {
-  category_id: string;
-};
+type NewProductFormData = z.infer<typeof productSchema>;
 
-interface ProductFormPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default function ProductFormPage({ params }: ProductFormPageProps) {
-  const resolvedParams = use(params);
+export default function ProductFormPage() {
   const router = useRouter();
-  const isNew = resolvedParams.id === 'new';
-  const [loading, setLoading] = useState(!isNew);
+  const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
 
   const {
@@ -60,7 +47,7 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
     formState: { errors, isSubmitting },
     reset,
     control,
-  } = useForm<ProductFormDataWithStringCategory>({
+  } = useForm<NewProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       attributes: [{ key: '', value: '' }],
@@ -74,25 +61,9 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const categoriesResponse = await getProductCategories();
       setCategories(categoriesResponse.data || []);
-
-      if (!isNew) {
-        const productResponse = await getProduct(resolvedParams.id);
-        const product = productResponse.data;
-        reset({
-          title: product.title,
-          category_id: product.category_id.toString(),
-          description: product.description,
-          price: product.price,
-          stock: product.stock,
-          image: product.image || '',
-          attributes:
-            product.attributes.length > 0
-              ? product.attributes
-              : [{ key: '', value: '' }],
-        });
-      }
     } catch (error) {
       console.error('Error fetching data:', error);
       toast.error('خطا در بارگذاری اطلاعات');
@@ -104,27 +75,23 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
 
   useEffect(() => {
     fetchData();
-  }, [isNew, resolvedParams.id]);
+  }, []);
 
-  const onSubmit = async (data: ProductFormDataWithStringCategory) => {
+  const onSubmit = async (data: NewProductFormData) => {
     try {
       const formData: ProductFormData = {
         ...data,
         category_id: parseInt(data.category_id),
-        attributes: data.attributes.filter((attr) => attr.key && attr.value),
+        image: data.image || '', // Provide empty string if undefined
+        attributes: data.attributes.filter((attr: { key: string; value: string }) => attr.key && attr.value),
       };
 
-      if (isNew) {
-        await createProduct(formData);
-        toast.success('محصول با موفقیت ایجاد شد');
-      } else {
-        await updateProduct(resolvedParams.id, formData);
-        toast.success('محصول با موفقیت بروزرسانی شد');
-      }
+      await createProduct(formData);
+      toast.success('محصول با موفقیت ایجاد شد');
       router.push('/admin/products');
     } catch (error) {
       console.error('Error saving product:', error);
-      toast.error(isNew ? 'خطا در ایجاد محصول' : 'خطا در بروزرسانی محصول');
+      toast.error('خطا در ایجاد محصول');
     }
   };
 
@@ -149,8 +116,8 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت محصولات', href: '/admin/products' },
           {
-            label: isNew ? 'افزودن محصول' : 'ویرایش محصول',
-            href: `/admin/products/${resolvedParams.id}`,
+            label: 'افزودن محصول',
+            href: '/admin/products/new',
             active: true,
           },
         ]}
@@ -160,7 +127,7 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              {isNew ? 'افزودن محصول جدید' : 'ویرایش محصول'}
+              افزودن محصول جدید
             </h1>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
               اطلاعات محصول، قیمت و ویژگی‌ها را وارد کنید
@@ -394,21 +361,21 @@ export default function ProductFormPage({ params }: ProductFormPageProps) {
           </div>
 
           {/* Submit */}
-          <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="white"
-              onClick={() => router.push('/admin/products')}
-            >
-              انصراف
-            </Button>
+          <div className="flex justify-start gap-3">
             <Button
               type="submit"
               loading={isSubmitting}
               className="flex items-center gap-2"
             >
               <Save className="h-4 w-4" />
-              {isNew ? 'ایجاد محصول' : 'بروزرسانی محصول'}
+              ایجاد محصول
+            </Button>
+            <Button
+              type="button"
+              variant="white"
+              onClick={() => router.push('/admin/products')}
+            >
+              انصراف
             </Button>
           </div>
         </form>

@@ -14,6 +14,7 @@ interface TableProps<T> {
   emptyMessage?: string;
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  onView?: (item: T) => void;
   getRowId?: (item: T) => string;
 }
 
@@ -25,6 +26,7 @@ export default function Table<T>({
   emptyMessage = 'هیچ موردی یافت نشد',
   onEdit,
   onDelete,
+  onView,
   getRowId = (item: any) => item.id,
 }: TableProps<T>) {
   if (loading) {
@@ -44,7 +46,7 @@ export default function Table<T>({
                     </div>
                     <div className="flex w-full items-center justify-between pt-4">
                       <div className="h-4 w-32 rounded bg-gray-200 dark:bg-gray-700"></div>
-                      {(actions || onEdit || onDelete) && (
+                      {(actions || onEdit || onDelete || onView) && (
                         <div className="flex gap-2">
                           <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
                           <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -66,8 +68,8 @@ export default function Table<T>({
                         {column.header}
                       </th>
                     ))}
-                    {(actions || onEdit || onDelete) && (
-                      <th scope="col" className="relative py-3 pr-3 pl-6">
+                    {(actions || onEdit || onDelete || onView) && (
+                      <th scope="col" className="relative py-3 pl-3 pr-6">
                         <span className="sr-only">Actions</span>
                       </th>
                     )}
@@ -87,9 +89,9 @@ export default function Table<T>({
                           <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
                         </td>
                       ))}
-                      {(actions || onEdit || onDelete) && (
-                        <td className="py-3 pr-3 pl-6 whitespace-nowrap">
-                          <div className="flex justify-end gap-3">
+                      {(actions || onEdit || onDelete || onView) && (
+                        <td className="py-3 pl-3 pr-6 whitespace-nowrap">
+                          <div className="flex justify-start gap-3">
                             <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
                             <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
                           </div>
@@ -149,10 +151,36 @@ export default function Table<T>({
                         </p>
                       ))}
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-start gap-2">
                       {actions?.(item)}
-                      {(onEdit || onDelete) && (
+                      {(onEdit || onDelete || onView) && (
                         <div className="flex gap-2">
+                          {onView && (
+                            <button
+                              onClick={() => onView(item)}
+                              className="rounded-md bg-gray-50 p-2 text-gray-600 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400 dark:hover:bg-gray-900/30"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="h-5 w-5"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                />
+                              </svg>
+                            </button>
+                          )}
                           {onEdit && (
                             <button
                               onClick={() => onEdit(item)}
@@ -211,8 +239,8 @@ export default function Table<T>({
                     {column.header}
                   </th>
                 ))}
-                {(actions || onEdit || onDelete) && (
-                  <th scope="col" className="relative py-3 pr-3 pl-6">
+                {(actions || onEdit || onDelete || onView) && (
+                  <th scope="col" className="relative py-3 pl-3 pr-6">
                     <span className="sr-only">Actions</span>
                   </th>
                 )}
@@ -223,7 +251,7 @@ export default function Table<T>({
                 <tr>
                   <td
                     colSpan={
-                      actions || onEdit || onDelete
+                      actions || onEdit || onDelete || onView
                         ? columns.length + 1
                         : columns.length
                     }
@@ -250,12 +278,38 @@ export default function Table<T>({
                         </div>
                       </td>
                     ))}
-                    {(actions || onEdit || onDelete) && (
-                      <td className="py-3 pr-3 pl-6 whitespace-nowrap">
-                        <div className="flex justify-end gap-3">
+                    {(actions || onEdit || onDelete || onView) && (
+                      <td className="py-3 pl-3 pr-6 whitespace-nowrap">
+                        <div className="flex justify-start gap-3">
                           {actions?.(item)}
-                          {(onEdit || onDelete) && (
+                          {(onEdit || onDelete || onView) && (
                             <div className="flex gap-2">
+                              {onView && (
+                                <button
+                                  onClick={() => onView(item)}
+                                  className="rounded-md bg-gray-50 p-2 text-gray-600 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400 dark:hover:bg-gray-900/30"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="h-5 w-5"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                                    />
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                                    />
+                                  </svg>
+                                </button>
+                              )}
                               {onEdit && (
                                 <button
                                   onClick={() => onEdit(item)}
