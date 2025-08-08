@@ -15,13 +15,14 @@ import {
 } from '@/app/lib/api/admin/product-categories';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
+import Input from '@/app/components/ui/Input';
+import Select from '@/app/components/ui/Select';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import {
   Plus,
   Package,
   Edit,
   Trash2,
-  Eye,
   Search,
   Filter,
   ShoppingCart,
@@ -241,7 +242,41 @@ export default function ProductsPage() {
         </div>
 
         {/* Filters */}
-        
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <Input
+            id="search"
+            label="جستجو"
+            placeholder="جستجو در نام یا توضیحات محصول..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Select
+            id="category"
+            label="دسته‌بندی"
+            placeholder="همه دسته‌بندی‌ها"
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            options={[
+              { label: 'همه دسته‌بندی‌ها', value: 'all' },
+              ...categories.map((category) => ({
+                label: category.name,
+                value: category.id.toString(),
+              })),
+            ]}
+          />
+          <div className="flex items-end">
+            <Button
+              variant="white"
+              onClick={() => {
+                setSearchTerm('');
+                setCategoryFilter('all');
+              }}
+              className="w-full"
+            >
+              پاک کردن فیلترها
+            </Button>
+          </div>
+        </div>
 
         {/* Products Table */}
         <div className="mt-6">
@@ -348,15 +383,6 @@ export default function ProductsPage() {
                         <td className="px-6 py-4 text-left text-sm font-medium whitespace-nowrap">
                           <div className="flex items-center gap-2 justify-start">
                             <Link href={`/admin/products/${product.id}`}>
-                              <Button
-                                variant="white"
-                                className="flex items-center gap-1 px-3 py-1 text-sm"
-                              >
-                                <Eye className="h-4 w-4" />
-                                مشاهده
-                              </Button>
-                            </Link>
-                            <Link href={`/admin/products/${product.id}/edit`}>
                               <Button
                                 variant="white"
                                 className="flex items-center gap-1 px-3 py-1 text-sm"

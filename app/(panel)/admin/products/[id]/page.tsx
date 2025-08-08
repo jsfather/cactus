@@ -2,29 +2,48 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 import {
+  createProduct,
+  updateProduct,
   getProduct,
-  deleteProduct,
   Product,
+  ProductFormData,
 } from '@/app/lib/api/admin/products';
+import {
+  getProductCategories,
+  ProductCategory,
+} from '@/app/lib/api/admin/product-categories';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import Input from '@/app/components/ui/Input';
+import Select from '@/app/components/ui/Select';
+import Textarea from '@/app/components/ui/Textarea';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import {
-  Package,
-  Edit,
-  Trash2,
-  ArrowLeft,
-  DollarSign,
-  Boxes,
-  Tag,
-  Calendar,
-  Info,
-} from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
+import { useFieldArray } from 'react-hook-form';
+import { z } from 'zod';
+import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
+import { ApiError } from '@/app/lib/api/client';
 
-export default function ProductDetailPage({
+const productSchema = z.object({
+  title: z.string().min(1, 'نام محصول الزامی است'),
+  category_id: z.string().min(1, 'دسته‌بندی الزامی است'),
+  description: z.string().min(1, 'توضیحات الزامی است'),
+  price: z.number().min(0, 'قیمت باید مثبت باشد'),
+  stock: z.number().min(0, 'موجودی باید مثبت باشد'),
+  image: z.string().optional(),
+  attributes: z.array(
+    z.object({
+      key: z.string().min(1, 'نام ویژگی الزامی است'),
+      value: z.string().min(1, 'مقدار ویژگی الزامی است'),
+    })
+  ),
+});
+
+type ProductFormInputs = z.infer<typeof productSchema>;
+
+export default function ProductFormPage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -32,72 +51,131 @@ export default function ProductDetailPage({
   const resolvedParams = use(params);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [product, setProduct] = useState<Product | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+
+  const isNew = resolvedParams.id === 'new';
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    submitWithErrorHandling,
+    globalError,
+    reset,
+    control,
+  } = useFormWithBackendErrors<ProductFormInputs>(productSchema);
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: 'attributes',
+  });
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    // Set default values for new products
+    if (isNew) {
+      reset({
+        title: '',
+        category_id: '',
+        description: '',
+        price: 0,
+        stock: 0,
+        image: '',
+        attributes: [{ key: '', value: '' }],
+      });
+    }
+  }, [isNew, reset]);
+
+  useEffect(() => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await getProduct(resolvedParams.id);
-        setProduct(response.data);
+        const categoriesResponse = await getProductCategories();
+        setCategories(categoriesResponse.data || []);
+
+        if (!isNew) {
+          const productResponse = await getProduct(resolvedParams.id);
+          const product = productResponse.data;
+          
+          if (!product) {
+            toast.error('محصول یافت نشد');
+            router.push('/admin/products');
+            return;
+          }
+
+          // Convert attributes object to array format
+          let attributesArray: { key: string; value: string }[] = [{ key: '', value: '' }];
+          if (product.attributes && typeof product.attributes === 'object') {
+            const attrs = Object.entries(product.attributes).map(([key, value]) => ({
+              key,
+              value: String(value)
+            }));
+            attributesArray = attrs.length > 0 ? attrs : [{ key: '', value: '' }];
+          }
+
+          // Get category_id from either category_id field or category.id
+          const categoryId = product.category_id || (product.category?.id);
+          
+          reset({
+            title: product.title || '',
+            category_id: categoryId ? categoryId.toString() : '',
+            description: product.description || '',
+            price: product.price || 0,
+            stock: product.stock || 0,
+            image: product.image || '',
+            attributes: attributesArray,
+          });
+        }
       } catch (error) {
-        console.error('Error fetching product:', error);
-        toast.error('خطا در بارگذاری محصول');
+        console.error('Error fetching data:', error);
+        toast.error('خطا در بارگذاری اطلاعات');
         router.push('/admin/products');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProduct();
-  }, [resolvedParams.id, router]);
+    fetchData();
+  }, [isNew, resolvedParams.id, reset, router]);
 
-  const handleDelete = async () => {
-    if (
-      !product ||
-      !confirm(`آیا از حذف محصول "${product.title}" مطمئن هستید؟`)
-    ) {
-      return;
+  const onSubmit = async (data: ProductFormInputs) => {
+    const formData: ProductFormData = {
+      ...data,
+      category_id: parseInt(data.category_id),
+      image: data.image || '',
+      attributes: data.attributes.filter((attr) => attr.key && attr.value),
+    };
+
+    if (isNew) {
+      await createProduct(formData);
+      toast.success('محصول با موفقیت ایجاد شد');
+    } else {
+      await updateProduct(resolvedParams.id, formData);
+      toast.success('محصول با موفقیت بروزرسانی شد');
     }
+    router.push('/admin/products');
+  };
 
-    try {
-      setIsDeleting(true);
-      await deleteProduct(product.id);
-      toast.success('محصول با موفقیت حذف شد');
-      router.push('/admin/products');
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      toast.error('خطا در حذف محصول');
-    } finally {
-      setIsDeleting(false);
+  const handleError = (error: ApiError) => {
+    console.log('Product form submission error:', error);
+    if (error?.message) {
+      toast.error(error.message);
+    } else {
+      toast.error('خطا در ثبت محصول');
     }
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
+  const addAttribute = () => {
+    append({ key: '', value: '' });
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'نامشخص';
-    return new Date(dateString).toLocaleDateString('fa-IR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  const removeAttribute = (index: number) => {
+    if (fields.length > 1) {
+      remove(index);
+    }
   };
 
   if (loading) {
     return <LoadingSpinner />;
-  }
-
-  if (!product) {
-    return (
-      <div className="py-12 text-center">
-        <Package className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-        <p className="text-gray-500 dark:text-gray-400">محصول یافت نشد</p>
-      </div>
-    );
   }
 
   return (
@@ -107,183 +185,198 @@ export default function ProductDetailPage({
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت محصولات', href: '/admin/products' },
           {
-            label: product.title,
-            href: `/admin/products/${product.id}`,
+            label: isNew ? 'افزودن محصول' : 'ویرایش محصول',
+            href: `/admin/products/${resolvedParams.id}`,
             active: true,
           },
         ]}
       />
 
       <div className="mt-8">
-        {/* Header */}
-        <div className="rounded-lg bg-white shadow dark:bg-gray-800">
-          <div className="px-6 py-4">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="mb-2 flex items-center gap-3">
-                  <Button
-                    variant="white"
-                    onClick={() => router.push('/admin/products')}
-                    className="flex items-center gap-2"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    بازگشت
-                  </Button>
-                  <span
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ${
-                      product.stock < 5
-                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                        : product.stock < 10
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-                          : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                    }`}
-                  >
-                    <Boxes className="h-4 w-4" />
-                    {product.stock} عدد در انبار
-                  </span>
-                </div>
-                <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                  {product.title}
-                </h1>
-                <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center gap-1">
-                    <Tag className="h-4 w-4" />
-                    {product.category?.name || 'نامشخص'}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="h-4 w-4" />
-                    {formatPrice(product.price)}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    {formatDate(product.created_at)}
-                  </div>
-                </div>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              {isNew ? 'افزودن محصول جدید' : 'ویرایش محصول'}
+            </h1>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              اطلاعات محصول، قیمت و ویژگی‌ها را وارد کنید
+            </p>
+          </div>
+          <Button
+            variant="white"
+            onClick={() => router.push('/admin/products')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            بازگشت
+          </Button>
+        </div>
+
+        <form
+          onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
+          className="space-y-8"
+        >
+          {globalError && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
+              {globalError}
+            </div>
+          )}
+
+          {/* Basic Information */}
+          <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+            <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                اطلاعات اصلی
+              </h3>
+            </div>
+            <div className="space-y-6 px-6 py-4">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <Input
+                  id="title"
+                  label="نام محصول"
+                  required
+                  placeholder="نام محصول را وارد کنید"
+                  error={errors.title?.message}
+                  {...register('title')}
+                />
+
+                <Select
+                  id="category_id"
+                  label="دسته‌بندی"
+                  required
+                  placeholder="دسته‌بندی را انتخاب کنید"
+                  error={errors.category_id?.message}
+                  options={categories.map((category) => ({
+                    label: category.name,
+                    value: category.id.toString(),
+                  }))}
+                  {...register('category_id')}
+                />
               </div>
-              <div className="flex gap-3">
+
+              <Textarea
+                id="description"
+                label="توضیحات"
+                required
+                placeholder="توضیحات محصول را وارد کنید"
+                error={errors.description?.message}
+                {...register('description')}
+              />
+
+              <Input
+                id="image"
+                label="تصویر محصول"
+                placeholder="آدرس تصویر محصول"
+                error={errors.image?.message}
+                {...register('image')}
+              />
+            </div>
+          </div>
+
+          {/* Price and Stock */}
+          <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+            <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                قیمت و موجودی
+              </h3>
+            </div>
+            <div className="px-6 py-4">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <Input
+                  id="price"
+                  label="قیمت (تومان)"
+                  type="number"
+                  required
+                  placeholder="0"
+                  convertNumbers
+                  error={errors.price?.message}
+                  {...register('price', { valueAsNumber: true })}
+                />
+
+                <Input
+                  id="stock"
+                  label="موجودی"
+                  type="number"
+                  required
+                  placeholder="0"
+                  convertNumbers
+                  error={errors.stock?.message}
+                  {...register('stock', { valueAsNumber: true })}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Attributes */}
+          <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+            <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  ویژگی‌های محصول
+                </h3>
                 <Button
-                  variant="danger"
-                  onClick={handleDelete}
-                  loading={isDeleting}
+                  type="button"
+                  variant="white"
+                  onClick={addAttribute}
                   className="flex items-center gap-2"
                 >
-                  <Trash2 className="h-4 w-4" />
-                  حذف
+                  <Plus className="h-4 w-4" />
+                  افزودن ویژگی
                 </Button>
-                <Link href={`/admin/products/${product.id}/edit`}>
-                  <Button variant="primary" className="flex items-center gap-2">
-                    <Edit className="h-4 w-4" />
-                    ویرایش
+              </div>
+            </div>
+            <div className="space-y-4 px-6 py-4">
+              {fields.map((field, index) => (
+                <div key={field.id} className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <Input
+                      id={`attributes.${index}.key`}
+                      placeholder="نام ویژگی (مثل: رنگ، سایز)"
+                      error={errors.attributes?.[index]?.key?.message}
+                      {...register(`attributes.${index}.key`)}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Input
+                      id={`attributes.${index}.value`}
+                      placeholder="مقدار ویژگی (مثل: قرمز، بزرگ)"
+                      error={errors.attributes?.[index]?.value?.message}
+                      {...register(`attributes.${index}.value`)}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    onClick={() => removeAttribute(index)}
+                    disabled={fields.length === 1}
+                    className="mt-1 flex items-center gap-1 px-3 py-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Product Image */}
-          <div className="lg:col-span-1">
-            <div className="rounded-lg bg-white shadow dark:bg-gray-800">
-              <div className="px-6 py-4">
-                <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
-                  تصویر محصول
-                </h3>
-                {product.image ? (
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="h-64 w-full rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="flex h-64 w-full items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-600">
-                    <Package className="h-16 w-16 text-gray-400" />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Product Details */}
-          <div className="space-y-6 lg:col-span-2">
-            {/* Description */}
-            <div className="rounded-lg bg-white shadow dark:bg-gray-800">
-              <div className="px-6 py-4">
-                <h3 className="mb-4 flex items-center gap-2 text-lg font-medium text-gray-900 dark:text-gray-100">
-                  <Info className="h-5 w-5" />
-                  توضیحات محصول
-                </h3>
-                <p className="leading-relaxed text-gray-700 dark:text-gray-300">
-                  {product.description}
-                </p>
-              </div>
-            </div>
-
-            {/* Attributes */}
-            {product.attributes && product.attributes.length > 0 && (
-              <div className="rounded-lg bg-white shadow dark:bg-gray-800">
-                <div className="px-6 py-4">
-                  <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
-                    ویژگی‌های محصول
-                  </h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {product.attributes.map((attribute, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-700"
-                      >
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
-                          {attribute.key}:
-                        </span>
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {attribute.value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
                 </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            <div className="rounded-lg bg-white shadow dark:bg-gray-800">
-              <div className="px-6 py-4">
-                <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
-                  آمار محصول
-                </h3>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                  <div className="rounded-lg bg-blue-50 p-4 text-center dark:bg-blue-900/20">
-                    <DollarSign className="mx-auto mb-2 h-8 w-8 text-blue-600" />
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {formatPrice(product.price)}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      قیمت
-                    </div>
-                  </div>
-                  <div className="rounded-lg bg-green-50 p-4 text-center dark:bg-green-900/20">
-                    <Boxes className="mx-auto mb-2 h-8 w-8 text-green-600" />
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {product.stock}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      موجودی
-                    </div>
-                  </div>
-                  <div className="rounded-lg bg-purple-50 p-4 text-center dark:bg-purple-900/20">
-                    <DollarSign className="mx-auto mb-2 h-8 w-8 text-purple-600" />
-                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                      {formatPrice(product.price * product.stock)}
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      ارزش کل
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
-        </div>
+
+          {/* Submit */}
+          <div className="flex justify-start gap-3">
+            <Button
+              type="submit"
+              loading={isSubmitting}
+              className="flex items-center gap-2"
+            >
+              <Save className="h-4 w-4" />
+              {isNew ? 'ایجاد محصول' : 'بروزرسانی محصول'}
+            </Button>
+            <Button
+              type="button"
+              variant="white"
+              onClick={() => router.push('/admin/products')}
+            >
+              انصراف
+            </Button>
+          </div>
+        </form>
       </div>
     </main>
   );

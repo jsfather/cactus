@@ -3,15 +3,16 @@ import request from '@/app/lib/api/client';
 export interface Product {
   id: number | string;
   title: string;
-  category_id: number | string;
+  category_id?: number | string;
   description: string;
   price: number;
   stock: number;
-  image: string;
-  attributes: { key: string; value: string }[];
+  image?: string;
+  attributes?: { key: string; value: string }[] | Record<string, any>;
   category?: {
     id: number | string;
     name: string;
+    type?: string;
   };
   created_at?: string;
   updated_at?: string;
