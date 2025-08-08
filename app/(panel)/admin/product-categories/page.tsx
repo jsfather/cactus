@@ -12,6 +12,9 @@ import {
 } from '@/app/lib/api/admin/product-categories';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
+import Input from '@/app/components/ui/Input';
+import Select from '@/app/components/ui/Select';
+import Textarea from '@/app/components/ui/Textarea';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Plus, Package, Trash2, Edit, AlertTriangle, Tag } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -20,6 +23,7 @@ import * as z from 'zod';
 
 const categorySchema = z.object({
   name: z.string().min(1, 'نام دسته‌بندی نمی‌تواند خالی باشد'),
+  type: z.string().min(1, 'نوع دسته‌بندی انتخاب کنید'),
   description: z.string().optional(),
 });
 
@@ -61,10 +65,11 @@ export default function ProductCategoriesPage() {
     if (editingCategory) {
       reset({
         name: editingCategory.name,
+        type: editingCategory.type,
         description: editingCategory.description || '',
       });
     } else {
-      reset({ name: '', description: '' });
+      reset({ name: '', type: '', description: '' });
     }
   }, [editingCategory, reset]);
 
@@ -210,51 +215,35 @@ export default function ProductCategoriesPage() {
               </h3>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >
-                      نام دسته‌بندی *
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      {...register('name')}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                      placeholder={
-                        editingCategory
-                          ? editingCategory.name
-                          : 'نام دسته‌بندی را وارد کنید...'
-                      }
-                    />
-                    {errors.name && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.name.message}
-                      </p>
-                    )}
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="description"
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >
-                      توضیحات
-                    </label>
-                    <input
-                      type="text"
-                      id="description"
-                      {...register('description')}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                      placeholder="توضیحات دسته‌بندی (اختیاری)"
-                    />
-                    {errors.description && (
-                      <p className="mt-1 text-sm text-red-600">
-                        {errors.description.message}
-                      </p>
-                    )}
-                  </div>
+                  <Input
+                    id="name"
+                    label="نام دسته‌بندی"
+                    required
+                    placeholder="نام دسته‌بندی را وارد کنید..."
+                    error={errors.name?.message}
+                    {...register('name')}
+                  />
+                  <Select
+                    id="type"
+                    label="نوع دسته‌بندی"
+                    required
+                    placeholder="نوع دسته‌بندی را انتخاب کنید..."
+                    error={errors.type?.message}
+                    options={[
+                      { label: 'فیزیکی', value: 'فیزیکی' },
+                      { label: 'دیجیتال', value: 'دیجیتال' },
+                      { label: 'ترکیبی', value: 'ترکیبی' },
+                    ]}
+                    {...register('type')}
+                  />
                 </div>
+                <Textarea
+                  id="description"
+                  label="توضیحات"
+                  placeholder="توضیحات دسته‌بندی (اختیاری)"
+                  error={errors.description?.message}
+                  {...register('description')}
+                />
                 <div className="flex justify-end gap-3">
                   <Button
                     type="button"
@@ -324,6 +313,9 @@ export default function ProductCategoriesPage() {
                             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                               {category.name}
                             </h3>
+                            <span className="mr-2 inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                              {category.type}
+                            </span>
                             <span className="mr-2 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
                               فعال
                             </span>

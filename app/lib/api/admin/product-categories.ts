@@ -3,6 +3,7 @@ import request from '@/app/lib/api/client';
 export interface ProductCategory {
   id: number | string;
   name: string;
+  type: string;
   description?: string;
   created_at?: string;
   updated_at?: string;
@@ -10,6 +11,7 @@ export interface ProductCategory {
 
 export interface ProductCategoryFormData {
   name: string;
+  type: string;
   description?: string;
 }
 

@@ -106,15 +106,27 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         if (!isNew) {
           const response = await getTermTeacher(resolvedParams.id);
           const termTeacher = response.data;
+          
+          console.log('Term Teacher Data:', termTeacher);
+          
+          if (!termTeacher) {
+            toast.error('ترم مدرس یافت نشد');
+            router.push('/admin/term-teachers');
+            return;
+          }
+
+          // Extract IDs from the nested objects based on actual API structure
+          const termId = termTeacher.term?.id;
+          const teacherId = termTeacher.user?.id;
+          
+          // Handle case where term might be null
+          if (!termId) {
+            console.warn('No term associated with this record');
+          }
+          
           reset({
-            term_id:
-              typeof termTeacher.term_id === 'string'
-                ? parseInt(termTeacher.term_id)
-                : termTeacher.term_id,
-            teacher_id:
-              typeof termTeacher.teacher_id === 'string'
-                ? parseInt(termTeacher.teacher_id)
-                : termTeacher.teacher_id,
+            term_id: termId ? (typeof termId === 'string' ? parseInt(termId) : termId) : (termOptions.length > 0 ? parseInt(termOptions[0].value) : 0),
+            teacher_id: teacherId ? (typeof teacherId === 'string' ? parseInt(teacherId) : teacherId) : 0,
             days: termTeacher.days || [],
           });
         } else {
