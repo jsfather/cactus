@@ -20,14 +20,18 @@ export default function Page() {
   const columns = [
     {
       header: 'نام مدرس',
-      accessor: 'id' as keyof SessionRecord,
-      render: (item: SessionRecord) => 
-        item.user ? `${item.user.first_name} ${item.user.last_name}` : 'نامشخص',
+      accessor: 'user' as keyof SessionRecord,
+      render: (item: SessionRecord) => {
+        if (!item.user) return 'نامشخص';
+        return `${item.user.first_name || ''} ${item.user.last_name || ''}`.trim();
+      },
     },
     {
       header: 'نام ترم',
-      accessor: 'id' as keyof SessionRecord,
-      render: (item: SessionRecord) => item.term?.title || item.term?.name || 'تعریف نشده',
+      accessor: 'term' as keyof SessionRecord,
+      render: (item: SessionRecord) => {
+        return item.term?.title || 'بدون ترم';
+      },
     },
   ];
 
@@ -36,8 +40,8 @@ export default function Page() {
       setLoading(true);
       const response = await getTermTeachers();
       if (response && response.data) {
-        console.log('API Response:', response.data);
-        console.log('First item structure:', response.data[0]);
+        console.log('Term Teachers Data:', response.data);
+        console.log('First item:', response.data[0]);
         setTermTeachers(response.data);
       } else {
         setTermTeachers([]);
@@ -139,7 +143,7 @@ export default function Page() {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="حذف ترم مدرس"
-        description={`آیا از حذف ترم مدرس "${(itemToDelete?.user?.first_name || 'نامشخص') + ' ' + (itemToDelete?.user?.last_name || '')}" اطمینان دارید؟`}
+        description={`آیا از حذف "${(itemToDelete?.user?.first_name || 'نامشخص') + ' ' + (itemToDelete?.user?.last_name || '')}" ${itemToDelete?.term ? `از ترم "${itemToDelete.term.title}"` : '(بدون ترم)'} اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"
