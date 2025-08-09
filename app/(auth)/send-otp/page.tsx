@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { sendOTP } from '@/app/lib/api/auth';
 import { useRouter } from 'next/navigation';
 import { Phone } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { convertToEnglishNumbers, isNumeric } from '@/app/lib/utils/persian';
 
 export default function SendOtpPage() {
   const [identifier, setIdentifier] = useState('');
@@ -11,17 +13,45 @@ export default function SendOtpPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
+  const validatePhone = (value: string): string => {
+    const trimmed = value.trim();
+    if (!trimmed) return 'وارد کردن شماره موبایل الزامی است';
+
+    const normalized = convertToEnglishNumbers(trimmed);
+
+    if (!isNumeric(trimmed)) return 'شماره موبایل فقط باید شامل ارقام باشد';
+    if (normalized.length !== 11) return 'شماره موبایل باید دقیقا ۱۱ رقم باشد';
+
+    return '';
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Block non-digits and enforce 11 chars max
+    const raw = e.target.value;
+    const digitsOnly = raw.replace(/[^0-9۰-۹٠-٩]/g, '');
+    const limited = digitsOnly.slice(0, 11);
+    setIdentifier(limited);
+    // Do not show error while typing; clear any prior error
+    if (error) setError('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    const validationMessage = validatePhone(identifier);
+    if (validationMessage) {
+      setError(validationMessage);
+      setLoading(false);
+      return;
+    }
+
     try {
-      await sendOTP(identifier).then((res) => {
-        router.push(
-          `/verify-otp?identifier=${encodeURIComponent(identifier)}&otp=${encodeURIComponent(res.data.otp)}`
-        );
-      });
+      const normalizedPhone = convertToEnglishNumbers(identifier.trim());
+      const res = await sendOTP(normalizedPhone);
+      toast.success(res.message || 'کد ارسال شد.');
+      router.push(`/verify-otp?identifier=${encodeURIComponent(normalizedPhone)}`);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -57,9 +87,14 @@ export default function SendOtpPage() {
             </div>
             <input
               id="identifier"
+              name="identifier"
               type="tel"
+              inputMode="numeric"
+              pattern="[0-9۰-۹٠-٩]*"
+              autoComplete="tel"
+              maxLength={11}
               value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              onChange={handleChange}
               className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 placeholder-gray-500 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white dark:placeholder-gray-400"
               required
               placeholder="09123456789"

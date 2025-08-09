@@ -1,10 +1,10 @@
 import request from '@/app/lib/api/client';
 
 export const sendOTP = async (phone: string) => {
-  const response = await request<{
-    message: string;
-    data: { otp: number; user_id: number };
-  }>('send_otp', { method: 'POST', body: JSON.stringify({ phone }) });
+  const response = await request<{ message: string }>(
+    'send_otp',
+    { method: 'POST', body: JSON.stringify({ phone }) }
+  );
 
   if (!response) {
     throw new Error('خطایی در ارسال کد رخ داده است');
