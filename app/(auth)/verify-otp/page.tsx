@@ -1,40 +1,66 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { verifyOTP } from '@/app/lib/api/auth';
+import { verifyOTP, sendOTP } from '@/app/lib/api/auth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { KeyRound, ArrowLeft, Lock } from 'lucide-react';
+import { KeyRound, ArrowLeft } from 'lucide-react';
 import { useUser } from '@/app/hooks/useUser';
-import { useRoleRedirect } from '@/app/hooks/useRoleGuard';
-
-// Get the password feature flag from environment
-const isPasswordAuthEnabled =
-  process.env.NEXT_PUBLIC_PASSWORD_AUTH_ENABLED === 'true';
+import { toast } from 'react-toastify';
+import { convertToEnglishNumbers, isNumeric } from '@/app/lib/utils/persian';
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
   const identifier = searchParams.get('identifier') || '';
-  const [otp, setOtp] = useState(searchParams.get('otp') || '');
-  const [password, setPassword] = useState('1234567890');
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [resendTimer, setResendTimer] = useState(60);
+  const [resendLoading, setResendLoading] = useState(false);
   const router = useRouter();
   const { refetch } = useUser();
-  const { redirectToRoleDashboard } = useRoleRedirect();
+
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer((s) => s - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
+  const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const digitsOnly = raw.replace(/[^0-9۰-۹٠-٩]/g, '');
+    const limited = digitsOnly.slice(0, 6);
+    setOtp(limited);
+    if (error) setError('');
+  };
+
+  const validateOtp = (value: string): string => {
+    const trimmed = value.trim();
+    if (!trimmed) return 'وارد کردن کد تایید الزامی است';
+    const normalized = convertToEnglishNumbers(trimmed);
+    if (!isNumeric(trimmed)) return 'کد تایید فقط باید شامل ارقام باشد';
+    if (normalized.length !== 6) return 'کد تایید باید دقیقا ۶ رقم باشد';
+    return '';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    const validationMessage = validateOtp(otp);
+    if (validationMessage) {
+      setError(validationMessage);
+      setLoading(false);
+      return;
+    }
+
     try {
-      // If password auth is enabled, send the password, otherwise send empty string
-      const result = await verifyOTP(
-        identifier,
-        isPasswordAuthEnabled ? password : '',
-        otp
-      );
+      const normalizedOtp = convertToEnglishNumbers(otp.trim());
+      const normalizedPhone = convertToEnglishNumbers(identifier.trim());
+      const result = await verifyOTP(normalizedPhone, '', normalizedOtp);
       localStorage.setItem('authToken', result.token);
       await refetch();
       router.push('/onboarding/user-info');
@@ -45,6 +71,25 @@ export default function VerifyOtpPage() {
           : 'کد تایید اشتباه است. دوباره تلاش کنید.';
       setError(errorMessage);
       setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0 || resendLoading) return;
+    try {
+      setResendLoading(true);
+      const normalizedPhone = convertToEnglishNumbers(identifier.trim());
+      const res = await sendOTP(normalizedPhone);
+      toast.success(res.message || 'کد مجدداً ارسال شد.');
+      setResendTimer(60);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'مشکلی در ارسال مجدد کد به وجود آمد.';
+      toast.error(errorMessage);
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -73,9 +118,13 @@ export default function VerifyOtpPage() {
             </div>
             <input
               id="otp"
-              type="text"
+              name="otp"
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9۰-۹٠-٩]*"
+              maxLength={6}
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={handleOtpChange}
               className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 placeholder-gray-500 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white dark:placeholder-gray-400"
               required
               placeholder="کد تایید را وارد کنید"
@@ -83,32 +132,6 @@ export default function VerifyOtpPage() {
             />
           </div>
         </div>
-
-        {isPasswordAuthEnabled && (
-          <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              رمز عبور
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <Lock className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 placeholder-gray-500 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white dark:placeholder-gray-400"
-                required
-                placeholder="رمز عبور را وارد کنید"
-                dir="ltr"
-              />
-            </div>
-          </div>
-        )}
 
         {error && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-500 dark:bg-red-900/50 dark:text-red-200">
@@ -132,6 +155,19 @@ export default function VerifyOtpPage() {
             ) : (
               'ورود به حساب کاربری'
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resendTimer > 0 || resendLoading}
+            className="hover:text-primary-600 dark:hover:text-primary-400 flex w-full items-center justify-center gap-2 text-sm text-gray-600 transition-colors dark:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {resendLoading
+              ? 'درحال ارسال...'
+              : resendTimer > 0
+              ? `ارسال دوباره کد (${resendTimer} ثانیه)`
+              : 'ارسال دوباره کد'}
           </button>
 
           <Link
