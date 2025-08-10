@@ -4,6 +4,7 @@ import { dana, danaFaNum } from '@/app/fonts';
 import { CartProvider } from '@/app/contexts/CartContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
@@ -67,6 +68,26 @@ export default function RootLayout({
           />
         </CartProvider>
       </body>
+      <Script
+        id="goftino-widget"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            !function(){
+              var i="wsEPPL",a=window,d=document;
+              function g(){
+                var g=d.createElement("script"),
+                s="https://www.goftino.com/widget/"+i,
+                l=localStorage.getItem("goftino_"+i);
+                g.async=!0;
+                g.src=l ? s+"?o="+l : s;
+                d.getElementsByTagName("head")[0].appendChild(g);
+              }
+              "complete"===d.readyState ? g() : a.attachEvent ? a.attachEvent("onload",g) : a.addEventListener("load",g,!1);
+            }();
+          `,
+        }}
+      />
     </html>
   );
 }
