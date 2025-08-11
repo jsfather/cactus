@@ -30,7 +30,7 @@ const menuItems = [
         href: '/admin/teachers',
       },
       {
-        title: 'کاربران',
+        title: 'همکاران',
         href: '/admin/users',
       },
     ],
@@ -90,6 +90,16 @@ const menuItems = [
       {
         title: 'تیکت ها',
         href: '/admin/tickets',
+      },
+    ],
+  },
+  {
+    title: 'تنظیمات',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'درباره ما',
+        href: '/admin/about-us',
       },
     ],
   },

@@ -1,6 +1,13 @@
+import { useEffect, useState } from 'react';
+import { homeSettingsService, HomeSettings } from '@/app/lib/api/admin/homeSettings';
 import Image from 'next/image';
 
 export default function Footer() {
+  const [settings, setSettings] = useState<HomeSettings | null>(null);
+  useEffect(() => {
+    homeSettingsService.get().then(setSettings).catch(() => setSettings(null));
+  }, []);
+
   return (
     <footer className="bg-gray-900 px-4 py-12 text-gray-300">
       <div className="container mx-auto px-4">
@@ -103,7 +110,11 @@ export default function Footer() {
                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
                   />
                 </svg>
-                <span>۰۲۱-۱۲۳۴۵۶۷۸</span>
+                {settings?.phone ? (
+                  <span>{settings.phone}</span>
+                ) : (
+                  <span className="w-24 h-4 rounded bg-gray-700 animate-pulse inline-block" />
+                )}
               </li>
               <li className="flex items-center gap-2">
                 <svg
@@ -119,7 +130,11 @@ export default function Footer() {
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
-                <span>info@cactus.ir</span>
+                {settings?.email ? (
+                  <span>{settings.email}</span>
+                ) : (
+                  <span className="w-32 h-4 rounded bg-gray-700 animate-pulse inline-block" />
+                )}
               </li>
               <li className="flex items-center gap-2">
                 <svg
@@ -141,7 +156,11 @@ export default function Footer() {
                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                   />
                 </svg>
-                <span>تهران، خیابان آزادی، پلاک ۱۲۳</span>
+                {settings?.address ? (
+                  <span>{settings.address}</span>
+                ) : (
+                  <span className="w-40 h-4 rounded bg-gray-700 animate-pulse inline-block" />
+                )}
               </li>
             </ul>
           </div>
@@ -165,7 +184,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-12 border-t border-gray-800 pt-8 text-center text-gray-400">
-          <p>© {new Date().getFullYear()} کاکتوس. تمامی حقوق محفوظ است.</p>
+          {settings?.footer_text ? (
+            <p>{settings.footer_text}</p>
+          ) : (
+            <div className="w-64 h-4 rounded bg-gray-700 animate-pulse mx-auto" />
+          )}
         </div>
       </div>
     </footer>

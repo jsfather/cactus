@@ -12,7 +12,8 @@ import {
   Linkedin,
   Youtube,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { homeSettingsService } from '@/app/lib/api/admin/homeSettings';
 
 interface FAQ {
   question: string;
@@ -47,31 +48,24 @@ const stats = [
   { number: '۱۰+', label: 'جایزه', description: 'در جشنواره‌های آموزشی' },
 ];
 
-const contactInfo = [
-  {
-    icon: <MapPin className="h-6 w-6" />,
-    title: 'آدرس',
-    details: ['تهران، خیابان آزادی، دانشگاه تهران، مرکز رشد واحدهای فناور'],
-  },
-  {
-    icon: <Phone className="h-6 w-6" />,
-    title: 'تلفن',
-    details: ['۰۲۱-۸۸۹۷۶۵۴۳', '۰۹۱۲-۳۴۵۶۷۸۹'],
-  },
-  {
-    icon: <Mail className="h-6 w-6" />,
-    title: 'ایمیل',
-    details: ['info@cactus-academy.ir', 'support@cactus-academy.ir'],
-  },
-  {
-    icon: <Clock className="h-6 w-6" />,
-    title: 'ساعات کاری',
-    details: ['شنبه تا چهارشنبه: ۸ صبح تا ۵ عصر', 'پنجشنبه: ۸ صبح تا ۱۲ ظهر'],
-  },
-];
-
 export default function Page() {
   const [activeTab, setActiveTab] = useState(0);
+  const [settings, setSettings] = useState<HomeSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await homeSettingsService.get();
+        setSettings(data);
+      } catch (e) {
+        setSettings(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   return (
     <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
@@ -139,30 +133,19 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               className="space-y-6 text-gray-600 dark:text-gray-300"
             >
-              <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                شرکت کاکتوس پویان گستر با شماره ثبت 7308
-              </p>
-              <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در دو
-                بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد. شرکت
-                کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال 1395 به
-                طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395 به صورت
-                حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با هوش مصنوعی
-                در حیطه دانش آموزی و در عرصه جهانی و بین المللی فعالیت داشته
-                است. در بخش تجارت الکترونیک، شخص مدیر عامل به صورت حقیقی در حال
-                فعالیت می باشند. رشته فنی و مهندسی روباتیک تلفیقی از سه رشته
-                مهندسی الکترونیک، مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس
-                پویان گستر در حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و
-                تربیت مهندسین واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها
-                به صورت مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم
-                افزارهایی چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش
-                مکانیک با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس،
-                کتیا و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش
-                برنامه نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ،
-                اتمل استودیو، ام بلاگ، پایتون و... آموزش داده می شود. پس از
-                گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و نظارت
-                شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
-              </p>
+              {loading ? (
+                <div className="animate-pulse space-y-4">
+                  <div className="h-6 w-1/2 rounded bg-gray-200 dark:bg-gray-700 mx-auto" />
+                  <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700 mx-auto" />
+                  <div className="h-4 w-2/3 rounded bg-gray-200 dark:bg-gray-700 mx-auto" />
+                </div>
+              ) : (
+                <>
+                  <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+                    {settings?.about_us || '---'}
+                  </p>
+                </>
+              )}
             </motion.div>
           </div>
         </div>
@@ -205,11 +188,13 @@ export default function Page() {
                   <h3 className="text-2xl font-bold dark:text-white">
                     ماموریت ما
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    ایجاد بستری برای یادگیری مؤثر و کاربردی با هدف پرورش نیروهای
-                    متخصص و کارآمد برای بازار کار ایران و جهان. ما معتقدیم آموزش
-                    باکیفیت حق همه افراد است و باید در دسترس همه باشد.
-                  </p>
+                  {loading ? (
+                    <div className="h-20 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+                  ) : (
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {settings?.our_mission || '---'}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -217,9 +202,7 @@ export default function Page() {
                     چشم‌انداز
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    تبدیل شدن به برترین پلتفرم آموزش تخصصی آنلاین در خاورمیانه
-                    تا سال ۱۴۰۵. ما می‌خواهیم با نوآوری در روش‌های آموزشی،
-                    استانداردهای جدیدی در صنعت آموزش آنلاین تعریف کنیم.
+                    {settings?.our_vision || '---'}
                   </p>
                 </div>
               )}
@@ -242,33 +225,68 @@ export default function Page() {
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
               <div className="space-y-8">
-                {contactInfo.map((info, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-start space-x-4"
-                  >
-                    <div className="text-primary-600 dark:text-primary-400 mt-1">
-                      {info.icon}
-                    </div>
-                    <div>
-                      <h3 className="mb-2 font-semibold dark:text-white">
-                        {info.title}
-                      </h3>
-                      {info.details.map((detail, idx) => (
-                        <p
-                          key={idx}
-                          className="text-gray-600 dark:text-gray-300"
-                        >
-                          {detail}
-                        </p>
-                      ))}
-                    </div>
-                  </motion.div>
-                ))}
-
+                {/* اطلاعات تماس داینامیک */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  className="flex items-start space-x-4"
+                >
+                  <div className="text-primary-600 dark:text-primary-400 mt-1">
+                    <MapPin className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="mb-2 font-semibold dark:text-white">آدرس</h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {settings?.address || '---'}
+                    </p>
+                  </div>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  className="flex items-start space-x-4"
+                >
+                  <div className="text-primary-600 dark:text-primary-400 mt-1">
+                    <Phone className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="mb-2 font-semibold dark:text-white">تلفن</h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {settings?.phone || '---'}
+                    </p>
+                  </div>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  className="flex items-start space-x-4"
+                >
+                  <div className="text-primary-600 dark:text-primary-400 mt-1">
+                    <Mail className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="mb-2 font-semibold dark:text-white">ایمیل</h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {settings?.email || '---'}
+                    </p>
+                  </div>
+                </motion.div>
+                {/* ساعت کاری استاتیک */}
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  className="flex items-start space-x-4"
+                >
+                  <div className="text-primary-600 dark:text-primary-400 mt-1">
+                    <Clock className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="mb-2 font-semibold dark:text-white">ساعات کاری</h3>
+                    <p className="text-gray-600 dark:text-gray-300">شنبه تا چهارشنبه: ۸ صبح تا ۵ عصر</p>
+                    <p className="text-gray-600 dark:text-gray-300">پنجشنبه: ۸ صبح تا ۱۲ ظهر</p>
+                  </div>
+                </motion.div>
+                {/* شبکه‌های اجتماعی */}
                 <div className="flex items-center justify-around gap-2">
                   {[Instagram, Twitter, Facebook, Linkedin, Youtube].map(
                     (Icon, index) => (

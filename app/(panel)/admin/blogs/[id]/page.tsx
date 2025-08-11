@@ -48,7 +48,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       try {
         const blog = await blogService.getBlog(resolvedParams.id);
         // Pre-fill form with existing blog data
-        reset(blog);
+        reset(blog.data);
       } catch (error) {
         toast.error('خطا در بارگذاری بلاگ');
         router.push('/admin/blogs');
