@@ -45,7 +45,7 @@ export default function Page() {
       setLoading(true);
       const response = await blogService.getBlogs();
       if (response) {
-        setBlogs(response);
+        setBlogs(response.data);
       }
     } catch (error) {
       toast.error('خطا در دریافت لیست بلاگ‌ها');

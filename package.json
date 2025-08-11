@@ -14,6 +14,7 @@
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.0.1",
     "@swc/helpers": "^0.5.17",
+    "@uiw/react-md-editor": "^4.0.8",
     "clsx": "^2.1.1",
     "framer-motion": "^12.14.0",
     "jalali-moment": "^3.3.11",
