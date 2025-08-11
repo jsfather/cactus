@@ -30,7 +30,7 @@ const menuItems = [
         href: '/admin/teachers',
       },
       {
-        title: 'کاربران',
+        title: 'همکاران',
         href: '/admin/users',
       },
     ],
