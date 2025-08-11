@@ -93,6 +93,16 @@ const menuItems = [
       },
     ],
   },
+  {
+    title: 'تنظیمات',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'درباره ما',
+        href: '/admin/about-us',
+      },
+    ],
+  },
 ];
 
 export default function Layout({
