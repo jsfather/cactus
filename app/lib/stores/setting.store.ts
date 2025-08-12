@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools } from 'zustand/middleware';
 import { settingsService } from '@/app/lib/services/settings.service';
 import type { GetSettingsResponse, Settings } from '@/app/lib/types/settings';
 import type { ApiError } from '@/app/lib/api/client';
@@ -16,72 +16,73 @@ interface SettingsState {
   clearError: () => void;
 
   // User CRUD
-  fetchSettings: () => Promise<void>;
+  fetchSettings: (force?: boolean) => Promise<Settings>;
   updateSettings: (settingsData: Settings) => Promise<GetSettingsResponse>;
 }
 
 export const useSettingsStore = create<SettingsState>()(
-  devtools(
-    persist(
-      (set, get) => ({
-        // Initial state
-        settings: {
-          id: '',
-          about_us: '',
-          phone: '',
-          email: '',
-          address: '',
-          our_mission: '',
-          our_vision: '',
-          footer_text: '',
-        },
-        loading: false,
-        error: null,
+  devtools((set, get) => ({
+    // Initial state
+    settings: {
+      id: '',
+      about_us: '',
+      phone: '',
+      email: '',
+      address: '',
+      our_mission: '',
+      our_vision: '',
+      footer_text: '',
+    },
+    loading: false,
+    error: null,
 
-        // Actions
-        setLoading: (loading) => set({ loading }),
+    // Actions
+    setLoading: (loading) => set({ loading }),
 
-        setError: (error) => set({ error }),
+    setError: (error) => set({ error }),
 
-        clearError: () => set({ error: null }),
+    clearError: () => set({ error: null }),
 
-        fetchSettings: async () => {
-          try {
-            set({ loading: true, error: null });
-            const response = await settingsService.getSettings();
-            set({
-              settings: response.data,
-              loading: false,
-            });
-          } catch (error) {
-            const apiError = error as ApiError;
-            set({ error: apiError.message, loading: false });
-            throw error;
-          }
-        },
+    fetchSettings: async (force = false) => {
+      try {
+        const { settings } = get();
 
-        updateSettings: async (settingsData) => {
-          try {
-            set({ loading: true, error: null });
-            const updatedSettings =
-              await settingsService.updateSettings(settingsData);
-            set((state) => ({
-              settings: state.settings,
-              loading: false,
-            }));
-            return updatedSettings;
-          } catch (error) {
-            const apiError = error as ApiError;
-            set({ error: apiError.message, loading: false });
-            throw error;
-          }
-        },
-      }),
-      {
-        name: 'settings-store',
-        partialize: (state) => ({ settings: state.settings }),
+        // If already loaded and not forcing refresh
+        if (!force && settings.id) {
+          return settings;
+        }
+
+        set({ loading: true, error: null });
+        const response = await settingsService.getSettings();
+
+        set({
+          settings: response.data,
+          loading: false,
+        });
+
+        return response.data;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
       }
-    ),
-    { name: 'settings-store' }
-  )
+    },
+
+    updateSettings: async (settingsData) => {
+      try {
+        set({ loading: true, error: null });
+        const updatedSettings =
+          await settingsService.updateSettings(settingsData);
+        set((state) => ({
+          settings: state.settings,
+          loading: false,
+        }));
+        return updatedSettings;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+  }))
 );

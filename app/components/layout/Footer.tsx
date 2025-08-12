@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import { homeSettingsService } from '@/app/lib/api/admin/homeSettings';
 import Image from 'next/image';
-import { Settings } from '@/app/lib/types/settings';
+import { useSettings } from '@/app/lib/hooks/use-settings';
+import { useEffect } from 'react';
 
 export default function Footer() {
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const { settings, fetchSettings } = useSettings();
+
   useEffect(() => {
-    homeSettingsService.get().then(setSettings).catch(() => setSettings(null));
-  }, []);
+    fetchSettings();
+  }, [fetchSettings]);
 
   return (
     <footer className="bg-gray-900 px-4 py-12 text-gray-300">

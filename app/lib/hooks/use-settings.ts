@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useSettingsStore } from '@/app/lib/stores/setting.store';
 import type { Settings } from '@/app/lib/types/settings';
 
-export const useUser = () => {
+export const useSettings = () => {
   const store = useSettingsStore();
 
   // Memoized actions
