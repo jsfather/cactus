@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { verifyOTP, sendOTP } from '@/app/lib/api/auth';
+import { authService } from '@/app/lib/services/auth.service';
 import Link from 'next/link';
 import { KeyRound, ArrowLeft } from 'lucide-react';
 import { useUser } from '@/app/hooks/useUser';
@@ -58,7 +58,10 @@ export default function VerifyOtpPage() {
     try {
       const normalizedOtp = convertToEnglishNumbers(otp.trim());
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
-      const result = await verifyOTP(normalizedPhone, '', normalizedOtp);
+      const result = await authService.verifyOTP({
+        phone: normalizedPhone,
+        otp: normalizedOtp,
+      });
       localStorage.setItem('authToken', result.token);
       await refetch();
     } catch (error: unknown) {
@@ -76,7 +79,7 @@ export default function VerifyOtpPage() {
     try {
       setResendLoading(true);
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
-      const res = await sendOTP(normalizedPhone);
+      const res = await authService.sendOTP({ phone: normalizedPhone });
       toast.success(res.message || 'کد مجدداً ارسال شد.');
       setResendTimer(60);
     } catch (error: unknown) {
@@ -158,13 +161,13 @@ export default function VerifyOtpPage() {
             type="button"
             onClick={handleResend}
             disabled={resendTimer > 0 || resendLoading}
-            className="hover:text-primary-600 dark:hover:text-primary-400 flex w-full items-center justify-center gap-2 text-sm text-gray-600 transition-colors dark:text-gray-400 disabled:cursor-not-allowed disabled:opacity-60"
+            className="hover:text-primary-600 dark:hover:text-primary-400 flex w-full items-center justify-center gap-2 text-sm text-gray-600 transition-colors disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-400"
           >
             {resendLoading
               ? 'درحال ارسال...'
               : resendTimer > 0
-              ? `ارسال دوباره کد (${resendTimer} ثانیه)`
-              : 'ارسال دوباره کد'}
+                ? `ارسال دوباره کد (${resendTimer} ثانیه)`
+                : 'ارسال دوباره کد'}
           </button>
 
           <Link

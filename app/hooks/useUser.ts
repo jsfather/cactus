@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { User } from '@/app/lib/types';
-import request from '@/app/lib/api/client';
+import { UpdateProfileRequest, User } from '@/app/lib/types';
+import {userService} from '@/app/lib/services/user.service';
 
 interface UseUserReturn {
   user: User | null;
@@ -9,7 +9,7 @@ interface UseUserReturn {
   isAuthenticated: boolean;
   logout: () => void;
   refetch: () => Promise<void>;
-  updateProfile: (data: Partial<User>) => Promise<void>;
+  updateProfile: (data: UpdateProfileRequest) => Promise<void>;
 }
 
 let globalUser: User | null = null;
@@ -45,7 +45,7 @@ export function useUser(): UseUserReturn {
         return;
       }
 
-      const data = await request<{ data: User }>('profile');
+      const data = await userService.getProfile();
       globalUser = data.data;
       globalError = null;
       setUser(data.data);
@@ -106,12 +106,9 @@ export function useUser(): UseUserReturn {
     await fetchProfile();
   };
 
-  const updateProfile = async (data: Partial<User>) => {
+  const updateProfile = async (data: UpdateProfileRequest) => {
     try {
-      const response = await request<{ data: User }>('profile', {
-        method: 'PUT',
-        body: JSON.stringify(data),
-      });
+      const response = await userService.updateProfile(data)
 
       globalUser = response.data;
       globalError = null;

@@ -11,7 +11,7 @@ class ApiClient {
 
   constructor() {
     this.client = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api',
+      baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ class ApiClient {
     this.client.interceptors.request.use(
       (config) => {
         if (typeof window !== 'undefined') {
-          const token = localStorage.getItem('token');
+          const token = localStorage.getItem('authToken');
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           }
@@ -48,8 +48,8 @@ class ApiClient {
 
         if (error.response?.status === 401) {
           if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
-            window.location.href = '/login';
+            localStorage.removeItem('authToken');
+            window.location.href = '/send-otp';
           }
         }
 

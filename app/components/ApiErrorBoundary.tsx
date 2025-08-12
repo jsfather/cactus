@@ -15,7 +15,7 @@ export function ApiErrorBoundary({ children }: ApiErrorBoundaryProps) {
       if (event.error instanceof ApiError) {
         if (event.error.status === 401) {
           localStorage.removeItem('authToken');
-          router.push('/login');
+          router.push('/send-otp');
         }
       }
     };
@@ -25,7 +25,7 @@ export function ApiErrorBoundary({ children }: ApiErrorBoundaryProps) {
       if (event.reason instanceof ApiError) {
         if (event.reason.status === 401) {
           localStorage.removeItem('authToken');
-          router.push('/login');
+          router.push('/send-otp');
         }
       }
     });

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs";
 import Input from "@/app/components/ui/Input";
@@ -11,7 +10,6 @@ import LoadingSpinner from "@/app/components/ui/LoadingSpinner";
 import { z } from "zod";
 import { useFormWithBackendErrors } from "@/app/hooks/useFormWithBackendErrors";
 import { homeSettingsService } from "@/app/lib/api/admin/homeSettings";
-import { ApiError } from "@/app/lib/api/client";
 
 const schema = z.object({
   phone: z.string().min(1, "شماره تماس الزامی است"),
@@ -26,7 +24,6 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function AboutUsPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   const {
@@ -35,7 +32,6 @@ export default function AboutUsPage() {
     formState: { errors, isSubmitting },
     submitWithErrorHandling,
     globalError,
-    setGlobalError,
     reset,
   } = useFormWithBackendErrors<FormData>(schema);
 
