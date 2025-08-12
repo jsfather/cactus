@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { verifyOTP, sendOTP } from '@/app/lib/api/auth';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { KeyRound, ArrowLeft } from 'lucide-react';
 import { useUser } from '@/app/hooks/useUser';
@@ -17,7 +16,6 @@ export default function VerifyOtpPage() {
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(60);
   const [resendLoading, setResendLoading] = useState(false);
-  const router = useRouter();
   const { refetch } = useUser();
 
   useEffect(() => {
@@ -63,7 +61,6 @@ export default function VerifyOtpPage() {
       const result = await verifyOTP(normalizedPhone, '', normalizedOtp);
       localStorage.setItem('authToken', result.token);
       await refetch();
-      router.push('/onboarding/user-info');
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
