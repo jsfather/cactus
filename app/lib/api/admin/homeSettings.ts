@@ -2,16 +2,16 @@ import { ApiService } from '@/app/lib/api/client';
 import { Settings } from '@/app/lib/types/settings';
 
 // Simple in-memory store
-class SettingsStore {
-  private data: Settings | null = null;
+class HomeSettingsStore {
+  private data: HomeSettings | null = null;
   private isLoading = false;
-  private loadingPromise: Promise<Settings> | null = null;
+  private loadingPromise: Promise<HomeSettings> | null = null;
 
-  getData(): Settings | null {
+  getData(): HomeSettings | null {
     return this.data;
   }
 
-  setData(data: Settings): void {
+  setData(data: HomeSettings): void {
     this.data = data;
   }
 
@@ -31,26 +31,26 @@ class SettingsStore {
     return this.isLoading;
   }
 
-  setLoadingPromise(promise: Promise<Settings> | null): void {
+  setLoadingPromise(promise: Promise<HomeSettings> | null): void {
     this.loadingPromise = promise;
   }
 
-  getLoadingPromise(): Promise<Settings> | null {
+  getLoadingPromise(): Promise<HomeSettings> | null {
     return this.loadingPromise;
   }
 }
 
 // Create a singleton store instance
-const store = new SettingsStore();
+const store = new HomeSettingsStore();
 
 // Helper function to fetch data from API
-const fetchData = async (): Promise<Settings> => {
-  const res = await ApiService.get<{ data: Settings }>('home/settings');
+const fetchData = async (): Promise<HomeSettings> => {
+  const res = await ApiService.get<{ data: HomeSettings }>('home/settings');
   return res.data;
 };
 
 export const homeSettingsService = {
-  get: async (forceRefresh = false): Promise<Settings> => {
+  get: async (forceRefresh = false): Promise<HomeSettings> => {
     // Return cached data if it exists and no force refresh
     if (!forceRefresh && store.isDataLoaded()) {
       return store.getData()!;
@@ -76,18 +76,15 @@ export const homeSettingsService = {
     }
   },
 
-  update: async (data: Omit<Settings, 'id'>): Promise<Settings> => {
-    const res = await ApiService.post<{ data: Settings }>(
-      'admin/settings',
-      data
-    );
+  update: async (data: Omit<HomeSettings, 'id'>): Promise<HomeSettings> => {
+    const res = await ApiService.post<{ data: HomeSettings }>('admin/settings', data);
     // Update the store with the new data after successful update
     store.setData(res.data);
     return res.data;
   },
 
   // Utility methods for store management
-  getCachedData: (): Settings | null => {
+  getCachedData: (): HomeSettings | null => {
     return store.getData();
   },
 
@@ -100,7 +97,7 @@ export const homeSettingsService = {
   },
 
   // Force refresh data
-  refresh: async (): Promise<Settings> => {
+  refresh: async (): Promise<HomeSettings> => {
     return homeSettingsService.get(true);
-  },
+  }
 };

@@ -1,197 +1,82 @@
-// lib/api-client.ts
-'use client';
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
-// Enhanced error types for better error handling
-export interface BackendError {
-  field: string;
+export interface ApiError {
   message: string;
+  status: number;
+  code?: string;
 }
 
-export interface BackendErrorResponse {
-  errors: BackendError[];
-  message?: string;
-}
+class ApiClient {
+  private client: AxiosInstance;
 
-export class ApiError extends Error {
-  public status: number;
-  public errors?: BackendError[];
-  public response: Response;
-
-  constructor(
-    message: string,
-    status: number,
-    response: Response,
-    errors?: BackendError[]
-  ) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.errors = errors;
-    this.response = response;
-  }
-}
-
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const headers: Record<string, string> = {
-    Accept: 'application/json',
-  };
-
-  // Only set Content-Type for non-FormData requests
-  if (!(options.body instanceof FormData)) {
-    headers['Content-Type'] = 'application/json';
-  }
-
-  if (options.headers) {
-    Object.entries(options.headers).forEach(([key, value]) => {
-      if (typeof value === 'string') {
-        headers[key] = value;
-      }
+  constructor() {
+    this.client = axios.create({
+      baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api',
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
+
+    this.setupInterceptors();
   }
 
-  const token = localStorage.getItem('authToken');
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
+  private setupInterceptors(): void {
+    // Request interceptor
+    this.client.interceptors.request.use(
+      (config) => {
+        if (typeof window !== 'undefined') {
+          const token = localStorage.getItem('token');
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
-  const requestUrl = `${API_URL}/${path}`;
-  const requestOptions = {
-    ...options,
-    headers,
-    redirect: 'follow' as RequestRedirect,
-  };
+    // Response interceptor
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const apiError: ApiError = {
+          message: error.response?.data?.message || error.message,
+          status: error.response?.status || 500,
+          code: error.response?.data?.code,
+        };
 
-  let response;
-  try {
-    response = await fetch(requestUrl, requestOptions);
-  } catch (error) {
-    throw new ApiError('خطای شبکه: عدم اتصال به سرور', 0, new Response());
-  }
+        if (error.response?.status === 401) {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+          }
+        }
 
-  // Handle network errors (status 0)
-  if (response.status === 0) {
-    throw new ApiError('خطای شبکه: عدم دسترسی به سرور', 0, response);
-  }
-
-  if (!response.ok) {
-    let errorData;
-    try {
-      errorData = await response.json();
-    } catch (e) {
-      errorData = {};
-    }
-
-    // Handle validation errors (422) vs other errors
-    if (response.status === 422 && errorData.errors) {
-      throw new ApiError(
-        errorData.message || 'خطای اعتبارسنجی',
-        response.status,
-        response,
-        errorData.errors
-      );
-    } else if (response.status === 422 && errorData) {
-      // Handle Laravel-style validation errors where errors might be in different format
-      throw new ApiError(
-        errorData.message || 'خطای اعتبارسنجی',
-        response.status,
-        response,
-        errorData.errors || errorData
-      );
-    }
-
-    throw new ApiError(
-      errorData.message || `خطای ${response.status}: ${response.statusText}`,
-      response.status,
-      response
+        return Promise.reject(apiError);
+      }
     );
   }
 
-  // Check if response has content
-  const contentType = response.headers.get('content-type');
-  const contentLength = response.headers.get('content-length');
-
-  // If status is 204 (No Content) or content-length is 0, return null
-  if (response.status === 204 || contentLength === '0') {
-    return null as T;
+  async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.client.get<T>(url, config);
+    return response.data;
   }
 
-  // If no content-type or not JSON, try to parse as JSON but handle empty responses
-  if (!contentType || !contentType.includes('application/json')) {
-    const text = await response.text();
-    if (!text) return null as T;
-    try {
-      return JSON.parse(text);
-    } catch {
-      return text as T;
-    }
+  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.client.post<T>(url, data, config);
+    return response.data;
   }
 
-  return response.json();
-}
-
-// Enhanced API service with better error handling
-export class ApiService {
-  static async get<T>(path: string, options: RequestInit = {}): Promise<T> {
-    return request<T>(path, { ...options, method: 'GET' });
+  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.client.put<T>(url, data, config);
+    return response.data;
   }
 
-  static async post<T>(
-    path: string,
-    data?: any,
-    options: RequestInit = {}
-  ): Promise<T> {
-    return request<T>(path, {
-      ...options,
-      method: 'POST',
-      body:
-        data instanceof FormData
-          ? data
-          : data
-            ? JSON.stringify(data)
-            : undefined,
-    });
-  }
-
-  static async put<T>(
-    path: string,
-    data?: any,
-    options: RequestInit = {}
-  ): Promise<T> {
-    return request<T>(path, {
-      ...options,
-      method: 'PUT',
-      body:
-        data instanceof FormData
-          ? data
-          : data
-            ? JSON.stringify(data)
-            : undefined,
-    });
-  }
-
-  static async patch<T>(
-    path: string,
-    data?: any,
-    options: RequestInit = {}
-  ): Promise<T> {
-    return request<T>(path, {
-      ...options,
-      method: 'PATCH',
-      body:
-        data instanceof FormData
-          ? data
-          : data
-            ? JSON.stringify(data)
-            : undefined,
-    });
-  }
-
-  static async delete<T>(path: string, options: RequestInit = {}): Promise<T> {
-    return request<T>(path, { ...options, method: 'DELETE' });
+  async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.client.delete<T>(url, config);
+    return response.data;
   }
 }
 
-// Re-export the original request function for backward compatibility
-export default request;
+export const apiClient = new ApiClient();
