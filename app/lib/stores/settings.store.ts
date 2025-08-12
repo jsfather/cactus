@@ -15,9 +15,8 @@ interface SettingsState {
   setError: (error: string | null) => void;
   clearError: () => void;
 
-  // User CRUD
   fetchSettings: (force?: boolean) => Promise<Settings>;
-  updateSettings: (settingsData: Settings) => Promise<GetSettingsResponse>;
+  updateSettings: (payload: Settings) => Promise<GetSettingsResponse>;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -68,11 +67,11 @@ export const useSettingsStore = create<SettingsState>()(
       }
     },
 
-    updateSettings: async (settingsData) => {
+    updateSettings: async (payload) => {
       try {
         set({ loading: true, error: null });
         const updatedSettings =
-          await settingsService.updateSettings(settingsData);
+          await settingsService.updateSettings(payload);
         set((state) => ({
           settings: state.settings,
           loading: false,

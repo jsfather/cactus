@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSettingsStore } from '@/app/lib/stores/setting.store';
+import { useSettingsStore } from '@/app/lib/stores/settings.store';
 import type { Settings } from '@/app/lib/types/settings';
 
 export const useSettings = () => {
@@ -12,7 +12,7 @@ export const useSettings = () => {
   );
 
   const updateSettings = useCallback(
-    (settingsData: Settings) => store.updateSettings(settingsData),
+    (payload: Settings) => store.updateSettings(payload),
     [store.updateSettings]
   );
 

@@ -7,10 +7,10 @@ export class SettingsService {
     return apiClient.get<GetSettingsResponse>(API_ENDPOINTS.SETTINGS.GET);
   }
 
-  async updateSettings(settings: Settings): Promise<GetSettingsResponse> {
+  async updateSettings(payload: Settings): Promise<GetSettingsResponse> {
     return apiClient.put<GetSettingsResponse>(
       API_ENDPOINTS.SETTINGS.UPDATE,
-      settings
+      payload
     );
   }
 }
