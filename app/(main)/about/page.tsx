@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { homeSettingsService } from '@/app/lib/api/admin/homeSettings';
+import { Settings } from '@/app/lib/types/settings';
 
 interface FAQ {
   question: string;
@@ -50,7 +51,7 @@ const stats = [
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState(0);
-  const [settings, setSettings] = useState<HomeSettings | null>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

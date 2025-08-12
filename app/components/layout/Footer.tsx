@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { homeSettingsService, HomeSettings } from '@/app/lib/api/admin/homeSettings';
+import { homeSettingsService } from '@/app/lib/api/admin/homeSettings';
 import Image from 'next/image';
+import { Settings } from '@/app/lib/types/settings';
 
 export default function Footer() {
-  const [settings, setSettings] = useState<HomeSettings | null>(null);
+  const [settings, setSettings] = useState<Settings | null>(null);
   useEffect(() => {
     homeSettingsService.get().then(setSettings).catch(() => setSettings(null));
   }, []);
