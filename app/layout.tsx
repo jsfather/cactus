@@ -3,7 +3,6 @@ import '@/app/globals.css';
 import { dana, danaFaNum } from '@/app/fonts';
 import { CartProvider } from '@/app/contexts/CartContext';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
@@ -56,13 +55,7 @@ export default function RootLayout({
         <CartProvider>
           {children}
           <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
             rtl={true}
-            pauseOnFocusLoss
             draggable
             pauseOnHover
           />

@@ -5,8 +5,25 @@ export interface Blog {
   description: string;
   meta_title: string;
   meta_description: string;
+  tags: string[];
   slug: string;
   created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
+}
+
+export interface GetBlogListResponse {
+  data: Blog[];
+}
+
+export interface GetBlogResponse {
+  data: Blog;
+}
+
+export interface BlogRequest {
+  title: string;
+  little_description: string;
+  description: string;
+  meta_title: string;
+  meta_description: string;
+  tags: string[];
+  slug: string;
 }

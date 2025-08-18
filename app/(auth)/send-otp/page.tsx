@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { sendOTP } from '@/app/lib/api/auth';
+import { authService } from '@/app/lib/services/auth.service';
 import { useRouter } from 'next/navigation';
 import { Phone } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -49,7 +49,7 @@ export default function SendOtpPage() {
 
     try {
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
-      const res = await sendOTP(normalizedPhone);
+      const res = await authService.sendOTP({phone: normalizedPhone });
       toast.success(res.message || 'کد ارسال شد.');
       router.push(`/verify-otp?identifier=${encodeURIComponent(normalizedPhone)}`);
     } catch (error: unknown) {

@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { blogService } from '@/app/lib/api/admin/blogs';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
@@ -13,6 +12,7 @@ import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { z } from 'zod';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
 import { ApiError } from '@/app/lib/api/client';
+import { useBlog } from '@/app/lib/hooks/use-blog';
 
 const schema = z.object({
   title: z.string().min(1, 'عنوان الزامی است'),
@@ -29,7 +29,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
-  const [loading, setLoading] = useState(!isNew);
 
   const {
     register,
@@ -37,36 +36,49 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     formState: { errors, isSubmitting },
     submitWithErrorHandling,
     globalError,
-    setGlobalError,
     reset,
   } = useFormWithBackendErrors<FormData>(schema);
+
+  const {
+    currentBlog,
+    loading,
+    fetchBlogById,
+    createBlog,
+    updateBlog,
+  } = useBlog();
 
   useEffect(() => {
     const fetchBlog = async () => {
       if (isNew) return;
 
       try {
-        const blog = await blogService.getBlog(resolvedParams.id);
-        // Pre-fill form with existing blog data
-        reset(blog.data);
+        await fetchBlogById(resolvedParams.id);
+        if (currentBlog) {
+          reset({
+            title: currentBlog.title,
+            little_description: currentBlog.little_description,
+            description: currentBlog.description,
+            meta_title: currentBlog.meta_title,
+            meta_description: currentBlog.meta_description,
+            slug: currentBlog.slug,
+          });
+        }
       } catch (error) {
+        console.error('Error fetching blog:', error);
         toast.error('خطا در بارگذاری بلاگ');
         router.push('/admin/blogs');
-      } finally {
-        setLoading(false);
       }
     };
-
     fetchBlog();
-  }, [isNew, resolvedParams.id, router, reset]);
+  }, []);
 
   const onSubmit = async (data: FormData) => {
     if (isNew) {
-      const result = await blogService.createBlog(data);
+      await createBlog(data);
       toast.success('بلاگ با موفقیت ایجاد شد');
       router.push('/admin/blogs');
     } else {
-      const result = await blogService.updateBlog(resolvedParams.id, data);
+      await updateBlog(resolvedParams.id, data);
       toast.success('بلاگ با موفقیت بروزرسانی شد');
       router.push('/admin/blogs');
     }

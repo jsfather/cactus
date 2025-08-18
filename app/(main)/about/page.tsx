@@ -13,7 +13,7 @@ import {
   Youtube,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { homeSettingsService } from '@/app/lib/api/admin/homeSettings';
+import { useSettings } from '@/app/lib/hooks/use-settings';
 
 interface FAQ {
   question: string;
@@ -50,22 +50,12 @@ const stats = [
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState(0);
-  const [settings, setSettings] = useState<HomeSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  const { settings, loading, fetchSettings } = useSettings();
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const data = await homeSettingsService.get();
-        setSettings(data);
-      } catch (e) {
-        setSettings(null);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchSettings();
-  }, []);
+  }, [fetchSettings]);
 
   return (
     <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
@@ -135,9 +125,9 @@ export default function Page() {
             >
               {loading ? (
                 <div className="animate-pulse space-y-4">
-                  <div className="h-6 w-1/2 rounded bg-gray-200 dark:bg-gray-700 mx-auto" />
-                  <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700 mx-auto" />
-                  <div className="h-4 w-2/3 rounded bg-gray-200 dark:bg-gray-700 mx-auto" />
+                  <div className="mx-auto h-6 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div className="mx-auto h-4 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div className="mx-auto h-4 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
                 </div>
               ) : (
                 <>
@@ -265,7 +255,9 @@ export default function Page() {
                     <Mail className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="mb-2 font-semibold dark:text-white">ایمیل</h3>
+                    <h3 className="mb-2 font-semibold dark:text-white">
+                      ایمیل
+                    </h3>
                     <p className="text-gray-600 dark:text-gray-300">
                       {settings?.email || '---'}
                     </p>
@@ -281,9 +273,15 @@ export default function Page() {
                     <Clock className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="mb-2 font-semibold dark:text-white">ساعات کاری</h3>
-                    <p className="text-gray-600 dark:text-gray-300">شنبه تا چهارشنبه: ۸ صبح تا ۵ عصر</p>
-                    <p className="text-gray-600 dark:text-gray-300">پنجشنبه: ۸ صبح تا ۱۲ ظهر</p>
+                    <h3 className="mb-2 font-semibold dark:text-white">
+                      ساعات کاری
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      شنبه تا چهارشنبه: ۸ صبح تا ۵ عصر
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      پنجشنبه: ۸ صبح تا ۱۲ ظهر
+                    </p>
                   </div>
                 </motion.div>
                 {/* شبکه‌های اجتماعی */}

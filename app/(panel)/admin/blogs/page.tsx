@@ -3,19 +3,27 @@
 import { useState, useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { blogService } from '@/app/lib/api/admin/blogs';
 import { Blog } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
+import { useBlog } from '@/app/lib/hooks/use-blog';
 
 export default function Page() {
   const router = useRouter();
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Blog | null>(null);
+  const {
+    blogList,
+    loading,
+    fetchBlogList,
+    deleteBlog,
+  } = useBlog();
+
+  useEffect(() => {
+    fetchBlogList();
+  }, [fetchBlogList]);
 
   const columns: Column<Blog>[] = [
     {
@@ -40,21 +48,6 @@ export default function Page() {
     },
   ];
 
-  const fetchBlogs = async () => {
-    try {
-      setLoading(true);
-      const response = await blogService.getBlogs();
-      if (response) {
-        setBlogs(response.data);
-      }
-    } catch (error) {
-      toast.error('خطا در دریافت لیست بلاگ‌ها');
-      setBlogs([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteClick = (blog: Blog) => {
     setItemToDelete(blog);
     setShowDeleteModal(true);
@@ -65,11 +58,11 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await blogService.deleteBlog(itemToDelete.id);
+      await deleteBlog(itemToDelete.id.toString());
       toast.success('بلاگ با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchBlogs();
+      await fetchBlogList();
     } catch (error) {
       toast.error('خطا در حذف بلاگ');
     } finally {
@@ -84,10 +77,6 @@ export default function Page() {
     }, 500);
   };
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
-
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
@@ -99,7 +88,7 @@ export default function Page() {
         </Button>
       </div>
       <Table
-        data={blogs}
+        data={blogList}
         columns={columns}
         loading={loading}
         emptyMessage="هیچ بلاگی یافت نشد"
