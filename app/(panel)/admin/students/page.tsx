@@ -3,19 +3,28 @@
 import { useState, useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getStudents, deleteStudent } from '@/app/lib/api/admin/students';
 import { Student } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
+import { useStudent } from '@/app/lib/hooks/use-student';
 
 export default function Page() {
   const router = useRouter();
-  const [students, setStudents] = useState<Student[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Student | null>(null);
+  
+  const {
+    studentList,
+    loading,
+    fetchStudentList,
+    deleteStudent,
+  } = useStudent();
+
+  useEffect(() => {
+    fetchStudentList();
+  }, [fetchStudentList]);
 
   const columns: Column<Student>[] = [
     {
@@ -35,21 +44,6 @@ export default function Page() {
     },
   ];
 
-  const fetchStudents = async () => {
-    try {
-      setLoading(true);
-      const response = await getStudents();
-      if (response) {
-        setStudents(response.data);
-      }
-    } catch (error) {
-      toast.error('خطا در دریافت لیست دانش‌آموزان');
-      setStudents([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteClick = (student: Student) => {
     setItemToDelete(student);
     setShowDeleteModal(true);
@@ -60,11 +54,11 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await deleteStudent(itemToDelete.user_id);
+      await deleteStudent(itemToDelete.user_id.toString());
       toast.success('دانش‌آموز با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchStudents();
+      await fetchStudentList();
     } catch (error) {
       toast.error('خطا در حذف دانش‌آموز');
     } finally {
@@ -74,12 +68,10 @@ export default function Page() {
 
   const handleDeleteCancel = () => {
     setShowDeleteModal(false);
-    setItemToDelete(null);
+    setTimeout(() => {
+      setItemToDelete(null);
+    }, 500);
   };
-
-  useEffect(() => {
-    fetchStudents();
-  }, []);
 
   return (
     <div className="w-full">
@@ -92,7 +84,7 @@ export default function Page() {
         </Button>
       </div>
       <Table
-        data={students}
+        data={studentList}
         columns={columns}
         loading={loading}
         emptyMessage="هیچ دانش‌آموزی یافت نشد"

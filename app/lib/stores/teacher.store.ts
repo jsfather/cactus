@@ -1,0 +1,128 @@
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import { teacherService, TeacherRequest, GetTeacherResponse } from '@/app/lib/services/teacher.service';
+import type { ApiError } from '@/app/lib/api/client';
+import { Teacher } from '@/app/lib/types';
+
+interface TeacherState {
+  // State
+  teacherList: Teacher[];
+  currentTeacher: Teacher | null;
+  loading: boolean;
+  error: string | null;
+
+  // Actions
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
+  clearError: () => void;
+
+  fetchTeacherList: () => Promise<void>;
+  createTeacher: (payload: TeacherRequest | FormData) => Promise<GetTeacherResponse>;
+  updateTeacher: (id: string, payload: TeacherRequest | FormData) => Promise<GetTeacherResponse>;
+  deleteTeacher: (id: string) => Promise<void>;
+  fetchTeacherById: (id: string) => Promise<void>;
+}
+
+export const useTeacherStore = create<TeacherState>()(
+  devtools((set, get) => ({
+    // Initial state
+    teacherList: [],
+    currentTeacher: null,
+    loading: false,
+    error: null,
+
+    // Actions
+    setLoading: (loading) => set({ loading }),
+
+    setError: (error) => set({ error }),
+
+    clearError: () => set({ error: null }),
+
+    fetchTeacherList: async () => {
+      try {
+        set({ loading: true, error: null });
+        const response = await teacherService.getList();
+        set({
+          teacherList: response.data,
+          loading: false,
+        });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    createTeacher: async (payload) => {
+      try {
+        set({ loading: true, error: null });
+        const newTeacher = await teacherService.create(payload);
+        set((state) => ({
+          teacherList: [newTeacher.data, ...state.teacherList],
+          loading: false,
+        }));
+        return newTeacher;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    updateTeacher: async (id, payload) => {
+      try {
+        set({ loading: true, error: null });
+        const updatedTeacher = await teacherService.update(id, payload);
+        set((state) => ({
+          teacherList: state.teacherList.map((teacher) =>
+            teacher.user_id.toString() === updatedTeacher.data.user_id.toString() 
+              ? updatedTeacher.data 
+              : teacher
+          ),
+          currentTeacher: updatedTeacher.data,
+          loading: false,
+        }));
+        return updatedTeacher;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    deleteTeacher: async (id) => {
+      try {
+        set({ loading: true, error: null });
+        await teacherService.delete(id);
+        set((state) => ({
+          teacherList: state.teacherList.filter((teacher) => 
+            teacher.user_id.toString() !== id
+          ),
+          currentTeacher: state.currentTeacher?.user_id.toString() === id 
+            ? null 
+            : state.currentTeacher,
+          loading: false,
+        }));
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    fetchTeacherById: async (id) => {
+      try {
+        set({ loading: true, error: null });
+        const response = await teacherService.getById(id);
+        set({
+          currentTeacher: response.data,
+          loading: false,
+        });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+  }))
+);
