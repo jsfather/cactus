@@ -1,22 +1,22 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { authService } from '@/app/lib/services/auth.service';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useAuthStore } from '@/app/lib/stores/auth.store';
 import Link from 'next/link';
 import { KeyRound, ArrowLeft } from 'lucide-react';
-import { useUser } from '@/app/hooks/useUser';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { convertToEnglishNumbers, isNumeric } from '@/app/lib/utils/persian';
 
 export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const identifier = searchParams.get('identifier') || '';
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(60);
   const [resendLoading, setResendLoading] = useState(false);
-  const { refetch } = useUser();
+  const { verifyOtp, sendOtp } = useAuthStore();
 
   useEffect(() => {
     if (resendTimer <= 0) return;
@@ -58,12 +58,14 @@ export default function VerifyOtpPage() {
     try {
       const normalizedOtp = convertToEnglishNumbers(otp.trim());
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
-      const result = await authService.verifyOTP({
+      await verifyOtp({
         phone: normalizedPhone,
         otp: normalizedOtp,
       });
-      localStorage.setItem('authToken', result.token);
-      await refetch();
+      
+      // After successful verification, redirect to dashboard
+      toast.success('ورود موفقیت‌آمیز بود');
+      router.push('/user'); // or wherever the user should go after login
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error
@@ -79,7 +81,7 @@ export default function VerifyOtpPage() {
     try {
       setResendLoading(true);
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
-      const res = await authService.sendOTP({ phone: normalizedPhone });
+      const res = await sendOtp({ phone: normalizedPhone });
       toast.success(res.message || 'کد مجدداً ارسال شد.');
       setResendTimer(60);
     } catch (error: unknown) {

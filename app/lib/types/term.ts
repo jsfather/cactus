@@ -20,3 +20,36 @@ export interface Term {
   updated_at?: string;
   deleted_at?: string | null;
 }
+
+// Admin term management types
+export interface GetTermListResponse {
+  data: Term[];
+}
+
+export interface GetTermResponse {
+  data: Term;
+}
+
+export interface CreateTermRequest {
+  title: string;
+  duration: string | number;
+  number_of_sessions: string | number;
+  level_id: number;
+  start_date: string;
+  end_date: string;
+  type: 'normal' | 'capacity_completion' | 'vip';
+  capacity: string | number;
+  project_type?: any;
+}
+
+export interface UpdateTermRequest {
+  title?: string;
+  duration?: string | number;
+  number_of_sessions?: string | number;
+  level_id?: number;
+  start_date?: string;
+  end_date?: string;
+  type?: 'normal' | 'capacity_completion' | 'vip';
+  capacity?: string | number;
+  project_type?: any;
+}

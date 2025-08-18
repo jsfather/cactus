@@ -44,3 +44,30 @@ export interface UpdateProfileRequest {
   national_code: string | null;
   profile_picture: string | null;
 }
+
+// Admin user management types
+export interface GetUserListResponse {
+  data: User[];
+}
+
+export interface GetUserResponse {
+  data: User;
+}
+
+export interface CreateUserRequest {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email?: string | null;
+  national_code?: string | null;
+  role: UserRole;
+}
+
+export interface UpdateUserRequest {
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email?: string | null;
+  national_code?: string | null;
+  role: UserRole;
+}
