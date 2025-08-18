@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import Breadcrumbs from "@/app/components/ui/Breadcrumbs";
 import Input from "@/app/components/ui/Input";
@@ -9,7 +9,7 @@ import { Button } from "@/app/components/ui/Button";
 import LoadingSpinner from "@/app/components/ui/LoadingSpinner";
 import { z } from "zod";
 import { useFormWithBackendErrors } from "@/app/hooks/useFormWithBackendErrors";
-import { homeSettingsService } from "@/app/lib/api/admin/homeSettings";
+import { useSettings } from "@/app/lib/hooks/use-settings";
 
 const schema = z.object({
   phone: z.string().min(1, "شماره تماس الزامی است"),
@@ -24,7 +24,12 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function AboutUsPage() {
-  const [loading, setLoading] = useState(true);
+  const {
+    settings,
+    loading,
+    fetchSettings,
+    updateSettings,
+  } = useSettings();
 
   const {
     register,
@@ -36,30 +41,23 @@ export default function AboutUsPage() {
   } = useFormWithBackendErrors<FormData>(schema);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      setLoading(true);
+    const loadSettings = async () => {
       try {
-        const data = await homeSettingsService.get();
+        const data = await fetchSettings();
         reset(data);
       } catch (e: any) {
         toast.error(e.message || "خطا در دریافت اطلاعات");
-      } finally {
-        setLoading(false);
       }
     };
-    fetchSettings();
-  }, [reset]);
+    loadSettings();
+  }, [fetchSettings, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
-      const res = await homeSettingsService.update(data);
-      toast.success(res?.message || "اطلاعات با موفقیت ذخیره شد");
+      await updateSettings(data as any);
+      toast.success("اطلاعات با موفقیت ذخیره شد");
     } catch (e: any) {
-      if (e instanceof ApiError) {
-        toast.error(e.message || "خطا در ذخیره اطلاعات");
-      } else {
-        toast.error("خطا در ذخیره اطلاعات");
-      }
+      toast.error(e.message || "خطا در ذخیره اطلاعات");
     }
   };
 
