@@ -1,0 +1,44 @@
+import { apiClient } from '@/app/lib/api/client';
+import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
+import {
+  GetOrderListResponse,
+  GetOrderResponse,
+  CreateOrderRequest,
+  UpdateOrderRequest,
+} from '@/app/lib/types';
+
+export class OrderService {
+  async getList(): Promise<GetOrderListResponse> {
+    return apiClient.get<GetOrderListResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ORDERS.GET_ALL
+    );
+  }
+
+  async getById(id: string): Promise<GetOrderResponse> {
+    return apiClient.get<GetOrderResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ORDERS.GET_BY_ID(id)
+    );
+  }
+
+  async create(payload: CreateOrderRequest): Promise<GetOrderResponse> {
+    return apiClient.post<GetOrderResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ORDERS.CREATE,
+      payload
+    );
+  }
+
+  async update(id: string, payload: UpdateOrderRequest): Promise<GetOrderResponse> {
+    return apiClient.put<GetOrderResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ORDERS.UPDATE(id),
+      payload
+    );
+  }
+
+  async delete(id: string): Promise<void> {
+    return apiClient.delete<void>(
+      API_ENDPOINTS.PANEL.ADMIN.ORDERS.DELETE(id)
+    );
+  }
+}
+
+export const orderService = new OrderService();

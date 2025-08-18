@@ -5,6 +5,8 @@ import {
   SendOTPResponse,
   VerifyOTPRequest,
   VerifyOTPResponse,
+  GetProfileResponse,
+  UpdateProfileRequest,
 } from '@/app/lib/types';
 
 export class AuthService {
@@ -20,6 +22,14 @@ export class AuthService {
       API_ENDPOINTS.AUTH.VERIFY_OTP,
       payload
     );
+  }
+
+  async getProfile(): Promise<GetProfileResponse> {
+    return apiClient.get<GetProfileResponse>(API_ENDPOINTS.USER.ME);
+  }
+
+  async updateProfile(payload: UpdateProfileRequest): Promise<GetProfileResponse> {
+    return apiClient.put<GetProfileResponse>(API_ENDPOINTS.USER.UPDATE, payload);
   }
 }
 

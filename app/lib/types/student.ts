@@ -14,3 +14,40 @@ export interface Student {
   birth_date: string | null;
   user: User;
 }
+
+// Admin student management types
+export interface GetStudentListResponse {
+  data: Student[];
+}
+
+export interface GetStudentResponse {
+  data: Student;
+}
+
+export interface CreateStudentRequest {
+  user_id: number;
+  level_id?: number | null;
+  father_name?: string | null;
+  mother_name?: string | null;
+  father_job?: string | null;
+  mother_job?: string | null;
+  has_allergy?: number;
+  allergy_details?: string | null;
+  interest_level?: number | null;
+  focus_level?: number | null;
+  birth_date?: string | null;
+}
+
+export interface UpdateStudentRequest {
+  user_id?: number;
+  level_id?: number | null;
+  father_name?: string | null;
+  mother_name?: string | null;
+  father_job?: string | null;
+  mother_job?: string | null;
+  has_allergy?: number;
+  allergy_details?: string | null;
+  interest_level?: number | null;
+  focus_level?: number | null;
+  birth_date?: string | null;
+}

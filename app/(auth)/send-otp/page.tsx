@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { authService } from '@/app/lib/services/auth.service';
+import { useAuthStore } from '@/app/lib/stores/auth.store';
 import { useRouter } from 'next/navigation';
 import { Phone } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import { convertToEnglishNumbers, isNumeric } from '@/app/lib/utils/persian';
 
 export default function SendOtpPage() {
@@ -12,6 +12,7 @@ export default function SendOtpPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { sendOtp } = useAuthStore();
 
   const validatePhone = (value: string): string => {
     const trimmed = value.trim();
@@ -49,7 +50,7 @@ export default function SendOtpPage() {
 
     try {
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
-      const res = await authService.sendOTP({phone: normalizedPhone });
+      const res = await sendOtp({phone: normalizedPhone });
       toast.success(res.message || 'کد ارسال شد.');
       router.push(`/verify-otp?identifier=${encodeURIComponent(normalizedPhone)}`);
     } catch (error: unknown) {

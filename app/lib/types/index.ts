@@ -17,3 +17,5 @@ export * from './term_teacher';
 export * from './term_student';
 export * from './student';
 export * from './teacher';
+export * from './product';
+export * from './order';
