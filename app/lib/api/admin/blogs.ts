@@ -27,3 +27,10 @@ export const blogService = {
     return await ApiService.delete<{data:Blog}>(`admin/blogs/${id}`);
   },
 };
+
+// Export individual functions for backward compatibility
+export const getBlogs = blogService.getBlogs;
+export const getBlog = blogService.getBlog;
+export const createBlog = blogService.createBlog;
+export const updateBlog = blogService.updateBlog;
+export const deleteBlog = blogService.deleteBlog;

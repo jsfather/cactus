@@ -6,6 +6,11 @@ export interface ApiError {
   code?: string;
 }
 
+export interface BackendError {
+  field: string;
+  message: string;
+}
+
 class ApiClient {
   private client: AxiosInstance;
 
@@ -26,6 +31,7 @@ class ApiClient {
     this.client.interceptors.request.use(
       (config) => {
         if (typeof window !== 'undefined') {
+          // Try to get token from localStorage (for backward compatibility and bootstrap)
           const token = localStorage.getItem('authToken');
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -49,6 +55,7 @@ class ApiClient {
         if (error.response?.status === 401) {
           if (typeof window !== 'undefined') {
             localStorage.removeItem('authToken');
+            // Note: Auth store will handle logout if imported
             window.location.href = '/send-otp';
           }
         }
@@ -80,3 +87,13 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+// Export ApiService as alias for backward compatibility
+export const ApiService = apiClient;
+
+// Default export for request function pattern
+const request = async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+  return apiClient.get<T>(url, config);
+};
+
+export default request;
