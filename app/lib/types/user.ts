@@ -16,6 +16,9 @@ export interface User {
 
 export interface SendOTPResponse {
   message: string;
+  data: {
+    is_new: boolean;
+  };
 }
 
 export interface SendOTPRequest {
@@ -43,6 +46,30 @@ export interface UpdateProfileRequest {
   email: string | null;
   national_code: string | null;
   profile_picture: string | null;
+}
+
+// Onboarding types
+export interface OnboardingInformationRequest {
+  first_name: string;
+  last_name: string;
+  username: string;
+  phone: string;
+  email: string;
+  national_code: string;
+  father_name: string;
+  mother_name: string;
+  father_job: string;
+  mother_job: string;
+  has_allergy: string;
+  allergy_details: string;
+  interest_level: string;
+  focus_level: string;
+  birth_date: string;
+}
+
+export interface OnboardingInformationResponse {
+  message: string;
+  data?: any;
 }
 
 // Admin user management types

@@ -3,6 +3,10 @@ export const API_ENDPOINTS = {
     SEND_OTP: '/send_otp',
     VERIFY_OTP: '/verify_otp',
   },
+  ONBOARDING: {
+    INFORMATION: '/api/information',
+    UPLOAD_DOCUMENTS: '/api/uploadDocuments',
+  },
   USER: {
     ME: '/profile',
     UPDATE: '/profile',
