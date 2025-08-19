@@ -105,6 +105,12 @@ export const API_ENDPOINTS = {
         CREATE: '/admin/exams',
         UPDATE: (id: string) => `/admin/exams/${id}`,
         DELETE: (id: string) => `/admin/exams/${id}`,
+        QUESTIONS: {
+          GET_ALL: (examId: string) => `/admin/exams/${examId}/questions`,
+          CREATE: (examId: string) => `/admin/exams/${examId}/questions`,
+          UPDATE: (examId: string, questionId: string) => `/admin/exams/${examId}/questions/${questionId}`,
+          DELETE: (examId: string, questionId: string) => `/admin/exams/${examId}/questions/${questionId}`,
+        },
       },
       
       TICKETS: {

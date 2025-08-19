@@ -3,20 +3,22 @@
 import { useState, useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getExams, deleteExam } from '@/app/lib/api/admin/exams';
-import { getTerms } from '@/app/lib/api/admin/terms';
-import { getUsers } from '@/app/lib/api/admin/users';
-import { Exam, Term, User } from '@/app/lib/types';
+import { useExamStore } from '@/app/lib/stores/exam.store';
+import { Exam } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 
 export default function Page() {
   const router = useRouter();
-  const [exams, setExams] = useState<Exam[]>([]);
-  const [terms, setTerms] = useState<Term[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { 
+    exams, 
+    isListLoading: loading, 
+    deleteExam, 
+    fetchExams, 
+    error 
+  } = useExamStore();
+  
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Exam | null>(null);
@@ -33,62 +35,24 @@ export default function Page() {
     {
       header: 'تاریخ آزمون',
       accessor: 'date',
+      render: (value) => value || '-',
     },
     {
       header: 'مدت زمان',
       accessor: 'duration',
+      render: (value) => value ? `${value} دقیقه` : '-',
     },
     {
       header: 'ترم',
       accessor: 'term_id',
-      render: (value) => {
-        if (!value) return '-';
-        const term = terms.find((t) => t.id.toString() === value.toString());
-        return term ? term.title : `ترم ${value}`;
-      },
+      render: (value) => value ? `ترم ${value}` : '-',
     },
     {
       header: 'ایجاد کننده',
       accessor: 'created_by',
-      render: (value, item) => {
-        if (!value || !item.created_by) return '-';
-
-        const name =
-          users.find((t) => t.id.toString() === value.toString())?.first_name +
-          ' ' +
-          users.find((t) => t.id.toString() === value.toString())?.last_name;
-        return name;
-      },
+      render: (value) => value ? `کاربر ${value}` : '-',
     },
   ];
-
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const [examsResponse, termsResponse, usersResponse] = await Promise.all([
-        getExams(),
-        getTerms(),
-        getUsers(),
-      ]);
-
-      if (examsResponse) {
-        setExams(examsResponse.data);
-      }
-      if (termsResponse) {
-        setTerms(termsResponse.data);
-      }
-      if (usersResponse) {
-        setUsers(usersResponse.data);
-      }
-    } catch (error) {
-      toast.error('خطا در دریافت اطلاعات');
-      setExams([]);
-      setTerms([]);
-      setUsers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleDeleteClick = (exam: Exam) => {
     setItemToDelete(exam);
@@ -100,11 +64,10 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await deleteExam(itemToDelete.id);
+      await deleteExam(itemToDelete.id.toString());
       toast.success('آزمون با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchData();
     } catch (error) {
       toast.error('خطا در حذف آزمون');
     } finally {
@@ -120,8 +83,8 @@ export default function Page() {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchExams();
+  }, [fetchExams]);
 
   return (
     <div className="w-full">
