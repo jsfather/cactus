@@ -20,7 +20,7 @@ export default function Footer() {
                 alt="لوگو کاکتوس"
                 width={40}
                 height={40}
-                className="rounded-lg"
+                className="rounded-lg transition-all duration-300 dark:brightness-0 dark:invert"
               />
               <span className="text-xl font-bold text-white">کاکتوس</span>
             </div>
