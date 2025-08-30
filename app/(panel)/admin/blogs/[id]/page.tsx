@@ -6,6 +6,7 @@ import { toast } from 'react-hot-toast';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
+import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
@@ -13,6 +14,7 @@ import { z } from 'zod';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
 import { ApiError } from '@/app/lib/api/client';
 import { useBlog } from '@/app/lib/hooks/use-blog';
+import { Controller } from 'react-hook-form';
 
 const schema = z.object({
   title: z.string().min(1, 'عنوان الزامی است'),
@@ -21,6 +23,7 @@ const schema = z.object({
   meta_title: z.string().min(1, 'عنوان متا الزامی است'),
   meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
   slug: z.string().min(1, 'اسلاگ الزامی است'),
+  tags: z.array(z.string()),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -33,6 +36,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
     submitWithErrorHandling,
     globalError,
@@ -61,6 +65,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             meta_title: currentBlog.meta_title,
             meta_description: currentBlog.meta_description,
             slug: currentBlog.slug,
+            tags: currentBlog.tags || [],
           });
         }
       } catch (error) {
@@ -142,13 +147,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="w-full">
-          <Textarea
-            id="description"
-            label="توضیحات"
-            placeholder="توضیحات کامل بلاگ را وارد کنید"
-            required
-            error={errors.description?.message}
-            {...register('description')}
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <MarkdownEditor
+                id="description"
+                label="محتوای کامل بلاگ"
+                placeholder="محتوای کامل بلاگ را در اینجا وارد کنید..."
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.description?.message}
+                required
+              />
+            )}
           />
         </div>
 

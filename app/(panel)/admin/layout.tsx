@@ -103,6 +103,16 @@ const menuItems = [
       },
     ],
   },
+  {
+    title: 'توسعه',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'Playground',
+        href: '/admin/playground',
+      },
+    ],
+  },
 ];
 
 export default function Layout({
