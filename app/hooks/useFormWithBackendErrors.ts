@@ -61,7 +61,8 @@ export function useFormWithBackendErrors<T extends FieldValues>(
         clearBackendErrors();
         await onSubmit(data);
       } catch (error: any) {
-        if (error instanceof ApiError) {
+        // Check if it's an API error by checking its properties
+        if (error && typeof error === 'object' && 'status' in error && 'message' in error) {
           // Handle validation errors (422)
           if (error.status === 422 && error.errors) {
             setBackendErrors(error.errors);

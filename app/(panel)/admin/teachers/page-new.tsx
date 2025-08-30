@@ -114,6 +114,7 @@ export default function Page() {
         emptyMessage="هیچ مربی‌ای یافت نشد"
         onEdit={(teacher) => router.push(`/admin/teachers/${teacher.user_id}`)}
         onDelete={handleDeleteClick}
+        getRowId={(teacher) => String(teacher.user_id)}
       />
 
       <ConfirmModal

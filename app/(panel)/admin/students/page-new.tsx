@@ -120,6 +120,7 @@ export default function Page() {
         emptyMessage="هیچ دانش‌آموزی یافت نشد"
         onEdit={(student) => router.push(`/admin/students/${student.user_id}`)}
         onDelete={handleDeleteClick}
+        getRowId={(student) => String(student.user_id)}
       />
 
       <ConfirmModal

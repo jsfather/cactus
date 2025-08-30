@@ -138,7 +138,7 @@ export default function Table<T>({
                     <div>
                       {columns.slice(1).map((column, index) => (
                         <p
-                          key={index}
+                          key={`${getRowId(item)}-mobile-col-${index}`}
                           className={`${
                             index === 0
                               ? 'text-xl font-medium'
@@ -268,7 +268,7 @@ export default function Table<T>({
                   >
                     {columns.map((column, index) => (
                       <td
-                        key={index}
+                        key={`${getRowId(item)}-col-${index}`}
                         className="py-3 pr-3 pl-6 whitespace-nowrap"
                       >
                         <div className="flex items-center gap-3">
