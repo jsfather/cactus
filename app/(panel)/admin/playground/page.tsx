@@ -41,32 +41,6 @@ export default function PlaygroundPage() {
 
   const { createBlog } = useBlog();
 
-  const onSubmit = async (data: FormData) => {
-    try {
-      // Create blog with default tags for playground
-      const blogData = {
-        ...data,
-        tags: ['playground', 'test'],
-      };
-      
-      await createBlog(blogData);
-      toast.success('بلاگ با موفقیت در Playground ایجاد شد');
-      
-      // Reset form after successful creation
-      reset({
-        title: '',
-        little_description: '',
-        description: '',
-        meta_title: '',
-        meta_description: '',
-        slug: '',
-        tags: [],
-      });
-    } catch (error) {
-      console.error('Error creating blog in playground:', error);
-    }
-  };
-
   const handleError = (error: ApiError) => {
     console.log('Playground blog form submission error:', error);
 
@@ -77,6 +51,28 @@ export default function PlaygroundPage() {
       toast.error('خطا در ثبت بلاگ');
     }
   };
+
+  const onSubmit = submitWithErrorHandling(async (data: FormData) => {
+    // Create blog with default tags for playground
+    const blogData = {
+      ...data,
+      tags: ['playground', 'test'],
+    };
+    
+    await createBlog(blogData);
+    toast.success('بلاگ با موفقیت در Playground ایجاد شد');
+    
+    // Reset form after successful creation
+    reset({
+      title: '',
+      little_description: '',
+      description: '',
+      meta_title: '',
+      meta_description: '',
+      slug: '',
+      tags: [],
+    });
+  }, handleError);
 
   const handleClearForm = () => {
     reset();
