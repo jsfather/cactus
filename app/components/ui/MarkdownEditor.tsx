@@ -85,13 +85,18 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
               : 'border-gray-300 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-200 dark:border-gray-700 dark:focus-within:border-primary-500 dark:focus-within:ring-primary-200/20'
           )}
         >
-          <div style={{ direction: 'rtl' }}>
+          <div style={{ direction: 'rtl', position: 'relative' }}>
+            {/* Custom Placeholder */}
+            {!value && (
+              <div className="absolute top-4 right-4 text-gray-400 dark:text-gray-500 pointer-events-none text-sm" style={{ direction: 'rtl' }}>
+                {placeholder}
+              </div>
+            )}
             <MDXEditor
               ref={editorRef}
               markdown={value}
               onChange={(newValue) => onChange?.(newValue)}
               readOnly={readOnly}
-              placeholder={placeholder}
               autoFocus={false}
               plugins={[
                 headingsPlugin(),
@@ -222,17 +227,34 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
           }
 
           .dark .markdown-editor-wrapper .mdxeditor-toolbar button {
-            color: #f3f4f6 !important;
+            color: #ffffff !important;
           }
 
           .dark .markdown-editor-wrapper .mdxeditor-toolbar button:hover {
-            background-color: #374151 !important;
+            background-color: #4b5563 !important;
             color: #ffffff !important;
           }
 
           .dark .markdown-editor-wrapper .mdxeditor-toolbar button[aria-pressed="true"] {
-            background-color: #1e40af !important;
-            color: #93c5fd !important;
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+          }
+
+          /* Toolbar Icons and SVGs in Dark Mode */
+          .dark .markdown-editor-wrapper .mdxeditor-toolbar button svg {
+            color: #ffffff !important;
+            fill: currentColor !important;
+          }
+
+          .dark .markdown-editor-wrapper .mdxeditor-toolbar button:hover svg {
+            color: #ffffff !important;
+            fill: currentColor !important;
+          }
+
+          .dark .markdown-editor-wrapper .mdxeditor-toolbar select,
+          .dark .markdown-editor-wrapper .mdxeditor-toolbar option {
+            color: #ffffff !important;
+            background-color: #1f2937 !important;
           }
 
           /* Content Editable Area - Force RTL */
@@ -249,6 +271,21 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
             outline: none !important;
             padding: 16px !important;
             min-height: 200px !important;
+            position: relative !important;
+            cursor: text !important;
+          }
+
+          /* Remove any default placeholder */
+          .markdown-editor-wrapper .mdxeditor-root-contenteditable::placeholder,
+          .markdown-editor-wrapper [contenteditable="true"]::placeholder {
+            opacity: 0 !important;
+            display: none !important;
+          }
+
+          .markdown-editor-wrapper .mdxeditor-root-contenteditable:empty::before,
+          .markdown-editor-wrapper [contenteditable="true"]:empty::before {
+            display: none !important;
+            content: none !important;
           }
 
           .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable,
@@ -257,30 +294,23 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
             color: #f3f4f6 !important;
           }
 
+          /* Cursor positioning fix */
+          .markdown-editor-wrapper .mdxeditor-root-contenteditable:focus,
+          .markdown-editor-wrapper [contenteditable="true"]:focus {
+            caret-color: #111827 !important;
+          }
+
+          .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable:focus,
+          .dark .markdown-editor-wrapper [contenteditable="true"]:focus {
+            caret-color: #f3f4f6 !important;
+          }
+
           /* Force RTL on all text content */
           .markdown-editor-wrapper .mdxeditor-root-contenteditable *,
           .markdown-editor-wrapper [contenteditable="true"] * {
             direction: rtl !important;
             text-align: right !important;
             unicode-bidi: embed !important;
-          }
-
-          /* Placeholder */
-          .markdown-editor-wrapper .mdxeditor-root-contenteditable:empty::before,
-          .markdown-editor-wrapper [contenteditable="true"]:empty::before {
-            content: attr(data-placeholder) !important;
-            color: #9ca3af !important;
-            direction: rtl !important;
-            text-align: right !important;
-            pointer-events: none !important;
-            position: absolute !important;
-            right: 16px !important;
-            top: 16px !important;
-          }
-
-          .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable:empty::before,
-          .dark .markdown-editor-wrapper [contenteditable="true"]:empty::before {
-            color: #6b7280 !important;
           }
 
           /* Prose Styling for RTL */
@@ -428,7 +458,7 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
           .dark .markdown-editor-wrapper .mdxeditor-select-trigger,
           .dark .markdown-editor-wrapper .mdxeditor-select-content {
             background-color: #1f2937 !important;
-            color: #f3f4f6 !important;
+            color: #ffffff !important;
             border-color: #374151 !important;
           }
 
