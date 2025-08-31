@@ -11,12 +11,14 @@ import {
   CreateBlogInput,
   UpdateBlogInput,
 } from "../../lib/validations/blog";
+import { Button, Input, Textarea, TagInput, DateTimePicker, MarkdownEditor, Select } from "@/components/ui";
 
 interface BlogFormProps {
   blog?: Blog | null;
   mode: "create" | "edit";
   onClose: () => void;
   onSuccess: () => void;
+  isPage?: boolean;
 }
 
 const BlogForm: React.FC<BlogFormProps> = ({

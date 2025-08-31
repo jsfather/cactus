@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useBlogStore } from "../../lib/store/blog";
+import Button from "../ui/Button";
 
 const BlogList: React.FC = () => {
   const router = useRouter();
@@ -47,12 +48,13 @@ const BlogList: React.FC = () => {
             <h3 className="text-sm font-medium text-red-800">Error</h3>
             <div className="mt-2 text-sm text-red-700">{error}</div>
             <div className="mt-4">
-              <button
+              <Button
                 onClick={clearError}
-                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+                variant="secondary"
+                className="bg-red-100 text-red-800 hover:bg-red-200"
               >
                 Dismiss
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -65,12 +67,12 @@ const BlogList: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Blog Management</h1>
-        <button
+        <Button
           onClick={handleCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          variant="primary"
         >
           Create New Blog
-        </button>
+        </Button>
       </div>
 
       {/* Blog List */}
@@ -107,24 +109,29 @@ const BlogList: React.FC = () => {
                     )}
                   </div>
                   <div className="flex space-x-2">
-                    <button
+                    <Button
                       onClick={() => handleView(blog.id)}
-                      className="text-green-600 hover:text-green-900 text-sm font-medium"
+                      variant="secondary"
+                      size="sm"
+                      className="text-green-600 hover:text-green-900"
                     >
                       View
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleEdit(blog.id)}
-                      className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+                      variant="secondary"
+                      size="sm"
+                      className="text-indigo-600 hover:text-indigo-900"
                     >
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleDelete(blog.id)}
-                      className="text-red-600 hover:text-red-900 text-sm font-medium"
+                      variant="danger"
+                      size="sm"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

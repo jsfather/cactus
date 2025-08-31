@@ -11,6 +11,7 @@ import {
   CreateBlogInput,
   UpdateBlogInput,
 } from "../../lib/validations/blog";
+import { Button, Input, Textarea } from "@/components/ui";
 
 interface BlogFormProps {
   blog?: Blog | null;
@@ -105,12 +106,14 @@ const BlogForm: React.FC<BlogFormProps> = ({
           <h3 className="text-lg font-medium text-gray-900">
             {mode === "create" ? "Create New Blog" : "Edit Blog"}
           </h3>
-          <button
+          <Button
             onClick={onClose}
+            variant="secondary"
+            size="sm"
             className="text-gray-400 hover:text-gray-600"
           >
             <span className="text-2xl">&times;</span>
-          </button>
+          </Button>
         </div>
       )}
 
@@ -228,13 +231,14 @@ const BlogForm: React.FC<BlogFormProps> = ({
               placeholder="Add a tag..."
               className="flex-1 border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
-            <button
+            <Button
               type="button"
               onClick={addTag}
-              className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700"
+              variant="primary"
+              className="rounded-l-none border-l-0"
             >
               Add
-            </button>
+            </Button>
           </div>
           {tags.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
@@ -244,13 +248,15 @@ const BlogForm: React.FC<BlogFormProps> = ({
                   className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
                 >
                   {tag}
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="ml-2 text-blue-600 hover:text-blue-800"
+                    variant="secondary"
+                    size="sm"
+                    className="ml-2 text-blue-600 hover:text-blue-800 p-0 w-4 h-4"
                   >
                     &times;
-                  </button>
+                  </Button>
                 </span>
               ))}
             </div>
@@ -293,24 +299,24 @@ const BlogForm: React.FC<BlogFormProps> = ({
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-3 pt-6">
-          <button
+          <Button
             type="button"
             onClick={onClose}
-            className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+            variant="secondary"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            variant="primary"
           >
             {loading
               ? "Saving..."
               : mode === "create"
               ? "Create Blog"
               : "Update Blog"}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

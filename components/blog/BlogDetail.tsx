@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useBlogStore } from "../../lib/store/blog";
+import { Button } from "@/components/ui";
 
 interface BlogDetailProps {
   blogId: number;
@@ -48,12 +49,14 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
             <h3 className="text-sm font-medium text-red-800">Error</h3>
             <div className="mt-2 text-sm text-red-700">{error}</div>
             <div className="mt-4">
-              <button
+              <Button
                 onClick={handleBack}
-                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+                variant="secondary"
+                size="sm"
+                className="bg-red-100 text-red-800 hover:bg-red-200"
               >
                 Go Back
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -65,12 +68,13 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">Blog not found.</p>
-        <button
+        <Button
           onClick={handleBack}
-          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          variant="primary"
+          className="mt-4"
         >
           Go Back
-        </button>
+        </Button>
       </div>
     );
   }
@@ -79,12 +83,14 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <button
+        <Button
           onClick={handleBack}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4"
+          variant="secondary"
+          size="sm"
+          className="text-blue-600 hover:text-blue-800 mb-4"
         >
           ← Back to Blog List
-        </button>
+        </Button>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
           {currentBlog.title}
         </h1>

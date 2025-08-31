@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useBlogStore } from "../../lib/store/blog";
-import BlogForm from "./BlogFormNew";
+import BlogForm from "./BlogFormRefactored";
 
 interface BlogEditPageProps {
   blogId: number;

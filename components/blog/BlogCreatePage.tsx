@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import BlogForm from "./BlogFormNew";
+import BlogForm from "./BlogFormRefactored";
 
 const BlogCreatePage: React.FC = () => {
   const router = useRouter();
