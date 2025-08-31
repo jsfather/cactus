@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useBlogStore } from "../../lib/store/blog";
-import { Button } from "@/components/ui";
+import { Button, MarkdownRenderer } from "@/components/ui";
 
 interface BlogDetailProps {
   blogId: number;
@@ -125,11 +125,10 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
       {/* Content */}
       <div className="bg-white shadow rounded-lg p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Content</h2>
-        <div className="prose max-w-none">
-          <p className="text-gray-700 whitespace-pre-wrap">
-            {currentBlog.description}
-          </p>
-        </div>
+        <MarkdownRenderer 
+          content={currentBlog.description} 
+          className="text-gray-700"
+        />
       </div>
 
       {/* SEO Information */}
