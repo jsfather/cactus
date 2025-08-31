@@ -1,11 +1,17 @@
 "use client";
 
+import { use } from "react";
 import { useRouter } from "next/navigation";
 import BlogDetail from "../../../../components/blog/BlogDetail";
 
-export default function ViewBlogPage({ params }: { params: { id: string } }) {
+export default function ViewBlogPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
-  const blogId = parseInt(params.id);
+  const resolvedParams = use(params);
+  const blogId = parseInt(resolvedParams.id);
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,7 +1,13 @@
+import { use } from "react";
 import BlogEditPage from "../../../components/blog/BlogEditPage";
 
-export default function EditBlogPage({ params }: { params: { id: string } }) {
-  const blogId = parseInt(params.id);
+export default function EditBlogPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const resolvedParams = use(params);
+  const blogId = parseInt(resolvedParams.id);
 
   return (
     <div className="min-h-screen bg-gray-50">

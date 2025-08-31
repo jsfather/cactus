@@ -125,8 +125,8 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
       {/* Content */}
       <div className="bg-white shadow rounded-lg p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Content</h2>
-        <MarkdownRenderer 
-          content={currentBlog.description} 
+        <MarkdownRenderer
+          content={currentBlog.description}
           className="text-gray-700"
         />
       </div>
