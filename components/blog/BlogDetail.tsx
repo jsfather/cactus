@@ -1,0 +1,165 @@
+"use client";
+
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useBlogStore } from "../../lib/store/blog";
+
+interface BlogDetailProps {
+  blogId: number;
+  onBack?: () => void;
+}
+
+const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
+  const router = useRouter();
+  const { currentBlog, loading, error, fetchBlog, clearCurrentBlog } =
+    useBlogStore();
+
+  useEffect(() => {
+    fetchBlog(blogId);
+    return () => clearCurrentBlog();
+  }, [blogId, fetchBlog, clearCurrentBlog]);
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      router.push("/blog");
+    }
+  };
+
+  useEffect(() => {
+    fetchBlog(blogId);
+    return () => clearCurrentBlog();
+  }, [blogId, fetchBlog, clearCurrentBlog]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">Error</h3>
+            <div className="mt-2 text-sm text-red-700">{error}</div>
+            <div className="mt-4">
+              <button
+                onClick={handleBack}
+                className="bg-red-100 px-3 py-2 rounded-md text-sm font-medium text-red-800 hover:bg-red-200"
+              >
+                Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentBlog) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500">Blog not found.</p>
+        <button
+          onClick={handleBack}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="mb-6">
+        <button
+          onClick={handleBack}
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4"
+        >
+          ← Back to Blog List
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          {currentBlog.title}
+        </h1>
+        <p className="text-lg text-gray-600 mb-4">
+          {currentBlog.little_description}
+        </p>
+
+        {/* Meta Information */}
+        <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-4">
+          <span>Created: {currentBlog.created_at}</span>
+          {currentBlog.publish_at && (
+            <span>Publish: {currentBlog.publish_at}</span>
+          )}
+          {currentBlog.user && (
+            <span>
+              Author: {currentBlog.user.first_name} {currentBlog.user.last_name}
+            </span>
+          )}
+        </div>
+
+        {/* Tags */}
+        {currentBlog.tags && currentBlog.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {currentBlog.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Content</h2>
+        <div className="prose max-w-none">
+          <p className="text-gray-700 whitespace-pre-wrap">
+            {currentBlog.description}
+          </p>
+        </div>
+      </div>
+
+      {/* SEO Information */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          SEO Information
+        </h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Meta Title
+            </label>
+            <p className="text-gray-900">{currentBlog.meta_title}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Meta Description
+            </label>
+            <p className="text-gray-900">{currentBlog.meta_description}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Slug
+            </label>
+            <p className="text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">
+              {currentBlog.slug}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BlogDetail;
