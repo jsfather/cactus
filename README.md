@@ -1,132 +1,36 @@
-# 🌵 Cactus - Online Robotics Academy
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A modern educational platform for robotics learning, built with Next.js 15, React, and TypeScript. This platform provides an interactive and user-friendly environment for robotics education.
+## Getting Started
 
-## 📚 About The Project
-
-Cactus is a comprehensive online robotics education platform that brings together students, educators, and robotics enthusiasts. Our platform offers:
-
-- **Interactive Courses**: Wide range of robotics courses from beginner to advanced levels
-- **Hands-on Projects**: Real-world experience with actual robots and equipment
-- **Innovation Hub**: Space for creativity and innovation in robotics
-- **Active Community**: Over 500 students and 50+ courses
-- **Equipment Shop**: Access to robotics parts and tools
-- **Expert Blog**: Latest news and articles in robotics
-
-## 🎯 Core Features
-
-- **Modern Interface**: Beautiful and user-friendly design with dark theme support
-- **Multilingual**: Full RTL support with Persian language and Jalali calendar
-- **Learning Management**:
-  - Course creation and management
-  - Student progress tracking
-  - Assignment submission
-  - Interactive quizzes
-- **E-commerce Integration**:
-  - Course purchases
-  - Equipment shop
-  - Secure payment processing
-- **Community Features**:
-  - Student profiles
-  - Discussion forums
-  - Progress sharing
-- **Admin Dashboard**: Comprehensive management tools
-
-## 🚀 Technical Features
-
-- **Modern Stack**: Built with Next.js 15.3.1 and React 19
-- **Type Safety**: Full TypeScript support
-- **Fast Development**: Powered by Turbopack for lightning-fast builds
-- **Authentication**: Secure user authentication system
-- **Responsive Design**: Works seamlessly on all devices
-
-## 🛠️ Tech Stack
-
-- **Framework**: [Next.js 15.3.1](https://nextjs.org/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**:
-  - [@headlessui/react](https://headlessui.com/)
-  - [@heroicons/react](https://heroicons.com/)
-  - [Framer Motion](https://www.framer.com/motion/)
-- **Form Handling**: [React Hook Form](https://react-hook-form.com/)
-- **Date Handling**:
-  - [jalali-moment](https://github.com/jalaali/moment-jalaali)
-  - [react-multi-date-picker](https://github.com/shahabyazdi/react-multi-date-picker)
-- **Validation**: [Zod](https://github.com/colinhacks/zod)
-- **Development Tools**:
-  - ESLint
-  - Prettier
-  - Turbopack
-
-## 📦 Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/jsfather/cactus.git
-cd cactus
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Create necessary environment files:
-
-```bash
-cp .env.example .env.local
-```
-
-## 🚀 Development
-
-To start the development server with Turbopack:
+First, run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Other available scripts:
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-- `npm run build`: Create a production build
-- `npm run start`: Start the production server
-- `npm run lint`: Run ESLint
-- `npm run format`: Format code with Prettier
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## 📁 Project Structure
+## Learn More
 
-```
-cactus/
-├── app/                    # Next.js 13+ App Router
-│   ├── (auth)/            # Authentication routes
-│   ├── (main)/            # Main application routes
-│   │   ├── courses/       # Course pages
-│   │   ├── shop/         # Equipment shop
-│   │   ├── blog/         # Blog articles
-│   │   └── teachers/     # Teacher profiles
-│   ├── (panel)/           # Admin panel routes
-│   ├── components/        # Shared components
-│   ├── hooks/            # Custom React hooks
-│   ├── lib/              # Utility functions
-│   └── fonts/            # Font assets
-├── public/               # Static assets
-└── [Configuration files] # Various config files
-```
+To learn more about Next.js, take a look at the following resources:
 
-## 🔧 Configuration
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-The project uses several configuration files:
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-- `next.config.ts`: Next.js configuration
-- `tsconfig.json`: TypeScript configuration
-- `.prettierrc`: Prettier formatting rules
-- `eslint.config.mjs`: ESLint rules
-- `postcss.config.mjs`: PostCSS configuration for Tailwind
+## Deploy on Vercel
 
-## 📝 License
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
