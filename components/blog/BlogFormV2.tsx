@@ -11,7 +11,15 @@ import {
   CreateBlogInput,
   UpdateBlogInput,
 } from "../../lib/validations/blog";
-import { Button, Input, Textarea, TagInput, DateTimePicker, MarkdownEditor, Select } from "@/components/ui";
+import {
+  Button,
+  Input,
+  Textarea,
+  TagInput,
+  DateTimePicker,
+  MarkdownEditor,
+  Select,
+} from "@/components/ui";
 
 interface BlogFormProps {
   blog?: Blog | null;
@@ -155,19 +163,15 @@ const BlogFormV2: React.FC<BlogFormProps> = ({
       />
 
       <div className="flex justify-end space-x-4 pt-6">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onClose}
-        >
+        <Button type="button" variant="secondary" onClick={onClose}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={loading}
-        >
-          {loading ? "Saving..." : mode === "create" ? "Create Blog" : "Update Blog"}
+        <Button type="submit" variant="primary" disabled={loading}>
+          {loading
+            ? "Saving..."
+            : mode === "create"
+            ? "Create Blog"
+            : "Update Blog"}
         </Button>
       </div>
     </form>

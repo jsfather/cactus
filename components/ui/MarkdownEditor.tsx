@@ -1,8 +1,25 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { MDXEditor, headingsPlugin, listsPlugin, quotePlugin, thematicBreakPlugin, markdownShortcutPlugin, linkPlugin, linkDialogPlugin, imagePlugin, toolbarPlugin, UndoRedo, BoldItalicUnderlineToggles, CodeToggle, CreateLink, InsertImage, Separator } from '@mdxeditor/editor';
-import '@mdxeditor/editor/style.css';
+import React from "react";
+import {
+  MDXEditor,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
+  thematicBreakPlugin,
+  markdownShortcutPlugin,
+  linkPlugin,
+  linkDialogPlugin,
+  imagePlugin,
+  toolbarPlugin,
+  UndoRedo,
+  BoldItalicUnderlineToggles,
+  CodeToggle,
+  CreateLink,
+  InsertImage,
+  Separator,
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 
 interface MarkdownEditorProps {
   value: string;
@@ -11,9 +28,18 @@ interface MarkdownEditorProps {
   error?: string;
 }
 
-const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange, label, error }) => (
+const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
+  value,
+  onChange,
+  label,
+  error,
+}) => (
   <div className="mb-4">
-    {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+    {label && (
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+    )}
     <div className="border border-gray-300 rounded-md focus-within:ring-blue-500 focus-within:border-blue-500">
       <MDXEditor
         markdown={value}
@@ -38,8 +64,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({ value, onChange, label,
                 <CreateLink />
                 <InsertImage />
               </>
-            )
-          })
+            ),
+          }),
         ]}
         contentEditableClassName="prose min-h-[200px] max-w-none p-3 focus:outline-none"
       />

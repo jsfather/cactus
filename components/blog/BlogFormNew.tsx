@@ -299,18 +299,10 @@ const BlogForm: React.FC<BlogFormProps> = ({
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-3 pt-6">
-          <Button
-            type="button"
-            onClick={onClose}
-            variant="secondary"
-          >
+          <Button type="button" onClick={onClose} variant="secondary">
             Cancel
           </Button>
-          <Button
-            type="submit"
-            disabled={loading}
-            variant="primary"
-          >
+          <Button type="submit" disabled={loading} variant="primary">
             {loading
               ? "Saving..."
               : mode === "create"

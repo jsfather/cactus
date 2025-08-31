@@ -102,10 +102,7 @@ const BlogList: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Blog Management</h1>
-        <Button
-          onClick={handleCreate}
-          variant="primary"
-        >
+        <Button onClick={handleCreate} variant="primary">
           Create New Blog
         </Button>
       </div>

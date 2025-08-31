@@ -68,11 +68,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">Blog not found.</p>
-        <Button
-          onClick={handleBack}
-          variant="primary"
-          className="mt-4"
-        >
+        <Button onClick={handleBack} variant="primary" className="mt-4">
           Go Back
         </Button>
       </div>
