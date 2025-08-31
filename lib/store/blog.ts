@@ -47,7 +47,7 @@ export const useBlogStore = create<BlogState>()(
 
       // Fetch single blog
       fetchBlog: async (id: number) => {
-        set({ loading: true, error: null });
+        set({ loading: true, error: null, currentBlog: null });
         try {
           const blog = await blogApi.getBlog(id);
           set({ currentBlog: blog, loading: false });

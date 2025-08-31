@@ -12,13 +12,24 @@ interface BlogDetailProps {
 
 const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
   const router = useRouter();
-  const { currentBlog, loading, error, fetchBlog, clearCurrentBlog } =
-    useBlogStore();
+  const {
+    currentBlog,
+    loading,
+    error,
+    fetchBlog,
+    clearCurrentBlog,
+    clearError,
+  } = useBlogStore();
 
   useEffect(() => {
+    // Fetch the blog immediately
     fetchBlog(blogId);
-    return () => clearCurrentBlog();
-  }, [blogId, fetchBlog, clearCurrentBlog]);
+
+    return () => {
+      clearCurrentBlog();
+      clearError();
+    };
+  }, [blogId]); // Remove function dependencies to prevent unnecessary re-runs
 
   const handleBack = () => {
     if (onBack) {
@@ -28,12 +39,8 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
     }
   };
 
-  useEffect(() => {
-    fetchBlog(blogId);
-    return () => clearCurrentBlog();
-  }, [blogId, fetchBlog, clearCurrentBlog]);
-
-  if (loading) {
+  // Show loading if we're fetching data or if we don't have data yet
+  if (loading || (!currentBlog && !error)) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -41,7 +48,7 @@ const BlogDetail: React.FC<BlogDetailProps> = ({ blogId, onBack }) => {
     );
   }
 
-  if (error) {
+  if (error && !loading) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-4">
         <div className="flex">

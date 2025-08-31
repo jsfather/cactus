@@ -11,8 +11,13 @@ const BlogList: React.FC = () => {
     useBlogStore();
 
   useEffect(() => {
+    // Fetch blogs immediately
     fetchBlogs();
-  }, [fetchBlogs]);
+
+    return () => {
+      clearError();
+    };
+  }, []); // Remove fetchBlogs from dependencies to prevent re-runs
 
   const handleEdit = (blogId: number) => {
     router.push(`/blog/${blogId}`);
@@ -32,7 +37,7 @@ const BlogList: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading || (blogs.length === 0 && !error)) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -40,7 +45,7 @@ const BlogList: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error && !loading) {
     return (
       <div className="bg-red-50 border border-red-200 rounded-md p-4">
         <div className="flex">
