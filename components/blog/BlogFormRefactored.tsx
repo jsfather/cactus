@@ -158,7 +158,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
         />
 
         {/* Tags */}
-        <TagInput tags={tags} setTags={setTags} />
+        <TagInput value={tags} onChange={setTags} />
 
         {/* User ID */}
         <Input
