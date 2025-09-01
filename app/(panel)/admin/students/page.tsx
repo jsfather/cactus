@@ -61,8 +61,7 @@ export default function Page() {
       header: 'تاریخ تولد',
       accessor: 'birth_date',
       render: (value): string => {
-        if (!value || typeof value !== 'string') return '---';
-        return new Date(value).toLocaleDateString('fa-IR');
+        return value ? String(value) : '---';
       },
     },
     {
