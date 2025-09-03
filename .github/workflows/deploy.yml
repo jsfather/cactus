@@ -30,6 +30,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          port: 9011
           script: |
             cd ${{ secrets.VPS_PATH }}
             git fetch --all
