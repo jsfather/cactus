@@ -1,0 +1,31 @@
+name: Deploy Cactus to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 9011
+          script: |
+            cd /var/www/cactus
+            git fetch --all
+            git reset --hard origin/main
+
+            # install dependencies & build on VPS
+            npm install
+            npm run build
+            pm2 restart cactus || pm2 start npm --name "cactus" -- run start
