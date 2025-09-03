@@ -29,3 +29,40 @@
 .custom-toast {
     background-color: var(--toast-background-color);
 }
+
+/* Markdown Editor Styles */
+.w-md-editor {
+    background-color: transparent !important;
+}
+
+.w-md-editor.w-md-editor-focus {
+    border-color: rgb(var(--color-primary-500)) !important;
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-200), 0.5) !important;
+}
+
+.w-md-editor-text-pre, .w-md-editor-text-input, .w-md-editor-text {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+}
+
+.w-md-editor-preview {
+    padding: 16px !important;
+}
+
+/* Dark mode support for markdown editor */
+[data-color-mode="dark"] .w-md-editor {
+    background-color: rgb(17 24 39) !important;
+    border-color: rgb(75 85 99) !important;
+}
+
+[data-color-mode="dark"] .w-md-editor-text-pre,
+[data-color-mode="dark"] .w-md-editor-text-input {
+    background-color: rgb(17 24 39) !important;
+    color: rgb(243 244 246) !important;
+}
+
+[data-color-mode="dark"] .w-md-editor-preview {
+    background-color: rgb(17 24 39) !important;
+    color: rgb(243 244 246) !important;
+}

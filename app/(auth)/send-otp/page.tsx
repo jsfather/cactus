@@ -52,7 +52,13 @@ export default function SendOtpPage() {
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
       const res = await sendOtp({phone: normalizedPhone });
       toast.success(res.message || 'کد ارسال شد.');
-      router.push(`/verify-otp?identifier=${encodeURIComponent(normalizedPhone)}`);
+      
+      // Pass both phone and is_new flag to verify-otp
+      const queryParams = new URLSearchParams({
+        identifier: normalizedPhone,
+        is_new: res.data.is_new.toString()
+      });
+      router.push(`/verify-otp?${queryParams.toString()}`);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error

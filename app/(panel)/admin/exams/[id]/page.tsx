@@ -6,9 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { getExam, createExam, updateExam } from '@/app/lib/api/admin/exams';
-import { getTerms } from '@/app/lib/api/admin/terms';
-import { Term } from '@/app/lib/types';
+import { useExamStore } from '@/app/lib/stores/exam.store';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
@@ -31,9 +29,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
-  const [loading, setLoading] = useState(!isNew);
-  const [terms, setTerms] = useState<Term[]>([]);
-  const [termsLoading, setTermsLoading] = useState(true);
+  
+  const { 
+    currentExam, 
+    isLoading: loading, 
+    fetchExamById, 
+    createExam, 
+    updateExam,
+    clearCurrentExam 
+  } = useExamStore();
 
   const {
     register,
@@ -46,44 +50,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   });
 
   useEffect(() => {
-    const fetchTerms = async () => {
-      try {
-        setTermsLoading(true);
-        const response = await getTerms();
-        if (response) {
-          setTerms(response.data);
-        }
-      } catch (error) {
-        toast.error('خطا در دریافت لیست ترم‌ها');
-        setTerms([]);
-      } finally {
-        setTermsLoading(false);
-      }
-    };
+    if (isNew) {
+      clearCurrentExam();
+    } else {
+      fetchExamById(resolvedParams.id);
+    }
+  }, [isNew, resolvedParams.id, fetchExamById, clearCurrentExam]);
 
-    const fetchExam = async () => {
-      if (isNew) return;
-
-      try {
-        const response = await getExam(resolvedParams.id);
-        const exam = response.data;
-        reset({
-          title: exam.title,
-          description: exam.description,
-          date: exam.date || null,
-          duration: exam.duration,
-          term_id: exam.term_id,
-        });
-      } catch (error) {
-        router.push('/admin/exams');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTerms();
-    fetchExam();
-  }, [isNew, resolvedParams.id, reset, router]);
+  useEffect(() => {
+    if (currentExam && !isNew) {
+      reset({
+        title: currentExam.title,
+        description: currentExam.description,
+        date: currentExam.date || null,
+        duration: currentExam.duration,
+        term_id: currentExam.term_id,
+      });
+    }
+  }, [currentExam, isNew, reset]);
 
   const onSubmit = async (data: ExamFormData) => {
     try {
@@ -96,17 +80,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
       router.push('/admin/exams');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد آزمون' : 'خطا در بروزرسانی آزمون');
+      // Error handling is done in the store
     }
   };
 
-  // Create term options for the select dropdown
-  const termOptions = terms.map((term) => ({
-    value: term.id.toString(),
-    label: term.title,
-  }));
-
-  if (loading || termsLoading) {
+  if (loading && !isNew) {
     return <LoadingSpinner />;
   }
 
@@ -175,11 +153,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             })}
           />
 
-          <Select
+          <Input
             id="term_id"
-            label="ترم"
-            placeholder="ترم را انتخاب کنید"
-            options={termOptions}
+            label="شناسه ترم"
+            type="number"
+            placeholder="شناسه ترم را وارد کنید"
             error={errors.term_id?.message}
             {...register('term_id', {
               setValueAs: (value: string) => (value ? parseInt(value) : null),

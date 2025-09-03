@@ -55,7 +55,7 @@ export default function AboutUsPage() {
       const res = await homeSettingsService.update(data);
       toast.success(res?.message || "اطلاعات با موفقیت ذخیره شد");
     } catch (e: any) {
-      if (e instanceof ApiError) {
+      if (e && typeof e === 'object' && 'status' in e && 'message' in e) {
         toast.error(e.message || "خطا در ذخیره اطلاعات");
       } else {
         toast.error("خطا در ذخیره اطلاعات");

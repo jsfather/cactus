@@ -11,6 +11,7 @@ export default function VerifyOtpPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const identifier = searchParams.get('identifier') || '';
+  const isNew = searchParams.get('is_new') === 'true';
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -63,9 +64,14 @@ export default function VerifyOtpPage() {
         otp: normalizedOtp,
       });
       
-      // After successful verification, redirect to dashboard
       toast.success('ورود موفقیت‌آمیز بود');
-      router.push('/user'); // or wherever the user should go after login
+      
+      // Check if user is new and redirect accordingly
+      if (isNew) {
+        router.push(`/onboarding/information?phone=${encodeURIComponent(normalizedPhone)}`);
+      } else {
+        router.push('/user'); // Existing user goes to dashboard
+      }
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error

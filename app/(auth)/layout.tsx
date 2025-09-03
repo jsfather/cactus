@@ -33,7 +33,7 @@ export default function Layout({
             alt="لوگو کاکتوس"
             width={100}
             height={100}
-            className="rounded-xl"
+            className="rounded-xl transition-all duration-300 dark:brightness-0 dark:invert"
           />
         </Link>
 

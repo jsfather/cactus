@@ -58,10 +58,10 @@ export const useBlogStore = create<BlogState>()(
         set({ loading: true, error: null });
         const newBlog = await blogService.create(payload);
         set((state) => ({
-          list: [newBlog.data, ...state.blogList],
+          blogList: [newBlog.data, ...state.blogList],
           loading: false,
         }));
-        return newBlog.data;
+        return newBlog;
       } catch (error) {
         const apiError = error as ApiError;
         set({ error: apiError.message, loading: false });
@@ -74,13 +74,13 @@ export const useBlogStore = create<BlogState>()(
         set({ loading: true, error: null });
         const updatedBlog = await blogService.update(id, payload);
         set((state) => ({
-          list: state.blogList.map((blog) =>
+          blogList: state.blogList.map((blog) =>
             blog.id === updatedBlog.data.id ? updatedBlog.data : blog
           ),
-          current: updatedBlog.data,
+          currentBlog: updatedBlog.data,
           loading: false,
         }));
-        return updatedBlog.data;
+        return updatedBlog;
       } catch (error) {
         const apiError = error as ApiError;
         set({ error: apiError.message, loading: false });
@@ -93,7 +93,7 @@ export const useBlogStore = create<BlogState>()(
         set({ loading: true, error: null });
         await blogService.delete(id);
         set((state) => ({
-          list: state.blogList.filter((blog) => blog.id !== id),
+          blogList: state.blogList.filter((blog) => blog.id !== id),
           loading: false,
         }));
       } catch (error) {

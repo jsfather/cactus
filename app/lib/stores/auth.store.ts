@@ -3,7 +3,7 @@ import { devtools, persist } from 'zustand/middleware';
 import { authService } from '@/app/lib/services/auth.service';
 import { apiClient } from '@/app/lib/api/client';
 import type { ApiError } from '@/app/lib/api/client';
-import { User, SendOTPRequest, VerifyOTPRequest, SendOTPResponse, VerifyOTPResponse, GetProfileResponse, UpdateProfileRequest } from '@/app/lib/types';
+import { User, SendOTPRequest, VerifyOTPRequest, SendOTPResponse, VerifyOTPResponse, GetProfileResponse, UpdateProfileRequest, OnboardingInformationRequest, OnboardingInformationResponse } from '@/app/lib/types';
 
 interface AuthState {
   // State
