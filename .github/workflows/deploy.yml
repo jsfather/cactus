@@ -13,17 +13,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Node.js 22
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-
-      - name: Build Next.js app
-        run: |
-          npm install
-          npm run build
-          npm prune --production
-
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -32,9 +21,11 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 9011
           script: |
-            cd ${{ secrets.VPS_PATH }}
+            cd /var/www/cactus
             git fetch --all
             git reset --hard origin/main
+
+            # install dependencies & build on VPS
             npm install
             npm run build
             pm2 restart cactus || pm2 start npm --name "cactus" -- run start
