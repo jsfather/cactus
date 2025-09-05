@@ -52,18 +52,8 @@ export default function Footer() {
               ))}
             </div>
             <div className="mt-4 inline-block rounded-lg bg-white p-2">
-              <a
-                referrerPolicy="origin"
-                target="_blank"
-                href="https://trustseal.enamad.ir/?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
-                className="block"
-              >
-                <img
-                  referrerPolicy="origin"
-                  src="https://trustseal.enamad.ir/?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
-                  alt="نماد اعتماد الکترونیکی"
-                  className="h-24 w-auto"
-                />
+              <a referrerPolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8'>
+                <img referrerPolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8' alt='نماد اعتماد الکترونیکی' style='cursor:pointer' code='NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8' />
               </a>
             </div>
           </div>
