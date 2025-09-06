@@ -51,7 +51,7 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-            <div className="mt-4 inline-block rounded-lg bg-white p-2">
+            {/* <div className="mt-4 inline-block rounded-lg bg-white p-2">
               <a
                 referrerPolicy="origin"
                 target="_blank"
@@ -66,7 +66,7 @@ export default function Footer() {
                   code="NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
                 />
               </a>
-            </div>
+            </div> */}
           </div>
 
           <div>
