@@ -157,7 +157,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <Package className="h-6 w-6 text-blue-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل محصولات
@@ -177,7 +177,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <DollarSign className="h-6 w-6 text-green-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       ارزش کل موجودی
@@ -197,7 +197,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <TrendingUp className="h-6 w-6 text-purple-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       میانگین قیمت
@@ -217,7 +217,7 @@ export default function ProductsPage() {
                 <div className="flex-shrink-0">
                   <AlertTriangle className={`h-6 w-6 ${lowStockProducts > 0 ? 'text-red-600' : 'text-gray-400'}`} />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       موجودی کم
@@ -239,7 +239,7 @@ export default function ProductsPage() {
               <div className="flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-yellow-400" />
               </div>
-              <div className="ml-3">
+              <div className="mr-3">
                 <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                   هشدار موجودی کم
                 </h3>

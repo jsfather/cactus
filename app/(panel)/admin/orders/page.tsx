@@ -178,7 +178,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <ShoppingCart className="h-6 w-6 text-blue-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل سفارشات
@@ -198,7 +198,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <DollarSign className="h-6 w-6 text-green-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل درآمد
@@ -218,7 +218,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <Clock className="h-6 w-6 text-yellow-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       سفارشات در انتظار
@@ -238,7 +238,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       سفارشات تحویل شده
@@ -261,7 +261,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <TrendingUp className="h-6 w-6 text-purple-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       میانگین ارزش سفارش
@@ -281,7 +281,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <Users className="h-6 w-6 text-indigo-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       نرخ تکمیل سفارشات
@@ -303,7 +303,7 @@ export default function OrdersPage() {
               <div className="flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-yellow-400" />
               </div>
-              <div className="ml-3">
+              <div className="mr-3">
                 <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                   سفارشات در انتظار پردازش
                 </h3>
