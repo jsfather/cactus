@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { orderService } from '@/app/lib/services/order.service';
 import type { ApiError } from '@/app/lib/api/client';
-import { Order, CreateOrderRequest, UpdateOrderRequest, GetOrderResponse } from '@/app/lib/types';
+import { Order, UpdateOrderStatusRequest, GetOrderResponse } from '@/app/lib/types';
 
 interface OrderState {
   // State
@@ -17,8 +17,7 @@ interface OrderState {
   clearError: () => void;
 
   fetchOrderList: () => Promise<void>;
-  createOrder: (payload: CreateOrderRequest) => Promise<GetOrderResponse>;
-  updateOrder: (id: string, payload: UpdateOrderRequest) => Promise<GetOrderResponse>;
+  updateOrderStatus: (id: string, payload: UpdateOrderStatusRequest) => Promise<void>;
   deleteOrder: (id: string) => Promise<void>;
   fetchOrderById: (id: string) => Promise<void>;
 }
@@ -51,34 +50,21 @@ export const useOrderStore = create<OrderState>()(
       }
     },
 
-    createOrder: async (payload) => {
+    updateOrderStatus: async (id, payload) => {
       try {
         set({ loading: true, error: null });
-        const newOrder = await orderService.create(payload);
-        set((state) => ({
-          orderList: [newOrder.data, ...state.orderList],
-          loading: false,
-        }));
-        return newOrder;
-      } catch (error) {
-        const apiError = error as ApiError;
-        set({ error: apiError.message, loading: false });
-        throw error;
-      }
-    },
-
-    updateOrder: async (id, payload) => {
-      try {
-        set({ loading: true, error: null });
-        const updatedOrder = await orderService.update(id, payload);
+        await orderService.updateStatus(id, payload);
+        
+        // Update the order status in the list and current order
         set((state) => ({
           orderList: state.orderList.map((order) =>
-            order.id.toString() === id ? updatedOrder.data : order
+            order.id.toString() === id ? { ...order, status: payload.status } : order
           ),
-          currentOrder: updatedOrder.data,
+          currentOrder: state.currentOrder && state.currentOrder.id.toString() === id 
+            ? { ...state.currentOrder, status: payload.status }
+            : state.currentOrder,
           loading: false,
         }));
-        return updatedOrder;
       } catch (error) {
         const apiError = error as ApiError;
         set({ error: apiError.message, loading: false });

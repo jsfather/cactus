@@ -1,20 +1,15 @@
 import { useCallback } from 'react';
 import { useOrderStore } from '@/app/lib/stores/order.store';
-import { CreateOrderRequest, UpdateOrderRequest } from '@/app/lib/types';
+import { UpdateOrderStatusRequest } from '@/app/lib/types';
 
 export const useOrder = () => {
   const store = useOrderStore();
 
   const fetchOrderList = useCallback(() => store.fetchOrderList(), [store.fetchOrderList]);
 
-  const createOrder = useCallback(
-    (payload: CreateOrderRequest) => store.createOrder(payload),
-    [store.createOrder]
-  );
-
-  const updateOrder = useCallback(
-    (id: string, payload: UpdateOrderRequest) => store.updateOrder(id, payload),
-    [store.updateOrder]
+  const updateOrderStatus = useCallback(
+    (id: string, payload: UpdateOrderStatusRequest) => store.updateOrderStatus(id, payload),
+    [store.updateOrderStatus]
   );
 
   const deleteOrder = useCallback(
@@ -36,8 +31,7 @@ export const useOrder = () => {
 
     // Actions
     fetchOrderList,
-    createOrder,
-    updateOrder,
+    updateOrderStatus,
     deleteOrder,
     fetchOrderById,
     clearError: store.clearError,

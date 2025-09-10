@@ -95,6 +95,58 @@ All API calls should follow these structures:
 }
 ```
 
+#### Orders API
+**Important**: Orders have **limited functionality** - only **list, view, delete, and status update**. No create or full update operations.
+
+```typescript
+// Order Response
+{
+  "id": "number",
+  "user_id": "number",
+  "user": {
+    "id": "number",
+    "first_name": "string",
+    "last_name": "string", 
+    "phone": "string",
+    "email": "string"
+  },
+  "items": [
+    {
+      "id": "number",
+      "product_id": "number",
+      "product": {
+        "id": "number",
+        "title": "string",
+        "image": "string"
+      },
+      "quantity": "number",
+      "price": "number",
+      "total": "number"
+    }
+  ],
+  "total_amount": "number",
+  "status": "pending|processing|shipped|delivered|cancelled",
+  "payment_status": "pending|paid|failed|refunded",
+  "shipping_address": "string",
+  "billing_address": "string",
+  "notes": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+
+// Update Order Status Request (only available operation)
+{
+  "status": "pending|processing|shipped|delivered|cancelled"
+}
+
+// Available Endpoints:
+// GET /admin/orders - List all orders
+// GET /admin/orders/{id} - Get single order
+// PUT /admin/orders/update-status/{id} - Update order status only
+// DELETE /admin/orders/{id} - Delete order
+```
+```
+
 ## Form Implementation Standards
 
 ### Form Validation with Zod
