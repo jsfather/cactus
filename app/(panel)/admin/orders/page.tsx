@@ -3,25 +3,30 @@
 import { useState, useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { Order } from '@/app/lib/types';
+import { Order, OrderStatus } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useOrder } from '@/app/lib/hooks/use-order';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import { ShoppingCart, DollarSign, Clock, CheckCircle, Users, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ShoppingCart, DollarSign, Clock, CheckCircle, Users, TrendingUp, AlertTriangle, Eye, Trash2, Edit } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 export default function OrdersPage() {
   const router = useRouter();
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Order | null>(null);
+  const [itemToUpdateStatus, setItemToUpdateStatus] = useState<Order | null>(null);
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus>('pending');
+  const [statusLoading, setStatusLoading] = useState(false);
   const {
     orderList,
     loading,
     fetchOrderList,
     deleteOrder,
+    updateOrderStatus,
   } = useOrder();
 
   useEffect(() => {
@@ -144,6 +149,36 @@ export default function OrdersPage() {
     }, 500);
   };
 
+  const handleStatusUpdateClick = (order: Order) => {
+    setItemToUpdateStatus(order);
+    setSelectedStatus(order.status);
+    setShowStatusModal(true);
+  };
+
+  const handleStatusUpdateConfirm = async () => {
+    if (!itemToUpdateStatus) return;
+
+    try {
+      setStatusLoading(true);
+      await updateOrderStatus(itemToUpdateStatus.id.toString(), { status: selectedStatus });
+      toast.success('وضعیت سفارش با موفقیت به‌روزرسانی شد');
+      setShowStatusModal(false);
+      setItemToUpdateStatus(null);
+      await fetchOrderList();
+    } catch (error) {
+      toast.error('خطا در به‌روزرسانی وضعیت سفارش');
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
+  const handleStatusUpdateCancel = () => {
+    setShowStatusModal(false);
+    setTimeout(() => {
+      setItemToUpdateStatus(null);
+    }, 500);
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -178,7 +213,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <ShoppingCart className="h-6 w-6 text-blue-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل سفارشات
@@ -198,7 +233,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <DollarSign className="h-6 w-6 text-green-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل درآمد
@@ -218,7 +253,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <Clock className="h-6 w-6 text-yellow-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       سفارشات در انتظار
@@ -238,7 +273,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <CheckCircle className="h-6 w-6 text-green-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       سفارشات تحویل شده
@@ -261,7 +296,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <TrendingUp className="h-6 w-6 text-purple-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       میانگین ارزش سفارش
@@ -281,7 +316,7 @@ export default function OrdersPage() {
                 <div className="flex-shrink-0">
                   <Users className="h-6 w-6 text-indigo-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       نرخ تکمیل سفارشات
@@ -303,7 +338,7 @@ export default function OrdersPage() {
               <div className="flex-shrink-0">
                 <AlertTriangle className="h-5 w-5 text-yellow-400" />
               </div>
-              <div className="ml-3">
+              <div className="mr-3">
                 <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
                   سفارشات در انتظار پردازش
                 </h3>
@@ -324,8 +359,31 @@ export default function OrdersPage() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ سفارشی یافت نشد"
-            onEdit={(order) => router.push(`/admin/orders/${order.id}`)}
-            onDelete={handleDeleteClick}
+            actions={(order: Order) => (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="info"
+                  onClick={() => router.push(`/admin/orders/${order.id}`)}
+                  className="p-1 text-xs"
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="warning"
+                  onClick={() => handleStatusUpdateClick(order)}
+                  className="p-1 text-xs"
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => handleDeleteClick(order)}
+                  className="p-1 text-xs"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           />
         </div>
       </div>
@@ -340,6 +398,57 @@ export default function OrdersPage() {
         cancelText="انصراف"
         loading={deleteLoading}
       />
+
+      {/* Status Update Modal */}
+      {showStatusModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={handleStatusUpdateCancel}></div>
+            <span className="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
+            <div className="inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-right align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
+              <div className="sm:flex sm:items-start">
+                <div className="mt-3 text-center sm:mr-4 sm:mt-0 sm:text-right">
+                  <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                    تغییر وضعیت سفارش
+                  </h3>
+                  <div className="mt-4">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                      وضعیت جدید سفارش شماره "{itemToUpdateStatus?.id}" را انتخاب کنید:
+                    </p>
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value as OrderStatus)}
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="pending">در انتظار</option>
+                      <option value="processing">در حال پردازش</option>
+                      <option value="shipped">ارسال شده</option>
+                      <option value="delivered">تحویل داده شده</option>
+                      <option value="cancelled">لغو شده</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <Button
+                  onClick={handleStatusUpdateConfirm}
+                  disabled={statusLoading}
+                  className="w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mr-3 sm:w-auto sm:text-sm"
+                >
+                  {statusLoading ? 'در حال به‌روزرسانی...' : 'به‌روزرسانی'}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={handleStatusUpdateCancel}
+                  className="mt-3 w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  انصراف
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

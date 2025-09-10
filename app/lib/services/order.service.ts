@@ -3,8 +3,7 @@ import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 import {
   GetOrderListResponse,
   GetOrderResponse,
-  CreateOrderRequest,
-  UpdateOrderRequest,
+  UpdateOrderStatusRequest,
 } from '@/app/lib/types';
 
 export class OrderService {
@@ -20,16 +19,9 @@ export class OrderService {
     );
   }
 
-  async create(payload: CreateOrderRequest): Promise<GetOrderResponse> {
-    return apiClient.post<GetOrderResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.ORDERS.CREATE,
-      payload
-    );
-  }
-
-  async update(id: string, payload: UpdateOrderRequest): Promise<GetOrderResponse> {
-    return apiClient.put<GetOrderResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.ORDERS.UPDATE(id),
+  async updateStatus(id: string, payload: UpdateOrderStatusRequest): Promise<void> {
+    return apiClient.put<void>(
+      API_ENDPOINTS.PANEL.ADMIN.ORDERS.UPDATE_STATUS(id),
       payload
     );
   }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -15,7 +15,7 @@ import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
 import Textarea from '@/app/components/ui/Textarea';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { Plus, X, Save, ArrowLeft } from 'lucide-react';
+import { Plus, X, Save, ArrowRight } from 'lucide-react';
 
 const productSchema = z.object({
   title: z.string().min(1, 'نام محصول نمی‌تواند خالی باشد'),
@@ -33,10 +33,11 @@ const productSchema = z.object({
 type ProductFormData = z.infer<typeof productSchema>;
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function ProductFormPage({ params }: Props) {
+  const resolvedParams = use(params);
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -77,11 +78,11 @@ export default function ProductFormPage({ params }: Props) {
   useEffect(() => {
     fetchCategories();
     
-    if (params.id !== 'new') {
+    if (resolvedParams.id !== 'new') {
       setIsEditing(true);
-      fetchProductById(params.id);
+      fetchProductById(resolvedParams.id);
     }
-  }, [fetchCategories, fetchProductById, params.id]);
+  }, [fetchCategories, fetchProductById, resolvedParams.id]);
 
   useEffect(() => {
     if (isEditing && currentProduct) {
@@ -121,7 +122,7 @@ export default function ProductFormPage({ params }: Props) {
           attributes: filteredAttributes,
         };
 
-        await updateProduct(params.id, productData);
+        await updateProduct(resolvedParams.id, productData);
         toast.success('محصول با موفقیت بروزرسانی شد');
       } else {
         const productData: CreateProductRequest = {
@@ -158,7 +159,7 @@ export default function ProductFormPage({ params }: Props) {
           { label: 'مدیریت محصولات', href: '/admin/products' },
           { 
             label: isEditing ? 'ویرایش محصول' : 'افزودن محصول', 
-            href: `/admin/products/${params.id}`, 
+            href: `/admin/products/${resolvedParams.id}`, 
             active: true 
           },
         ]}
@@ -179,7 +180,7 @@ export default function ProductFormPage({ params }: Props) {
             onClick={() => router.push('/admin/products')}
             className="flex items-center gap-2"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" />
             بازگشت
           </Button>
         </div>

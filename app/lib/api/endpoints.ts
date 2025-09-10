@@ -54,8 +54,7 @@ export const API_ENDPOINTS = {
       ORDERS: {
         GET_ALL: '/admin/orders',
         GET_BY_ID: (id: string) => `/admin/orders/${id}`,
-        CREATE: '/admin/orders',
-        UPDATE: (id: string) => `/admin/orders/${id}`,
+        UPDATE_STATUS: (id: string) => `/admin/orders/update-status/${id}`,
         DELETE: (id: string) => `/admin/orders/${id}`,
       },
       

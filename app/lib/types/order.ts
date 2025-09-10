@@ -54,3 +54,7 @@ export interface UpdateOrderRequest {
   billing_address?: string;
   notes?: string;
 }
+
+export interface UpdateOrderStatusRequest {
+  status: OrderStatus;
+}

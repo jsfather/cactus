@@ -3,18 +3,15 @@
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import {
-  getOrder,
-  updateOrderStatus,
-  deleteOrder,
-  Order,
-} from '@/app/lib/api/admin/orders';
+import { useOrder } from '@/app/lib/hooks/use-order';
+import { Order, OrderStatus } from '@/app/lib/types';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import {
   ShoppingCart,
-  ArrowLeft,
+  ArrowRight,
   User,
   Phone,
   MapPin,
@@ -45,7 +42,7 @@ const statusOptions = [
     icon: CheckCircle,
     color: 'green',
   },
-  { value: 'canceled', label: 'لغو شده', icon: X, color: 'red' },
+  { value: 'cancelled', label: 'لغو شده', icon: X, color: 'red' },
 ];
 
 const statusColors: Record<string, string> = {
@@ -66,63 +63,62 @@ export default function OrderDetailPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [order, setOrder] = useState<Order | null>(null);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<OrderStatus>('pending');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const {
+    currentOrder: order,
+    loading,
+    fetchOrderById,
+    updateOrderStatus,
+    deleteOrder,
+  } = useOrder();
 
   useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        setLoading(true);
-        const response = await getOrder(resolvedParams.id);
-        setOrder(response.data);
-        setSelectedStatus(response.data.status);
-      } catch (error) {
-        console.error('Error fetching order:', error);
-        toast.error('خطا در بارگذاری سفارش');
-        router.push('/admin/orders');
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (resolvedParams.id) {
+      fetchOrderById(resolvedParams.id);
+    }
+  }, [resolvedParams.id, fetchOrderById]);
 
-    fetchOrder();
-  }, [resolvedParams.id, router]);
+  useEffect(() => {
+    if (order) {
+      setSelectedStatus(order.status);
+    }
+  }, [order]);
 
   const handleStatusUpdate = async () => {
     if (!order || selectedStatus === order.status) return;
 
     try {
-      setIsUpdatingStatus(true);
-      await updateOrderStatus(order.id, selectedStatus);
-      toast.success('وضعیت سفارش با موفقیت بروزرسانی شد');
-      setOrder({ ...order, status: selectedStatus as any });
+      setStatusLoading(true);
+      await updateOrderStatus(order.id.toString(), { status: selectedStatus });
+      toast.success('وضعیت سفارش با موفقیت به‌روزرسانی شد');
+      setShowStatusModal(false);
     } catch (error) {
       console.error('Error updating order status:', error);
-      toast.error('خطا در بروزرسانی وضعیت سفارش');
+      toast.error('خطا در به‌روزرسانی وضعیت سفارش');
       setSelectedStatus(order.status);
     } finally {
-      setIsUpdatingStatus(false);
+      setStatusLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!order || !confirm('آیا از حذف این سفارش مطمئن هستید؟')) {
-      return;
-    }
+    if (!order) return;
 
     try {
-      setIsDeleting(true);
-      await deleteOrder(order.id);
+      setDeleteLoading(true);
+      await deleteOrder(order.id.toString());
       toast.success('سفارش با موفقیت حذف شد');
       router.push('/admin/orders');
     } catch (error) {
       console.error('Error deleting order:', error);
       toast.error('خطا در حذف سفارش');
     } finally {
-      setIsDeleting(false);
+      setDeleteLoading(false);
     }
   };
 
@@ -189,7 +185,7 @@ export default function OrderDetailPage({
                     onClick={() => router.push('/admin/orders')}
                     className="flex items-center gap-2"
                   >
-                    <ArrowLeft className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" />
                     بازگشت
                   </Button>
                   <span
@@ -207,7 +203,7 @@ export default function OrderDetailPage({
                 <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
-                    {order.user?.name || 'کاربر نامشخص'}
+                    {`${order.user?.first_name || ''} ${order.user?.last_name || ''}`.trim() || order.user?.phone || 'کاربر نامشخص'}
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
@@ -222,8 +218,8 @@ export default function OrderDetailPage({
               <div className="flex gap-3">
                 <Button
                   variant="danger"
-                  onClick={handleDelete}
-                  loading={isDeleting}
+                  onClick={() => setShowDeleteModal(true)}
+                  disabled={deleteLoading}
                   className="flex items-center gap-2"
                 >
                   <Trash2 className="h-4 w-4" />
@@ -248,7 +244,7 @@ export default function OrderDetailPage({
                     نام مشتری
                   </label>
                   <p className="text-gray-900 dark:text-gray-100">
-                    {order.user?.name || 'نامشخص'}
+                    {`${order.user?.first_name || ''} ${order.user?.last_name || ''}`.trim() || 'نامشخص'}
                   </p>
                 </div>
                 <div>
@@ -265,7 +261,7 @@ export default function OrderDetailPage({
                   </label>
                   <p className="flex items-center gap-1 text-gray-900 dark:text-gray-100">
                     <Phone className="h-4 w-4" />
-                    {order.phone}
+                    {order.user?.phone || 'نامشخص'}
                   </p>
                 </div>
                 <div>
@@ -318,7 +314,7 @@ export default function OrderDetailPage({
                   </label>
                   <select
                     value={selectedStatus}
-                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    onChange={(e) => setSelectedStatus(e.target.value as OrderStatus)}
                     className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
                   >
                     {statusOptions.map((option) => (
@@ -329,13 +325,12 @@ export default function OrderDetailPage({
                   </select>
                 </div>
                 <Button
-                  onClick={handleStatusUpdate}
-                  loading={isUpdatingStatus}
-                  disabled={selectedStatus === order.status}
+                  onClick={() => setShowStatusModal(true)}
+                  disabled={selectedStatus === order.status || statusLoading}
                   className="flex w-full items-center justify-center gap-2"
                 >
                   <Check className="h-4 w-4" />
-                  بروزرسانی وضعیت
+                  {statusLoading ? 'در حال به‌روزرسانی...' : 'به‌روزرسانی وضعیت'}
                 </Button>
               </div>
             </div>
@@ -463,6 +458,30 @@ export default function OrderDetailPage({
           </div>
         )}
       </div>
+
+      {/* Delete Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDelete}
+        title="حذف سفارش"
+        description={`آیا از حذف سفارش شماره "${order?.id}" مطمئن هستید؟`}
+        confirmText="حذف"
+        cancelText="انصراف"
+        loading={deleteLoading}
+      />
+
+      {/* Status Update Modal */}
+      <ConfirmModal
+        isOpen={showStatusModal}
+        onClose={() => setShowStatusModal(false)}
+        onConfirm={handleStatusUpdate}
+        title="تغییر وضعیت سفارش"
+        description={`آیا از تغییر وضعیت سفارش به "${statusOptions.find(s => s.value === selectedStatus)?.label}" مطمئن هستید؟`}
+        confirmText="به‌روزرسانی"
+        cancelText="انصراف"
+        loading={statusLoading}
+      />
     </main>
   );
 }
