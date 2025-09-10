@@ -1,5 +1,8 @@
 # Cactus Project Instructions for GitHub Copilot
 
+## Important Note
+**UPDATE INSTRUCTION EACH TIME SOMETHING NEW ADDED TO LOGIC** - This document must be updated whenever new features, patterns, or logic are implemented in the project.
+
 ## Project Overview
 This is a **Next.js 14** application with **App Router** for a Persian robotics education platform called **Cactus**. The project follows a **client-side first** approach with **SPA-style** navigation and **RTL (Right-to-Left)** design for Persian content.
 
@@ -494,5 +497,60 @@ export const useProduct = create<ProductStore>((set, get) => ({
 4. **UI**: Build RTL-compliant components
 5. **Forms**: Add validation with Persian messages
 6. **Testing**: Verify RTL layout and functionality
+
+## Recent Implementation Updates
+
+### Orders System Refactoring (Latest)
+**Date**: September 2025  
+**Status**: ✅ **COMPLETED**
+
+**Changes Made**:
+- **Removed Create/Update**: Orders API only supports list, view, delete, and status update
+- **Added Status Management**: Full status workflow with confirmation modals
+- **Updated Service Layer**: `orderService` now uses limited endpoints
+- **Refactored Store**: `useOrderStore` with `updateOrderStatus` action
+- **Enhanced UI**: RTL-compliant order management with custom action buttons
+- **Fixed Detail Page**: Converted to use Zustand hooks instead of direct API calls
+
+**Key Features**:
+- Status update modal with dropdown selection (pending → processing → shipped → delivered/cancelled)
+- Confirmation modals for all destructive actions
+- Summary statistics dashboard
+- RTL navigation with `ArrowRight` for back buttons
+- Persian error handling and loading states
+
+**Files Updated**:
+- `app/lib/services/order.service.ts` - Limited to supported operations
+- `app/lib/stores/order.store.ts` - Added status update functionality
+- `app/lib/hooks/use-order.ts` - Removed create/update methods
+- `app/(panel)/admin/orders/page.tsx` - Enhanced with status management
+- `app/(panel)/admin/orders/[id]/page.tsx` - Converted to Zustand pattern
+- `app/lib/types/order.ts` - Added `UpdateOrderStatusRequest`
+- `app/lib/api/endpoints.ts` - Updated order endpoints
+
+### Products & Categories System  
+**Status**: ✅ **COMPLETED**
+- Full CRUD with attributes system
+- RTL-compliant design patterns
+- Summary statistics dashboards
+- Form validation with Zod
+
+### Blog System
+**Status**: ✅ **COMPLETED**  
+- Zustand store implementation
+- RTL form patterns established
+- File upload functionality
+
+### Shop Section Status
+**Status**: ✅ **COMPLETED**
+- ✅ Products management (full CRUD)
+- ✅ Categories management (full CRUD)  
+- ✅ Orders management (list/view/delete/status-update)
+
+**Next Priorities**:
+- Students management system
+- Teachers management system
+- Course/Terms management
+- User profile management
 
 This instruction set should be followed for all new features and refactoring to maintain consistency across the entire Cactus platform.

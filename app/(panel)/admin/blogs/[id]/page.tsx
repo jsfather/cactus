@@ -6,29 +6,34 @@ import { toast } from 'react-hot-toast';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
+import DatePicker from '@/app/components/ui/DatePicker';
 import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-
 import { z } from 'zod';
-import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-import { ApiError } from '@/app/lib/api/client';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useBlog } from '@/app/lib/hooks/use-blog';
-import { Controller } from 'react-hook-form';
+import { useUser } from '@/app/hooks/useUser';
+import { CreateBlogRequest, UpdateBlogRequest } from '@/app/lib/types';
+import { ArrowRight, Save } from 'lucide-react';
 
 const schema = z.object({
-  title: z.string().min(1, 'عنوان الزامی است'),
+  title: z.string().min(1, 'عنوان مقاله الزامی است'),
   little_description: z.string().min(1, 'توضیحات کوتاه الزامی است'),
-  description: z.string().min(1, 'توضیحات الزامی است'),
+  description: z.string().min(1, 'محتوای مقاله الزامی است'),
   meta_title: z.string().min(1, 'عنوان متا الزامی است'),
   meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
-  slug: z.string().min(1, 'اسلاگ الزامی است'),
-  tags: z.array(z.string()),
+  slug: z.string()
+    .min(1, 'اسلاگ الزامی است')
+    .regex(/^[a-z0-9-]+$/, 'اسلاگ باید شامل حروف انگلیسی کوچک، اعداد و خط تیره باشد'),
+  tags: z.string(),
+  publish_at: z.string().min(1, 'تاریخ انتشار الزامی است'),
 });
 
 type FormData = z.infer<typeof schema>;
 
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
+export default function BlogFormPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
@@ -38,69 +43,100 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-    submitWithErrorHandling,
-    globalError,
     reset,
-  } = useFormWithBackendErrors<FormData>(schema);
+    setValue,
+    watch,
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      title: '',
+      little_description: '',
+      description: '',
+      meta_title: '',
+      meta_description: '',
+      slug: '',
+      tags: '',
+      publish_at: new Date().toISOString().split('T')[0],
+    },
+  });
 
   const {
     currentBlog,
     loading,
+    error,
     fetchBlogById,
     createBlog,
     updateBlog,
+    clearError,
   } = useBlog();
 
-  useEffect(() => {
-    const fetchBlog = async () => {
-      if (isNew) return;
+  const { user, loading: userLoading } = useUser();
 
-      try {
-        await fetchBlogById(resolvedParams.id);
-        if (currentBlog) {
-          reset({
-            title: currentBlog.title,
-            little_description: currentBlog.little_description,
-            description: currentBlog.description,
-            meta_title: currentBlog.meta_title,
-            meta_description: currentBlog.meta_description,
-            slug: currentBlog.slug,
-            tags: currentBlog.tags || [],
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching blog:', error);
-        toast.error('خطا در بارگذاری بلاگ');
-        router.push('/admin/blogs');
-      }
-    };
-    fetchBlog();
-  }, []);
+  const titleValue = watch('title');
+  useEffect(() => {
+    if (titleValue && isNew) {
+      const slug = titleValue
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+      setValue('slug', slug);
+    }
+  }, [titleValue, isNew, setValue]);
+
+  useEffect(() => {
+    if (!isNew && resolvedParams.id) {
+      fetchBlogById(resolvedParams.id);
+    }
+  }, [isNew, resolvedParams.id, fetchBlogById]);
+
+  useEffect(() => {
+    if (currentBlog && !isNew) {
+      reset({
+        title: currentBlog.title,
+        little_description: currentBlog.little_description,
+        description: currentBlog.description,
+        meta_title: currentBlog.meta_title,
+        meta_description: currentBlog.meta_description,
+        slug: currentBlog.slug,
+        tags: Array.isArray(currentBlog.tags) ? currentBlog.tags.join(', ') : '',
+        publish_at: currentBlog.publish_at ? currentBlog.publish_at.split('T')[0] : new Date().toISOString().split('T')[0],
+      });
+    }
+  }, [currentBlog, isNew, reset]);
 
   const onSubmit = async (data: FormData) => {
-    if (isNew) {
-      await createBlog(data);
-      toast.success('بلاگ با موفقیت ایجاد شد');
+    try {
+      clearError();
+      
+      if (!user?.id) {
+        toast.error('شناسه کاربر یافت نشد. لطفاً مجدد وارد شوید.');
+        return;
+      }
+      
+      const payload = {
+        ...data,
+        tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        user_id: user.id, // استفاده از آیدی کاربر لاگین شده
+      };
+
+      if (isNew) {
+        await createBlog(payload as CreateBlogRequest);
+        toast.success('مقاله با موفقیت ایجاد شد');
+      } else {
+        await updateBlog(resolvedParams.id, payload as UpdateBlogRequest);
+        toast.success('مقاله با موفقیت به‌روزرسانی شد');
+      }
+      
       router.push('/admin/blogs');
-    } else {
-      await updateBlog(resolvedParams.id, data);
-      toast.success('بلاگ با موفقیت بروزرسانی شد');
-      router.push('/admin/blogs');
+    } catch (error: any) {
+      console.error('Error saving blog:', error);
+      toast.error(error?.message || 'خطا در ذخیره مقاله');
     }
   };
 
-  const handleError = (error: ApiError) => {
-    console.log('Blog form submission error:', error);
-
-    // Show toast error message
-    if (error?.message) {
-      toast.error(error.message);
-    } else {
-      toast.error('خطا در ثبت بلاگ');
-    }
-  };
-
-  if (loading) {
+  if (userLoading || (loading && !isNew)) {
     return <LoadingSpinner />;
   }
 
@@ -108,106 +144,180 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'بلاگ', href: '/admin/blogs' },
+          { label: 'پنل مدیریت', href: '/admin' },
+          { label: 'مدیریت مقالات', href: '/admin/blogs' },
           {
-            label: isNew ? 'ایجاد بلاگ' : 'ویرایش بلاگ',
+            label: isNew ? 'افزودن مقاله جدید' : 'ویرایش مقاله',
             href: `/admin/blogs/${resolvedParams.id}`,
             active: true,
           },
         ]}
       />
 
-      <form
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
-        className="mt-8 space-y-6"
-      >
-        {globalError && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
-            {globalError}
+      <div className="mt-8">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="secondary"
+              onClick={() => router.push('/admin/blogs')}
+              className="flex items-center gap-2"
+            >
+              <ArrowRight className="h-4 w-4" />
+              بازگشت
+            </Button>
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                {isNew ? 'افزودن مقاله جدید' : 'ویرایش مقاله'}
+              </h1>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                {isNew ? 'مقاله جدید ایجاد کنید' : 'اطلاعات مقاله را ویرایش کنید'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-6 rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+            <div className="text-sm text-red-700 dark:text-red-300">{error}</div>
           </div>
         )}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="title"
-            label="عنوان"
-            placeholder="عنوان بلاگ را وارد کنید"
-            required
-            error={errors.title?.message}
-            {...register('title')}
-          />
 
-          <Input
-            id="little_description"
-            label="توضیحات کوتاه"
-            placeholder="توضیحات کوتاه بلاگ را وارد کنید"
-            required
-            error={errors.little_description?.message}
-            {...register('little_description')}
-          />
+        <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div className="lg:col-span-2">
+                <Input
+                  label="عنوان مقاله"
+                  {...register('title')}
+                  error={errors.title?.message}
+                  placeholder="عنوان مقاله را وارد کنید"
+                  required
+                />
+              </div>
+
+              <div className="lg:col-span-2">
+                <Textarea
+                  label="توضیحات کوتاه"
+                  {...register('little_description')}
+                  error={errors.little_description?.message}
+                  placeholder="توضیحات کوتاه مقاله"
+                  rows={3}
+                  required
+                />
+              </div>
+
+              <div>
+                <Input
+                  label="اسلاگ (URL)"
+                  {...register('slug')}
+                  error={errors.slug?.message}
+                  placeholder="blog-slug"
+                  required
+                  dir="ltr"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  اسلاگ برای URL مقاله استفاده می‌شود
+                </p>
+              </div>
+
+              <div>
+                <Controller
+                  name="publish_at"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      id="publish_at"
+                      label="تاریخ انتشار"
+                      required
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      error={errors.publish_at?.message}
+                      placeholder="تاریخ انتشار را انتخاب کنید"
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="lg:col-span-2">
+                <Input
+                  label="برچسب‌ها"
+                  {...register('tags')}
+                  error={errors.tags?.message}
+                  placeholder="Laravel, PHP, Backend"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  برچسب‌ها را با کاما جدا کنید
+                </p>
+              </div>
+
+              <div>
+                <Input
+                  label="عنوان متا (SEO)"
+                  {...register('meta_title')}
+                  error={errors.meta_title?.message}
+                  placeholder="عنوان برای موتورهای جستجو"
+                  required
+                />
+              </div>
+
+              <div className="lg:col-span-2">
+                <Textarea
+                  label="توضیحات متا (SEO)"
+                  {...register('meta_description')}
+                  error={errors.meta_description?.message}
+                  placeholder="توضیحات برای موتورهای جستجو"
+                  rows={2}
+                  required
+                />
+              </div>
+
+              <div className="lg:col-span-2">
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <MarkdownEditor
+                      id="description"
+                      label="محتوای مقاله"
+                      placeholder="محتوای کامل مقاله را در اینجا وارد کنید..."
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.description?.message}
+                      required
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-4 border-t border-gray-200 pt-6 dark:border-gray-700">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => router.push('/admin/blogs')}
+              >
+                انصراف
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" />
+                {isSubmitting
+                  ? isNew 
+                    ? 'در حال ایجاد...'
+                    : 'در حال به‌روزرسانی...'
+                  : isNew
+                    ? 'ایجاد مقاله'
+                    : 'به‌روزرسانی مقاله'
+                }
+              </Button>
+            </div>
+          </form>
         </div>
-
-        <div className="w-full">
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <MarkdownEditor
-                id="description"
-                label="محتوای کامل بلاگ"
-                placeholder="محتوای کامل بلاگ را در اینجا وارد کنید..."
-                value={field.value}
-                onChange={field.onChange}
-                error={errors.description?.message}
-                required
-              />
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="meta_title"
-            label="عنوان متا"
-            placeholder="عنوان متا بلاگ را وارد کنید"
-            required
-            error={errors.meta_title?.message}
-            {...register('meta_title')}
-          />
-
-          <Input
-            id="slug"
-            label="اسلاگ"
-            placeholder="اسلاگ بلاگ را وارد کنید"
-            required
-            error={errors.slug?.message}
-            {...register('slug')}
-          />
-        </div>
-
-        <div className="w-full">
-          <Input
-            id="meta_description"
-            label="توضیحات متا"
-            placeholder="توضیحات متا بلاگ را وارد کنید"
-            required
-            error={errors.meta_description?.message}
-            {...register('meta_description')}
-          />
-        </div>
-
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="white"
-            onClick={() => router.push('/admin/blogs')}
-          >
-            انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            {isNew ? 'ایجاد بلاگ' : 'بروزرسانی بلاگ'}
-          </Button>
-        </div>
-      </form>
+      </div>
     </main>
   );
 }

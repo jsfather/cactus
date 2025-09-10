@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { blogService } from '@/app/lib/services/blog.service';
 import type { ApiError } from '@/app/lib/api/client';
-import { Blog, BlogRequest, GetBlogResponse } from '@/app/lib/types';
+import { Blog, CreateBlogRequest, UpdateBlogRequest, GetBlogResponse } from '@/app/lib/types';
 
 interface BlogState {
   // State
@@ -17,8 +17,8 @@ interface BlogState {
   clearError: () => void;
 
   fetchBlogList: () => Promise<void>;
-  createBlog: (payload: BlogRequest) => Promise<GetBlogResponse>;
-  updateBlog: (id: string, payload: BlogRequest) => Promise<GetBlogResponse>;
+  createBlog: (payload: CreateBlogRequest) => Promise<GetBlogResponse>;
+  updateBlog: (id: string, payload: UpdateBlogRequest) => Promise<GetBlogResponse>;
   deleteBlog: (id: string) => Promise<void>;
   fetchBlogById: (id: string) => Promise<void>;
 }

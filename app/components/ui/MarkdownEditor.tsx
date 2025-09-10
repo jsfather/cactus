@@ -64,6 +64,16 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
       }
     }, [ref]);
 
+    // Update editor content when value prop changes
+    useEffect(() => {
+      if (editorRef.current && value !== undefined) {
+        const currentMarkdown = editorRef.current.getMarkdown();
+        if (currentMarkdown !== value) {
+          editorRef.current.setMarkdown(value);
+        }
+      }
+    }, [value]);
+
     return (
       <div className={clsx('w-full', className)} dir="rtl">
         {label && (
@@ -93,6 +103,7 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
               </div>
             )}
             <MDXEditor
+              key={value} // Force re-render when value changes
               ref={editorRef}
               markdown={value}
               onChange={(newValue) => onChange?.(newValue)}
