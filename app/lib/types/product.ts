@@ -1,54 +1,75 @@
+export interface ProductAttribute {
+  key: string;
+  value: string;
+}
+
 export interface Product {
   id: number | string;
-  name: string;
+  title: string;
   description: string;
   price: number;
-  stock_quantity: number;
-  category_id: number;
-  category?: ProductCategory;
-  images: string[];
-  specifications: Record<string, any>;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  stock: number;
+  image: string | null;
+  attributes: Record<string, string>;
+  category: ProductCategory | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface ProductCategory {
   id: number | string;
   name: string;
-  description?: string;
-  is_active: boolean;
-  created_at: string;
+  type: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CreateProductRequest {
+  title: string;
+  category_id: number;
+  description: string;
+  price: number;
+  stock: number;
+  image?: string;
+  attributes?: ProductAttribute[];
+}
+
+export interface UpdateProductRequest {
+  title: string;
+  category_id: number;
+  description: string;
+  price: number;
+  stock: number;
+  image?: string;
+  attributes?: ProductAttribute[];
 }
 
 export interface GetProductListResponse {
   data: Product[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: Array<{
+      url: string | null;
+      label: string;
+      active: boolean;
+    }>;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 export interface GetProductResponse {
   data: Product;
-}
-
-export interface CreateProductRequest {
-  name: string;
-  description: string;
-  price: number;
-  stock_quantity: number;
-  category_id: number;
-  images?: string[];
-  specifications?: Record<string, any>;
-  is_active?: boolean;
-}
-
-export interface UpdateProductRequest {
-  name: string;
-  description: string;
-  price: number;
-  stock_quantity: number;
-  category_id: number;
-  images?: string[];
-  specifications?: Record<string, any>;
-  is_active?: boolean;
 }
 
 // Product Category types

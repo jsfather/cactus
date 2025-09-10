@@ -8,14 +8,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useProduct } from '@/app/lib/hooks/use-product';
 import { useProductCategory } from '@/app/lib/hooks/use-product-category';
-import { CreateProductRequest, ProductAttribute } from '@/app/lib/types/product';
+import { CreateProductRequest, UpdateProductRequest, ProductAttribute } from '@/app/lib/types/product';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
 import Textarea from '@/app/components/ui/Textarea';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { Package, Plus, X, Save } from 'lucide-react';
+import { Package, Plus, X, Save, ArrowLeft } from 'lucide-react';
 
 const productSchema = z.object({
   title: z.string().min(1, 'نام محصول نمی‌تواند خالی باشد'),
@@ -32,11 +32,22 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>;
 
-export default function NewProductPage() {
+interface Props {
+  params: { id: string };
+}
+
+export default function ProductFormPage({ params }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   
-  const { createProduct, loading } = useProduct();
+  const { 
+    createProduct, 
+    updateProduct, 
+    fetchProductById, 
+    currentProduct, 
+    loading 
+  } = useProduct();
   const { categories, fetchCategories, loading: categoriesLoading } = useProductCategory();
 
   const {
@@ -44,7 +55,7 @@ export default function NewProductPage() {
     handleSubmit,
     control,
     formState: { errors },
-    watch,
+    reset,
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
@@ -65,7 +76,30 @@ export default function NewProductPage() {
 
   useEffect(() => {
     fetchCategories();
-  }, [fetchCategories]);
+    
+    if (params.id !== 'new') {
+      setIsEditing(true);
+      fetchProductById(params.id);
+    }
+  }, [fetchCategories, fetchProductById, params.id]);
+
+  useEffect(() => {
+    if (isEditing && currentProduct) {
+      const attributesArray = currentProduct.attributes 
+        ? Object.entries(currentProduct.attributes).map(([key, value]) => ({ key, value }))
+        : [{ key: '', value: '' }];
+
+      reset({
+        title: currentProduct.title,
+        category_id: currentProduct.category?.id?.toString() || '',
+        description: currentProduct.description,
+        price: currentProduct.price,
+        stock: currentProduct.stock,
+        image: currentProduct.image || '',
+        attributes: attributesArray,
+      });
+    }
+  }, [currentProduct, isEditing, reset]);
 
   const onSubmit = async (data: ProductFormData) => {
     try {
@@ -76,27 +110,43 @@ export default function NewProductPage() {
         attr => attr.key.trim() && attr.value.trim()
       ) || [];
 
-      const productData: CreateProductRequest = {
-        title: data.title,
-        category_id: Number(data.category_id),
-        description: data.description,
-        price: data.price,
-        stock: data.stock,
-        image: data.image || '',
-        attributes: filteredAttributes,
-      };
+      if (isEditing) {
+        const productData: UpdateProductRequest = {
+          title: data.title,
+          category_id: Number(data.category_id),
+          description: data.description,
+          price: data.price,
+          stock: data.stock,
+          image: data.image || '',
+          attributes: filteredAttributes,
+        };
 
-      await createProduct(productData);
-      toast.success('محصول با موفقیت ایجاد شد');
+        await updateProduct(params.id, productData);
+        toast.success('محصول با موفقیت بروزرسانی شد');
+      } else {
+        const productData: CreateProductRequest = {
+          title: data.title,
+          category_id: Number(data.category_id),
+          description: data.description,
+          price: data.price,
+          stock: data.stock,
+          image: data.image || '',
+          attributes: filteredAttributes,
+        };
+
+        await createProduct(productData);
+        toast.success('محصول با موفقیت ایجاد شد');
+      }
+      
       router.push('/admin/products');
     } catch (error) {
-      toast.error('خطا در ایجاد محصول');
+      toast.error(isEditing ? 'خطا در بروزرسانی محصول' : 'خطا در ایجاد محصول');
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (categoriesLoading) {
+  if (loading || categoriesLoading) {
     return <LoadingSpinner />;
   }
 
@@ -106,7 +156,11 @@ export default function NewProductPage() {
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت محصولات', href: '/admin/products' },
-          { label: 'افزودن محصول', href: '/admin/products/new', active: true },
+          { 
+            label: isEditing ? 'ویرایش محصول' : 'افزودن محصول', 
+            href: `/admin/products/${params.id}`, 
+            active: true 
+          },
         ]}
       />
 
@@ -114,12 +168,20 @@ export default function NewProductPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              افزودن محصول جدید
+              {isEditing ? 'ویرایش محصول' : 'افزودن محصول جدید'}
             </h1>
             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-              اطلاعات محصول جدید را وارد کنید
+              {isEditing ? 'اطلاعات محصول را ویرایش کنید' : 'اطلاعات محصول جدید را وارد کنید'}
             </p>
           </div>
+          <Button
+            variant="white"
+            onClick={() => router.push('/admin/products')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            بازگشت
+          </Button>
         </div>
 
         <div className="mt-6 rounded-lg bg-white shadow dark:bg-gray-800">
@@ -247,11 +309,11 @@ export default function NewProductPage() {
                 </Button>
                 <Button
                   type="submit"
-                  loading={submitting || loading}
+                  loading={submitting}
                   className="flex items-center gap-2"
                 >
                   <Save className="h-4 w-4" />
-                  ایجاد محصول
+                  {isEditing ? 'بروزرسانی محصول' : 'ایجاد محصول'}
                 </Button>
               </div>
             </form>
