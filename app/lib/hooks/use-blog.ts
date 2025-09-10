@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useBlogStore } from '@/app/lib/stores/blog.store';
-import { BlogRequest } from '@/app/lib/types';
+import { CreateBlogRequest, UpdateBlogRequest } from '@/app/lib/types';
 
 export const useBlog = () => {
   const store = useBlogStore();
@@ -8,12 +8,12 @@ export const useBlog = () => {
   const fetchBlogList = useCallback(() => store.fetchBlogList(), [store.fetchBlogList]);
 
   const createBlog = useCallback(
-    (payload: BlogRequest) => store.createBlog(payload),
+    (payload: CreateBlogRequest) => store.createBlog(payload),
     [store.createBlog]
   );
 
   const updateBlog = useCallback(
-    (id: string, payload: BlogRequest) => store.updateBlog(id, payload),
+    (id: string, payload: UpdateBlogRequest) => store.updateBlog(id, payload),
     [store.updateBlog]
   );
 

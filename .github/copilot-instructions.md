@@ -47,6 +47,14 @@
 - Middleware موجود برای route protection کافی است.
 - Logout فقط پاک کردن session از localStorage.
 
+## UI Components & Standards
+- **Date/Time Inputs**: ALWAYS use `DatePicker` from `@/app/components/ui/DatePicker` for any date/time input fields
+  - Usage: `<Controller name="date_field" control={control} render={({ field }) => (<DatePicker id="date_field" label="تاریخ" value={field.value} onChange={field.onChange} onBlur={field.onBlur} error={errors.date_field?.message} required />)} />`
+- **Rich Text/Markdown**: ALWAYS use `MarkdownEditor` from `@/app/components/ui/MarkdownEditor` for large text content like descriptions, articles, content
+  - Usage: `<Controller name="description" control={control} render={({ field }) => (<MarkdownEditor id="description" label="محتوای متن" value={field.value} onChange={field.onChange} error={errors.description?.message} required />)} />`
+- **Basic Inputs**: Use standard `Input` and `Textarea` components for simple text fields
+- **Form Structure**: Always wrap custom components in `Controller` for react-hook-form integration
+
 ## UI / Layout
 - **TailwindCSS** استفاده شود.
 - Navbar فیکس بالا، Sidebar فقط تو `(panel)`.
@@ -72,6 +80,7 @@
   - ساخت storeهای zustand برای هر domain.
   - استفاده از fetcher client-side برای همه endpointها.
   - فرم‌ها را یکدست با Zod پیاده کند.
+  - **CRITICAL**: همیشه از `DatePicker` برای تاریخ و `MarkdownEditor` برای محتوای بزرگ استفاده کن.
   - UI/Layout مطابق الگوی مشخص شده باشد.
   - RTL و Dark/Light mode رعایت شود.
   - Token management در zustand.

@@ -127,17 +127,17 @@ export default function Table<T>({
                 >
                   <div className="flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700">
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {columns[0].render
                           ? columns[0].render(item[columns[0].accessor], item)
                           : String(item[columns[0].accessor])}
-                      </p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex w-full items-center justify-between pt-4">
                     <div>
                       {columns.slice(1).map((column, index) => (
-                        <p
+                        <div
                           key={`${getRowId(item)}-mobile-col-${index}`}
                           className={`${
                             index === 0
@@ -148,7 +148,7 @@ export default function Table<T>({
                           {column.render
                             ? column.render(item[column.accessor], item)
                             : String(item[column.accessor])}
-                        </p>
+                        </div>
                       ))}
                     </div>
                     <div className="flex justify-start gap-2">

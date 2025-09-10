@@ -1,7 +1,8 @@
 import { apiClient } from '@/app/lib/api/client';
 import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 import {
-  BlogRequest,
+  CreateBlogRequest,
+  UpdateBlogRequest,
   GetBlogListResponse,
   GetBlogResponse,
 } from '@/app/lib/types';
@@ -19,14 +20,14 @@ export class BlogService {
     );
   }
 
-  async create(payload: BlogRequest): Promise<GetBlogResponse> {
+  async create(payload: CreateBlogRequest): Promise<GetBlogResponse> {
     return apiClient.post<GetBlogResponse>(
       API_ENDPOINTS.PANEL.ADMIN.BLOG.CREATE,
       payload
     );
   }
 
-  async update(id: string, payload: BlogRequest): Promise<GetBlogResponse> {
+  async update(id: string, payload: UpdateBlogRequest): Promise<GetBlogResponse> {
     return apiClient.put<GetBlogResponse>(
       API_ENDPOINTS.PANEL.ADMIN.BLOG.UPDATE(id),
       payload
