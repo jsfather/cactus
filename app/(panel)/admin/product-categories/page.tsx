@@ -2,20 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import {
-  getProductCategories,
-  createProductCategory,
-  updateProductCategory,
-  deleteProductCategory,
-  ProductCategory,
-  ProductCategoryFormData,
-} from '@/app/lib/api/admin/product-categories';
+import { useProductCategory } from '@/app/lib/hooks/use-product-category';
+import { ProductCategory, ProductCategoryFormData } from '@/app/lib/api/admin/product-categories';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
-import Select from '@/app/components/ui/Select';
-import Textarea from '@/app/components/ui/Textarea';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Plus, Package, Trash2, Edit, AlertTriangle, Tag } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,17 +16,27 @@ import * as z from 'zod';
 
 const categorySchema = z.object({
   name: z.string().min(1, 'نام دسته‌بندی نمی‌تواند خالی باشد'),
-  type: z.string().min(1, 'نوع دسته‌بندی انتخاب کنید'),
-  description: z.string().optional(),
+  type: z.string().min(1, 'نوع دسته‌بندی نمی‌تواند خالی باشد'),
 });
 
 export default function ProductCategoriesPage() {
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingCategory, setEditingCategory] =
-    useState<ProductCategory | null>(null);
+  const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
   const [deletingId, setDeletingId] = useState<number | string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<ProductCategory | null>(null);
+
+  // Hook
+  const { 
+    categories, 
+    loading, 
+    error, 
+    fetchCategories, 
+    createCategory, 
+    updateCategory, 
+    deleteCategory,
+    clearError 
+  } = useProductCategory();
 
   const {
     register,
@@ -44,55 +47,42 @@ export default function ProductCategoriesPage() {
     resolver: zodResolver(categorySchema),
   });
 
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      const response = await getProductCategories();
-      setCategories(response.data || []);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      toast.error('خطا در بارگذاری دسته‌بندی‌ها');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      clearError();
+    }
+  }, [error, clearError]);
 
   useEffect(() => {
     if (editingCategory) {
       reset({
         name: editingCategory.name,
         type: editingCategory.type,
-        description: editingCategory.description || '',
       });
     } else {
-      reset({ name: '', type: '', description: '' });
+      reset({ name: '', type: '' });
     }
   }, [editingCategory, reset]);
 
   const onSubmit = async (data: ProductCategoryFormData) => {
     try {
       if (editingCategory) {
-        await updateProductCategory(editingCategory.id, data);
+        await updateCategory(editingCategory.id, data);
         toast.success('دسته‌بندی با موفقیت بروزرسانی شد');
         setEditingCategory(null);
       } else {
-        await createProductCategory(data);
+        await createCategory(data);
         toast.success('دسته‌بندی با موفقیت ایجاد شد');
       }
       reset();
       setShowAddForm(false);
-      fetchCategories();
     } catch (error) {
-      console.error('Error saving category:', error);
-      toast.error(
-        editingCategory
-          ? 'خطا در بروزرسانی دسته‌بندی'
-          : 'خطا در ایجاد دسته‌بندی'
-      );
+      // Error is handled by the store and toast
     }
   };
 
@@ -107,22 +97,30 @@ export default function ProductCategoriesPage() {
     reset();
   };
 
-  const handleDelete = async (id: number | string, name: string) => {
-    if (!confirm(`آیا از حذف دسته‌بندی "${name}" مطمئن هستید؟`)) {
-      return;
-    }
+  const handleDelete = (category: ProductCategory) => {
+    setCategoryToDelete(category);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!categoryToDelete) return;
 
     try {
-      setDeletingId(id);
-      await deleteProductCategory(id);
+      setDeletingId(categoryToDelete.id);
+      await deleteCategory(categoryToDelete.id);
       toast.success('دسته‌بندی با موفقیت حذف شد');
-      fetchCategories();
+      setShowDeleteModal(false);
+      setCategoryToDelete(null);
     } catch (error) {
-      console.error('Error deleting category:', error);
-      toast.error('خطا در حذف دسته‌بندی');
+      // Error is handled by the store and toast
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setCategoryToDelete(null);
   };
 
   if (loading) {
@@ -223,27 +221,15 @@ export default function ProductCategoriesPage() {
                     error={errors.name?.message}
                     {...register('name')}
                   />
-                  <Select
+                  <Input
                     id="type"
                     label="نوع دسته‌بندی"
                     required
-                    placeholder="نوع دسته‌بندی را انتخاب کنید..."
+                    placeholder="نوع دسته‌بندی را وارد کنید..."
                     error={errors.type?.message}
-                    options={[
-                      { label: 'فیزیکی', value: 'فیزیکی' },
-                      { label: 'دیجیتال', value: 'دیجیتال' },
-                      { label: 'ترکیبی', value: 'ترکیبی' },
-                    ]}
                     {...register('type')}
                   />
                 </div>
-                <Textarea
-                  id="description"
-                  label="توضیحات"
-                  placeholder="توضیحات دسته‌بندی (اختیاری)"
-                  error={errors.description?.message}
-                  {...register('description')}
-                />
                 <div className="flex justify-end gap-3">
                   <Button
                     type="button"
@@ -299,7 +285,7 @@ export default function ProductCategoriesPage() {
           ) : (
             <div className="overflow-hidden bg-white shadow sm:rounded-md dark:bg-gray-800">
               <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-                {categories.map((category, index) => (
+                {categories.map((category: ProductCategory, index: number) => (
                   <li key={category.id} className="px-6 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
@@ -321,8 +307,7 @@ export default function ProductCategoriesPage() {
                             </span>
                           </div>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {category.description || 'بدون توضیحات'} • شناسه:{' '}
-                            {category.id}
+                            شناسه: {category.id}
                           </p>
                         </div>
                       </div>
@@ -337,9 +322,7 @@ export default function ProductCategoriesPage() {
                         </Button>
                         <Button
                           variant="danger"
-                          onClick={() =>
-                            handleDelete(category.id, category.name)
-                          }
+                          onClick={() => handleDelete(category)}
                           loading={deletingId === category.id}
                           className="flex items-center gap-1 px-3 py-1 text-sm"
                         >
@@ -378,6 +361,17 @@ export default function ProductCategoriesPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="حذف دسته‌بندی"
+        description={`آیا از حذف دسته‌بندی "${categoryToDelete?.name}" مطمئن هستید؟`}
+        confirmText="حذف"
+        cancelText="انصراف"
+        loading={deletingId === categoryToDelete?.id}
+      />
     </main>
   );
 }

@@ -1,35 +1,17 @@
-import request from '@/app/lib/api/client';
-
-export interface Product {
-  id: number | string;
-  title: string;
-  category_id?: number | string;
-  description: string;
-  price: number;
-  stock: number;
-  image?: string;
-  attributes?: { key: string; value: string }[] | Record<string, any>;
-  category?: {
-    id: number | string;
-    name: string;
-    type?: string;
-  };
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface ProductFormData {
-  title: string;
-  category_id: number | string;
-  description: string;
-  price: number;
-  stock: number;
-  image: string;
-  attributes: { key: string; value: string }[];
-}
+import { apiClient } from '@/app/lib/api/client';
+import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
+import {
+  Product,
+  CreateProductRequest,
+  UpdateProductRequest,
+  GetProductListResponse,
+  GetProductResponse,
+} from '@/app/lib/types/product';
 
 export const getProducts = async () => {
-  const response = await request<{ data: Product[] }>('admin/products');
+  const response = await apiClient.get<GetProductListResponse>(
+    API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.GET_ALL
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست محصولات رخ داده است');
@@ -39,7 +21,9 @@ export const getProducts = async () => {
 };
 
 export const getProduct = async (id: number | string) => {
-  const response = await request<{ data: Product }>(`admin/products/${id}`);
+  const response = await apiClient.get<GetProductResponse>(
+    API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.GET_BY_ID(String(id))
+  );
 
   if (!response) {
     throw new Error('خطایی در دریافت محصول رخ داده است');
@@ -48,11 +32,11 @@ export const getProduct = async (id: number | string) => {
   return response;
 };
 
-export const createProduct = async (data: ProductFormData) => {
-  const response = await request<{ data: Product }>('admin/products', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+export const createProduct = async (data: CreateProductRequest) => {
+  const response = await apiClient.post<GetProductResponse>(
+    API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.CREATE,
+    data
+  );
 
   if (!response) {
     throw new Error('خطایی در ساخت محصول رخ داده است');
@@ -63,12 +47,12 @@ export const createProduct = async (data: ProductFormData) => {
 
 export const updateProduct = async (
   id: number | string,
-  data: ProductFormData
+  data: UpdateProductRequest
 ) => {
-  const response = await request<{ data: Product }>(`admin/products/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
+  const response = await apiClient.put<GetProductResponse>(
+    API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.UPDATE(String(id)),
+    data
+  );
 
   if (!response) {
     throw new Error('خطایی در بروزرسانی محصول رخ داده است');
@@ -78,9 +62,9 @@ export const updateProduct = async (
 };
 
 export const deleteProduct = async (id: number | string) => {
-  const response = await request<{ data: Product }>(`admin/products/${id}`, {
-    method: 'DELETE',
-  });
+  const response = await apiClient.delete<{ data: Product }>(
+    API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.DELETE(String(id))
+  );
 
   if (!response) {
     throw new Error('خطایی در حذف محصول رخ داده است');

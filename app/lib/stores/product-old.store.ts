@@ -5,7 +5,7 @@ import {
   Product,
   CreateProductRequest,
   UpdateProductRequest,
-  GetProductResponse,
+  GetProductListResponse,
 } from '@/app/lib/types/product';
 import {
   getProducts,
@@ -22,6 +22,7 @@ interface ProductState {
   productList: Product[];
   categoryList: ProductCategory[];
   currentProduct: Product | null;
+  currentCategory: ProductCategory | null;
   loading: boolean;
   error: string | null;
 
@@ -39,6 +40,10 @@ interface ProductState {
 
   // Category actions
   fetchCategoryList: () => Promise<void>;
+  createCategory: (payload: any) => Promise<any>;
+  updateCategory: (id: string, payload: any) => Promise<any>;
+  deleteCategory: (id: string) => Promise<void>;
+  fetchCategoryById: (id: string) => Promise<void>;
 }
 
 export const useProductStore = create<ProductState>()(
@@ -47,6 +52,7 @@ export const useProductStore = create<ProductState>()(
     productList: [],
     categoryList: [],
     currentProduct: null,
+    currentCategory: null,
     loading: false,
     error: null,
 
@@ -59,7 +65,7 @@ export const useProductStore = create<ProductState>()(
     fetchProductList: async () => {
       try {
         set({ loading: true, error: null });
-        const response = await getProducts();
+        const response = await productService.getList();
         set({
           productList: response.data,
           loading: false,
@@ -74,7 +80,7 @@ export const useProductStore = create<ProductState>()(
     createProduct: async (payload) => {
       try {
         set({ loading: true, error: null });
-        const newProduct = await createProduct(payload);
+        const newProduct = await productService.create(payload);
         set((state) => ({
           productList: [newProduct.data, ...state.productList],
           loading: false,
@@ -90,7 +96,7 @@ export const useProductStore = create<ProductState>()(
     updateProduct: async (id, payload) => {
       try {
         set({ loading: true, error: null });
-        const updatedProduct = await updateProduct(id, payload);
+        const updatedProduct = await productService.update(id, payload);
         set((state) => ({
           productList: state.productList.map((product) =>
             product.id.toString() === id ? updatedProduct.data : product
@@ -109,7 +115,7 @@ export const useProductStore = create<ProductState>()(
     deleteProduct: async (id) => {
       try {
         set({ loading: true, error: null });
-        await deleteProduct(id);
+        await productService.delete(id);
         set((state) => ({
           productList: state.productList.filter((product) => product.id.toString() !== id),
           loading: false,
@@ -121,14 +127,11 @@ export const useProductStore = create<ProductState>()(
       }
     },
 
-    fetchProductById: async (id) => {
+    fetchProductById: async (id: string) => {
       try {
         set({ loading: true, error: null });
-        const product = await getProduct(id);
-        set({
-          currentProduct: product.data,
-          loading: false,
-        });
+        const product = await productService.getById(id);
+        set({ currentProduct: product.data, loading: false });
       } catch (error) {
         const apiError = error as ApiError;
         set({ error: apiError.message, loading: false });
@@ -140,9 +143,9 @@ export const useProductStore = create<ProductState>()(
     fetchCategoryList: async () => {
       try {
         set({ loading: true, error: null });
-        const response = await getProductCategories();
+        const response = await productService.getCategoryList();
         set({
-          categoryList: response.data || [],
+          categoryList: response.data,
           loading: false,
         });
       } catch (error) {
@@ -151,7 +154,67 @@ export const useProductStore = create<ProductState>()(
         throw error;
       }
     },
-  }), {
-    name: 'product-store',
-  })
+
+    createCategory: async (payload) => {
+      try {
+        set({ loading: true, error: null });
+        const newCategory = await productService.createCategory(payload);
+        set((state) => ({
+          categoryList: [newCategory.data, ...state.categoryList],
+          loading: false,
+        }));
+        return newCategory;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    updateCategory: async (id, payload) => {
+      try {
+        set({ loading: true, error: null });
+        const updatedCategory = await productService.updateCategory(id, payload);
+        set((state) => ({
+          categoryList: state.categoryList.map((category) =>
+            category.id.toString() === id ? updatedCategory.data : category
+          ),
+          currentCategory: updatedCategory.data,
+          loading: false,
+        }));
+        return updatedCategory;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    deleteCategory: async (id) => {
+      try {
+        set({ loading: true, error: null });
+        await productService.deleteCategory(id);
+        set((state) => ({
+          categoryList: state.categoryList.filter((category) => category.id.toString() !== id),
+          loading: false,
+        }));
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    fetchCategoryById: async (id: string) => {
+      try {
+        set({ loading: true, error: null });
+        const category = await productService.getCategoryById(id);
+        set({ currentCategory: category.data, loading: false });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+  }))
 );
