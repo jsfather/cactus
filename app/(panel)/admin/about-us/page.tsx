@@ -9,7 +9,7 @@ import { Button } from "@/app/components/ui/Button";
 import LoadingSpinner from "@/app/components/ui/LoadingSpinner";
 import { z } from "zod";
 import { useFormWithBackendErrors } from "@/app/hooks/useFormWithBackendErrors";
-import { homeSettingsService } from "@/app/lib/api/admin/homeSettings";
+import { useSettingsStore } from "@/app/lib/stores/settings.store";
 
 const schema = z.object({
   phone: z.string().min(1, "شماره تماس الزامی است"),
@@ -24,7 +24,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function AboutUsPage() {
-  const [loading, setLoading] = useState(true);
+  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
 
   const {
     register,
@@ -36,24 +36,22 @@ export default function AboutUsPage() {
   } = useFormWithBackendErrors<FormData>(schema);
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      setLoading(true);
+    const loadSettings = async () => {
       try {
-        const data = await homeSettingsService.get();
+        const data = await fetchSettings();
         reset(data);
       } catch (e: any) {
         toast.error(e.message || "خطا در دریافت اطلاعات");
-      } finally {
-        setLoading(false);
       }
     };
-    fetchSettings();
-  }, [reset]);
+    loadSettings();
+  }, [fetchSettings, reset]);
 
   const onSubmit = async (data: FormData) => {
     try {
-      const res = await homeSettingsService.update(data);
-      toast.success(res?.message || "اطلاعات با موفقیت ذخیره شد");
+      const updateData = { ...settings, ...data };
+      const res = await updateSettings(updateData);
+      toast.success("اطلاعات با موفقیت ذخیره شد");
     } catch (e: any) {
       if (e && typeof e === 'object' && 'status' in e && 'message' in e) {
         toast.error(e.message || "خطا در ذخیره اطلاعات");
