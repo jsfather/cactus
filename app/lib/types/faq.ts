@@ -2,6 +2,8 @@ export interface FAQ {
   id: number | string;
   question: string;
   answer: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Admin FAQ management types
@@ -19,6 +21,6 @@ export interface CreateFAQRequest {
 }
 
 export interface UpdateFAQRequest {
-  question?: string;
-  answer?: string;
+  question: string;
+  answer: string;
 }
