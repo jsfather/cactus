@@ -1,289 +1,372 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Controller } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { getTerm, createTerm, updateTerm } from '@/app/lib/api/admin/terms';
-import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import Input from '@/app/components/ui/Input';
+import { z } from 'zod';
+
+// UI Components
 import { Button } from '@/app/components/ui/Button';
-import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
 import DatePicker from '@/app/components/ui/DatePicker';
-import { Controller } from 'react-hook-form';
+import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 
-import { z } from 'zod';
+// Hooks and Types
+import { useTerm } from '@/app/lib/hooks/use-term';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-import { ApiError } from '@/app/lib/api/client';
-import { convertToEnglishNumbers } from '@/app/lib/utils/persian';
+import { CreateTermRequest, UpdateTermRequest } from '@/app/lib/types/term';
 
+// Utils
+import { convertToEnglishNumbers } from '@/app/lib/utils';
+
+// Form Validation Schema
 const termSchema = z.object({
-  title: z.string().min(1, 'عنوان الزامی است'),
-  duration: z.string().min(1, 'مدت زمان الزامی است'),
-  number_of_sessions: z.string().min(1, 'تعداد جلسات الزامی است'),
-  level_id: z.number({ required_error: 'سطح الزامی است' }),
-  start_date: z.string().min(1, 'تاریخ شروع الزامی است'),
-  end_date: z.string().min(1, 'تاریخ پایان الزامی است'),
-  type: z.enum(['normal', 'capacity_completion', 'vip'], {
-    required_error: 'نوع ترم الزامی است',
+  title: z.string().min(1, 'عنوان ضروری است'),
+  start_date: z.string().min(1, 'تاریخ شروع ضروری است'),
+  end_date: z.string().min(1, 'تاریخ پایان ضروری است'),
+  duration: z.string().min(1, 'مدت زمان ضروری است'),
+  number_of_sessions: z.string().min(1, 'تعداد جلسات ضروری است'),
+  capacity: z.string().min(1, 'ظرفیت ضروری است'),
+  type: z.enum(['normal', 'capacity_completion', 'project_based', 'specialized', 'ai'], {
+    errorMap: () => ({ message: 'نوع ترم ضروری است' })
   }),
-  capacity: z.string().min(1, 'ظرفیت الزامی است'),
+  price: z.string().min(1, 'قیمت ضروری است'),
 });
 
 type TermFormData = z.infer<typeof termSchema>;
 
-const termTypeOptions = [
-  { value: 'normal', label: 'عادی' },
-  { value: 'capacity_completion', label: 'تکمیل ظرفیت' },
-  { value: 'vip', label: 'ویژه' },
-];
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-const levelOptions = [
-  { value: '1', label: 'مبتدی' },
-  { value: '2', label: 'متوسط' },
-  { value: '3', label: 'پیشرفته' },
-];
-
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
+const TermFormPage: React.FC<PageProps> = ({ params }) => {
   const router = useRouter();
-  const isNew = resolvedParams.id === 'new';
+  const { createTerm, updateTerm, fetchTermById, currentTerm } = useTerm();
+
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const isNew = resolvedParams?.id === 'new';
+
   const {
-    register,
-    handleSubmit,
     control,
-    formState: { errors, isSubmitting },
-    submitWithErrorHandling,
-    globalError,
-    setGlobalError,
+    handleSubmit,
     reset,
+    formState: { errors, isSubmitting },
   } = useFormWithBackendErrors<TermFormData>(termSchema);
 
   useEffect(() => {
-    const fetchTerm = async () => {
-      if (isNew) {
-        // Set default values for new terms
+    const resolveParams = async () => {
+      const resolvedParamsData = await params;
+      setResolvedParams(resolvedParamsData);
+
+      if (resolvedParamsData.id === 'new') {
+        // Clear form for new term
         reset({
           title: '',
-          duration: '',
-          number_of_sessions: '',
-          level_id: 1,
           start_date: '',
           end_date: '',
-          type: 'normal',
+          duration: '',
+          number_of_sessions: '',
           capacity: '',
+          type: 'normal',
+          price: '',
         });
         setLoading(false);
         return;
       }
 
       try {
-        const response = await getTerm(resolvedParams.id);
-        const term = response.data;
-        reset({
-          title: term.title,
-          duration: String(term.duration), // Convert to string
-          number_of_sessions: String(term.number_of_sessions), // Convert to string
-          level_id: term.level_id || term.level?.id, // Handle both cases
-          start_date: term.start_date,
-          end_date: term.end_date,
-          type: term.type,
-          capacity: String(term.capacity), // Convert to string
-        });
+        await fetchTermById(resolvedParamsData.id);
       } catch (error) {
-        toast.error('خطا در بارگذاری ترم');
+        toast.error('خطا در بارگذاری اطلاعات ترم');
         router.push('/admin/terms');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTerm();
-  }, [isNew, resolvedParams.id, reset, router]);
+    resolveParams();
+  }, [fetchTermById, reset, router]);
+
+  // Set form data when currentTerm changes
+  useEffect(() => {
+    if (currentTerm && !isNew) {
+      reset({
+        title: currentTerm.title,
+        start_date: currentTerm.start_date,
+        end_date: currentTerm.end_date,
+        duration: currentTerm.duration.toString(),
+        number_of_sessions: currentTerm.number_of_sessions.toString(),
+        capacity: currentTerm.capacity.toString(),
+        type: currentTerm.type,
+        price: currentTerm.price.toString(),
+      });
+    }
+  }, [currentTerm, isNew, reset]);
 
   const onSubmit = async (data: TermFormData) => {
-    // Convert Persian/Arabic numbers to English before sending to server
+    if (!resolvedParams) return;
+
     const processedData = {
-      ...data,
-      duration: convertToEnglishNumbers(data.duration),
-      number_of_sessions: convertToEnglishNumbers(data.number_of_sessions),
-      capacity: convertToEnglishNumbers(data.capacity),
+      title: data.title,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      duration: Number(convertToEnglishNumbers(data.duration)),
+      number_of_sessions: Number(convertToEnglishNumbers(data.number_of_sessions)),
+      capacity: convertToEnglishNumbers(data.capacity), // Keep as string for API
+      price: convertToEnglishNumbers(data.price), // Keep as string for API
+      type: data.type,
+      level_id: 1, // Default level_id
     };
 
-    if (isNew) {
-      await createTerm(processedData);
-      toast.success('ترم با موفقیت ایجاد شد');
+    try {
+      if (resolvedParams.id === 'new') {
+        await createTerm(processedData as CreateTermRequest);
+        toast.success('ترم با موفقیت ایجاد شد');
+      } else {
+        await updateTerm(resolvedParams.id, processedData as UpdateTermRequest);
+        toast.success('ترم با موفقیت به‌روزرسانی شد');
+      }
       router.push('/admin/terms');
-    } else {
-      await updateTerm(resolvedParams.id, processedData);
-      toast.success('ترم با موفقیت بروزرسانی شد');
-      router.push('/admin/terms');
-    }
-  };
-
-  const handleError = (error: ApiError) => {
-    console.log('Term form submission error:', error);
-
-    // Show toast error message
-    if (error?.message) {
-      toast.error(error.message);
-    } else {
+    } catch (error) {
       toast.error(isNew ? 'خطا در ایجاد ترم' : 'خطا در بروزرسانی ترم');
     }
   };
 
-  if (loading) {
-    return <LoadingSpinner />;
+  const handleError = () => {
+    toast.error(isNew ? 'خطا در ایجاد ترم' : 'خطا در بروزرسانی ترم');
+  };
+
+  if (!resolvedParams || loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
+  const breadcrumbItems = [
+    { label: 'داشبورد', href: '/admin' },
+    { label: 'ترم‌ها', href: '/admin/terms' },
+    { label: isNew ? 'ایجاد ترم جدید' : 'ویرایش ترم', href: '#' },
+  ];
+
   return (
-    <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: 'ترم‌ها', href: '/admin/terms' },
-          {
-            label: isNew ? 'ایجاد ترم' : 'ویرایش ترم',
-            href: `/admin/terms/${resolvedParams.id}`,
-            active: true,
-          },
-        ]}
-      />
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Breadcrumbs breadcrumbs={breadcrumbItems} />
+      </div>
 
-      <form
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
-        className="mt-8 space-y-6"
-      >
-        {globalError && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
-            {globalError}
-          </div>
-        )}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="title"
-            label="عنوان"
-            placeholder="عنوان ترم را وارد کنید"
-            required
-            error={errors.title?.message}
-            {...register('title')}
-          />
-
-          <Select
-            id="type"
-            label="نوع ترم"
-            placeholder="نوع ترم را انتخاب کنید"
-            options={termTypeOptions}
-            required
-            error={errors.type?.message}
-            {...register('type')}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="duration"
-            label="مدت زمان"
-            placeholder="مدت زمان ترم را وارد کنید"
-            required
-            convertNumbers={true}
-            error={errors.duration?.message}
-            {...register('duration', {
-              setValueAs: (value) => convertToEnglishNumbers(value),
-            })}
-          />
-
-          <Input
-            id="number_of_sessions"
-            label="تعداد جلسات"
-            placeholder="تعداد جلسات را وارد کنید"
-            required
-            convertNumbers={true}
-            error={errors.number_of_sessions?.message}
-            {...register('number_of_sessions', {
-              setValueAs: (value) => convertToEnglishNumbers(value),
-            })}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Select
-            id="level_id"
-            label="سطح"
-            placeholder="سطح را انتخاب کنید"
-            options={levelOptions}
-            required
-            error={errors.level_id?.message}
-            {...register('level_id', {
-              setValueAs: (value: string) => parseInt(value, 10),
-            })}
-          />
-
-          <Input
-            id="capacity"
-            label="ظرفیت"
-            placeholder="ظرفیت ترم را وارد کنید"
-            required
-            convertNumbers={true}
-            error={errors.capacity?.message}
-            {...register('capacity', {
-              setValueAs: (value) => convertToEnglishNumbers(value),
-            })}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Controller
-            name="start_date"
-            control={control}
-            render={({ field }) => (
-              <DatePicker
-                id="start_date"
-                label="تاریخ شروع"
-                placeholder="تاریخ شروع را وارد کنید"
-                required
-                error={errors.start_date?.message}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                name={field.name}
-              />
-            )}
-          />
-
-          <Controller
-            name="end_date"
-            control={control}
-            render={({ field }) => (
-              <DatePicker
-                id="end_date"
-                label="تاریخ پایان"
-                placeholder="تاریخ پایان را وارد کنید"
-                required
-                error={errors.end_date?.message}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                name={field.name}
-              />
-            )}
-          />
-        </div>
-
-        <div className="flex justify-end gap-3">
+      <div className="mb-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {isNew ? 'ایجاد ترم جدید' : 'ویرایش ترم'}
+          </h1>
           <Button
-            type="button"
-            variant="white"
+            variant="secondary"
             onClick={() => router.push('/admin/terms')}
+            className="flex items-center gap-2"
           >
-            انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            {isNew ? 'ایجاد ترم' : 'بروزرسانی ترم'}
+            <span>←</span>
+            بازگشت به لیست
           </Button>
         </div>
-      </form>
-    </main>
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <form onSubmit={handleSubmit(onSubmit, handleError)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Title */}
+            <div className="md:col-span-2">
+              <Controller
+                name="title"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="title"
+                    label="عنوان ترم"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.title?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+
+            {/* Type */}
+            <div>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    id="type"
+                    label="نوع ترم"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.type?.message}
+                    placeholder="انتخاب کنید"
+                    required
+                    options={[
+                      { value: 'normal', label: 'عادی' },
+                      { value: 'capacity_completion', label: 'تکمیل ظرفیت' },
+                      { value: 'project_based', label: 'پروژه محور(ویژه)' },
+                      { value: 'specialized', label: 'گرایش تخصصی' },
+                      { value: 'ai', label: 'هوش مصنوعی' },
+                    ]}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Duration */}
+            <div>
+              <Controller
+                name="duration"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="duration"
+                    label="مدت زمان (روز)"
+                    type="number"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.duration?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+
+            {/* Number of Sessions */}
+            <div>
+              <Controller
+                name="number_of_sessions"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="number_of_sessions"
+                    label="تعداد جلسات"
+                    type="number"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.number_of_sessions?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+
+            {/* Capacity */}
+            <div>
+              <Controller
+                name="capacity"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="capacity"
+                    label="ظرفیت"
+                    type="number"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.capacity?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+
+            {/* Price */}
+            <div>
+              <Controller
+                name="price"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="price"
+                    label="قیمت (تومان)"
+                    type="number"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.price?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+
+            {/* Start Date */}
+            <div>
+              <Controller
+                name="start_date"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="start_date"
+                    label="تاریخ شروع"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.start_date?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+
+            {/* End Date */}
+            <div>
+              <Controller
+                name="end_date"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="end_date"
+                    label="تاریخ پایان"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.end_date?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex items-center gap-2"
+            >
+              {isSubmitting ? 'در حال پردازش...' : (isNew ? 'ایجاد ترم' : 'بروزرسانی ترم')}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => router.push('/admin/terms')}
+            >
+              انصراف
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
-}
+};
+
+export default TermFormPage;

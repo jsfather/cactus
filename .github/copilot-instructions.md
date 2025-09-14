@@ -47,6 +47,66 @@
 - Middleware موجود برای route protection کافی است.
 - Logout فقط پاک کردن session از localStorage.
 
+## Reference Implementation Examples
+- **Blog Section**: Complete CRUD with RTL design, summary stats, proper form validation
+  - Types: `lib/types/blog.ts`
+  - Service: `lib/services/blog.service.ts`
+  - Store: `lib/stores/blog.store.ts`
+  - Hook: `lib/hooks/use-blog.ts`
+  - Listing: `(panel)/admin/blogs/page.tsx`
+  - Form: `(panel)/admin/blogs/[id]/page.tsx`
+
+- **Terms Section**: Complete CRUD implementation following established patterns
+  - Types: `lib/types/term.ts` with API structure: `{title, duration, number_of_sessions, level_id, start_date, end_date, type, capacity, price}`
+  - Term types: 'normal' (عادی), 'capacity_completion' (تکمیل ظرفیت), 'project_based' (پروژه محور(ویژه)), 'specialized' (گرایش تخصصی), 'ai' (هوش مصنوعی)
+  - API expects capacity and price as strings, not numbers
+  - Service: `lib/services/term.service.ts` using `/admin/terms` endpoint
+  - Store: `lib/stores/term.store.ts` with full CRUD operations
+  - Hook: `lib/hooks/use-term.ts` with callback optimization
+  - Listing: `(panel)/admin/terms/page.tsx` with RTL design, breadcrumbs, summary stats
+  - Form: `(panel)/admin/terms/[id]/page.tsx` using DatePicker, Select, and proper validation
+
+- **Products Section**: Another complete reference following the same patterns
+  - Full CRUD with proper state management
+  - RTL design with summary statistics
+  - Form validation with Zod and proper error handling
+
+## Implementation Patterns for New Sections
+**کوپایلت باید این الگو را برای ایجاد بخش‌های جدید دنبال کند:**
+
+1. **Types Definition**: 
+   - Main interface with all fields from API response
+   - Separate Request interfaces for Create/Update
+   - Response wrapper interfaces
+
+2. **Service Layer**:
+   - Class-based service with CRUD methods
+   - Use `apiClient` from `lib/api/client.ts`
+   - Export singleton instance
+
+3. **Zustand Store**:
+   - State: list, current item, loading, error
+   - Actions: CRUD operations with proper error handling
+   - Optimistic updates for better UX
+
+4. **Hook Layer**:
+   - Wrapper around store with useCallback optimization
+   - Clean API for components
+
+5. **Listing Page**:
+   - RTL design with breadcrumbs
+   - Summary stats cards with icons
+   - Table with proper columns and rendering
+   - Delete confirmation modal
+   - Loading states
+
+6. **Form Page**:
+   - Proper form validation with Zod
+   - **CRITICAL**: Use DatePicker for dates, MarkdownEditor for content
+   - Grid layout with responsive design
+   - Breadcrumbs and navigation
+   - Loading and error states
+
 ## UI Components & Standards
 - **Date/Time Inputs**: ALWAYS use `DatePicker` from `@/app/components/ui/DatePicker` for any date/time input fields
   - Usage: `<Controller name="date_field" control={control} render={({ field }) => (<DatePicker id="date_field" label="تاریخ" value={field.value} onChange={field.onChange} onBlur={field.onBlur} error={errors.date_field?.message} required />)} />`

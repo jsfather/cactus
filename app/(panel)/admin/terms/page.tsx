@@ -1,40 +1,58 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table, { Column } from '@/app/components/ui/Table';
-import { toast } from 'react-hot-toast';
-import { Term } from '@/app/lib/types';
-import ConfirmModal from '@/app/components/ui/ConfirmModal';
-import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
+import Table, { Column } from '@/app/components/ui/Table';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import { Button } from '@/app/components/ui/Button';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { Term } from '@/app/lib/types';
 import { useTerm } from '@/app/lib/hooks/use-term';
+import { Plus, Calendar, Users, BookOpen, Clock } from 'lucide-react';
 
-export default function Page() {
+export default function TermsPage() {
   const router = useRouter();
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Term | null>(null);
+  
   const {
     termList,
     loading,
     fetchTermList,
     deleteTerm,
+    clearError,
   } = useTerm();
 
   useEffect(() => {
     fetchTermList();
   }, [fetchTermList]);
 
+  // Calculate summary statistics
+  const totalTerms = termList.length;
+  const activeTerms = termList.filter(term => {
+    const today = new Date();
+    const endDate = new Date(term.end_date);
+    return endDate >= today;
+  }).length;
+  const totalStudents = termList.reduce((sum, term) => sum + (term.students?.length || 0), 0);
+  const totalCapacity = termList.reduce((sum, term) => sum + term.capacity, 0);
+
   const columns: Column<Term>[] = [
     {
       header: 'عنوان ترم',
       accessor: 'title',
+      render: (value, item): string => {
+        return `${value} - ${item.level?.name || 'نامشخص'}`;
+      },
     },
     {
-      header: 'مدت دوره',
+      header: 'مدت زمان',
       accessor: 'duration',
       render: (value): string => {
-        return `${value} ماه`;
+        return `${value} دقیقه`;
       },
     },
     {
@@ -45,11 +63,23 @@ export default function Page() {
       },
     },
     {
-      header: 'سطح',
-      accessor: 'level',
-      render: (value): string => {
-        const level = value as any;
-        return level?.name || '---';
+      header: 'نوع ترم',
+      accessor: 'type',
+      render: (value): React.JSX.Element => {
+        const typeMap = {
+          normal: { label: 'عادی', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' },
+          capacity_completion: { label: 'تکمیل ظرفیت', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' },
+          project_based: { label: 'پروژه محور(ویژه)', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' },
+          specialized: { label: 'گرایش تخصصی', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' },
+          ai: { label: 'هوش مصنوعی', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300' },
+        };
+        const type = typeMap[value as keyof typeof typeMap] || { label: value as string, color: 'bg-gray-100 text-gray-800' };
+        
+        return (
+          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${type.color}`}>
+            {type.label}
+          </span>
+        );
       },
     },
     {
@@ -60,15 +90,10 @@ export default function Page() {
       },
     },
     {
-      header: 'نوع ترم',
-      accessor: 'type',
+      header: 'قیمت',
+      accessor: 'price',
       render: (value): string => {
-        const typeMap = {
-          normal: 'عادی',
-          capacity_completion: 'تکمیل ظرفیت',
-          vip: 'VIP',
-        };
-        return typeMap[value as keyof typeof typeMap] || value as string;
+        return new Intl.NumberFormat('fa-IR').format(Number(value)) + ' تومان';
       },
     },
     {
@@ -76,7 +101,7 @@ export default function Page() {
       accessor: 'start_date',
       render: (value): string => {
         if (!value || typeof value !== 'string') return '---';
-        return new Date(value).toLocaleDateString('fa-IR');
+        return value; // Already in Persian format
       },
     },
     {
@@ -84,7 +109,7 @@ export default function Page() {
       accessor: 'end_date',
       render: (value): string => {
         if (!value || typeof value !== 'string') return '---';
-        return new Date(value).toLocaleDateString('fa-IR');
+        return value; // Already in Persian format
       },
     },
   ];
@@ -118,35 +143,139 @@ export default function Page() {
     }, 500);
   };
 
-  return (
-    <div className="w-full">
-      <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          ترم‌ها
-        </h1>
-        <Button onClick={() => router.push('/admin/terms/new')}>
-          ایجاد ترم
-        </Button>
-      </div>
-      <Table
-        data={termList}
-        columns={columns}
-        loading={loading}
-        emptyMessage="هیچ ترمی یافت نشد"
-        onEdit={(term) => router.push(`/admin/terms/${term.id}`)}
-        onDelete={handleDeleteClick}
-      />
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
-      <ConfirmModal
-        isOpen={showDeleteModal}
-        onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        title="حذف ترم"
-        description={`آیا از حذف ترم "${itemToDelete?.title}" اطمینان دارید؟`}
-        confirmText="حذف"
-        loading={deleteLoading}
-        variant="danger"
-      />
-    </div>
+  return (
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+        {/* Breadcrumb */}
+        <Breadcrumbs
+          breadcrumbs={[
+            { label: 'داشبورد', href: '/admin' },
+            { label: 'ترم‌ها', href: '/admin/terms' },
+          ]}
+        />
+
+        {/* Header */}
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              مدیریت ترم‌ها
+            </h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
+              مدیریت و ویرایش ترم‌های آموزشی
+            </p>
+          </div>
+          <Button 
+            onClick={() => router.push('/admin/terms/new')}
+            className="flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            ایجاد ترم جدید
+          </Button>
+        </div>
+
+        {/* Summary Stats */}
+        <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <BookOpen className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="mr-4 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    کل ترم‌ها
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {totalTerms.toLocaleString('fa-IR')}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Calendar className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="mr-4 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    ترم‌های فعال
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {activeTerms.toLocaleString('fa-IR')}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Users className="h-8 w-8 text-purple-600" />
+              </div>
+              <div className="mr-4 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    کل دانش‌آموزان
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {totalStudents.toLocaleString('fa-IR')}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <Clock className="h-8 w-8 text-orange-600" />
+              </div>
+              <div className="mr-4 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    کل ظرفیت
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {totalCapacity.toLocaleString('fa-IR')} نفر
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="mt-8">
+          <Table
+            data={termList}
+            columns={columns}
+            loading={loading}
+            emptyMessage="هیچ ترمی یافت نشد"
+            onEdit={(term) => router.push(`/admin/terms/${term.id}`)}
+            onDelete={handleDeleteClick}
+          />
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          onClose={handleDeleteCancel}
+          onConfirm={handleDeleteConfirm}
+          title="حذف ترم"
+          description={`آیا از حذف ترم "${itemToDelete?.title}" اطمینان دارید؟`}
+          confirmText="حذف"
+          loading={deleteLoading}
+          variant="danger"
+        />
+      </div>
+    </main>
   );
 }
