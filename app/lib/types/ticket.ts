@@ -7,13 +7,16 @@ export interface Message {
 }
 
 export interface Ticket {
-  id: number;
+  id: number | string;
   subject: string;
-  status: string;
-  student: string;
-  teacher: string;
-  department: string;
-  messages: Message[];
+  status: 'open' | 'closed' | 'pending';
+  student?: string;
+  teacher?: string;
+  department?: string;
+  messages?: Message[];
+  created_at: string;
+  updated_at: string;
+  type?: 'student' | 'teacher'; // Added for filtering
 }
 
 export interface Reply {
@@ -31,24 +34,37 @@ export interface GetTicketResponse {
 
 export interface CreateTicketRequest {
   subject: string;
-  department: string;
+  department?: string;
   message: string;
   attachment?: string | null;
 }
 
 export interface UpdateTicketRequest {
   subject?: string;
-  status?: string;
+  status?: 'open' | 'closed' | 'pending';
   department?: string;
+}
+
+export interface ReplyTicketRequest {
+  message: string;
 }
 
 export interface TicketDepartment {
   id: number | string;
-  name: string;
+  title: string;
+  name?: string; // For backward compatibility
   description?: string;
-  is_active: boolean;
+  is_active?: boolean;
 }
 
 export interface GetTicketDepartmentListResponse {
   data: TicketDepartment[];
+}
+
+export interface CreateTicketDepartmentRequest {
+  title: string;
+}
+
+export interface UpdateTicketDepartmentRequest {
+  title: string;
 }
