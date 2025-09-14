@@ -4,8 +4,10 @@ import {
   Ticket,
   CreateTicketRequest,
   UpdateTicketRequest,
+  ReplyTicketRequest,
   TicketDepartment,
-  Reply,
+  CreateTicketDepartmentRequest,
+  UpdateTicketDepartmentRequest,
 } from '@/app/lib/types';
 import toast from 'react-hot-toast';
 
@@ -16,16 +18,27 @@ interface TicketStore {
   departments: TicketDepartment[];
   isLoading: boolean;
   isListLoading: boolean;
+  isDepartmentsLoading: boolean;
   error: string | null;
 
   // Actions
   fetchTickets: () => Promise<void>;
+  fetchTeacherTickets: () => Promise<void>;
+  fetchAllTickets: () => Promise<void>;
   fetchTicketById: (id: string) => Promise<void>;
   createTicket: (payload: CreateTicketRequest) => Promise<void>;
   updateTicket: (id: string, payload: UpdateTicketRequest) => Promise<void>;
   deleteTicket: (id: string) => Promise<void>;
+  closeTicket: (id: string) => Promise<void>;
+  replyToTicket: (id: string, payload: ReplyTicketRequest) => Promise<void>;
+  
+  // Department actions
   fetchDepartments: () => Promise<void>;
-  replyToTicket: (id: string, payload: Reply) => Promise<void>;
+  createDepartment: (payload: CreateTicketDepartmentRequest) => Promise<void>;
+  updateDepartment: (id: string, payload: UpdateTicketDepartmentRequest) => Promise<void>;
+  deleteDepartment: (id: string) => Promise<void>;
+  
+  // Utility actions
   clearCurrentTicket: () => void;
   clearError: () => void;
 }
@@ -37,6 +50,7 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
   departments: [],
   isLoading: false,
   isListLoading: false,
+  isDepartmentsLoading: false,
   error: null,
 
   // Actions
@@ -46,10 +60,68 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
       const response = await ticketService.getList();
       
       if (response.data) {
-        set({ tickets: response.data });
+        // Mark tickets as student type
+        const ticketsWithType = response.data.map(ticket => ({
+          ...ticket,
+          type: 'student' as const
+        }));
+        set({ tickets: ticketsWithType });
       } else {
         throw new Error('خطا در دریافت تیکت‌ها');
       }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'خطا در دریافت تیکت‌ها';
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+    } finally {
+      set({ isListLoading: false });
+    }
+  },
+
+  fetchTeacherTickets: async () => {
+    try {
+      set({ isListLoading: true, error: null });
+      const response = await ticketService.getTeacherTickets();
+      
+      if (response.data) {
+        // Mark tickets as teacher type
+        const ticketsWithType = response.data.map(ticket => ({
+          ...ticket,
+          type: 'teacher' as const
+        }));
+        set({ tickets: ticketsWithType });
+      } else {
+        throw new Error('خطا در دریافت تیکت‌های مدرس');
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'خطا در دریافت تیکت‌های مدرس';
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+    } finally {
+      set({ isListLoading: false });
+    }
+  },
+
+  fetchAllTickets: async () => {
+    try {
+      set({ isListLoading: true, error: null });
+      const [studentsResponse, teachersResponse] = await Promise.all([
+        ticketService.getList(),
+        ticketService.getTeacherTickets(),
+      ]);
+      
+      const allTickets = [
+        ...studentsResponse.data.map(ticket => ({
+          ...ticket,
+          type: 'student' as const
+        })),
+        ...teachersResponse.data.map(ticket => ({
+          ...ticket,
+          type: 'teacher' as const
+        })),
+      ];
+      
+      set({ tickets: allTickets });
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || error.message || 'خطا در دریافت تیکت‌ها';
       set({ error: errorMessage });
@@ -110,12 +182,11 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
       
       if (response.data) {
         const updatedTicket = response.data;
-        const ticketId = parseInt(id);
         set(state => ({
           tickets: state.tickets.map(ticket => 
-            ticket.id === ticketId ? updatedTicket : ticket
+            ticket.id.toString() === id ? updatedTicket : ticket
           ),
-          currentTicket: state.currentTicket?.id === ticketId ? updatedTicket : state.currentTicket
+          currentTicket: state.currentTicket?.id.toString() === id ? updatedTicket : state.currentTicket
         }));
         toast.success('تیکت با موفقیت ویرایش شد');
       } else {
@@ -136,10 +207,9 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
       set({ isLoading: true, error: null });
       await ticketService.delete(id);
       
-      const ticketId = parseInt(id);
       set(state => ({
-        tickets: state.tickets.filter(ticket => ticket.id !== ticketId),
-        currentTicket: state.currentTicket?.id === ticketId ? null : state.currentTicket
+        tickets: state.tickets.filter(ticket => ticket.id.toString() !== id),
+        currentTicket: state.currentTicket?.id.toString() === id ? null : state.currentTicket
       }));
       toast.success('تیکت با موفقیت حذف شد');
     } catch (error: any) {
@@ -152,9 +222,54 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
     }
   },
 
-  fetchDepartments: async () => {
+  closeTicket: async (id: string) => {
     try {
       set({ isLoading: true, error: null });
+      const response = await ticketService.close(id);
+      
+      if (response.data) {
+        const updatedTicket = response.data;
+        set(state => ({
+          tickets: state.tickets.map(ticket => 
+            ticket.id.toString() === id ? updatedTicket : ticket
+          ),
+          currentTicket: state.currentTicket?.id.toString() === id ? updatedTicket : state.currentTicket
+        }));
+        toast.success('تیکت با موفقیت بسته شد');
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'خطا در بستن تیکت';
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  replyToTicket: async (id: string, payload: ReplyTicketRequest) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await ticketService.reply(id, payload);
+      
+      if (response.data) {
+        set({ currentTicket: response.data });
+        toast.success('پاسخ با موفقیت ارسال شد');
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'خطا در ارسال پاسخ';
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  // Department actions
+  fetchDepartments: async () => {
+    try {
+      set({ isDepartmentsLoading: true, error: null });
       const response = await ticketService.getDepartments();
       
       if (response.data) {
@@ -167,20 +282,24 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
       set({ error: errorMessage });
       toast.error(errorMessage);
     } finally {
-      set({ isLoading: false });
+      set({ isDepartmentsLoading: false });
     }
   },
 
-  replyToTicket: async (id: string, payload: Reply) => {
+  createDepartment: async (payload: CreateTicketDepartmentRequest) => {
     try {
       set({ isLoading: true, error: null });
-      await ticketService.reply(id, payload);
+      const response = await ticketService.createDepartment(payload);
       
-      // Refresh the current ticket to show new reply
-      await get().fetchTicketById(id);
-      toast.success('پاسخ با موفقیت ارسال شد');
+      if (response.data) {
+        const newDepartment = response.data;
+        set(state => ({ 
+          departments: [...state.departments, newDepartment]
+        }));
+        toast.success('دپارتمان با موفقیت ایجاد شد');
+      }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'خطا در ارسال پاسخ';
+      const errorMessage = error.response?.data?.message || error.message || 'خطا در ایجاد دپارتمان';
       set({ error: errorMessage });
       toast.error(errorMessage);
       throw error;
@@ -189,6 +308,50 @@ export const useTicketStore = create<TicketStore>((set, get) => ({
     }
   },
 
+  updateDepartment: async (id: string, payload: UpdateTicketDepartmentRequest) => {
+    try {
+      set({ isLoading: true, error: null });
+      const response = await ticketService.updateDepartment(id, payload);
+      
+      if (response.data) {
+        const updatedDepartment = response.data;
+        set(state => ({
+          departments: state.departments.map(dept => 
+            dept.id.toString() === id ? updatedDepartment : dept
+          )
+        }));
+        toast.success('دپارتمان با موفقیت ویرایش شد');
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'خطا در ویرایش دپارتمان';
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  deleteDepartment: async (id: string) => {
+    try {
+      set({ isLoading: true, error: null });
+      await ticketService.deleteDepartment(id);
+      
+      set(state => ({
+        departments: state.departments.filter(dept => dept.id.toString() !== id)
+      }));
+      toast.success('دپارتمان با موفقیت حذف شد');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'خطا در حذف دپارتمان';
+      set({ error: errorMessage });
+      toast.error(errorMessage);
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  // Utility actions
   clearCurrentTicket: () => set({ currentTicket: null }),
   clearError: () => set({ error: null }),
 }));

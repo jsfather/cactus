@@ -3,8 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { toast } from 'react-hot-toast';
-import { getTickets, getTeacherTickets } from '@/app/lib/api/admin/tickets';
+import { useTicket } from '@/app/lib/hooks/use-ticket';
 import { Ticket } from '@/app/lib/types';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
@@ -46,57 +45,35 @@ const statusIcons: Record<string, React.ReactElement> = {
 
 export default function TicketsPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [tickets, setTickets] = useState<any[]>([]);
-  const [filteredTickets, setFilteredTickets] = useState<any[]>([]);
+  const {
+    tickets,
+    isListLoading,
+    fetchTickets,
+    fetchTeacherTickets,
+    fetchAllTickets,
+  } = useTicket();
+  
+  const [filteredTickets, setFilteredTickets] = useState<Ticket[]>([]);
   const [ticketType, setTicketType] = useState<TicketType>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
-    const fetchTickets = async () => {
+    const loadTickets = async () => {
       try {
-        setLoading(true);
-
         if (ticketType === 'all') {
-          // Fetch both student and teacher tickets
-          const [studentsResponse, teachersResponse] = await Promise.all([
-            getTickets(),
-            getTeacherTickets(),
-          ]);
-
-          const allTickets = [
-            ...studentsResponse.data.map((ticket: any) => ({
-              ...ticket,
-              type: 'student',
-            })),
-            ...teachersResponse.data.map((ticket: any) => ({
-              ...ticket,
-              type: 'teacher',
-            })),
-          ];
-
-          setTickets(allTickets);
+          await fetchAllTickets();
         } else if (ticketType === 'students') {
-          const response = await getTickets();
-          setTickets(
-            response.data.map((ticket: any) => ({ ...ticket, type: 'student' }))
-          );
+          await fetchTickets();
         } else {
-          const response = await getTeacherTickets();
-          setTickets(
-            response.data.map((ticket: any) => ({ ...ticket, type: 'teacher' }))
-          );
+          await fetchTeacherTickets();
         }
       } catch (error) {
         console.error('Error fetching tickets:', error);
-        toast.error('خطا در بارگذاری تیکت‌ها');
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchTickets();
-  }, [ticketType]);
+    loadTickets();
+  }, [ticketType, fetchTickets, fetchTeacherTickets, fetchAllTickets]);
 
   useEffect(() => {
     let filtered = tickets;
@@ -118,7 +95,7 @@ export default function TicketsPage() {
     });
   };
 
-  const getTicketTypeIcon = (type: string) => {
+  const getTicketTypeIcon = (type?: string) => {
     return type === 'teacher' ? (
       <GraduationCap className="h-4 w-4" />
     ) : (
@@ -139,7 +116,7 @@ export default function TicketsPage() {
     }
   };
 
-  if (loading) {
+  if (isListLoading) {
     return <LoadingSpinner />;
   }
 
@@ -180,7 +157,7 @@ export default function TicketsPage() {
                 <div className="flex-shrink-0">
                   <MessageCircle className="h-6 w-6 text-gray-400" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       کل تیکت‌ها
@@ -200,7 +177,7 @@ export default function TicketsPage() {
                 <div className="flex-shrink-0">
                   <Clock className="h-6 w-6 text-green-400" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       تیکت‌های باز
@@ -220,7 +197,7 @@ export default function TicketsPage() {
                 <div className="flex-shrink-0">
                   <User className="h-6 w-6 text-blue-400" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       تیکت‌های دانش‌آموزان
@@ -240,7 +217,7 @@ export default function TicketsPage() {
                 <div className="flex-shrink-0">
                   <GraduationCap className="h-6 w-6 text-purple-400" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
+                <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       تیکت‌های مدرسین
@@ -336,9 +313,11 @@ export default function TicketsPage() {
                   <h3 className="text-lg font-medium text-gray-900 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-400">
                     {ticket.subject}
                   </h3>
-                  <p className="mt-2 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
-                    {ticket.department || 'بدون بخش'}
-                  </p>
+                  {ticket.department && (
+                    <p className="mt-2 line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
+                      {ticket.department}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-4 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">

@@ -1,18 +1,19 @@
 export interface Term {
   id: number | string;
   title: string;
-  duration: string | number; // Can be string or number from server
-  number_of_sessions: string | number; // Can be string or number from server
+  duration: number; // Duration in minutes
+  number_of_sessions: number;
   level_id: number;
   level: {
     id: number;
     name: string;
     label: string;
   };
-  start_date: string;
-  end_date: string;
-  type: 'normal' | 'capacity_completion' | 'vip';
-  capacity: string | number; // Can be string or number from server
+  start_date: string; // Persian date format like "1404-01-20"
+  end_date: string; // Persian date format like "1404-03-20"
+  type: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  capacity: number;
+  price: number;
   project_type?: any;
   students?: any[];
   teachers?: any[];
@@ -32,24 +33,24 @@ export interface GetTermResponse {
 
 export interface CreateTermRequest {
   title: string;
-  duration: string | number;
-  number_of_sessions: string | number;
+  duration: number;
+  number_of_sessions: number;
   level_id: number;
-  start_date: string;
-  end_date: string;
-  type: 'normal' | 'capacity_completion' | 'vip';
-  capacity: string | number;
-  project_type?: any;
+  start_date: string; // Persian date format like "1404-01-20"
+  end_date: string; // Persian date format like "1404-03-20"
+  type: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  capacity: string; // API expects string
+  price: string; // API expects string
 }
 
 export interface UpdateTermRequest {
   title?: string;
-  duration?: string | number;
-  number_of_sessions?: string | number;
+  duration?: number;
+  number_of_sessions?: number;
   level_id?: number;
-  start_date?: string;
-  end_date?: string;
-  type?: 'normal' | 'capacity_completion' | 'vip';
-  capacity?: string | number;
-  project_type?: any;
+  start_date?: string; // Persian date format like "1404-01-20"
+  end_date?: string; // Persian date format like "1404-03-20"
+  type?: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  capacity?: string; // API expects string
+  price?: string; // API expects string
 }

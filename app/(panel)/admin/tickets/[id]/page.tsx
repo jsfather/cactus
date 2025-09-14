@@ -2,12 +2,7 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
-import {
-  getTicket,
-  closeTicket,
-  replyTicket,
-} from '@/app/lib/api/admin/tickets';
+import { useTicket } from '@/app/lib/hooks/use-ticket';
 import { Ticket, Message } from '@/app/lib/types';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
@@ -55,9 +50,15 @@ export default function TicketDetailPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [ticket, setTicket] = useState<Ticket | null>(null);
-  const [isClosing, setIsClosing] = useState(false);
+  const {
+    currentTicket,
+    isLoading,
+    fetchTicketById,
+    closeTicket,
+    replyToTicket,
+    clearCurrentTicket,
+  } = useTicket();
+  
   const [isReplying, setIsReplying] = useState(false);
 
   const {
@@ -70,54 +71,41 @@ export default function TicketDetailPage({
   });
 
   useEffect(() => {
-    const fetchTicket = async () => {
+    const loadTicket = async () => {
       try {
-        setLoading(true);
-        const response = await getTicket(resolvedParams.id);
-        setTicket(response.data);
+        await fetchTicketById(resolvedParams.id);
       } catch (error) {
         console.error('Error fetching ticket:', error);
-        toast.error('خطا در بارگذاری تیکت');
         router.push('/admin/tickets');
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchTicket();
-  }, [resolvedParams.id, router]);
+    loadTicket();
+
+    return () => {
+      clearCurrentTicket();
+    };
+  }, [resolvedParams.id, fetchTicketById, clearCurrentTicket, router]);
 
   const handleCloseTicket = async () => {
-    if (!ticket || ticket.status === 'closed') return;
+    if (!currentTicket || currentTicket.status === 'closed') return;
 
     try {
-      setIsClosing(true);
-      await closeTicket(ticket.id);
-      toast.success('تیکت با موفقیت بسته شد');
-      setTicket({ ...ticket, status: 'closed' });
+      await closeTicket(currentTicket.id.toString());
     } catch (error) {
       console.error('Error closing ticket:', error);
-      toast.error('خطا در بستن تیکت');
-    } finally {
-      setIsClosing(false);
     }
   };
 
   const onSubmitReply = async (data: ReplyFormData) => {
-    if (!ticket) return;
+    if (!currentTicket) return;
 
     try {
-      await replyTicket(ticket.id, data.message);
-      toast.success('پاسخ با موفقیت ارسال شد');
+      await replyToTicket(currentTicket.id.toString(), data);
       reset();
       setIsReplying(false);
-
-      // Refresh ticket to get updated messages
-      const response = await getTicket(resolvedParams.id);
-      setTicket(response.data);
     } catch (error) {
       console.error('Error sending reply:', error);
-      toast.error('خطا در ارسال پاسخ');
     }
   };
 
@@ -144,11 +132,11 @@ export default function TicketDetailPage({
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (!ticket) {
+  if (!currentTicket) {
     return (
       <div className="py-12 text-center">
         <FileText className="mx-auto mb-4 h-12 w-12 text-gray-400" />
@@ -164,8 +152,8 @@ export default function TicketDetailPage({
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت تیکت‌ها', href: '/admin/tickets' },
           {
-            label: `تیکت #${ticket.id}`,
-            href: `/admin/tickets/${ticket.id}`,
+            label: `تیکت #${currentTicket.id}`,
+            href: `/admin/tickets/${currentTicket.id}`,
             active: true,
           },
         ]}
@@ -188,40 +176,40 @@ export default function TicketDetailPage({
                   </Button>
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium ${
-                      statusColors[ticket.status] || statusColors.open
+                      statusColors[currentTicket.status] || statusColors.open
                     }`}
                   >
-                    {statusIcons[ticket.status] || statusIcons.open}
-                    {getStatusText(ticket.status)}
+                    {statusIcons[currentTicket.status] || statusIcons.open}
+                    {getStatusText(currentTicket.status)}
                   </span>
                 </div>
                 <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                  {ticket.subject}
+                  {currentTicket.subject}
                 </h1>
                 <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
-                    {ticket.student || ticket.teacher || 'کاربر نامشخص'}
+                    {currentTicket.student || currentTicket.teacher || 'کاربر نامشخص'}
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
-                    {formatDate(ticket.created_at || new Date().toISOString())}
+                    {formatDate(currentTicket.created_at || new Date().toISOString())}
                   </div>
                   <div className="flex items-center gap-1">
                     <MessageCircle className="h-4 w-4" />
-                    {ticket.messages?.length || 0} پیام
+                    {currentTicket.messages?.length || 0} پیام
                   </div>
                 </div>
-                {ticket.department && (
+                {currentTicket.department && (
                   <div className="mt-2">
                     <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/10 ring-inset dark:bg-blue-900 dark:text-blue-300">
-                      {ticket.department}
+                      {currentTicket.department}
                     </span>
                   </div>
                 )}
               </div>
               <div className="flex gap-3">
-                {ticket.status !== 'closed' && (
+                {currentTicket.status !== 'closed' && (
                   <>
                     <Button
                       variant="primary"
@@ -234,7 +222,7 @@ export default function TicketDetailPage({
                     <Button
                       variant="danger"
                       onClick={handleCloseTicket}
-                      loading={isClosing}
+                      loading={isLoading}
                       className="flex items-center gap-2"
                     >
                       <X className="h-4 w-4" />
@@ -248,7 +236,7 @@ export default function TicketDetailPage({
         </div>
 
         {/* Reply Form */}
-        {isReplying && ticket.status !== 'closed' && (
+        {isReplying && currentTicket.status !== 'closed' && (
           <div className="mt-6 rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="px-6 py-4">
               <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -298,8 +286,8 @@ export default function TicketDetailPage({
 
         {/* Messages */}
         <div className="mt-6 space-y-4">
-          {ticket.messages && ticket.messages.length > 0 ? (
-            ticket.messages.map((message, index) => (
+          {currentTicket.messages && currentTicket.messages.length > 0 ? (
+            currentTicket.messages.map((message, index) => (
               <div
                 key={index}
                 className={`rounded-lg bg-white shadow dark:bg-gray-800 ${

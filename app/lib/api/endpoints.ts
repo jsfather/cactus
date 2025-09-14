@@ -114,11 +114,19 @@ export const API_ENDPOINTS = {
       
       TICKETS: {
         GET_ALL: '/admin/tickets',
-        GET_BY_ID: (id: string) => `/admin/tickets/${id}`,
+        GET_TEACHERS: '/admin/teacher_tickets',
+        GET_BY_ID: (id: string) => `/admin/ticket/${id}`,
         CREATE: '/admin/tickets',
         UPDATE: (id: string) => `/admin/tickets/${id}`,
         DELETE: (id: string) => `/admin/tickets/${id}`,
-        DEPARTMENTS: '/admin/tickets/departments',
+        CLOSE: (id: string) => `/admin/ticket/${id}/close`,
+        REPLY: (id: string) => `/admin/ticket/${id}/reply`,
+        DEPARTMENTS: {
+          GET_ALL: '/admin/tickets/departments',
+          CREATE: '/admin/tickets/departments',
+          UPDATE: (id: string) => `/admin/tickets/departments/${id}`,
+          DELETE: (id: string) => `/admin/tickets/departments/${id}`,
+        },
       },
       
       FAQS: {

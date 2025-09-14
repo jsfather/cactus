@@ -1,151 +1,118 @@
 import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
 import { faqService } from '@/app/lib/services/faq.service';
-import {
-  FAQ,
-  CreateFAQRequest,
-  UpdateFAQRequest,
-} from '@/app/lib/types';
-import toast from 'react-hot-toast';
+import type { ApiError } from '@/app/lib/api/client';
+import { FAQ, CreateFAQRequest, UpdateFAQRequest, GetFAQResponse } from '@/app/lib/types';
 
-interface FAQStore {
+interface FAQState {
   // State
-  faqs: FAQ[];
+  faqList: FAQ[];
   currentFAQ: FAQ | null;
-  isLoading: boolean;
-  isListLoading: boolean;
+  loading: boolean;
   error: string | null;
 
   // Actions
-  fetchFAQs: () => Promise<void>;
-  fetchFAQById: (id: string) => Promise<void>;
-  createFAQ: (payload: CreateFAQRequest) => Promise<void>;
-  updateFAQ: (id: string, payload: UpdateFAQRequest) => Promise<void>;
-  deleteFAQ: (id: string) => Promise<void>;
-  clearCurrentFAQ: () => void;
+  setLoading: (loading: boolean) => void;
+  setError: (error: string | null) => void;
   clearError: () => void;
+
+  fetchFAQList: () => Promise<void>;
+  createFAQ: (payload: CreateFAQRequest) => Promise<GetFAQResponse>;
+  updateFAQ: (id: string, payload: UpdateFAQRequest) => Promise<GetFAQResponse>;
+  deleteFAQ: (id: string) => Promise<void>;
+  fetchFAQById: (id: string) => Promise<void>;
 }
 
-export const useFAQStore = create<FAQStore>((set, get) => ({
-  // Initial state
-  faqs: [],
-  currentFAQ: null,
-  isLoading: false,
-  isListLoading: false,
-  error: null,
+export const useFAQStore = create<FAQState>()(
+  devtools((set, get) => ({
+    // Initial state
+    faqList: [],
+    currentFAQ: null,
+    loading: false,
+    error: null,
 
-  // Actions
-  fetchFAQs: async () => {
-    try {
-      set({ isListLoading: true, error: null });
-      const response = await faqService.getList();
-      
-      if (response.data) {
-        set({ faqs: response.data });
-      } else {
-        throw new Error('خطا در دریافت سوالات متداول');
+    // Actions
+    setLoading: (loading) => set({ loading }),
+
+    setError: (error) => set({ error }),
+
+    clearError: () => set({ error: null }),
+
+    fetchFAQList: async () => {
+      try {
+        set({ loading: true, error: null });
+        const response = await faqService.getList();
+        set({
+          faqList: response.data,
+          loading: false,
+        });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'خطا در دریافت سوالات متداول';
-      set({ error: errorMessage });
-      toast.error(errorMessage);
-    } finally {
-      set({ isListLoading: false });
-    }
-  },
+    },
 
-  fetchFAQById: async (id: string) => {
-    try {
-      set({ isLoading: true, error: null });
-      const response = await faqService.getById(id);
-      
-      if (response.data) {
-        set({ currentFAQ: response.data });
-      } else {
-        throw new Error('خطا در دریافت سوال متداول');
-      }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'خطا در دریافت سوال متداول';
-      set({ error: errorMessage });
-      toast.error(errorMessage);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-
-  createFAQ: async (payload: CreateFAQRequest) => {
-    try {
-      set({ isLoading: true, error: null });
-      const response = await faqService.create(payload);
-      
-      if (response.data) {
-        const newFAQ = response.data;
-        set(state => ({ 
-          faqs: [newFAQ, ...state.faqs],
-          currentFAQ: newFAQ
+    createFAQ: async (payload) => {
+      try {
+        set({ loading: true, error: null });
+        const newFAQ = await faqService.create(payload);
+        set((state) => ({
+          faqList: [newFAQ.data, ...state.faqList],
+          loading: false,
         }));
-        toast.success('سوال متداول با موفقیت ایجاد شد');
-      } else {
-        throw new Error('خطا در ایجاد سوال متداول');
+        return newFAQ;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'خطا در ایجاد سوال متداول';
-      set({ error: errorMessage });
-      toast.error(errorMessage);
-      throw error;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+    },
 
-  updateFAQ: async (id: string, payload: UpdateFAQRequest) => {
-    try {
-      set({ isLoading: true, error: null });
-      const response = await faqService.update(id, payload);
-      
-      if (response.data) {
-        const updatedFAQ = response.data;
-        const faqId = parseInt(id);
-        set(state => ({
-          faqs: state.faqs.map(faq => 
-            faq.id === faqId ? updatedFAQ : faq
+    updateFAQ: async (id, payload) => {
+      try {
+        set({ loading: true, error: null });
+        const updatedFAQ = await faqService.update(id, payload);
+        set((state) => ({
+          faqList: state.faqList.map((faq) =>
+            faq.id === updatedFAQ.data.id ? updatedFAQ.data : faq
           ),
-          currentFAQ: state.currentFAQ?.id === faqId ? updatedFAQ : state.currentFAQ
+          currentFAQ: updatedFAQ.data,
+          loading: false,
         }));
-        toast.success('سوال متداول با موفقیت ویرایش شد');
-      } else {
-        throw new Error('خطا در ویرایش سوال متداول');
+        return updatedFAQ;
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'خطا در ویرایش سوال متداول';
-      set({ error: errorMessage });
-      toast.error(errorMessage);
-      throw error;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+    },
 
-  deleteFAQ: async (id: string) => {
-    try {
-      set({ isLoading: true, error: null });
-      await faqService.delete(id);
-      
-      const faqId = parseInt(id);
-      set(state => ({
-        faqs: state.faqs.filter(faq => faq.id !== faqId),
-        currentFAQ: state.currentFAQ?.id === faqId ? null : state.currentFAQ
-      }));
-      toast.success('سوال متداول با موفقیت حذف شد');
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || error.message || 'خطا در حذف سوال متداول';
-      set({ error: errorMessage });
-      toast.error(errorMessage);
-      throw error;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+    deleteFAQ: async (id) => {
+      try {
+        set({ loading: true, error: null });
+        await faqService.delete(id);
+        set((state) => ({
+          faqList: state.faqList.filter((faq) => faq.id !== id),
+          loading: false,
+        }));
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
 
-  clearCurrentFAQ: () => set({ currentFAQ: null }),
-  clearError: () => set({ error: null }),
-}));
+    fetchFAQById: async (id: string) => {
+      try {
+        set({ loading: true, error: null });
+        const faq = await faqService.getById(id);
+        set({ currentFAQ: faq.data, loading: false });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+  }))
+);

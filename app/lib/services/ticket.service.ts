@@ -1,18 +1,28 @@
 import { apiClient } from '@/app/lib/api/client';
 import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 import {
-  GetTicketListResponse,
-  GetTicketResponse,
   CreateTicketRequest,
   UpdateTicketRequest,
+  ReplyTicketRequest,
+  GetTicketListResponse,
+  GetTicketResponse,
+  CreateTicketDepartmentRequest,
+  UpdateTicketDepartmentRequest,
   GetTicketDepartmentListResponse,
-  Reply,
+  TicketDepartment,
 } from '@/app/lib/types';
 
 export class TicketService {
+  // Main ticket operations
   async getList(): Promise<GetTicketListResponse> {
     return apiClient.get<GetTicketListResponse>(
       API_ENDPOINTS.PANEL.ADMIN.TICKETS.GET_ALL
+    );
+  }
+
+  async getTeacherTickets(): Promise<GetTicketListResponse> {
+    return apiClient.get<GetTicketListResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.TICKETS.GET_TEACHERS
     );
   }
 
@@ -37,21 +47,46 @@ export class TicketService {
   }
 
   async delete(id: string): Promise<void> {
-    return apiClient.delete<void>(
-      API_ENDPOINTS.PANEL.ADMIN.TICKETS.DELETE(id)
+    return apiClient.delete<void>(API_ENDPOINTS.PANEL.ADMIN.TICKETS.DELETE(id));
+  }
+
+  async close(id: string): Promise<GetTicketResponse> {
+    return apiClient.post<GetTicketResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.TICKETS.CLOSE(id)
     );
   }
 
+  async reply(id: string, payload: ReplyTicketRequest): Promise<GetTicketResponse> {
+    return apiClient.post<GetTicketResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.TICKETS.REPLY(id),
+      payload
+    );
+  }
+
+  // Department operations
   async getDepartments(): Promise<GetTicketDepartmentListResponse> {
     return apiClient.get<GetTicketDepartmentListResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.TICKETS.DEPARTMENTS
+      API_ENDPOINTS.PANEL.ADMIN.TICKETS.DEPARTMENTS.GET_ALL
     );
   }
 
-  async reply(id: string, payload: Reply): Promise<void> {
-    return apiClient.post<void>(
-      `${API_ENDPOINTS.PANEL.ADMIN.TICKETS.GET_BY_ID(id)}/reply`,
+  async createDepartment(payload: CreateTicketDepartmentRequest): Promise<{ data: TicketDepartment }> {
+    return apiClient.post<{ data: TicketDepartment }>(
+      API_ENDPOINTS.PANEL.ADMIN.TICKETS.DEPARTMENTS.CREATE,
       payload
+    );
+  }
+
+  async updateDepartment(id: string, payload: UpdateTicketDepartmentRequest): Promise<{ data: TicketDepartment }> {
+    return apiClient.put<{ data: TicketDepartment }>(
+      API_ENDPOINTS.PANEL.ADMIN.TICKETS.DEPARTMENTS.UPDATE(id),
+      payload
+    );
+  }
+
+  async deleteDepartment(id: string): Promise<void> {
+    return apiClient.delete<void>(
+      API_ENDPOINTS.PANEL.ADMIN.TICKETS.DEPARTMENTS.DELETE(id)
     );
   }
 }
