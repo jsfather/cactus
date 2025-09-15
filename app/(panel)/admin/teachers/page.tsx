@@ -30,12 +30,20 @@ export default function TeachersPage() {
   }, [fetchTeacherList]);
 
   // Calculate summary stats
-  const activeTeachers = teacherList.filter(teacher => teacher.user?.role === 'teacher').length;
-  const skillfulTeachers = teacherList.filter(teacher => 
-    teacher.skills && Array.isArray(teacher.skills) && teacher.skills.length > 0
+  const activeTeachers = teacherList.filter(
+    (teacher) => teacher.user?.role === 'teacher'
   ).length;
-  const experiencedTeachers = teacherList.filter(teacher => 
-    teacher.work_experiences && Array.isArray(teacher.work_experiences) && teacher.work_experiences.length > 0
+  const skillfulTeachers = teacherList.filter(
+    (teacher) =>
+      teacher.skills &&
+      Array.isArray(teacher.skills) &&
+      teacher.skills.length > 0
+  ).length;
+  const experiencedTeachers = teacherList.filter(
+    (teacher) =>
+      teacher.work_experiences &&
+      Array.isArray(teacher.work_experiences) &&
+      teacher.work_experiences.length > 0
   ).length;
 
   const columns: Column<Teacher>[] = [
@@ -76,7 +84,11 @@ export default function TeachersPage() {
       accessor: 'bio',
       render: (value): string => {
         const bio = value as string;
-        return bio ? (bio.length > 50 ? bio.substring(0, 50) + '...' : bio) : '---';
+        return bio
+          ? bio.length > 50
+            ? bio.substring(0, 50) + '...'
+            : bio
+          : '---';
       },
     },
     {
@@ -96,7 +108,9 @@ export default function TeachersPage() {
               </span>
             ))}
             {skills.length > 2 && (
-              <span className="text-xs text-gray-500">+{skills.length - 2}</span>
+              <span className="text-xs text-gray-500">
+                +{skills.length - 2}
+              </span>
             )}
           </div>
         );
@@ -165,7 +179,7 @@ export default function TeachersPage() {
             </p>
           </div>
           <Button onClick={() => router.push('/admin/teachers/new')}>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             افزودن مربی جدید
           </Button>
         </div>
@@ -260,7 +274,9 @@ export default function TeachersPage() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ مربی‌ای یافت نشد"
-            onEdit={(teacher) => router.push(`/admin/teachers/${teacher.user_id}`)}
+            onEdit={(teacher) =>
+              router.push(`/admin/teachers/${teacher.user_id}`)
+            }
             onDelete={handleDeleteClick}
             getRowId={(teacher) => String(teacher.user_id)}
           />

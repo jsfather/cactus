@@ -2,11 +2,11 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { teacherService } from '@/app/lib/services/teacher.service';
 import type { ApiError } from '@/app/lib/api/client';
-import { 
-  Teacher, 
-  CreateTeacherRequest, 
-  UpdateTeacherRequest, 
-  GetTeacherResponse 
+import {
+  Teacher,
+  CreateTeacherRequest,
+  UpdateTeacherRequest,
+  GetTeacherResponse,
 } from '@/app/lib/types/teacher';
 
 interface TeacherState {
@@ -24,7 +24,10 @@ interface TeacherState {
 
   fetchTeacherList: () => Promise<void>;
   createTeacher: (payload: CreateTeacherRequest) => Promise<GetTeacherResponse>;
-  updateTeacher: (id: string, payload: UpdateTeacherRequest) => Promise<GetTeacherResponse>;
+  updateTeacher: (
+    id: string,
+    payload: UpdateTeacherRequest
+  ) => Promise<GetTeacherResponse>;
   deleteTeacher: (id: string) => Promise<void>;
   fetchTeacherById: (id: string) => Promise<void>;
 }
@@ -100,7 +103,9 @@ export const useTeacherStore = create<TeacherState>()(
         set({ loading: true, error: null });
         await teacherService.delete(id);
         set((state) => ({
-          teacherList: state.teacherList.filter((teacher) => teacher.user_id.toString() !== id),
+          teacherList: state.teacherList.filter(
+            (teacher) => teacher.user_id.toString() !== id
+          ),
           totalTeachers: Math.max(0, state.totalTeachers - 1),
           loading: false,
         }));
