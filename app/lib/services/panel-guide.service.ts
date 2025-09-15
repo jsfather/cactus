@@ -20,7 +20,9 @@ export class PanelGuideService {
     );
   }
 
-  async create(payload: CreatePanelGuideRequest | FormData): Promise<GetPanelGuideResponse> {
+  async create(
+    payload: CreatePanelGuideRequest | FormData
+  ): Promise<GetPanelGuideResponse> {
     // Handle FormData for file uploads
     if (payload instanceof FormData) {
       return apiClient.post<GetPanelGuideResponse>(
@@ -54,7 +56,10 @@ export class PanelGuideService {
     );
   }
 
-  async update(id: string, payload: UpdatePanelGuideRequest | FormData): Promise<GetPanelGuideResponse> {
+  async update(
+    id: string,
+    payload: UpdatePanelGuideRequest | FormData
+  ): Promise<GetPanelGuideResponse> {
     // Handle FormData for file uploads
     if (payload instanceof FormData) {
       return apiClient.post<GetPanelGuideResponse>(
@@ -71,7 +76,8 @@ export class PanelGuideService {
     // Convert to FormData if it's a regular object
     const formData = new FormData();
     if (payload.title) formData.append('title', payload.title);
-    if (payload.description) formData.append('description', payload.description);
+    if (payload.description)
+      formData.append('description', payload.description);
     if (payload.type) formData.append('type', payload.type);
     if (payload.file) formData.append('file', payload.file);
 

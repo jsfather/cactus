@@ -29,14 +29,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
-  
-  const { 
-    currentExam, 
-    isLoading: loading, 
-    fetchExamById, 
-    createExam, 
+
+  const {
+    currentExam,
+    isLoading: loading,
+    fetchExamById,
+    createExam,
     updateExam,
-    clearCurrentExam 
+    clearCurrentExam,
   } = useExamStore();
 
   const {

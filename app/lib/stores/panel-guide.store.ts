@@ -19,8 +19,13 @@ interface PanelGuideStore {
   // Actions
   fetchPanelGuides: () => Promise<void>;
   fetchPanelGuideById: (id: string) => Promise<void>;
-  createPanelGuide: (payload: CreatePanelGuideRequest | FormData) => Promise<void>;
-  updatePanelGuide: (id: string, payload: UpdatePanelGuideRequest | FormData) => Promise<void>;
+  createPanelGuide: (
+    payload: CreatePanelGuideRequest | FormData
+  ) => Promise<void>;
+  updatePanelGuide: (
+    id: string,
+    payload: UpdatePanelGuideRequest | FormData
+  ) => Promise<void>;
   deletePanelGuide: (id: string) => Promise<void>;
   clearCurrentPanelGuide: () => void;
   clearError: () => void;
@@ -41,14 +46,17 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
         try {
           set({ isListLoading: true, error: null, panelGuides: [] });
           const response = await panelGuideService.getList();
-          
+
           if (response.data) {
             set({ panelGuides: response.data });
           } else {
             throw new Error('خطا در دریافت راهنماهای پنل');
           }
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'خطا در دریافت راهنماهای پنل';
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            'خطا در دریافت راهنماهای پنل';
           set({ error: errorMessage });
           toast.error(errorMessage);
         } finally {
@@ -60,14 +68,17 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
         try {
           set({ isLoading: true, error: null, currentPanelGuide: null });
           const response = await panelGuideService.getById(id);
-          
+
           if (response.data) {
             set({ currentPanelGuide: response.data });
           } else {
             throw new Error('خطا در دریافت راهنمای پنل');
           }
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'خطا در دریافت راهنمای پنل';
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            'خطا در دریافت راهنمای پنل';
           set({ error: errorMessage });
           toast.error(errorMessage);
         } finally {
@@ -79,18 +90,21 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
         try {
           set({ isLoading: true, error: null });
           const response = await panelGuideService.create(payload);
-          
+
           if (response.data) {
             const newPanelGuide = response.data;
-            set(state => ({ 
+            set((state) => ({
               panelGuides: [newPanelGuide, ...state.panelGuides],
-              currentPanelGuide: newPanelGuide
+              currentPanelGuide: newPanelGuide,
             }));
           } else {
             throw new Error('خطا در ایجاد راهنمای پنل');
           }
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'خطا در ایجاد راهنمای پنل';
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            'خطا در ایجاد راهنمای پنل';
           set({ error: errorMessage });
           toast.error(errorMessage);
           throw error;
@@ -99,25 +113,34 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
         }
       },
 
-      updatePanelGuide: async (id: string, payload: UpdatePanelGuideRequest | FormData) => {
+      updatePanelGuide: async (
+        id: string,
+        payload: UpdatePanelGuideRequest | FormData
+      ) => {
         try {
           set({ isLoading: true, error: null });
           const response = await panelGuideService.update(id, payload);
-          
+
           if (response.data) {
             const updatedPanelGuide = response.data;
             const panelGuideId = parseInt(id);
-            set(state => ({
-              panelGuides: state.panelGuides.map(guide => 
+            set((state) => ({
+              panelGuides: state.panelGuides.map((guide) =>
                 guide.id === panelGuideId ? updatedPanelGuide : guide
               ),
-              currentPanelGuide: state.currentPanelGuide?.id === panelGuideId ? updatedPanelGuide : state.currentPanelGuide
+              currentPanelGuide:
+                state.currentPanelGuide?.id === panelGuideId
+                  ? updatedPanelGuide
+                  : state.currentPanelGuide,
             }));
           } else {
             throw new Error('خطا در ویرایش راهنمای پنل');
           }
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'خطا در ویرایش راهنمای پنل';
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            'خطا در ویرایش راهنمای پنل';
           set({ error: errorMessage });
           toast.error(errorMessage);
           throw error;
@@ -130,14 +153,22 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
         try {
           set({ isLoading: true, error: null });
           await panelGuideService.delete(id);
-          
+
           const panelGuideId = parseInt(id);
-          set(state => ({
-            panelGuides: state.panelGuides.filter(guide => guide.id !== panelGuideId),
-            currentPanelGuide: state.currentPanelGuide?.id === panelGuideId ? null : state.currentPanelGuide
+          set((state) => ({
+            panelGuides: state.panelGuides.filter(
+              (guide) => guide.id !== panelGuideId
+            ),
+            currentPanelGuide:
+              state.currentPanelGuide?.id === panelGuideId
+                ? null
+                : state.currentPanelGuide,
           }));
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || error.message || 'خطا در حذف راهنمای پنل';
+          const errorMessage =
+            error.response?.data?.message ||
+            error.message ||
+            'خطا در حذف راهنمای پنل';
           set({ error: errorMessage });
           toast.error(errorMessage);
           throw error;

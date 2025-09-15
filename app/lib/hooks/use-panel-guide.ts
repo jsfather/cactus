@@ -21,21 +21,33 @@ export const usePanelGuide = () => {
     return fetchPanelGuides();
   }, [fetchPanelGuides]);
 
-  const handleFetchPanelGuideById = useCallback((id: string) => {
-    return fetchPanelGuideById(id);
-  }, [fetchPanelGuideById]);
+  const handleFetchPanelGuideById = useCallback(
+    (id: string) => {
+      return fetchPanelGuideById(id);
+    },
+    [fetchPanelGuideById]
+  );
 
-  const handleCreatePanelGuide = useCallback((payload: any) => {
-    return createPanelGuide(payload);
-  }, [createPanelGuide]);
+  const handleCreatePanelGuide = useCallback(
+    (payload: any) => {
+      return createPanelGuide(payload);
+    },
+    [createPanelGuide]
+  );
 
-  const handleUpdatePanelGuide = useCallback((id: string, payload: any) => {
-    return updatePanelGuide(id, payload);
-  }, [updatePanelGuide]);
+  const handleUpdatePanelGuide = useCallback(
+    (id: string, payload: any) => {
+      return updatePanelGuide(id, payload);
+    },
+    [updatePanelGuide]
+  );
 
-  const handleDeletePanelGuide = useCallback((id: string) => {
-    return deletePanelGuide(id);
-  }, [deletePanelGuide]);
+  const handleDeletePanelGuide = useCallback(
+    (id: string) => {
+      return deletePanelGuide(id);
+    },
+    [deletePanelGuide]
+  );
 
   const handleClearCurrentPanelGuide = useCallback(() => {
     clearCurrentPanelGuide();

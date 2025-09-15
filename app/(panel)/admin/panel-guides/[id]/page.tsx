@@ -68,7 +68,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     } else {
       fetchPanelGuideById(resolvedParams.id);
     }
-  }, [isNew, resolvedParams.id, fetchPanelGuideById, clearCurrentPanelGuide, reset]);
+  }, [
+    isNew,
+    resolvedParams.id,
+    fetchPanelGuideById,
+    clearCurrentPanelGuide,
+    reset,
+  ]);
 
   useEffect(() => {
     if (currentPanelGuide && !isNew) {
@@ -123,10 +129,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         ]}
       />
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-8 space-y-6"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
             id="title"
