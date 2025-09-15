@@ -27,7 +27,7 @@ export default function TicketPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(params.id === 'create');
-  
+
   const {
     ticket,
     departments,
@@ -68,7 +68,7 @@ export default function TicketPage(props: { params: Promise<{ id: string }> }) {
         department_id: parseInt(data.department_id),
         teacher_id: data.teacher_id || '',
       };
-      
+
       await createTicket(payload);
       toast.success('تیکت با موفقیت ایجاد شد');
       router.push('/student/tickets');
@@ -82,7 +82,7 @@ export default function TicketPage(props: { params: Promise<{ id: string }> }) {
   }
 
   // Department options for select
-  const departmentOptions = departments.map(dept => ({
+  const departmentOptions = departments.map((dept) => ({
     value: dept.id.toString(),
     label: dept.title,
   }));
@@ -102,46 +102,66 @@ export default function TicketPage(props: { params: Promise<{ id: string }> }) {
         />
 
         <div className="mt-8 space-y-6">
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">موضوع</h3>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{currentTicket.subject}</p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">وضعیت</h3>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  موضوع
+                </h3>
                 <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {currentTicket.status === 'open' ? 'باز' : 
-                   currentTicket.status === 'closed' ? 'بسته' : 
-                   currentTicket.status === 'pending' ? 'در انتظار' : currentTicket.status}
+                  {currentTicket.subject}
                 </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">بخش</h3>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{currentTicket.department}</p>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  وضعیت
+                </h3>
+                <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                  {currentTicket.status === 'open'
+                    ? 'باز'
+                    : currentTicket.status === 'closed'
+                      ? 'بسته'
+                      : currentTicket.status === 'pending'
+                        ? 'در انتظار'
+                        : currentTicket.status}
+                </p>
               </div>
               <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">مدرس</h3>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">{currentTicket.teacher || 'تعیین نشده'}</p>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  بخش
+                </h3>
+                <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                  {currentTicket.department}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                  مدرس
+                </h3>
+                <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                  {currentTicket.teacher || 'تعیین نشده'}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">پیام‌ها</h3>
+          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+            <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              پیام‌ها
+            </h3>
             <div className="space-y-4">
               {currentTicket.messages?.map((message, index) => (
                 <div
                   key={index}
-                  className={`p-4 rounded-lg ${
-                    message.is_student 
-                      ? 'bg-blue-50 dark:bg-blue-900/20 ml-8' 
-                      : 'bg-gray-50 dark:bg-gray-700 mr-8'
+                  className={`rounded-lg p-4 ${
+                    message.is_student
+                      ? 'ml-8 bg-blue-50 dark:bg-blue-900/20'
+                      : 'mr-8 bg-gray-50 dark:bg-gray-700'
                   }`}
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-sm text-gray-900 dark:text-white">
+                  <div className="mb-2 flex items-start justify-between">
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
                       {message.sender}
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -229,126 +249,6 @@ export default function TicketPage(props: { params: Promise<{ id: string }> }) {
                 required
               />
             )}
-          />
-        </div>
-
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="white"
-            onClick={() => router.push('/student/tickets')}
-          >
-            انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            ایجاد تیکت
-          </Button>
-        </div>
-      </form>
-    </main>
-  );
-}
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">وضعیت</h3>
-              <p className="mt-1 text-sm text-gray-900">{ticket.status}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">بخش</h3>
-              <p className="mt-1 text-sm text-gray-900">{ticket.department}</p>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-500">مدرس</h3>
-              <p className="mt-1 text-sm text-gray-900">{ticket.teacher}</p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">پیام‌ها</h3>
-            <div className="space-y-4">
-              {ticket.messages.map((message: any) => (
-                <div
-                  key={message.id}
-                  className="rounded-lg border border-gray-200 p-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">
-                      {message.sender}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      {message.created_at}
-                    </span>
-                  </div>
-                  <p className="mt-2 text-sm text-gray-700">
-                    {message.content}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              variant="white"
-              onClick={() => router.push('/student/tickets')}
-            >
-              بازگشت
-            </Button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  return (
-    <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: 'تیکت‌ها', href: '/student/tickets' },
-          {
-            label: 'ایجاد تیکت',
-            href: `/student/tickets/${resolvedParams.id}`,
-            active: true,
-          },
-        ]}
-      />
-
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="subject"
-            label="موضوع"
-            placeholder="موضوع تیکت را وارد کنید"
-            required
-            error={errors.subject?.message}
-            {...register('subject')}
-          />
-
-          <Select
-            id="department"
-            label="بخش"
-            placeholder="بخش مورد نظر را انتخاب کنید"
-            options={departmentOptions}
-            required
-            error={errors.department?.message}
-            {...register('department')}
-          />
-        </div>
-
-        <div className="w-full">
-          <Textarea
-            id="message"
-            label="پیام"
-            placeholder="پیام خود را وارد کنید"
-            required
-            error={errors.message?.message}
-            {...register('message')}
           />
         </div>
 

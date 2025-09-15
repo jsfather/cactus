@@ -1,0 +1,31 @@
+name: Deploy Cactus to Dev Environment
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Deploy to Dev VPS via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.DEV_VPS_HOST }}
+          username: ${{ secrets.DEV_VPS_USER }}
+          key: ${{ secrets.DEV_VPS_SSH_KEY }}
+          port: ${{ secrets.DEV_VPS_PORT || 22 }}
+          script: |
+            cd /var/www/cactus-dev
+            git fetch --all
+            git reset --hard origin/develop
+
+            # install dependencies & build on dev VPS
+            npm install
+            npm run build
+            pm2 restart cactus-dev || pm2 start npm --name "cactus-dev" -- run start
