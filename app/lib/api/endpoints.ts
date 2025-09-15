@@ -82,6 +82,10 @@ export const API_ENDPOINTS = {
         DELETE: (id: string) => `/admin/terms/${id}`,
       },
 
+      LEVELS: {
+        GET_ALL: '/admin/levels',
+      },
+
       TERM_STUDENTS: {
         GET_ALL: '/admin/term-students',
         GET_BY_ID: (id: string) => `/admin/term-students/${id}`,

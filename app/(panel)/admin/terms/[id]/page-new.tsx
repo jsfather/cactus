@@ -13,6 +13,7 @@ import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTerm } from '@/app/lib/hooks/use-term';
+import { useLevel } from '@/app/lib/hooks/use-level';
 import { CreateTermRequest, UpdateTermRequest } from '@/app/lib/types';
 import { ArrowRight, Save } from 'lucide-react';
 
@@ -23,9 +24,12 @@ const schema = z.object({
   level_id: z.coerce.number().min(1, 'سطح الزامی است'),
   start_date: z.string().min(1, 'تاریخ شروع الزامی است'),
   end_date: z.string().min(1, 'تاریخ پایان الزامی است'),
-  type: z.enum(['normal', 'capacity_completion', 'vip'], {
-    required_error: 'نوع ترم الزامی است',
-  }),
+  type: z.enum(
+    ['normal', 'capacity_completion', 'project_based', 'specialized', 'ai'],
+    {
+      required_error: 'نوع ترم الزامی است',
+    }
+  ),
   capacity: z.coerce.number().min(1, 'ظرفیت الزامی است'),
   price: z.coerce.number().min(0, 'قیمت نمی‌تواند منفی باشد'),
 });
@@ -35,16 +39,16 @@ type FormData = z.infer<typeof schema>;
 const termTypeOptions = [
   { value: 'normal', label: 'عادی' },
   { value: 'capacity_completion', label: 'تکمیل ظرفیت' },
-  { value: 'vip', label: 'ویژه' },
+  { value: 'project_based', label: 'پروژه محور(ویژه)' },
+  { value: 'specialized', label: 'گرایش تخصصی' },
+  { value: 'ai', label: 'هوش مصنوعی' },
 ];
 
-const levelOptions = [
-  { value: 1, label: 'سطح ۱ (۶-۸ سال)' },
-  { value: 2, label: 'سطح ۲ (۹-۱۰ سال)' },
-  { value: 3, label: 'سطح ۳ (۱۱-۱۲ سال)' },
-];
-
-export default function TermFormPage({ params }: { params: Promise<{ id: string }> }) {
+export default function TermFormPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
@@ -58,6 +62,8 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
     updateTerm,
     clearError,
   } = useTerm();
+
+  const { levelList, loading: levelsLoading, fetchLevelList } = useLevel();
 
   const {
     register,
@@ -90,6 +96,10 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
   }, [resolvedParams.id, isNew, fetchTermById]);
 
   useEffect(() => {
+    fetchLevelList();
+  }, [fetchLevelList]);
+
+  useEffect(() => {
     if (currentTerm && !isNew) {
       reset({
         title: currentTerm.title,
@@ -108,15 +118,22 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
   const onSubmit = async (data: FormData) => {
     try {
       clearError();
-      
+
+      // Convert numbers to strings as API expects
+      const apiData = {
+        ...data,
+        capacity: data.capacity.toString(),
+        price: data.price.toString(),
+      };
+
       if (isNew) {
-        await createTerm(data as CreateTermRequest);
+        await createTerm(apiData as CreateTermRequest);
         toast.success('ترم با موفقیت ایجاد شد');
       } else {
-        await updateTerm(resolvedParams.id, data as UpdateTermRequest);
+        await updateTerm(resolvedParams.id, apiData as UpdateTermRequest);
         toast.success('ترم با موفقیت به‌روزرسانی شد');
       }
-      
+
       router.push('/admin/terms');
     } catch (error) {
       toast.error(isNew ? 'خطا در ایجاد ترم' : 'خطا در به‌روزرسانی ترم');
@@ -136,7 +153,7 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <Breadcrumbs items={breadcrumbItems} />
+        <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
         <div className="mt-8 flex items-center justify-between">
           <div>
@@ -150,7 +167,7 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
             )}
           </div>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => router.push('/admin/terms')}
             className="flex items-center gap-2"
           >
@@ -171,7 +188,7 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
                   required
                 />
               </div>
-              
+
               <div>
                 <Input
                   label="مدت زمان هر جلسه (دقیقه)"
@@ -204,17 +221,15 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
                     <Select
                       label="سطح"
                       value={field.value}
-                      onValueChange={(value) => field.onChange(Number(value))}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
                       error={errors.level_id?.message}
                       placeholder="سطح را انتخاب کنید"
+                      options={levelList.map((level) => ({
+                        value: level.id,
+                        label: `${level.label} - ${level.name}`,
+                      }))}
                       required
-                    >
-                      {levelOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </Select>
+                    />
                   )}
                 />
               </div>
@@ -229,17 +244,12 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
                     <Select
                       label="نوع ترم"
                       value={field.value}
-                      onValueChange={field.onChange}
+                      onChange={(e) => field.onChange(e.target.value)}
                       error={errors.type?.message}
                       placeholder="نوع ترم را انتخاب کنید"
+                      options={termTypeOptions}
                       required
-                    >
-                      {termTypeOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </Select>
+                    />
                   )}
                 />
               </div>
@@ -310,7 +320,7 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
             <div className="flex items-center justify-end gap-4 border-t border-gray-200 pt-6 dark:border-gray-700">
               <Button
                 type="button"
-                variant="outline"
+                variant="secondary"
                 onClick={() => router.push('/admin/terms')}
                 disabled={isSubmitting}
               >
@@ -325,8 +335,8 @@ export default function TermFormPage({ params }: { params: Promise<{ id: string 
                 {isSubmitting
                   ? 'در حال ذخیره...'
                   : isNew
-                  ? 'ایجاد ترم'
-                  : 'به‌روزرسانی ترم'}
+                    ? 'ایجاد ترم'
+                    : 'به‌روزرسانی ترم'}
               </Button>
             </div>
           </form>

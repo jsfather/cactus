@@ -17,6 +17,7 @@ import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 // Hooks and Types
 import { useStudent } from '@/app/lib/hooks/use-student';
+import { useLevel } from '@/app/lib/hooks/use-level';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
 import {
   CreateStudentRequest,
@@ -64,6 +65,8 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
     clearCurrentStudent,
   } = useStudent();
 
+  const { levelList, loading: levelsLoading, fetchLevelList } = useLevel();
+
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
     null
   );
@@ -89,6 +92,10 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
       clearCurrentStudent();
     };
   }, [clearCurrentStudent]);
+
+  useEffect(() => {
+    fetchLevelList();
+  }, [fetchLevelList]);
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -138,7 +145,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
       reset({
         first_name: currentStudent.user?.first_name || '',
         last_name: currentStudent.user?.last_name || '',
-        username: currentStudent.user?.username || '',
+        username: '', // Username not available in current student data
         phone: currentStudent.user?.phone || '',
         email: currentStudent.user?.email || '',
         national_code: currentStudent.user?.national_code || '',
@@ -365,7 +372,10 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
                     label="سطح"
                     value={field.value}
                     onChange={field.onChange}
-                    options={levelOptions}
+                    options={levelList.map((level) => ({
+                      value: level.id.toString(),
+                      label: `${level.label} - ${level.name}`,
+                    }))}
                     error={errors.level_id?.message}
                     required
                   />
@@ -561,7 +571,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
           <div className="flex justify-end space-x-3 space-x-reverse pt-6">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={() => router.push('/admin/students')}
               disabled={isSubmitting}
             >
