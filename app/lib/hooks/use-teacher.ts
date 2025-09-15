@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useTeacherStore } from '@/app/lib/stores/teacher.store';
-import { CreateTeacherRequest, UpdateTeacherRequest } from '@/app/lib/types';
+import { CreateTeacherRequest, UpdateTeacherRequest } from '@/app/lib/types/teacher';
 
 export const useTeacher = () => {
   const store = useTeacherStore();
@@ -33,6 +33,7 @@ export const useTeacher = () => {
     currentTeacher: store.currentTeacher,
     loading: store.loading,
     error: store.error,
+    totalTeachers: store.totalTeachers,
 
     // Actions
     fetchTeacherList,

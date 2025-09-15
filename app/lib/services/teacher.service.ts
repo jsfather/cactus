@@ -5,7 +5,7 @@ import {
   GetTeacherResponse,
   CreateTeacherRequest,
   UpdateTeacherRequest,
-} from '@/app/lib/types';
+} from '@/app/lib/types/teacher';
 
 export class TeacherService {
   async getList(): Promise<GetTeacherListResponse> {
