@@ -29,12 +29,3 @@ jobs:
             npm install
             npm run build
             pm2 restart cactus-dev || pm2 start npm --name "cactus-dev" -- run start -- -p 3001
-
-      - name: Create GitHub deployment status
-        uses: chrnorm/deployment-action@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          environment: development
-          description: 'Deployed to Dev VPS'
-          ref: develop
-          state: success
