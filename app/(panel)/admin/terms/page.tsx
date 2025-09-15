@@ -44,8 +44,28 @@ export default function TermsPage() {
     {
       header: 'عنوان ترم',
       accessor: 'title',
-      render: (value, item): string => {
-        return `${value} - ${item.level?.name || 'نامشخص'}`;
+      render: (value): string => {
+        return value as string;
+      },
+    },
+    {
+      header: 'سطح',
+      accessor: 'level',
+      render: (value, item): React.JSX.Element => {
+        const level = item.level;
+        if (!level) {
+          return (
+            <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+              نامشخص
+            </span>
+          );
+        }
+        
+        return (
+          <span className="inline-flex items-center rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
+            {level.label} - {level.name}
+          </span>
+        );
       },
     },
     {

@@ -3,7 +3,7 @@ export interface Term {
   title: string;
   duration: number; // Duration in minutes
   number_of_sessions: number;
-  level_id: number;
+  level_id?: number; // Optional since API might return level object instead
   level: {
     id: number;
     name: string;
