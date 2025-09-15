@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast';
 import { useExamStore } from '@/app/lib/stores/exam.store';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
-import Textarea from '@/app/components/ui/Textarea';
+import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import Select from '@/app/components/ui/Select';
 import DatePicker from '@/app/components/ui/DatePicker';
 import { Button } from '@/app/components/ui/Button';
@@ -118,7 +118,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             render={({ field }) => (
               <DatePicker
                 id="date"
-                label="تاریخ"
+                label="تاریخ آزمون"
                 placeholder="تاریخ آزمون را وارد کنید"
                 error={errors.date?.message}
                 value={field.value || ''}
@@ -131,13 +131,19 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className="w-full">
-          <Textarea
-            id="description"
-            label="توضیحات"
-            placeholder="توضیحات آزمون را وارد کنید"
-            required
-            error={errors.description?.message}
-            {...register('description')}
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <MarkdownEditor
+                id="description"
+                label="توضیحات آزمون"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.description?.message}
+                required
+              />
+            )}
           />
         </div>
 

@@ -2,12 +2,10 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import {
-  getPanelGuide,
-  createPanelGuide,
-  updatePanelGuide,
-} from '@/app/lib/api/admin/panel_guides';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
@@ -15,10 +13,7 @@ import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import Select from '@/app/components/ui/Select';
 import FileUpload from '@/app/components/ui/FileUpload';
-
-import { z } from 'zod';
-import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-import { ApiError } from '@/app/lib/api/client';
+import { usePanelGuide } from '@/app/lib/hooks/use-panel-guide';
 
 const panelGuideSchema = z.object({
   title: z.string().min(1, 'عنوان الزامی است'),
@@ -40,96 +35,78 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
-  const [loading, setLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const {
+    currentPanelGuide,
+    isLoading: loading,
+    fetchPanelGuideById,
+    createPanelGuide,
+    updatePanelGuide,
+    clearCurrentPanelGuide,
+  } = usePanelGuide();
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
-    submitWithErrorHandling,
-    globalError,
-    setGlobalError,
     reset,
-  } = useFormWithBackendErrors<PanelGuideFormData>(panelGuideSchema);
+  } = useForm<PanelGuideFormData>({
+    resolver: zodResolver(panelGuideSchema),
+  });
 
   useEffect(() => {
-    const fetchPanelGuide = async () => {
-      if (isNew) {
-        // Set default values for new guides
-        reset({
-          title: '',
-          description: '',
-          type: 'student',
-        });
-        setLoading(false);
-        return;
-      }
+    if (isNew) {
+      clearCurrentPanelGuide();
+      // Set default values for new guides
+      reset({
+        title: '',
+        description: '',
+        type: 'student',
+      });
+    } else {
+      fetchPanelGuideById(resolvedParams.id);
+    }
+  }, [isNew, resolvedParams.id, fetchPanelGuideById, clearCurrentPanelGuide, reset]);
 
-      try {
-        const response = await getPanelGuide(resolvedParams.id);
-        const guide = response.data;
-        reset({
-          title: guide.title,
-          description: guide.description,
-          type: guide.type,
-        });
-      } catch (error) {
-        toast.error('خطا در بارگذاری راهنمای پنل');
-        router.push('/admin/panel-guides');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPanelGuide();
-  }, [isNew, resolvedParams.id, reset, router]);
+  useEffect(() => {
+    if (currentPanelGuide && !isNew) {
+      reset({
+        title: currentPanelGuide.title,
+        description: currentPanelGuide.description,
+        type: currentPanelGuide.type,
+      });
+    }
+  }, [currentPanelGuide, isNew, reset]);
 
   const onSubmit = async (data: PanelGuideFormData) => {
-    console.log('Form data before FormData creation:', data);
-    console.log('Selected file:', selectedFile);
+    try {
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('description', data.description);
+      formData.append('type', data.type);
 
-    // Create FormData for file upload
-    const formData = new FormData();
-    formData.append('title', data.title);
-    formData.append('description', data.description);
-    formData.append('type', data.type);
+      // Add file if selected
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+      }
 
-    // Add file if selected
-    if (selectedFile) {
-      formData.append('file', selectedFile);
-    }
-
-    // Log FormData contents
-    console.log('FormData contents:');
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    if (isNew) {
-      await createPanelGuide(formData);
-      toast.success('راهنمای پنل با موفقیت ایجاد شد');
-    } else {
-      await updatePanelGuide(resolvedParams.id, formData);
-      toast.success('راهنمای پنل با موفقیت بروزرسانی شد');
-    }
-    router.push('/admin/panel-guides');
-  };
-
-  const handleError = (error: ApiError) => {
-    console.log('Panel guide form submission error:', error);
-
-    // Show toast error message
-    if (error?.message) {
-      toast.error(error.message);
-    } else {
-      toast.error(
-        isNew ? 'خطا در ایجاد راهنمای پنل' : 'خطا در بروزرسانی راهنمای پنل'
-      );
+      if (isNew) {
+        await createPanelGuide(formData);
+        toast.success('راهنمای پنل با موفقیت ایجاد شد');
+      } else {
+        await updatePanelGuide(resolvedParams.id, formData);
+        toast.success('راهنمای پنل با موفقیت بروزرسانی شد');
+      }
+      router.push('/admin/panel-guides');
+    } catch (error) {
+      // Error handling is done in the store
     }
   };
 
-  if (loading) {
+  if (loading && !isNew) {
     return <LoadingSpinner />;
   }
 
@@ -147,14 +124,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       />
 
       <form
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
+        onSubmit={handleSubmit(onSubmit)}
         className="mt-8 space-y-6"
       >
-        {globalError && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
-            {globalError}
-          </div>
-        )}
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
             id="title"
@@ -165,14 +137,23 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             {...register('title')}
           />
 
-          <Select
-            id="type"
-            label="نوع کاربر"
-            placeholder="نوع کاربر را انتخاب کنید"
-            options={userTypeOptions}
-            required
-            error={errors.type?.message}
-            {...register('type')}
+          <Controller
+            name="type"
+            control={control}
+            render={({ field }) => (
+              <Select
+                id="type"
+                label="نوع کاربر"
+                placeholder="نوع کاربر را انتخاب کنید"
+                options={userTypeOptions}
+                required
+                error={errors.type?.message}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+              />
+            )}
           />
         </div>
 
