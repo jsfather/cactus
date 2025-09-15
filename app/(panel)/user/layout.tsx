@@ -14,10 +14,6 @@ const menuItems = [
         title: 'اطلاعات کاربری',
         href: '/user/profile',
       },
-      {
-        title: 'تغییر رمز عبور',
-        href: '/user/password',
-      },
     ],
   },
 ];
