@@ -28,4 +28,4 @@ jobs:
             # install dependencies & build on dev VPS
             npm install
             npm run build
-            pm2 restart cactus-dev || pm2 start npm --name "cactus-dev" -- run start
+            pm2 restart cactus-dev || pm2 start npm --name "cactus-dev" -- run start -- -p 3001
