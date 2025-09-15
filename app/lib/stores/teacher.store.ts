@@ -2,7 +2,12 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { teacherService } from '@/app/lib/services/teacher.service';
 import type { ApiError } from '@/app/lib/api/client';
-import { Teacher, CreateTeacherRequest, UpdateTeacherRequest, GetTeacherResponse } from '@/app/lib/types';
+import {
+  Teacher,
+  CreateTeacherRequest,
+  UpdateTeacherRequest,
+  GetTeacherResponse,
+} from '@/app/lib/types/teacher';
 
 interface TeacherState {
   // State
@@ -10,6 +15,7 @@ interface TeacherState {
   currentTeacher: Teacher | null;
   loading: boolean;
   error: string | null;
+  totalTeachers: number;
 
   // Actions
   setLoading: (loading: boolean) => void;
@@ -18,7 +24,10 @@ interface TeacherState {
 
   fetchTeacherList: () => Promise<void>;
   createTeacher: (payload: CreateTeacherRequest) => Promise<GetTeacherResponse>;
-  updateTeacher: (id: string, payload: UpdateTeacherRequest) => Promise<GetTeacherResponse>;
+  updateTeacher: (
+    id: string,
+    payload: UpdateTeacherRequest
+  ) => Promise<GetTeacherResponse>;
   deleteTeacher: (id: string) => Promise<void>;
   fetchTeacherById: (id: string) => Promise<void>;
 }
@@ -30,6 +39,7 @@ export const useTeacherStore = create<TeacherState>()(
     currentTeacher: null,
     loading: false,
     error: null,
+    totalTeachers: 0,
 
     // Actions
     setLoading: (loading) => set({ loading }),
@@ -42,6 +52,7 @@ export const useTeacherStore = create<TeacherState>()(
         const response = await teacherService.getList();
         set({
           teacherList: response.data,
+          totalTeachers: response.meta?.total || response.data.length,
           loading: false,
         });
       } catch (error) {
@@ -57,6 +68,7 @@ export const useTeacherStore = create<TeacherState>()(
         const newTeacher = await teacherService.create(payload);
         set((state) => ({
           teacherList: [newTeacher.data, ...state.teacherList],
+          totalTeachers: state.totalTeachers + 1,
           loading: false,
         }));
         return newTeacher;
@@ -91,7 +103,10 @@ export const useTeacherStore = create<TeacherState>()(
         set({ loading: true, error: null });
         await teacherService.delete(id);
         set((state) => ({
-          teacherList: state.teacherList.filter((teacher) => teacher.user_id.toString() !== id),
+          teacherList: state.teacherList.filter(
+            (teacher) => teacher.user_id.toString() !== id
+          ),
+          totalTeachers: Math.max(0, state.totalTeachers - 1),
           loading: false,
         }));
       } catch (error) {

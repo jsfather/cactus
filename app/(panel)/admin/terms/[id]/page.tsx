@@ -16,6 +16,7 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 
 // Hooks and Types
 import { useTerm } from '@/app/lib/hooks/use-term';
+import { useLevel } from '@/app/lib/hooks/use-level';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
 import { CreateTermRequest, UpdateTermRequest } from '@/app/lib/types/term';
 
@@ -30,6 +31,7 @@ const termSchema = z.object({
   duration: z.string().min(1, 'مدت زمان ضروری است'),
   number_of_sessions: z.string().min(1, 'تعداد جلسات ضروری است'),
   capacity: z.string().min(1, 'ظرفیت ضروری است'),
+  level_id: z.string().min(1, 'سطح ضروری است'),
   type: z.enum(['normal', 'capacity_completion', 'project_based', 'specialized', 'ai'], {
     errorMap: () => ({ message: 'نوع ترم ضروری است' })
   }),
@@ -47,6 +49,7 @@ interface PageProps {
 const TermFormPage: React.FC<PageProps> = ({ params }) => {
   const router = useRouter();
   const { createTerm, updateTerm, fetchTermById, currentTerm } = useTerm();
+  const { levelList, loading: levelsLoading, fetchLevelList } = useLevel();
 
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,6 +62,10 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
     reset,
     formState: { errors, isSubmitting },
   } = useFormWithBackendErrors<TermFormData>(termSchema);
+
+  useEffect(() => {
+    fetchLevelList();
+  }, [fetchLevelList]);
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -74,6 +81,7 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
           duration: '',
           number_of_sessions: '',
           capacity: '',
+          level_id: '',
           type: 'normal',
           price: '',
         });
@@ -94,9 +102,12 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
     resolveParams();
   }, [fetchTermById, reset, router]);
 
-  // Set form data when currentTerm changes
+  // Set form data when currentTerm changes and levels are loaded
   useEffect(() => {
-    if (currentTerm && !isNew) {
+    if (currentTerm && !isNew && levelList.length > 0) {
+      // Extract level_id from the nested level object or use level_id directly
+      const levelId = currentTerm.level?.id || currentTerm.level_id;
+      
       reset({
         title: currentTerm.title,
         start_date: currentTerm.start_date,
@@ -104,11 +115,12 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
         duration: currentTerm.duration.toString(),
         number_of_sessions: currentTerm.number_of_sessions.toString(),
         capacity: currentTerm.capacity.toString(),
+        level_id: levelId?.toString() || '',
         type: currentTerm.type,
         price: currentTerm.price.toString(),
       });
     }
-  }, [currentTerm, isNew, reset]);
+  }, [currentTerm, isNew, reset, levelList]);
 
   const onSubmit = async (data: TermFormData) => {
     if (!resolvedParams) return;
@@ -122,7 +134,7 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
       capacity: convertToEnglishNumbers(data.capacity), // Keep as string for API
       price: convertToEnglishNumbers(data.price), // Keep as string for API
       type: data.type,
-      level_id: 1, // Default level_id
+      level_id: Number(data.level_id),
     };
 
     try {
@@ -143,7 +155,7 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
     toast.error(isNew ? 'خطا در ایجاد ترم' : 'خطا در بروزرسانی ترم');
   };
 
-  if (!resolvedParams || loading) {
+  if (!resolvedParams || loading || levelsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
@@ -223,6 +235,30 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
                       { value: 'specialized', label: 'گرایش تخصصی' },
                       { value: 'ai', label: 'هوش مصنوعی' },
                     ]}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Level */}
+            <div>
+              <Controller
+                name="level_id"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    id="level_id"
+                    label="سطح"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.level_id?.message}
+                    placeholder="انتخاب کنید"
+                    required
+                    options={levelList.map((level) => ({
+                      value: level.id.toString(),
+                      label: `${level.label} - ${level.name}`,
+                    }))}
                   />
                 )}
               />

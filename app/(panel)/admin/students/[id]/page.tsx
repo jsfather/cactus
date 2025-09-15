@@ -1,88 +1,109 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-hot-toast';
-import {
-  getStudent,
-  createStudent,
-  updateStudent,
-} from '@/app/lib/api/admin/students';
-import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import Input from '@/app/components/ui/Input';
-import { Button } from '@/app/components/ui/Button';
-import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import Select from '@/app/components/ui/Select';
-import Textarea from '@/app/components/ui/Textarea';
-import FileUpload from '@/app/components/ui/FileUpload';
-import DatePicker from '@/app/components/ui/DatePicker';
 import { Controller } from 'react-hook-form';
-
+import { toast } from 'react-hot-toast';
 import { z } from 'zod';
-import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-import { ApiError } from '@/app/lib/api/client';
-import { convertToEnglishNumbers } from '@/app/lib/utils/persian';
 
+// UI Components
+import { Button } from '@/app/components/ui/Button';
+import Input from '@/app/components/ui/Input';
+import Select from '@/app/components/ui/Select';
+import DatePicker from '@/app/components/ui/DatePicker';
+import FileUpload from '@/app/components/ui/FileUpload';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+
+// Hooks and Types
+import { useStudent } from '@/app/lib/hooks/use-student';
+import { useLevel } from '@/app/lib/hooks/use-level';
+import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
+import {
+  CreateStudentRequest,
+  UpdateStudentRequest,
+} from '@/app/lib/types/student';
+
+// Utils
+import { convertToEnglishNumbers } from '@/app/lib/utils';
+
+// Form Validation Schema
 const studentSchema = z.object({
-  first_name: z.string().min(1, 'نام الزامی است'),
-  last_name: z.string().min(1, 'نام خانوادگی الزامی است'),
-  username: z.string().min(1, 'نام کاربری الزامی است'),
-  phone: z.string().min(1, 'شماره موبایل الزامی است'),
-  email: z.string().optional(),
+  first_name: z.string().min(1, 'نام ضروری است'),
+  last_name: z.string().min(1, 'نام خانوادگی ضروری است'),
+  username: z.string().min(1, 'نام کاربری ضروری است'),
+  phone: z.string().min(11, 'شماره تلفن باید حداقل ۱۱ رقم باشد'),
+  email: z.string().email('ایمیل معتبر وارد کنید').optional().or(z.literal('')),
   national_code: z.string().optional(),
-  password: z.string().min(6, 'رمز عبور حداقل ۶ کاراکتر است'),
-  level_id: z.number({ required_error: 'سطح الزامی است' }),
-  father_name: z.string().min(1, 'نام پدر الزامی است'),
-  mother_name: z.string().min(1, 'نام مادر الزامی است'),
-  father_job: z.string().min(1, 'شغل پدر الزامی است'),
-  mother_job: z.string().min(1, 'شغل مادر الزامی است'),
-  has_allergy: z.number({ required_error: 'وضعیت آلرژی الزامی است' }),
+  level_id: z.string().min(1, 'سطح ضروری است'),
+  father_name: z.string().min(1, 'نام پدر ضروری است'),
+  mother_name: z.string().min(1, 'نام مادر ضروری است'),
+  father_job: z.string().min(1, 'شغل پدر ضروری است'),
+  mother_job: z.string().min(1, 'شغل مادر ضروری است'),
+  has_allergy: z.string().min(1, 'وضعیت آلرژی ضروری است'),
   allergy_details: z.string().optional(),
-  interest_level: z.string().min(1, 'سطح علاقه الزامی است'),
-  focus_level: z.string().min(1, 'سطح تمرکز الزامی است'),
-  birth_date: z.string().min(1, 'تاریخ تولد الزامی است'),
+  interest_level: z.string().min(1, 'سطح علاقه ضروری است'),
+  focus_level: z.string().min(1, 'سطح تمرکز ضروری است'),
+  birth_date: z.string().min(1, 'تاریخ تولد ضروری است'),
 });
 
 type StudentFormData = z.infer<typeof studentSchema>;
 
-const levelOptions = [
-  { value: '1', label: 'مبتدی' },
-  { value: '2', label: 'متوسط' },
-  { value: '3', label: 'پیشرفته' },
-];
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-const allergyOptions = [
-  { value: '0', label: 'ندارد' },
-  { value: '1', label: 'دارد' },
-];
-
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
+const StudentFormPage: React.FC<PageProps> = ({ params }) => {
   const router = useRouter();
-  const isNew = resolvedParams.id === 'new';
+  const {
+    createStudent,
+    updateStudent,
+    fetchStudentById,
+    currentStudent,
+    clearCurrentStudent,
+  } = useStudent();
+
+  const { levelList, loading: levelsLoading, fetchLevelList } = useLevel();
+
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [nationalCard, setNationalCard] = useState<File | null>(null);
   const [certificate, setCertificate] = useState<File | null>(null);
 
+  const isNew = resolvedParams?.id === 'new';
+
   const {
-    register,
-    handleSubmit,
     control,
-    formState: { errors, isSubmitting },
-    submitWithErrorHandling,
-    globalError,
-    setGlobalError,
+    handleSubmit,
     reset,
     watch,
+    formState: { errors, isSubmitting },
   } = useFormWithBackendErrors<StudentFormData>(studentSchema);
 
   const hasAllergy = watch('has_allergy');
 
   useEffect(() => {
-    const fetchStudent = async () => {
-      if (isNew) {
-        // Set default values for new students
+    return () => {
+      clearCurrentStudent();
+    };
+  }, [clearCurrentStudent]);
+
+  useEffect(() => {
+    fetchLevelList();
+  }, [fetchLevelList]);
+
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParamsData = await params;
+      setResolvedParams(resolvedParamsData);
+
+      if (resolvedParamsData.id === 'new') {
+        // Clear form for new student
         reset({
           first_name: '',
           last_name: '',
@@ -90,13 +111,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           phone: '',
           email: '',
           national_code: '',
-          password: '',
-          level_id: 1,
+          level_id: '',
           father_name: '',
           mother_name: '',
           father_job: '',
           mother_job: '',
-          has_allergy: 0,
+          has_allergy: '0',
           allergy_details: '',
           interest_level: '',
           focus_level: '',
@@ -107,304 +127,468 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       }
 
       try {
-        const response = await getStudent(resolvedParams.id);
-        const student = response.data;
-        reset({
-          first_name: student.user.first_name,
-          last_name: student.user.last_name,
-          username: student.user.username,
-          phone: student.user.phone,
-          email: student.user.email || '',
-          national_code: student.user.national_code || '',
-          password: '', // Don't pre-fill password
-          level_id:
-            typeof student.level_id === 'string'
-              ? parseInt(student.level_id)
-              : student.level_id || 1,
-          father_name: student.father_name || '',
-          mother_name: student.mother_name || '',
-          father_job: student.father_job || '',
-          mother_job: student.mother_job || '',
-          has_allergy:
-            typeof student.has_allergy === 'string'
-              ? parseInt(student.has_allergy)
-              : student.has_allergy || 0,
-          allergy_details: student.allergy_details || '',
-          interest_level: String(student.interest_level || ''),
-          focus_level: String(student.focus_level || ''),
-          birth_date: student.birth_date || '',
-        });
+        await fetchStudentById(resolvedParamsData.id);
       } catch (error) {
-        toast.error('خطا در بارگذاری دانش‌آموز');
+        toast.error('خطا در بارگذاری اطلاعات دانش‌آموز');
         router.push('/admin/students');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStudent();
-  }, [isNew, resolvedParams.id, reset, router]);
+    resolveParams();
+  }, [fetchStudentById, reset, router]);
+
+  // Set form data when currentStudent changes
+  useEffect(() => {
+    if (currentStudent && !isNew) {
+      reset({
+        first_name: currentStudent.user?.first_name || '',
+        last_name: currentStudent.user?.last_name || '',
+        username: '', // Username not available in current student data
+        phone: currentStudent.user?.phone || '',
+        email: currentStudent.user?.email || '',
+        national_code: currentStudent.user?.national_code || '',
+        level_id: currentStudent.level_id?.toString() || '',
+        father_name: currentStudent.father_name || '',
+        mother_name: currentStudent.mother_name || '',
+        father_job: currentStudent.father_job || '',
+        mother_job: currentStudent.mother_job || '',
+        has_allergy: currentStudent.has_allergy?.toString() || '0',
+        allergy_details: currentStudent.allergy_details || '',
+        interest_level: currentStudent.interest_level?.toString() || '',
+        focus_level: currentStudent.focus_level?.toString() || '',
+        birth_date: currentStudent.birth_date || '',
+      });
+    }
+  }, [currentStudent, reset, isNew]);
 
   const onSubmit = async (data: StudentFormData) => {
-    console.log('Form data before FormData creation:', data);
+    try {
+      const formData: CreateStudentRequest | UpdateStudentRequest = {
+        first_name: data.first_name.trim(),
+        last_name: data.last_name.trim(),
+        username: data.username.trim(),
+        phone: convertToEnglishNumbers(data.phone).trim(),
+        email: data.email?.trim() || undefined,
+        national_code: data.national_code?.trim() || undefined,
+        level_id: parseInt(data.level_id),
+        father_name: data.father_name.trim(),
+        mother_name: data.mother_name.trim(),
+        father_job: data.father_job.trim(),
+        mother_job: data.mother_job.trim(),
+        has_allergy: parseInt(data.has_allergy),
+        allergy_details: data.allergy_details?.trim() || undefined,
+        interest_level: parseInt(data.interest_level),
+        focus_level: parseInt(data.focus_level),
+        birth_date: data.birth_date,
+        profile_picture: profilePicture || undefined,
+        national_card: nationalCard || undefined,
+        certificate: certificate || undefined,
+      };
 
-    // Create FormData for file upload
-    const formData = new FormData();
+      if (isNew) {
+        await createStudent(formData as CreateStudentRequest);
+        toast.success('دانش‌آموز با موفقیت ایجاد شد');
+      } else {
+        await updateStudent(
+          resolvedParams!.id,
+          formData as UpdateStudentRequest
+        );
+        toast.success('دانش‌آموز با موفقیت ویرایش شد');
+      }
 
-    // Add basic fields
-    formData.append('first_name', data.first_name);
-    formData.append('last_name', data.last_name);
-    formData.append('username', data.username);
-    formData.append('phone', data.phone);
-    formData.append('email', data.email || '');
-    formData.append('national_code', data.national_code || '');
-    formData.append('password', data.password);
-    formData.append('level_id', data.level_id.toString());
-    formData.append('father_name', data.father_name);
-    formData.append('mother_name', data.mother_name);
-    formData.append('father_job', data.father_job);
-    formData.append('mother_job', data.mother_job);
-    formData.append('has_allergy', data.has_allergy.toString());
-    formData.append('allergy_details', data.allergy_details || '');
-    formData.append(
-      'interest_level',
-      convertToEnglishNumbers(data.interest_level)
-    );
-    formData.append('focus_level', convertToEnglishNumbers(data.focus_level));
-    formData.append('birth_date', data.birth_date);
-
-    // Add files if selected
-    if (profilePicture) {
-      formData.append('profile_picture', profilePicture);
-    }
-    if (nationalCard) {
-      formData.append('national_card', nationalCard);
-    }
-    if (certificate) {
-      formData.append('certificate', certificate);
-    }
-
-    // Log FormData contents
-    console.log('FormData contents:');
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    if (isNew) {
-      await createStudent(formData);
-      toast.success('دانش‌آموز با موفقیت ایجاد شد');
-    } else {
-      await updateStudent(resolvedParams.id, formData);
-      toast.success('دانش‌آموز با موفقیت بروزرسانی شد');
-    }
-    router.push('/admin/students');
-  };
-
-  const handleError = (error: ApiError) => {
-    console.log('Student form submission error:', error);
-
-    // Show toast error message
-    if (error?.message) {
-      toast.error(error.message);
-    } else {
-      toast.error(
-        isNew ? 'خطا در ایجاد دانش‌آموز' : 'خطا در بروزرسانی دانش‌آموز'
-      );
+      router.push('/admin/students');
+    } catch (error: any) {
+      console.error('Form submission error:', error);
+      toast.error(error?.message || 'خطا در ثبت اطلاعات');
     }
   };
+
+  const levelOptions = [
+    { value: '1', label: 'مبتدی' },
+    { value: '2', label: 'متوسط' },
+    { value: '3', label: 'پیشرفته' },
+  ];
+
+  const allergyOptions = [
+    { value: '0', label: 'ندارد' },
+    { value: '1', label: 'دارد' },
+  ];
 
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   return (
-    <main>
+    <div className="w-full space-y-6">
+      {/* Breadcrumbs */}
       <Breadcrumbs
         breadcrumbs={[
+          { label: 'پنل مدیریت', href: '/admin' },
           { label: 'دانش‌آموزان', href: '/admin/students' },
-          {
-            label: isNew ? 'ایجاد دانش‌آموز' : 'ویرایش دانش‌آموز',
-            href: `/admin/students/${resolvedParams.id}`,
-            active: true,
-          },
+          { label: isNew ? 'افزودن دانش‌آموز' : 'ویرایش دانش‌آموز', href: '#' },
         ]}
       />
 
-      <form
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
-        className="mt-8 space-y-6"
-      >
-        {globalError && (
-          <div className="mb-4 rounded-lg border border-red-200 bg-red-100 p-4 text-sm text-red-700">
-            {globalError}
-          </div>
-        )}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="first_name"
-            label="نام"
-            required
-            error={errors.first_name?.message}
-            {...register('first_name')}
-          />
-          <Input
-            id="last_name"
-            label="نام خانوادگی"
-            required
-            error={errors.last_name?.message}
-            {...register('last_name')}
-          />
-          <Input
-            id="username"
-            label="نام کاربری"
-            required
-            error={errors.username?.message}
-            {...register('username')}
-          />
-          <Input
-            id="phone"
-            label="شماره موبایل"
-            required
-            error={errors.phone?.message}
-            {...register('phone')}
-          />
-          <Input
-            id="email"
-            label="ایمیل"
-            error={errors.email?.message}
-            {...register('email')}
-          />
-          <Input
-            id="national_code"
-            label="کد ملی"
-            error={errors.national_code?.message}
-            {...register('national_code')}
-          />
-          <Input
-            id="password"
-            label="رمز عبور"
-            type="password"
-            required
-            error={errors.password?.message}
-            {...register('password')}
-          />
-          <Select
-            label="سطح"
-            required
-            options={levelOptions}
-            placeholder="انتخاب کنید"
-            error={errors.level_id?.message}
-            {...register('level_id', { valueAsNumber: true })}
-          />
-          <Input
-            id="father_name"
-            label="نام پدر"
-            required
-            error={errors.father_name?.message}
-            {...register('father_name')}
-          />
-          <Input
-            id="mother_name"
-            label="نام مادر"
-            required
-            error={errors.mother_name?.message}
-            {...register('mother_name')}
-          />
-          <Input
-            id="father_job"
-            label="شغل پدر"
-            required
-            error={errors.father_job?.message}
-            {...register('father_job')}
-          />
-          <Input
-            id="mother_job"
-            label="شغل مادر"
-            required
-            error={errors.mother_job?.message}
-            {...register('mother_job')}
-          />
-          <Select
-            label="آلرژی"
-            required
-            options={allergyOptions}
-            placeholder="انتخاب کنید"
-            error={errors.has_allergy?.message}
-            {...register('has_allergy', { valueAsNumber: true })}
-          />
-          <Input
-            id="allergy_details"
-            label="توضیحات آلرژی"
-            error={errors.allergy_details?.message}
-            {...register('allergy_details')}
-          />
-          <Input
-            id="interest_level"
-            label="سطح علاقه"
-            required
-            error={errors.interest_level?.message}
-            {...register('interest_level')}
-          />
-          <Input
-            id="focus_level"
-            label="سطح تمرکز"
-            required
-            error={errors.focus_level?.message}
-            {...register('focus_level')}
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <FileUpload
-            id="profile_picture"
-            label="عکس پروفایل"
-            accept="image/*"
-            onChange={setProfilePicture}
-          />
-          <FileUpload
-            id="national_card"
-            label="کارت ملی"
-            accept="image/*"
-            onChange={setNationalCard}
-          />
-          <FileUpload
-            id="certificate"
-            label="مدرک"
-            accept="image/*,.pdf"
-            onChange={setCertificate}
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-1">
-          <Controller
-            name="birth_date"
-            control={control}
-            render={({ field }) => (
-              <DatePicker
-                id="birth_date"
-                label="تاریخ تولد"
-                required
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                error={errors.birth_date?.message}
-                placeholder="تاریخ تولد را انتخاب کنید"
-              />
-            )}
-          />
-        </div>
+      {/* Header */}
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {isNew ? 'افزودن دانش‌آموز جدید' : 'ویرایش دانش‌آموز'}
+        </h1>
+      </div>
 
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="white"
-            onClick={() => router.push('/admin/students')}
-          >
-            انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            {isNew ? 'ایجاد دانش‌آموز' : 'بروزرسانی دانش‌آموز'}
-          </Button>
-        </div>
-      </form>
-    </main>
+      {/* Form */}
+      <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
+          {/* Personal Information */}
+          <div>
+            <h2 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              اطلاعات شخصی
+            </h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <Controller
+                name="first_name"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="first_name"
+                    label="نام"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.first_name?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="last_name"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="last_name"
+                    label="نام خانوادگی"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.last_name?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="username"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="username"
+                    label="نام کاربری"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.username?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="phone"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="phone"
+                    label="شماره تلفن"
+                    type="tel"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.phone?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="email"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="email"
+                    label="ایمیل"
+                    type="email"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.email?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="national_code"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="national_code"
+                    label="کد ملی"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.national_code?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                name="birth_date"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    id="birth_date"
+                    label="تاریخ تولد"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.birth_date?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="level_id"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    id="level_id"
+                    label="سطح"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={levelList.map((level) => ({
+                      value: level.id.toString(),
+                      label: `${level.label} - ${level.name}`,
+                    }))}
+                    error={errors.level_id?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Family Information */}
+          <div>
+            <h2 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              اطلاعات خانوادگی
+            </h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <Controller
+                name="father_name"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="father_name"
+                    label="نام پدر"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.father_name?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="mother_name"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="mother_name"
+                    label="نام مادر"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.mother_name?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="father_job"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="father_job"
+                    label="شغل پدر"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.father_job?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="mother_job"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="mother_job"
+                    label="شغل مادر"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.mother_job?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Health and Performance Information */}
+          <div>
+            <h2 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              اطلاعات سلامتی و عملکرد
+            </h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <Controller
+                name="has_allergy"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    id="has_allergy"
+                    label="وضعیت آلرژی"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={allergyOptions}
+                    error={errors.has_allergy?.message}
+                    required
+                  />
+                )}
+              />
+
+              {hasAllergy === '1' && (
+                <Controller
+                  name="allergy_details"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="allergy_details"
+                      label="جزئیات آلرژی"
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      error={errors.allergy_details?.message}
+                    />
+                  )}
+                />
+              )}
+
+              <Controller
+                name="interest_level"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="interest_level"
+                    label="سطح علاقه (۱-۱۰۰)"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.interest_level?.message}
+                    required
+                  />
+                )}
+              />
+
+              <Controller
+                name="focus_level"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="focus_level"
+                    label="سطح تمرکز (۱-۱۰۰)"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.focus_level?.message}
+                    required
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          {/* File Uploads */}
+          <div>
+            <h2 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
+              فایل‌ها و مدارک
+            </h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <FileUpload
+                id="profile_picture"
+                label="تصویر پروفایل"
+                accept="image/*"
+                onChange={setProfilePicture}
+                placeholder="انتخاب تصویر"
+              />
+
+              <FileUpload
+                id="national_card"
+                label="تصویر کارت ملی"
+                accept="image/*"
+                onChange={setNationalCard}
+                placeholder="انتخاب تصویر"
+              />
+
+              <FileUpload
+                id="certificate"
+                label="مدرک تحصیلی"
+                accept="image/*,.pdf"
+                onChange={setCertificate}
+                placeholder="انتخاب فایل"
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end space-x-3 space-x-reverse pt-6">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => router.push('/admin/students')}
+              disabled={isSubmitting}
+            >
+              انصراف
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              loading={isSubmitting}
+            >
+              {isNew ? 'ایجاد دانش‌آموز' : 'ویرایش دانش‌آموز'}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
-}
+};
+
+export default StudentFormPage;

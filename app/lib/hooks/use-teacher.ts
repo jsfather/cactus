@@ -1,11 +1,17 @@
 import { useCallback } from 'react';
 import { useTeacherStore } from '@/app/lib/stores/teacher.store';
-import { CreateTeacherRequest, UpdateTeacherRequest } from '@/app/lib/types';
+import {
+  CreateTeacherRequest,
+  UpdateTeacherRequest,
+} from '@/app/lib/types/teacher';
 
 export const useTeacher = () => {
   const store = useTeacherStore();
 
-  const fetchTeacherList = useCallback(() => store.fetchTeacherList(), [store.fetchTeacherList]);
+  const fetchTeacherList = useCallback(
+    () => store.fetchTeacherList(),
+    [store.fetchTeacherList]
+  );
 
   const createTeacher = useCallback(
     (payload: CreateTeacherRequest) => store.createTeacher(payload),
@@ -13,7 +19,8 @@ export const useTeacher = () => {
   );
 
   const updateTeacher = useCallback(
-    (id: string, payload: UpdateTeacherRequest) => store.updateTeacher(id, payload),
+    (id: string, payload: UpdateTeacherRequest) =>
+      store.updateTeacher(id, payload),
     [store.updateTeacher]
   );
 
@@ -33,6 +40,7 @@ export const useTeacher = () => {
     currentTeacher: store.currentTeacher,
     loading: store.loading,
     error: store.error,
+    totalTeachers: store.totalTeachers,
 
     // Actions
     fetchTeacherList,

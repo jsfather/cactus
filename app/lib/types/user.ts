@@ -4,10 +4,13 @@ export type UserRole = 'admin' | 'teacher' | 'student';
 
 export interface User {
   id: number;
+  username: string;
   first_name: string | null;
   last_name: string | null;
   phone: string | null;
   email: string | null;
+  address: string | null;
+  postal_code: string | null;
   national_code: string | null;
   profile_picture: string | null;
   role: UserRole | null;
@@ -43,9 +46,10 @@ export interface UpdateProfileRequest {
   first_name: string;
   last_name: string;
   username: string;
+  phone: string;
   email: string | null;
   national_code: string | null;
-  profile_picture: string | null;
+  profile_picture?: File | null;
 }
 
 // Onboarding types

@@ -5,7 +5,10 @@ import { CreateStudentRequest, UpdateStudentRequest } from '@/app/lib/types';
 export const useStudent = () => {
   const store = useStudentStore();
 
-  const fetchStudentList = useCallback(() => store.fetchStudentList(), [store.fetchStudentList]);
+  const fetchStudentList = useCallback(
+    () => store.fetchStudentList(),
+    [store.fetchStudentList]
+  );
 
   const createStudent = useCallback(
     (payload: CreateStudentRequest) => store.createStudent(payload),
@@ -13,7 +16,8 @@ export const useStudent = () => {
   );
 
   const updateStudent = useCallback(
-    (id: string, payload: UpdateStudentRequest) => store.updateStudent(id, payload),
+    (id: string, payload: UpdateStudentRequest) =>
+      store.updateStudent(id, payload),
     [store.updateStudent]
   );
 
@@ -25,6 +29,11 @@ export const useStudent = () => {
   const fetchStudentById = useCallback(
     (id: string) => store.fetchStudentById(id),
     [store.fetchStudentById]
+  );
+
+  const clearCurrentStudent = useCallback(
+    () => store.clearCurrentStudent(),
+    [store.clearCurrentStudent]
   );
 
   return {
@@ -40,6 +49,7 @@ export const useStudent = () => {
     updateStudent,
     deleteStudent,
     fetchStudentById,
+    clearCurrentStudent,
     clearError: store.clearError,
   };
 };

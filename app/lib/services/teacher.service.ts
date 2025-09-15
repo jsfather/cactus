@@ -5,7 +5,7 @@ import {
   GetTeacherResponse,
   CreateTeacherRequest,
   UpdateTeacherRequest,
-} from '@/app/lib/types';
+} from '@/app/lib/types/teacher';
 
 export class TeacherService {
   async getList(): Promise<GetTeacherListResponse> {
@@ -27,7 +27,10 @@ export class TeacherService {
     );
   }
 
-  async update(id: string, payload: UpdateTeacherRequest): Promise<GetTeacherResponse> {
+  async update(
+    id: string,
+    payload: UpdateTeacherRequest
+  ): Promise<GetTeacherResponse> {
     return apiClient.put<GetTeacherResponse>(
       API_ENDPOINTS.PANEL.ADMIN.TEACHERS.UPDATE(id),
       payload

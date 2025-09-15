@@ -1,26 +1,75 @@
-import { User } from '@/app/lib/types';
-
-export interface Teacher {
-  user_id: number | string;
-  bio: string;
-  user: User;
-  level_id?: number | string;
-  father_name?: string;
-  mother_name?: string;
-  father_job?: string;
-  mother_job?: string;
-  has_allergy?: number | string;
-  allergy_details?: string;
-  interest_level?: number | string;
-  focus_level?: number | string;
-  birth_date?: string;
-  national_card?: string;
-  certificate?: string;
+export interface User {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  phone: string;
+  email: string;
+  address: string | null;
+  postal_code: string | null;
+  national_code: string;
+  profile_picture: string | null;
+  files: Array<{
+    type: string;
+    file_path: string;
+  }>;
 }
 
-// Admin teacher management types
+export interface Skill {
+  name: string;
+  score: number;
+}
+
+export interface WorkExperience {
+  company: string;
+  role: string;
+  years: string;
+  description?: string;
+}
+
+export interface Education {
+  degree: string;
+  university: string;
+  description?: string;
+  year: number;
+}
+
+export interface Teacher {
+  user_id: number;
+  bio: string | null;
+  about_me: string | null;
+  member_since: string | null;
+  city: string | null;
+  skills: Skill[] | null;
+  work_experiences: WorkExperience[] | null;
+  educations: Education[] | null;
+  achievements: string | null;
+  user: User;
+}
+
 export interface GetTeacherListResponse {
   data: Teacher[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: Array<{
+      url: string | null;
+      label: string;
+      active: boolean;
+    }>;
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }
 
 export interface GetTeacherResponse {
@@ -28,35 +77,40 @@ export interface GetTeacherResponse {
 }
 
 export interface CreateTeacherRequest {
-  user_id: number;
-  bio: string;
-  level_id?: number;
-  father_name?: string;
-  mother_name?: string;
-  father_job?: string;
-  mother_job?: string;
-  has_allergy?: number;
-  allergy_details?: string;
-  interest_level?: number;
-  focus_level?: number;
-  birth_date?: string;
-  national_card?: string;
-  certificate?: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  national_code: string;
+  phone: string;
+  password: string;
+  bio?: string;
+  about_me?: string;
+  member_since?: string;
+  city?: string;
+  skills?: Skill[];
+  work_experiences?: WorkExperience[];
+  educations?: Education[];
+  achievements?: string;
 }
 
 export interface UpdateTeacherRequest {
-  user_id?: number;
+  first_name: string;
+  last_name: string;
+  username: string;
+  email: string;
+  national_code: string;
+  phone: string;
+  password?: string;
   bio?: string;
-  level_id?: number;
-  father_name?: string;
-  mother_name?: string;
-  father_job?: string;
-  mother_job?: string;
-  has_allergy?: number;
-  allergy_details?: string;
-  interest_level?: number;
-  focus_level?: number;
-  birth_date?: string;
-  national_card?: string;
-  certificate?: string;
+  about_me?: string;
+  member_since?: string;
+  city?: string;
+  skills?: Skill[];
+  work_experiences?: WorkExperience[];
+  educations?: Education[];
+  achievements?: string;
 }
+
+// Legacy interface for backward compatibility
+export interface TeacherRequest extends CreateTeacherRequest {}

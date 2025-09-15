@@ -2,7 +2,12 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { studentService } from '@/app/lib/services/student.service';
 import type { ApiError } from '@/app/lib/api/client';
-import { Student, CreateStudentRequest, UpdateStudentRequest, GetStudentResponse } from '@/app/lib/types';
+import {
+  Student,
+  CreateStudentRequest,
+  UpdateStudentRequest,
+  GetStudentResponse,
+} from '@/app/lib/types';
 
 interface StudentState {
   // State
@@ -18,9 +23,13 @@ interface StudentState {
 
   fetchStudentList: () => Promise<void>;
   createStudent: (payload: CreateStudentRequest) => Promise<GetStudentResponse>;
-  updateStudent: (id: string, payload: UpdateStudentRequest) => Promise<GetStudentResponse>;
+  updateStudent: (
+    id: string,
+    payload: UpdateStudentRequest
+  ) => Promise<GetStudentResponse>;
   deleteStudent: (id: string) => Promise<void>;
   fetchStudentById: (id: string) => Promise<void>;
+  clearCurrentStudent: () => void;
 }
 
 export const useStudentStore = create<StudentState>()(
@@ -35,6 +44,7 @@ export const useStudentStore = create<StudentState>()(
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
     clearError: () => set({ error: null }),
+    clearCurrentStudent: () => set({ currentStudent: null }),
 
     fetchStudentList: async () => {
       try {
@@ -91,7 +101,9 @@ export const useStudentStore = create<StudentState>()(
         set({ loading: true, error: null });
         await studentService.delete(id);
         set((state) => ({
-          studentList: state.studentList.filter((student) => student.user_id.toString() !== id),
+          studentList: state.studentList.filter(
+            (student) => student.user_id.toString() !== id
+          ),
           loading: false,
         }));
       } catch (error) {
