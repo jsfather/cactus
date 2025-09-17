@@ -82,7 +82,7 @@ export default function Header() {
                   className="transition-all duration-300 dark:brightness-0 dark:invert"
                 />
                 <span className="from-primary-600 to-primary-800 mx-2 hidden bg-gradient-to-l bg-clip-text text-2xl font-black text-transparent lg:block">
-                  Cactus
+                  کاکتوس
                 </span>
               </Link>
 
