@@ -25,7 +25,15 @@ jobs:
             git fetch --all
             git reset --hard origin/develop
 
-            # install dependencies & build on dev VPS
             npm install
             npm run build
-            pm2 restart cactus-dev || pm2 start npm --name "cactus-dev" -- run start -- -p 3001
+
+            # stop if running
+            pm2 stop cactus-dev || true
+            pm2 delete cactus-dev || true
+
+            # start on port 3001
+            PORT=3001 pm2 start npm --name "cactus-dev" -- run start
+
+            # save PM2 process list
+            pm2 save
