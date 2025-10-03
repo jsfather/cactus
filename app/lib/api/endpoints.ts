@@ -4,8 +4,8 @@ export const API_ENDPOINTS = {
     VERIFY_OTP: '/verify_otp',
   },
   ONBOARDING: {
-    INFORMATION: '/api/information',
-    UPLOAD_DOCUMENTS: '/api/uploadDocuments',
+    INFORMATION: '/information',
+    UPLOAD_DOCUMENTS: '/uploadDocuments',
   },
   USER: {
     ME: '/profile',

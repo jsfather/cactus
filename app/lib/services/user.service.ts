@@ -1,7 +1,7 @@
 import { apiClient } from '@/app/lib/api/client';
 import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
-import { 
-  GetProfileResponse, 
+import {
+  GetProfileResponse,
   UpdateProfileRequest,
   GetUserListResponse,
   GetUserResponse,
@@ -17,9 +17,41 @@ export class UserService {
   async updateProfile(
     payload: UpdateProfileRequest
   ): Promise<GetProfileResponse> {
+    // If profile_picture is a File, use FormData with POST method
+    if (payload.profile_picture instanceof File) {
+      const formData = new FormData();
+      formData.append('_method', 'PUT'); // Laravel method spoofing
+      formData.append('first_name', payload.first_name);
+      formData.append('last_name', payload.last_name);
+      formData.append('username', payload.username);
+      formData.append('phone', payload.phone);
+      if (payload.email) {
+        formData.append('email', payload.email);
+      }
+      if (payload.national_code) {
+        formData.append('national_code', payload.national_code);
+      }
+      formData.append('profile_picture', payload.profile_picture);
+
+      return apiClient.post<GetProfileResponse>(
+        API_ENDPOINTS.USER.UPDATE,
+        formData
+      );
+    }
+
+    // If no file, send as regular JSON with PUT
+    const jsonPayload = {
+      first_name: payload.first_name,
+      last_name: payload.last_name,
+      username: payload.username,
+      phone: payload.phone,
+      email: payload.email,
+      national_code: payload.national_code,
+    };
+
     return apiClient.put<GetProfileResponse>(
       API_ENDPOINTS.USER.UPDATE,
-      payload
+      jsonPayload
     );
   }
 
@@ -43,7 +75,10 @@ export class UserService {
     );
   }
 
-  async update(id: string, payload: UpdateUserRequest): Promise<GetUserResponse> {
+  async update(
+    id: string,
+    payload: UpdateUserRequest
+  ): Promise<GetUserResponse> {
     return apiClient.put<GetUserResponse>(
       API_ENDPOINTS.PANEL.ADMIN.USERS.UPDATE(id),
       payload
@@ -51,9 +86,7 @@ export class UserService {
   }
 
   async delete(id: string): Promise<void> {
-    return apiClient.delete<void>(
-      API_ENDPOINTS.PANEL.ADMIN.USERS.DELETE(id)
-    );
+    return apiClient.delete<void>(API_ENDPOINTS.PANEL.ADMIN.USERS.DELETE(id));
   }
 }
 

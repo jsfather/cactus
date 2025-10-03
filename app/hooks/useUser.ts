@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { UpdateProfileRequest, User } from '@/app/lib/types';
-import {userService} from '@/app/lib/services/user.service';
+import { userService } from '@/app/lib/services/user.service';
 
 interface UseUserReturn {
   user: User | null;
@@ -9,7 +9,7 @@ interface UseUserReturn {
   isAuthenticated: boolean;
   logout: () => void;
   refetch: () => Promise<void>;
-  updateProfile: (data: UpdateProfileRequest) => Promise<void>;
+  updateProfile: (data: UpdateProfileRequest) => Promise<any>;
 }
 
 let globalUser: User | null = null;
@@ -108,15 +108,24 @@ export function useUser(): UseUserReturn {
 
   const updateProfile = async (data: UpdateProfileRequest) => {
     try {
-      const response = await userService.updateProfile(data)
+      const response = await userService.updateProfile(data);
 
+      // Update global state
       globalUser = response.data;
       globalError = null;
+
+      // Update local state
       setUser(response.data);
+      setError(null);
+
+      // Notify all listeners (including Sidebar)
       notifyListeners();
+
+      return response;
     } catch (err) {
       globalError = err as Error;
       setError(err as Error);
+      notifyListeners();
       throw err;
     }
   };

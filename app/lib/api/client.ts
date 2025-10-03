@@ -64,7 +64,7 @@ class ApiClient {
       } catch (error) {
         console.warn('Failed to parse auth-storage from localStorage:', error);
       }
-      
+
       // Fallback to direct localStorage access for backward compatibility
       const token = localStorage.getItem('authToken');
       if (token) {
@@ -72,7 +72,7 @@ class ApiClient {
         return token;
       }
     }
-    
+
     return null;
   }
 
@@ -84,6 +84,12 @@ class ApiClient {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+
+        // Don't override Content-Type if it's FormData
+        if (config.data instanceof FormData) {
+          delete config.headers['Content-Type'];
+        }
+
         return config;
       },
       (error) => Promise.reject(error)
@@ -106,7 +112,7 @@ class ApiClient {
             this.currentToken = null;
             localStorage.removeItem('authToken');
             localStorage.removeItem('auth-storage');
-            
+
             // Redirect to login
             window.location.href = '/send-otp';
           }
@@ -122,12 +128,20 @@ class ApiClient {
     return response.data;
   }
 
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.client.post<T>(url, data, config);
     return response.data;
   }
 
-  async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
     const response = await this.client.put<T>(url, data, config);
     return response.data;
   }

@@ -3,15 +3,26 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useOnboardingStore } from '@/app/lib/stores/onboarding.store';
-import { User, Calendar, Mail, Phone, FileText, Heart, Brain, Focus } from 'lucide-react';
+import {
+  User,
+  Calendar,
+  Mail,
+  Phone,
+  FileText,
+  Heart,
+  Brain,
+  Focus,
+} from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { convertToEnglishNumbers, isNumeric } from '@/app/lib/utils/persian';
+import DatePicker from '@/app/components/ui/DatePicker';
+import '@/app/components/ui/DatePicker.css';
 
 export default function OnboardingInformationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get('phone') || '';
-  
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -38,18 +49,27 @@ export default function OnboardingInformationPage() {
 
     // Required fields
     if (!formData.first_name.trim()) newErrors.first_name = 'نام الزامی است';
-    if (!formData.last_name.trim()) newErrors.last_name = 'نام خانوادگی الزامی است';
+    if (!formData.last_name.trim())
+      newErrors.last_name = 'نام خانوادگی الزامی است';
     if (!formData.username.trim()) newErrors.username = 'نام کاربری الزامی است';
-    if (!formData.national_code.trim()) newErrors.national_code = 'کد ملی الزامی است';
-    if (!formData.father_name.trim()) newErrors.father_name = 'نام پدر الزامی است';
-    if (!formData.mother_name.trim()) newErrors.mother_name = 'نام مادر الزامی است';
-    if (!formData.father_job.trim()) newErrors.father_job = 'شغل پدر الزامی است';
-    if (!formData.mother_job.trim()) newErrors.mother_job = 'شغل مادر الزامی است';
-    if (!formData.birth_date.trim()) newErrors.birth_date = 'تاریخ تولد الزامی است';
+    if (!formData.national_code.trim())
+      newErrors.national_code = 'کد ملی الزامی است';
+    if (!formData.father_name.trim())
+      newErrors.father_name = 'نام پدر الزامی است';
+    if (!formData.mother_name.trim())
+      newErrors.mother_name = 'نام مادر الزامی است';
+    if (!formData.father_job.trim())
+      newErrors.father_job = 'شغل پدر الزامی است';
+    if (!formData.mother_job.trim())
+      newErrors.mother_job = 'شغل مادر الزامی است';
+    if (!formData.birth_date.trim())
+      newErrors.birth_date = 'تاریخ تولد الزامی است';
 
     // National code validation
     if (formData.national_code.trim()) {
-      const normalizedNationalCode = convertToEnglishNumbers(formData.national_code.trim());
+      const normalizedNationalCode = convertToEnglishNumbers(
+        formData.national_code.trim()
+      );
       if (!isNumeric(formData.national_code.trim())) {
         newErrors.national_code = 'کد ملی فقط باید شامل ارقام باشد';
       } else if (normalizedNationalCode.length !== 10) {
@@ -69,7 +89,8 @@ export default function OnboardingInformationPage() {
     if (formData.username.trim()) {
       const usernameRegex = /^[a-zA-Z0-9_]+$/;
       if (!usernameRegex.test(formData.username.trim())) {
-        newErrors.username = 'نام کاربری فقط باید شامل حروف انگلیسی، اعداد و آندرلاین باشد';
+        newErrors.username =
+          'نام کاربری فقط باید شامل حروف انگلیسی، اعداد و آندرلاین باشد';
       } else if (formData.username.trim().length < 3) {
         newErrors.username = 'نام کاربری باید حداقل ۳ کاراکتر باشد';
       }
@@ -84,28 +105,41 @@ export default function OnboardingInformationPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    
+
     // Clear error for this field
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: '' }));
     }
 
     // Special handling for numeric fields
     if (name === 'national_code') {
       const digitsOnly = value.replace(/[^0-9۰-۹٠-٩]/g, '');
       const limited = digitsOnly.slice(0, 10);
-      setFormData(prev => ({ ...prev, [name]: limited }));
+      setFormData((prev) => ({ ...prev, [name]: limited }));
       return;
     }
 
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Special handler for DatePicker
+  const handleDateChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, birth_date: value }));
+    // Clear error for this field
+    if (errors.birth_date) {
+      setErrors((prev) => ({ ...prev, birth_date: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       toast.error('لطفا خطاهای فرم را اصلاح کنید');
       return;
@@ -142,9 +176,11 @@ export default function OnboardingInformationPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">اطلاعات شخصی</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            اطلاعات شخصی
+          </h3>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 نام *
@@ -163,7 +199,9 @@ export default function OnboardingInformationPage() {
                 />
               </div>
               {errors.first_name && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.first_name}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.first_name}
+                </p>
               )}
             </div>
 
@@ -180,12 +218,14 @@ export default function OnboardingInformationPage() {
                 placeholder="نام خانوادگی خود را وارد کنید"
               />
               {errors.last_name && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.last_name}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.last_name}
+                </p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 نام کاربری *
@@ -200,7 +240,9 @@ export default function OnboardingInformationPage() {
                 dir="ltr"
               />
               {errors.username && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.username}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.username}
+                </p>
               )}
             </div>
 
@@ -224,7 +266,7 @@ export default function OnboardingInformationPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 ایمیل
@@ -244,7 +286,9 @@ export default function OnboardingInformationPage() {
                 />
               </div>
               {errors.email && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.email}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.email}
+                </p>
               )}
             </div>
 
@@ -268,38 +312,33 @@ export default function OnboardingInformationPage() {
                 />
               </div>
               {errors.national_code && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.national_code}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.national_code}
+                </p>
               )}
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              تاریخ تولد *
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <Calendar className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="date"
-                name="birth_date"
-                value={formData.birth_date}
-                onChange={handleInputChange}
-                className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white"
-              />
-            </div>
-            {errors.birth_date && (
-              <p className="text-sm text-red-500 dark:text-red-400">{errors.birth_date}</p>
-            )}
+            <DatePicker
+              id="birth_date"
+              label="تاریخ تولد"
+              value={formData.birth_date}
+              onChange={handleDateChange}
+              error={errors.birth_date}
+              required
+              placeholder="تاریخ تولد خود را انتخاب کنید"
+            />
           </div>
         </div>
 
         {/* Family Information */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">اطلاعات خانوادگی</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            اطلاعات خانوادگی
+          </h3>
+
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 نام پدر *
@@ -313,7 +352,9 @@ export default function OnboardingInformationPage() {
                 placeholder="نام پدر"
               />
               {errors.father_name && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.father_name}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.father_name}
+                </p>
               )}
             </div>
 
@@ -330,12 +371,14 @@ export default function OnboardingInformationPage() {
                 placeholder="نام مادر"
               />
               {errors.mother_name && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.mother_name}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.mother_name}
+                </p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 شغل پدر *
@@ -349,7 +392,9 @@ export default function OnboardingInformationPage() {
                 placeholder="شغل پدر"
               />
               {errors.father_job && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.father_job}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.father_job}
+                </p>
               )}
             </div>
 
@@ -366,7 +411,9 @@ export default function OnboardingInformationPage() {
                 placeholder="شغل مادر"
               />
               {errors.mother_job && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.mother_job}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.mother_job}
+                </p>
               )}
             </div>
           </div>
@@ -374,8 +421,10 @@ export default function OnboardingInformationPage() {
 
         {/* Health & Personal Info */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">اطلاعات سلامت و شخصیتی</h3>
-          
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            اطلاعات سلامت و شخصیتی
+          </h3>
+
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               آیا آلرژی دارید؟ *
@@ -412,7 +461,7 @@ export default function OnboardingInformationPage() {
                 جزئیات آلرژی *
               </label>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 right-0 top-3 flex items-start pr-3">
+                <div className="pointer-events-none absolute inset-y-0 top-3 right-0 flex items-start pr-3">
                   <Heart className="h-5 w-5 text-gray-400" />
                 </div>
                 <textarea
@@ -425,12 +474,14 @@ export default function OnboardingInformationPage() {
                 />
               </div>
               {errors.allergy_details && (
-                <p className="text-sm text-red-500 dark:text-red-400">{errors.allergy_details}</p>
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  {errors.allergy_details}
+                </p>
               )}
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 سطح علاقه (۱-۱۰۰) *
@@ -448,7 +499,7 @@ export default function OnboardingInformationPage() {
                   onChange={handleInputChange}
                   className="w-full"
                 />
-                <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <div className="mt-1 text-center text-sm text-gray-600 dark:text-gray-400">
                   {formData.interest_level}
                 </div>
               </div>
@@ -471,7 +522,7 @@ export default function OnboardingInformationPage() {
                   onChange={handleInputChange}
                   className="w-full"
                 />
-                <div className="text-center text-sm text-gray-600 dark:text-gray-400 mt-1">
+                <div className="mt-1 text-center text-sm text-gray-600 dark:text-gray-400">
                   {formData.focus_level}
                 </div>
               </div>

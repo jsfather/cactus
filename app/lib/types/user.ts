@@ -49,7 +49,7 @@ export interface UpdateProfileRequest {
   phone: string;
   email: string | null;
   national_code: string | null;
-  profile_picture?: File | null;
+  profile_picture?: globalThis.File | null;
 }
 
 // Onboarding types
