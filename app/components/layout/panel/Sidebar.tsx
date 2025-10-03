@@ -235,6 +235,7 @@ export default function Sidebar({
                 alt={`${user.first_name} ${user.last_name}`}
                 fill
                 className="object-cover"
+                unoptimized={true}
               />
             ) : (
               <User2 className="h-6 w-6 text-gray-400 dark:text-gray-500" />
