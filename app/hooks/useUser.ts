@@ -18,7 +18,6 @@ let globalError: Error | null = null;
 let listeners: Array<() => void> = [];
 
 const notifyListeners = () => {
-  console.log('Notifying listeners, globalUser:', globalUser);
   listeners.forEach((listener) => listener());
 };
 

@@ -89,6 +89,22 @@ export default function ProfilePage() {
 
   const onSubmit = async (data: FormData) => {
     try {
+      // Clean up profile_picture field
+      let profilePicture = null;
+      if (data.profile_picture) {
+        if (
+          data.profile_picture instanceof File &&
+          data.profile_picture.size > 0
+        ) {
+          profilePicture = data.profile_picture;
+        } else if (
+          data.profile_picture instanceof FileList &&
+          data.profile_picture.length > 0
+        ) {
+          profilePicture = data.profile_picture[0];
+        }
+      }
+
       const payload: UpdateProfileRequest = {
         first_name: data.first_name,
         last_name: data.last_name,
@@ -96,10 +112,20 @@ export default function ProfilePage() {
         phone: data.phone,
         email: data.email || null,
         national_code: data.national_code || null,
-        profile_picture: data.profile_picture || null,
+        profile_picture: profilePicture,
       };
 
-      console.log('Updating profile with payload:', payload);
+      console.log('Updating profile with payload:', {
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        username: payload.username,
+        phone: payload.phone,
+        email: payload.email,
+        national_code: payload.national_code,
+        profile_picture: profilePicture
+          ? `File: ${profilePicture.name} (${profilePicture.size} bytes)`
+          : null,
+      });
 
       // First update through user service to ensure global state is updated
       const response = await updateUserProfile(payload);
@@ -162,11 +188,15 @@ export default function ProfilePage() {
               {profile?.profile_picture ? (
                 <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-gray-200 dark:border-gray-700">
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '')}/${profile.profile_picture}`}
+                    src={profile.profile_picture.startsWith('http') 
+                      ? profile.profile_picture 
+                      : `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '')}/${profile.profile_picture}`
+                    }
                     alt="تصویر پروفایل"
                     width={96}
                     height={96}
                     className="h-full w-full object-cover"
+                    unoptimized={true} // Disable Next.js optimization for external images
                   />
                 </div>
               ) : (

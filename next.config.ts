@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
         hostname: 'randomuser.me',
         pathname: '/api/portraits/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'kaktos.kanoonbartarha.ir',
+        pathname: '/user_files/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'kaktos.kanoonbartarha.ir',
+        pathname: '/user_files/**',
+      },
     ],
   },
 };
