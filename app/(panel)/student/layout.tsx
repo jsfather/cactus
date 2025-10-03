@@ -55,6 +55,16 @@ const menuItems = [
       },
     ],
   },
+  {
+    title: 'راهنما',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'راهنمای کار با پنل',
+        href: '/student/guides',
+      },
+    ],
+  },
 ];
 
 export default function Layout({

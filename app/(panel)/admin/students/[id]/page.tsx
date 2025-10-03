@@ -24,6 +24,9 @@ import {
   UpdateStudentRequest,
 } from '@/app/lib/types/student';
 
+// Components
+import StudentActiveTerms from '@/app/components/admin/StudentActiveTerms';
+
 // Utils
 import { convertToEnglishNumbers } from '@/app/lib/utils';
 
@@ -566,6 +569,11 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
               />
             </div>
           </div>
+
+          {/* Student Active Terms - Only show for existing students */}
+          {!isNew && resolvedParams?.id && (
+            <StudentActiveTerms studentId={resolvedParams.id} />
+          )}
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-3 space-x-reverse pt-6">
