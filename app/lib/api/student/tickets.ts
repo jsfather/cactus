@@ -1,47 +1,40 @@
-import request from '@/app/lib/api/client';
-import { Exam, Ticket } from '@/app/lib/types';
+import { apiClient } from '@/app/lib/api/client';
+import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
+import {
+  GetStudentTicketListResponse,
+  GetStudentTicketResponse,
+  CreateStudentTicketRequest,
+  CreateStudentTicketResponse,
+  GetTicketDepartmentListResponse,
+} from '@/app/lib/types';
 
-export const getTickets = async () => {
-  const response = await request<{ data: Ticket[] }>('student/tickets');
-
-  if (!response) {
-    throw new Error('خطایی در دریافت لیست تیکت ها رخ داده است');
+export class StudentTicketService {
+  async getTickets(): Promise<GetStudentTicketListResponse> {
+    return apiClient.get<GetStudentTicketListResponse>(
+      API_ENDPOINTS.STUDENT.TICKETS.GET_ALL
+    );
   }
 
-  return response;
-};
-
-export const getTicket = async (id: number | string) => {
-  const response = await request<{ data: Ticket }>(`student/ticket/${id}`);
-
-  if (!response) {
-    throw new Error('خطایی در دریافت تیکت رخ داده است');
+  async getTicketById(id: string): Promise<GetStudentTicketResponse> {
+    return apiClient.get<GetStudentTicketResponse>(
+      API_ENDPOINTS.STUDENT.TICKETS.GET_BY_ID(id)
+    );
   }
 
-  return response;
-};
-
-export const createTicket = async (data: Partial<Ticket>) => {
-  const response = await request<Exam>('student/ticket', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-
-  if (!response) {
-    throw new Error('خطایی در ایجاد تیکت رخ داده است');
+  async createTicket(
+    payload: CreateStudentTicketRequest
+  ): Promise<CreateStudentTicketResponse> {
+    return apiClient.post<CreateStudentTicketResponse>(
+      API_ENDPOINTS.STUDENT.TICKETS.CREATE,
+      payload
+    );
   }
 
-  return response;
-};
-
-export const getTicketDepartments = async () => {
-  const response = await request<{
-    data: { id: number | string; title: string };
-  }>('student/tickets/departments');
-
-  if (!response) {
-    throw new Error('خطایی در دریافت لیست بخش های تیکت رخ داده است');
+  async getDepartments(): Promise<GetTicketDepartmentListResponse> {
+    return apiClient.get<GetTicketDepartmentListResponse>(
+      API_ENDPOINTS.STUDENT.TICKETS.DEPARTMENTS
+    );
   }
+}
 
-  return response;
-};
+export const studentTicketService = new StudentTicketService();

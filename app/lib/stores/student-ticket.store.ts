@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { studentTicketService } from '@/app/lib/services/student-ticket.service';
+import { studentTicketService } from '@/app/lib/api/student/tickets';
 import {
   Ticket,
   TicketDepartment,
@@ -43,7 +43,7 @@ export const useStudentTicketStore = create<StudentTicketStore>()(
       fetchTickets: async () => {
         try {
           set({ isListLoading: true, error: null, tickets: [] });
-          const response = await studentTicketService.getList();
+          const response = await studentTicketService.getTickets();
 
           if (response.data) {
             set({ tickets: response.data });
@@ -65,7 +65,7 @@ export const useStudentTicketStore = create<StudentTicketStore>()(
       fetchTicketById: async (id: string) => {
         try {
           set({ isLoading: true, error: null, currentTicket: null });
-          const response = await studentTicketService.getById(id);
+          const response = await studentTicketService.getTicketById(id);
 
           if (response.data) {
             set({ currentTicket: response.data });
@@ -87,7 +87,7 @@ export const useStudentTicketStore = create<StudentTicketStore>()(
       createTicket: async (payload: CreateStudentTicketRequest) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await studentTicketService.create(payload);
+          const response = await studentTicketService.createTicket(payload);
 
           if (response.ticket) {
             const newTicket = response.ticket;

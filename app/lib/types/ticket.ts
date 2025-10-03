@@ -9,6 +9,8 @@ export interface Message {
 export interface Ticket {
   id: number | string;
   subject: string;
+  description?: string; // اضافه کردن description
+  response?: string; // اضافه کردن response
   status: 'open' | 'closed' | 'pending';
   student?: string;
   teacher?: string | null;
@@ -34,9 +36,9 @@ export interface GetStudentTicketResponse {
 
 export interface CreateStudentTicketRequest {
   subject: string;
-  message: string;
-  department_id: number | string;
-  teacher_id?: string;
+  description: string; // تغییر از message به description
+  department: string; // تغییر از department_id به department
+  teacher?: string; // تغییر از teacher_id به teacher
 }
 
 export interface CreateStudentTicketResponse {

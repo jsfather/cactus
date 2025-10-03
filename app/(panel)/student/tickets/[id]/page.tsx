@@ -1,270 +1,231 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { toast } from 'react-hot-toast';
+import { useParams } from 'next/navigation';
+import { useStudentTicket } from '@/app/lib/hooks/use-student-ticket';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import Input from '@/app/components/ui/Input';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
-import Select from '@/app/components/ui/Select';
-import { useStudentTicket } from '@/app/lib/hooks/use-student-ticket';
+import {
+  ArrowRight,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Calendar,
+  User,
+  Building,
+  MessageSquare,
+} from 'lucide-react';
 
-const ticketSchema = z.object({
-  subject: z.string().min(1, 'موضوع الزامی است'),
-  message: z.string().min(1, 'پیام الزامی است'),
-  department_id: z.string().min(1, 'بخش الزامی است'),
-  teacher_id: z.string().optional(),
-});
+const statusColors: Record<string, string> = {
+  open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  closed: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+  pending:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+};
 
-type TicketFormData = z.infer<typeof ticketSchema>;
+const statusIcons: Record<string, React.ReactElement> = {
+  open: <Clock className="h-5 w-5" />,
+  closed: <CheckCircle className="h-5 w-5" />,
+  pending: <AlertCircle className="h-5 w-5" />,
+};
 
-export default function TicketPage(props: { params: Promise<{ id: string }> }) {
-  const params = use(props.params);
+const statusTranslations: Record<string, string> = {
+  open: 'باز',
+  closed: 'بسته',
+  pending: 'در انتظار',
+};
+
+const departmentTranslations: Record<string, string> = {
+  technical: 'فنی',
+  educational: 'آموزشی',
+  financial: 'مالی',
+  support: 'پشتیبانی',
+  other: 'سایر',
+};
+
+export default function TicketDetailPage() {
   const router = useRouter();
-  const [isCreating, setIsCreating] = useState(params.id === 'create');
+  const params = useParams();
+  const ticketId = params.id as string;
 
   const {
-    ticket,
-    departments,
-    isLoading,
-    isDepartmentsLoading,
+    currentTicket: ticket,
+    isDetailLoading,
     fetchTicket,
-    fetchDepartments,
-    createTicket,
+    error,
   } = useStudentTicket();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TicketFormData>({
-    resolver: zodResolver(ticketSchema),
-    defaultValues: {
-      subject: '',
-      message: '',
-      department_id: '',
-      teacher_id: '',
-    },
-  });
-
   useEffect(() => {
-    if (isCreating) {
-      fetchDepartments();
-    } else {
-      fetchTicket(params.id);
+    if (ticketId) {
+      fetchTicket(ticketId);
     }
-  }, [params.id, isCreating, fetchTicket, fetchDepartments]);
+  }, [ticketId, fetchTicket]);
 
-  const onSubmit = async (data: TicketFormData) => {
-    try {
-      const payload = {
-        subject: data.subject,
-        message: data.message,
-        department_id: parseInt(data.department_id),
-        teacher_id: data.teacher_id || '',
-      };
+  const breadcrumbItems = [
+    { label: 'پنل دانش‌آموز', href: '/student' },
+    { label: 'تیکت‌ها', href: '/student/tickets' },
+    {
+      label: ticket?.subject || 'جزئیات تیکت',
+      href: `/student/tickets/${ticketId}`,
+      active: true,
+    },
+  ];
 
-      await createTicket(payload);
-      toast.success('تیکت با موفقیت ایجاد شد');
-      router.push('/student/tickets');
-    } catch (error) {
-      // Error handling is done in the store
-    }
+  const handleBack = () => {
+    router.push('/student/tickets');
   };
 
-  if (loading && !isNew) {
+  if (isDetailLoading) {
     return <LoadingSpinner />;
   }
 
-  // Department options for select
-  const departmentOptions = departments.map((dept) => ({
-    value: dept.id.toString(),
-    label: dept.title,
-  }));
-
-  if (!isNew && currentTicket) {
+  if (!ticket) {
     return (
-      <main>
-        <Breadcrumbs
-          breadcrumbs={[
-            { label: 'تیکت‌ها', href: '/student/tickets' },
-            {
-              label: 'مشاهده تیکت',
-              href: `/student/tickets/${resolvedParams.id}`,
-              active: true,
-            },
-          ]}
-        />
-
-        <div className="mt-8 space-y-6">
-          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  موضوع
-                </h3>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {currentTicket.subject}
-                </p>
+      <div className="space-y-6">
+        <Breadcrumbs breadcrumbs={breadcrumbItems} />
+        <div className="bg-white shadow sm:rounded-lg dark:bg-gray-800">
+          <div className="px-4 py-5 sm:p-6">
+            <div className="text-center">
+              <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                تیکت یافت نشد
+              </h3>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                تیکت مورد نظر شما یافت نشد
+              </p>
+              <div className="mt-6">
+                <Button onClick={handleBack}>
+                  <ArrowRight className="mr-2 h-4 w-4" />
+                  بازگشت به لیست تیکت‌ها
+                </Button>
               </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  وضعیت
-                </h3>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {currentTicket.status === 'open'
-                    ? 'باز'
-                    : currentTicket.status === 'closed'
-                      ? 'بسته'
-                      : currentTicket.status === 'pending'
-                        ? 'در انتظار'
-                        : currentTicket.status}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  بخش
-                </h3>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {currentTicket.department}
-                </p>
-              </div>
-              <div>
-                <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  مدرس
-                </h3>
-                <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                  {currentTicket.teacher || 'تعیین نشده'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Messages */}
-          <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-            <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
-              پیام‌ها
-            </h3>
-            <div className="space-y-4">
-              {currentTicket.messages?.map((message, index) => (
-                <div
-                  key={index}
-                  className={`rounded-lg p-4 ${
-                    message.is_student
-                      ? 'ml-8 bg-blue-50 dark:bg-blue-900/20'
-                      : 'mr-8 bg-gray-50 dark:bg-gray-700'
-                  }`}
-                >
-                  <div className="mb-2 flex items-start justify-between">
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      {message.sender}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(message.created_at).toLocaleDateString('fa-IR')}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300">
-                    <MarkdownRenderer content={message.message} />
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: 'تیکت‌ها', href: '/student/tickets' },
-          {
-            label: 'ایجاد تیکت',
-            href: '/student/tickets/new',
-            active: true,
-          },
-        ]}
-      />
+    <div className="space-y-6">
+      <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Input
-            id="subject"
-            label="موضوع"
-            placeholder="موضوع تیکت را وارد کنید"
-            required
-            error={errors.subject?.message}
-            {...register('subject')}
-          />
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            جزئیات تیکت
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            مشاهده جزئیات و وضعیت تیکت پشتیبانی
+          </p>
+        </div>
+        <Button variant="secondary" onClick={handleBack}>
+          <ArrowRight className="mr-2 h-4 w-4" />
+          بازگشت
+        </Button>
+      </div>
 
-          <Controller
-            name="department_id"
-            control={control}
-            render={({ field }) => (
-              <Select
-                id="department_id"
-                label="بخش"
-                placeholder="بخش مربوطه را انتخاب کنید"
-                options={departmentOptions}
-                required
-                loading={isDepartmentsLoading}
-                error={errors.department_id?.message}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                name={field.name}
-              />
+      {/* Ticket Info */}
+      <div className="bg-white shadow sm:rounded-lg dark:bg-gray-800">
+        <div className="px-4 py-5 sm:p-6">
+          <div className="space-y-6">
+            {/* Status and Subject */}
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {ticket.subject}
+                </h2>
+                <div className="mt-2 flex items-center space-x-4 space-x-reverse">
+                  <span
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                      statusColors[ticket.status]
+                    }`}
+                  >
+                    {statusIcons[ticket.status]}
+                    <span className="mr-2">
+                      {statusTranslations[ticket.status] || ticket.status}
+                    </span>
+                  </span>
+                  {ticket.created_at && (
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <Calendar className="ml-1 h-4 w-4" />
+                      تاریخ ایجاد:{' '}
+                      {new Date(ticket.created_at).toLocaleDateString('fa-IR')}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Details Grid */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="flex items-center space-x-3 space-x-reverse">
+                <Building className="h-5 w-5 text-gray-400" />
+                <div>
+                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    بخش
+                  </dt>
+                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                    {departmentTranslations[ticket.department || ''] ||
+                      ticket.department ||
+                      '-'}
+                  </dd>
+                </div>
+              </div>
+
+              {ticket.teacher && (
+                <div className="flex items-center space-x-3 space-x-reverse">
+                  <User className="h-5 w-5 text-gray-400" />
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      مدرس
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">
+                      {ticket.teacher}
+                    </dd>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <h3 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">
+                توضیحات
+              </h3>
+              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
+                <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                  {ticket.description || 'توضیحاتی ارائه نشده است.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Response Section */}
+            {ticket.response && (
+              <div>
+                <h3 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">
+                  پاسخ پشتیبانی
+                </h3>
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+                  <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                    {ticket.response}
+                  </p>
+                  {ticket.updated_at && (
+                    <div className="mt-3 flex items-center text-sm text-blue-600 dark:text-blue-400">
+                      <Calendar className="ml-1 h-4 w-4" />
+                      تاریخ پاسخ:{' '}
+                      {new Date(ticket.updated_at).toLocaleDateString('fa-IR')}
+                    </div>
+                  )}
+                </div>
+              </div>
             )}
-          />
+          </div>
         </div>
-
-        <div className="grid grid-cols-1 gap-6">
-          <Input
-            id="teacher_id"
-            label="شناسه مدرس (اختیاری)"
-            placeholder="در صورت تمایل شناسه مدرس را وارد کنید"
-            error={errors.teacher_id?.message}
-            {...register('teacher_id')}
-          />
-        </div>
-
-        <div className="w-full">
-          <Controller
-            name="message"
-            control={control}
-            render={({ field }) => (
-              <MarkdownEditor
-                id="message"
-                label="پیام"
-                value={field.value}
-                onChange={field.onChange}
-                error={errors.message?.message}
-                required
-              />
-            )}
-          />
-        </div>
-
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="white"
-            onClick={() => router.push('/student/tickets')}
-          >
-            انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting}>
-            ایجاد تیکت
-          </Button>
-        </div>
-      </form>
-    </main>
+      </div>
+    </div>
   );
 }

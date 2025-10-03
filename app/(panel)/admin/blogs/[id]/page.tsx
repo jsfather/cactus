@@ -17,23 +17,49 @@ import { useBlog } from '@/app/lib/hooks/use-blog';
 import { useUser } from '@/app/hooks/useUser';
 import { CreateBlogRequest, UpdateBlogRequest } from '@/app/lib/types';
 import { ArrowRight, Save } from 'lucide-react';
+import Select from '@/app/components/ui/Select';
 
-const schema = z.object({
-  title: z.string().min(1, 'عنوان مقاله الزامی است'),
-  little_description: z.string().min(1, 'توضیحات کوتاه الزامی است'),
-  description: z.string().min(1, 'محتوای مقاله الزامی است'),
-  meta_title: z.string().min(1, 'عنوان متا الزامی است'),
-  meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
-  slug: z.string()
-    .min(1, 'اسلاگ الزامی است')
-    .regex(/^[a-z0-9-]+$/, 'اسلاگ باید شامل حروف انگلیسی کوچک، اعداد و خط تیره باشد'),
-  tags: z.string(),
-  publish_at: z.string().min(1, 'تاریخ انتشار الزامی است'),
-});
+const schema = z
+  .object({
+    title: z.string().min(1, 'عنوان مقاله الزامی است'),
+    little_description: z.string().min(1, 'توضیحات کوتاه الزامی است'),
+    description: z.string().min(1, 'محتوای مقاله الزامی است'),
+    meta_title: z.string().min(1, 'عنوان متا الزامی است'),
+    meta_description: z.string().min(1, 'توضیحات متا الزامی است'),
+    slug: z
+      .string()
+      .min(1, 'اسلاگ الزامی است')
+      .regex(
+        /^[a-z0-9-]+$/,
+        'اسلاگ باید شامل حروف انگلیسی کوچک، اعداد و خط تیره باشد'
+      ),
+    tags: z.string(),
+    status: z.enum(['draft', 'published'], {
+      required_error: 'وضعیت انتشار الزامی است',
+    }),
+    publish_at: z.string().min(1, 'تاریخ انتشار الزامی است'),
+  })
+  .refine(
+    (data) => {
+      // If status is published, publish_at is required
+      if (data.status === 'published' && !data.publish_at) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'تاریخ انتشار برای مقالات منتشر شده الزامی است',
+      path: ['publish_at'],
+    }
+  );
 
 type FormData = z.infer<typeof schema>;
 
-export default function BlogFormPage({ params }: { params: Promise<{ id: string }> }) {
+export default function BlogFormPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
@@ -56,7 +82,8 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
       meta_description: '',
       slug: '',
       tags: '',
-      publish_at: new Date().toISOString().split('T')[0],
+      status: 'draft',
+      publish_at: '',
     },
   });
 
@@ -73,6 +100,8 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
   const { user, loading: userLoading } = useUser();
 
   const titleValue = watch('title');
+  const statusValue = watch('status');
+
   useEffect(() => {
     if (titleValue && isNew) {
       const slug = titleValue
@@ -85,6 +114,18 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
     }
   }, [titleValue, isNew, setValue]);
 
+  // Handle status change and auto-set publish date
+  useEffect(() => {
+    if (statusValue === 'published') {
+      setValue('publish_at', new Date().toISOString().split('T')[0]);
+    } else if (statusValue === 'draft') {
+      // For draft, set a future date (10 years from now)
+      const futureDate = new Date();
+      futureDate.setFullYear(futureDate.getFullYear() + 10);
+      setValue('publish_at', futureDate.toISOString().split('T')[0]);
+    }
+  }, [statusValue, setValue]);
+
   useEffect(() => {
     if (!isNew && resolvedParams.id) {
       fetchBlogById(resolvedParams.id);
@@ -93,6 +134,11 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
 
   useEffect(() => {
     if (currentBlog && !isNew) {
+      // Determine status based on publish_at date
+      const publishDate = new Date(currentBlog.publish_at);
+      const now = new Date();
+      const isDraft = publishDate > now;
+
       reset({
         title: currentBlog.title,
         little_description: currentBlog.little_description,
@@ -100,8 +146,13 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
         meta_title: currentBlog.meta_title,
         meta_description: currentBlog.meta_description,
         slug: currentBlog.slug,
-        tags: Array.isArray(currentBlog.tags) ? currentBlog.tags.join(', ') : '',
-        publish_at: currentBlog.publish_at ? currentBlog.publish_at.split('T')[0] : new Date().toISOString().split('T')[0],
+        tags: Array.isArray(currentBlog.tags)
+          ? currentBlog.tags.join(', ')
+          : '',
+        status: isDraft ? 'draft' : 'published',
+        publish_at: currentBlog.publish_at
+          ? currentBlog.publish_at.split('T')[0]
+          : new Date().toISOString().split('T')[0],
       });
     }
   }, [currentBlog, isNew, reset]);
@@ -109,26 +160,43 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
   const onSubmit = async (data: FormData) => {
     try {
       clearError();
-      
+
       if (!user?.id) {
         toast.error('شناسه کاربر یافت نشد. لطفاً مجدد وارد شوید.');
         return;
       }
-      
+
       const payload = {
-        ...data,
-        tags: data.tags.split(',').map(tag => tag.trim()).filter(Boolean),
+        title: data.title,
+        little_description: data.little_description,
+        description: data.description,
+        meta_title: data.meta_title,
+        meta_description: data.meta_description,
+        slug: data.slug,
+        tags: data.tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter(Boolean),
         user_id: user.id, // استفاده از آیدی کاربر لاگین شده
+        publish_at: data.publish_at || new Date().toISOString().split('T')[0],
       };
 
       if (isNew) {
         await createBlog(payload as CreateBlogRequest);
-        toast.success('مقاله با موفقیت ایجاد شد');
+        const statusMessage =
+          data.status === 'published'
+            ? 'منتشر شد'
+            : 'به عنوان پیش‌نویس ذخیره شد';
+        toast.success(`مقاله با موفقیت ${statusMessage}`);
       } else {
         await updateBlog(resolvedParams.id, payload as UpdateBlogRequest);
-        toast.success('مقاله با موفقیت به‌روزرسانی شد');
+        const statusMessage =
+          data.status === 'published'
+            ? 'منتشر شد'
+            : 'به عنوان پیش‌نویس ذخیره شد';
+        toast.success(`مقاله با موفقیت ${statusMessage}`);
       }
-      
+
       router.push('/admin/blogs');
     } catch (error: any) {
       console.error('Error saving blog:', error);
@@ -170,7 +238,9 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
                 {isNew ? 'افزودن مقاله جدید' : 'ویرایش مقاله'}
               </h1>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {isNew ? 'مقاله جدید ایجاد کنید' : 'اطلاعات مقاله را ویرایش کنید'}
+                {isNew
+                  ? 'مقاله جدید ایجاد کنید'
+                  : 'اطلاعات مقاله را ویرایش کنید'}
               </p>
             </div>
           </div>
@@ -178,7 +248,9 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
 
         {error && (
           <div className="mb-6 rounded-md bg-red-50 p-4 dark:bg-red-900/20">
-            <div className="text-sm text-red-700 dark:text-red-300">{error}</div>
+            <div className="text-sm text-red-700 dark:text-red-300">
+              {error}
+            </div>
           </div>
         )}
 
@@ -222,22 +294,73 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
 
               <div>
                 <Controller
-                  name="publish_at"
+                  name="status"
                   control={control}
                   render={({ field }) => (
-                    <DatePicker
-                      id="publish_at"
-                      label="تاریخ انتشار"
+                    <Select
+                      id="status"
+                      label="وضعیت انتشار"
                       required
                       value={field.value}
                       onChange={field.onChange}
                       onBlur={field.onBlur}
-                      error={errors.publish_at?.message}
-                      placeholder="تاریخ انتشار را انتخاب کنید"
+                      error={errors.status?.message}
+                      options={[
+                        { value: 'draft', label: 'پیش‌نویس' },
+                        { value: 'published', label: 'منتشر شده' },
+                      ]}
                     />
                   )}
                 />
               </div>
+
+              {statusValue === 'draft' && (
+                <div>
+                  <Controller
+                    name="publish_at"
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="publish_at"
+                        label="تاریخ انتشار (اختیاری)"
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        error={errors.publish_at?.message}
+                        placeholder="تاریخ انتشار را انتخاب کنید"
+                      />
+                    )}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    برای پیش‌نویس می‌توانید تاریخ انتشار آینده انتخاب کنید
+                  </p>
+                </div>
+              )}
+
+              {statusValue === 'published' && (
+                <div>
+                  <Controller
+                    name="publish_at"
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        id="publish_at"
+                        label="تاریخ انتشار"
+                        required
+                        value={field.value}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        error={errors.publish_at?.message}
+                        placeholder="تاریخ انتشار"
+                        disabled
+                      />
+                    )}
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    تاریخ انتشار به صورت خودکار روی امروز تنظیم شده است
+                  </p>
+                </div>
+              )}
 
               <div className="lg:col-span-2">
                 <Input
@@ -306,13 +429,20 @@ export default function BlogFormPage({ params }: { params: Promise<{ id: string 
               >
                 <Save className="h-4 w-4" />
                 {isSubmitting
-                  ? isNew 
-                    ? 'در حال ایجاد...'
-                    : 'در حال به‌روزرسانی...'
+                  ? isNew
+                    ? statusValue === 'published'
+                      ? 'در حال انتشار...'
+                      : 'در حال ذخیره پیش‌نویس...'
+                    : statusValue === 'published'
+                      ? 'در حال انتشار...'
+                      : 'در حال ذخیره پیش‌نویس...'
                   : isNew
-                    ? 'ایجاد مقاله'
-                    : 'به‌روزرسانی مقاله'
-                }
+                    ? statusValue === 'published'
+                      ? 'انتشار مقاله'
+                      : 'ذخیره پیش‌نویس'
+                    : statusValue === 'published'
+                      ? 'انتشار مقاله'
+                      : 'ذخیره پیش‌نویس'}
               </Button>
             </div>
           </form>

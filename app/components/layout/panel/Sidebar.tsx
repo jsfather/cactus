@@ -7,6 +7,7 @@ import { User2, X, Settings } from 'lucide-react';
 import { User } from '@/app/lib/types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useRef } from 'react';
+import { getImageUrl, isValidImageUrl } from '@/app/lib/utils/image';
 
 interface MenuItem {
   title: string;
@@ -161,12 +162,7 @@ export default function Sidebar({
   };
 
   // Check if avatar URL is valid
-  const hasValidAvatar =
-    user.profile_picture &&
-    (user.profile_picture.startsWith('http') ||
-      user.profile_picture.startsWith('/')) &&
-    user.profile_picture !== '/default-avatar.jpg' &&
-    user.profile_picture !== '/default-avatar.png';
+  const hasValidAvatar = isValidImageUrl(user.profile_picture);
 
   const renderMenuItem = (item: MenuItem, depth = 0) => {
     if (item.isGroupTitle) {
@@ -231,10 +227,11 @@ export default function Sidebar({
           <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gray-50 ring-2 ring-gray-100 dark:bg-gray-800 dark:ring-gray-800">
             {hasValidAvatar ? (
               <Image
-                src={user.profile_picture || ''}
+                src={getImageUrl(user.profile_picture) || ''}
                 alt={`${user.first_name} ${user.last_name}`}
                 fill
                 className="object-cover"
+                unoptimized={true}
               />
             ) : (
               <User2 className="h-6 w-6 text-gray-400 dark:text-gray-500" />
