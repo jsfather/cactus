@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useStudentTicketStore } from '@/app/lib/stores/student-ticket.store';
+import { CreateStudentTicketRequest } from '@/app/lib/types';
 
 export const useStudentTicket = () => {
   const {
@@ -30,7 +31,7 @@ export const useStudentTicket = () => {
   );
 
   const handleCreateTicket = useCallback(
-    (payload: any) => {
+    (payload: CreateStudentTicketRequest) => {
       return createTicket(payload);
     },
     [createTicket]
@@ -54,9 +55,12 @@ export const useStudentTicket = () => {
     departments,
     isLoading,
     isListLoading,
+    isDetailLoading: isLoading, // alias برای loading جزئیات
     isDepartmentsLoading,
+    isCreateLoading: isLoading, // alias برای loading ایجاد
     error,
     fetchTickets: handleFetchTickets,
+    fetchTicket: handleFetchTicketById, // alias مطابق با صفحه
     fetchTicketById: handleFetchTicketById,
     createTicket: handleCreateTicket,
     fetchDepartments: handleFetchDepartments,

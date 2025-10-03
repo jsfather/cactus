@@ -218,4 +218,13 @@ export const API_ENDPOINTS = {
     CONTACT: '/contact',
     HOME_SETTINGS: '/home/settings',
   },
+
+  STUDENT: {
+    TICKETS: {
+      GET_ALL: '/student/tickets',
+      GET_BY_ID: (id: string) => `/student/ticket/${id}`,
+      CREATE: '/student/ticket',
+      DEPARTMENTS: '/student/tickets/departments',
+    },
+  },
 } as const;
