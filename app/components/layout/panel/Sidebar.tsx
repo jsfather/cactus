@@ -42,13 +42,16 @@ function SidebarSkeleton() {
 
       {/* Skeleton avatar section */}
       <div className="flex items-center gap-3 border-b border-gray-100 p-3 dark:border-gray-800">
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"></div>
           <div className="absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full border border-white bg-gray-300 dark:border-gray-900 dark:bg-gray-600"></div>
         </div>
-        <div className="flex-1">
-          <div className="mb-1 h-4 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
-          <div className="h-3 w-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <div className="mb-1 h-4 w-24 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+            <div className="h-3 w-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+          <div className="h-6 w-6 flex-shrink-0 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
         </div>
       </div>
 
@@ -224,7 +227,7 @@ export default function Sidebar({
 
       {/* User avatar section */}
       <div className="flex items-center gap-3 border-b border-gray-100 p-3 dark:border-gray-800">
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gray-50 ring-2 ring-gray-100 dark:bg-gray-800 dark:ring-gray-800">
             {hasValidAvatar ? (
               <Image
@@ -239,8 +242,8 @@ export default function Sidebar({
           </div>
           <div className="absolute right-0 bottom-0 h-2.5 w-2.5 rounded-full border border-white bg-green-500 dark:border-gray-900"></div>
         </div>
-        <div className="flex min-w-0 flex-1 items-center justify-between">
-          <div>
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
             <h3 className="truncate text-sm font-medium text-gray-800 dark:text-gray-200">{`${user.first_name} ${user.last_name}`}</h3>
             <div className="text-xs text-gray-500 dark:text-gray-400">
               آنلاین
@@ -248,7 +251,7 @@ export default function Sidebar({
           </div>
           <Link
             href="/user/profile"
-            className="p-1.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            className="flex-shrink-0 p-1.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <Settings className="text-primary-500 h-4 w-4" />
           </Link>

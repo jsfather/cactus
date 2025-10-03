@@ -11,6 +11,7 @@ import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useProfile } from '@/app/lib/hooks/use-profile';
+import { useUser } from '@/app/hooks/useUser';
 import { UpdateProfileRequest } from '@/app/lib/types';
 import { User, Save } from 'lucide-react';
 import Image from 'next/image';
@@ -21,7 +22,8 @@ const schema = z.object({
   username: z.string().min(1, 'نام کاربری الزامی است'),
   phone: z.string().min(1, 'شماره موبایل الزامی است'),
   email: z.string().email('فرمت ایمیل صحیح نیست').optional().or(z.literal('')),
-  national_code: z.string()
+  national_code: z
+    .string()
     .regex(/^\d{10}$/, 'کد ملی باید ۱۰ رقم باشد')
     .optional()
     .or(z.literal('')),
@@ -55,9 +57,11 @@ export default function ProfilePage() {
     loading,
     error,
     fetchProfile,
-    updateProfile,
+    updateProfile: updateProfileService,
     clearError,
   } = useProfile();
+
+  const { updateProfile: updateUserProfile } = useUser();
 
   useEffect(() => {
     fetchProfile();
@@ -95,11 +99,27 @@ export default function ProfilePage() {
         profile_picture: data.profile_picture || null,
       };
 
-      await updateProfile(payload);
+      console.log('Updating profile with payload:', payload);
+
+      // First update through user service to ensure global state is updated
+      const response = await updateUserProfile(payload);
+      console.log('User profile updated, response:', response);
+
+      // Then update profile service for local state consistency (non-blocking)
+      try {
+        await updateProfileService(payload);
+      } catch (profileError) {
+        console.warn(
+          'Profile service update failed, but user data is already updated:',
+          profileError
+        );
+      }
+
       toast.success('اطلاعات پروفایل با موفقیت بروزرسانی شد');
     } catch (error: any) {
       // Error handling is done in the store and displayed via toast
       console.error('Profile update error:', error);
+      toast.error('خطا در بروزرسانی پروفایل');
     }
   };
 
@@ -110,7 +130,7 @@ export default function ProfilePage() {
 
   if (loading && !profile) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -120,10 +140,10 @@ export default function ProfilePage() {
     <div className="space-y-6">
       <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-            <User className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+      <div className="rounded-lg bg-white p-6 shadow-lg dark:bg-gray-800">
+        <div className="mb-6 flex items-center gap-3">
+          <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900">
+            <User className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -137,21 +157,21 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Profile Picture Section */}
-          <div className="flex flex-col items-center space-y-4 pb-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col items-center space-y-4 border-b border-gray-200 pb-6 dark:border-gray-700">
             <div className="relative">
               {profile?.profile_picture ? (
-                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200 dark:border-gray-700">
+                <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-gray-200 dark:border-gray-700">
                   <Image
                     src={`${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '')}/${profile.profile_picture}`}
                     alt="تصویر پروفایل"
                     width={96}
                     height={96}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
               ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                  <User className="w-12 h-12 text-gray-400 dark:text-gray-500" />
+                <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+                  <User className="h-12 w-12 text-gray-400 dark:text-gray-500" />
                 </div>
               )}
             </div>
@@ -174,7 +194,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Form Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Input
               id="first_name"
               label="نام"
@@ -228,14 +248,14 @@ export default function ProfilePage() {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-end border-t border-gray-200 pt-6 dark:border-gray-700">
             <Button
               type="submit"
               loading={isSubmitting}
               disabled={loading}
               className="flex items-center gap-2"
             >
-              <Save className="w-4 h-4" />
+              <Save className="h-4 w-4" />
               ذخیره تغییرات
             </Button>
           </div>
