@@ -6,6 +6,8 @@ import { useOnboardingStore } from '@/app/lib/stores/onboarding.store';
 import { User, Calendar, Mail, Phone, FileText, Heart, Brain, Focus } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { convertToEnglishNumbers, isNumeric } from '@/app/lib/utils/persian';
+import DatePicker from '@/app/components/ui/DatePicker';
+import '@/app/components/ui/DatePicker.css';
 
 export default function OnboardingInformationPage() {
   const router = useRouter();
@@ -101,6 +103,15 @@ export default function OnboardingInformationPage() {
     }
 
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Special handler for DatePicker
+  const handleDateChange = (value: string) => {
+    setFormData(prev => ({ ...prev, birth_date: value }));
+    // Clear error for this field
+    if (errors.birth_date) {
+      setErrors(prev => ({ ...prev, birth_date: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -274,24 +285,15 @@ export default function OnboardingInformationPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              تاریخ تولد *
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <Calendar className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="date"
-                name="birth_date"
-                value={formData.birth_date}
-                onChange={handleInputChange}
-                className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white"
-              />
-            </div>
-            {errors.birth_date && (
-              <p className="text-sm text-red-500 dark:text-red-400">{errors.birth_date}</p>
-            )}
+            <DatePicker
+              id="birth_date"
+              label="تاریخ تولد"
+              value={formData.birth_date}
+              onChange={handleDateChange}
+              error={errors.birth_date}
+              required
+              placeholder="تاریخ تولد خود را انتخاب کنید"
+            />
           </div>
         </div>
 
@@ -406,7 +408,7 @@ export default function OnboardingInformationPage() {
             </div>
           </div>
 
-          {formData.has_allergy === '1' && (
+                    {formData.has_allergy === '1' && (
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 جزئیات آلرژی *
