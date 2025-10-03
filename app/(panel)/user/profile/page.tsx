@@ -15,6 +15,7 @@ import { useUser } from '@/app/hooks/useUser';
 import { UpdateProfileRequest } from '@/app/lib/types';
 import { User, Save } from 'lucide-react';
 import Image from 'next/image';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 const schema = z.object({
   first_name: z.string().min(1, 'نام الزامی است'),
@@ -188,16 +189,12 @@ export default function ProfilePage() {
               {profile?.profile_picture ? (
                 <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-gray-200 dark:border-gray-700">
                   <Image
-                    src={
-                      profile.profile_picture.startsWith('http')
-                        ? profile.profile_picture
-                        : `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '')}/${profile.profile_picture}`
-                    }
+                    src={getImageUrl(profile.profile_picture) || ''}
                     alt="تصویر پروفایل"
                     width={96}
                     height={96}
                     className="h-full w-full object-cover"
-                    unoptimized={true} // Disable Next.js optimization for external images
+                    unoptimized={true}
                   />
                 </div>
               ) : (
