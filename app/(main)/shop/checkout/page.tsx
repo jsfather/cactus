@@ -261,8 +261,9 @@ export default function CheckoutPage() {
                       <div className="flex items-center gap-4">
                         <span className="text-primary-600 dark:text-primary-400">
                           {(
-                            parseInt((item.price || '0').replace(/[^0-9]/g, '')) *
-                            item.quantity
+                            parseInt(
+                              (item.price || '0').replace(/[^0-9]/g, '')
+                            ) * item.quantity
                           ).toLocaleString()}{' '}
                           تومان
                         </span>
