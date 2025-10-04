@@ -56,6 +56,16 @@ const menuItems = [
     ],
   },
   {
+    title: 'فروشگاه',
+    isGroupTitle: true,
+    subItems: [
+      {
+        title: 'سفارشات',
+        href: '/student/orders',
+      },
+    ],
+  },
+  {
     title: 'راهنما',
     isGroupTitle: true,
     subItems: [

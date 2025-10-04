@@ -169,6 +169,12 @@ export const API_ENDPOINTS = {
         CREATE: '/student/ticket',
         DEPARTMENTS: '/student/tickets/departments',
       },
+      ORDERS: {
+        GET_ALL: '/orders',
+        GET_BY_ID: (id: string) => `/orders/${id}`,
+        SHOW_WITH_CODE: '/orders/show_with_code',
+        BUY: '/order/buy',
+      },
     },
 
     TEACHER: {
@@ -202,6 +208,7 @@ export const API_ENDPOINTS = {
 
     SHOP: {
       PRODUCTS: '/products',
+      HOME_PRODUCTS: '/home/products',
       PRODUCT_BY_ID: (id: string) => `/products/${id}`,
       CATEGORIES: '/product-categories',
     },

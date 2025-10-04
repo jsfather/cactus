@@ -10,3 +10,5 @@ export { useAuth } from './use-auth';
 export { useSettings } from './use-settings';
 export { useTicket } from './useTicket';
 export { useFAQ } from './useFAQ';
+export { useStudentOrder } from './use-student-order';
+export { usePublicProduct } from './use-public-product';

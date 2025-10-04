@@ -6,10 +6,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, Minus, Plus, Trash2 } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
+import { useStudentOrder } from '@/app/lib/hooks/use-student-order';
+import toast from 'react-hot-toast';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { state, removeItem, updateQuantity, clearCart } = useCart();
+  const { buyOrder, loading } = useStudentOrder();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -19,12 +22,42 @@ export default function CheckoutPage() {
     postalCode: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the order to your backend
-    alert('سفارش شما با موفقیت ثبت شد');
-    clearCart();
-    router.push('/shop');
+
+    try {
+      // Prepare the order data - ensure product IDs are numbers
+      const productIds = state.items.map((item) => {
+        // If the ID is a string (like "api-6"), extract the numeric part
+        if (typeof item.id === 'string') {
+          return parseInt(item.id.toString().replace('api-', ''));
+        }
+        // If it's already a number, use it directly
+        return item.id;
+      });
+
+      const orderData = {
+        products: productIds,
+        address: `${formData.address}, ${formData.city}`,
+        postal_code: formData.postalCode,
+      };
+
+      // Call the buy order API
+      const response = await buyOrder(orderData);
+
+      if (response.success && response.payment_url) {
+        // Clear cart on successful order creation
+        clearCart();
+
+        // Redirect to payment gateway
+        window.location.href = response.payment_url;
+      } else {
+        toast.error('خطا در ایجاد سفارش');
+      }
+    } catch (error) {
+      // Error handling is done in the store with toast
+      console.error('Order creation failed:', error);
+    }
   };
 
   if (state.items.length === 0) {
@@ -181,9 +214,10 @@ export default function CheckoutPage() {
             </div>
             <button
               type="submit"
-              className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 w-full rounded-lg px-6 py-3 text-white transition-colors"
+              disabled={loading}
+              className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 w-full rounded-lg px-6 py-3 text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-400"
             >
-              ثبت سفارش
+              {loading ? 'در حال پردازش...' : 'ثبت سفارش و پرداخت'}
             </button>
           </form>
         </div>
@@ -227,7 +261,7 @@ export default function CheckoutPage() {
                       <div className="flex items-center gap-4">
                         <span className="text-primary-600 dark:text-primary-400">
                           {(
-                            parseInt(item.price.replace(/[^0-9]/g, '')) *
+                            parseInt((item.price || '0').replace(/[^0-9]/g, '')) *
                             item.quantity
                           ).toLocaleString()}{' '}
                           تومان
@@ -249,7 +283,7 @@ export default function CheckoutPage() {
                 <span className="text-gray-600 dark:text-gray-400">
                   جمع سبد خرید
                 </span>
-                <span>{state.totalPrice.toLocaleString()} تومان</span>
+                <span>{(state.totalPrice || 0).toLocaleString()} تومان</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
@@ -260,7 +294,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between border-t border-gray-200 pt-2 text-lg font-bold dark:border-gray-700">
                 <span>مجموع</span>
                 <span className="text-primary-600 dark:text-primary-400">
-                  {state.totalPrice.toLocaleString()} تومان
+                  {(state.totalPrice || 0).toLocaleString()} تومان
                 </span>
               </div>
             </div>
