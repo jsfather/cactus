@@ -124,7 +124,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
                         e.currentTarget.style.display = 'none';
                       }}
                       // Add unoptimized for external URLs that might not be properly configured
-                      unoptimized={typeof imageUrl === 'string' && imageUrl.startsWith('http')}
+                      unoptimized={
+                        typeof imageUrl === 'string' &&
+                        imageUrl.startsWith('http')
+                      }
                     />
                   </div>
                 </div>
