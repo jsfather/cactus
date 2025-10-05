@@ -62,24 +62,6 @@ export class TermTeacherService {
     }
   }
 
-  async update(id: string, payload: UpdateTermTeacherRequest): Promise<UpdateTermTeacherResponse> {
-    try {
-      const response = await apiClient.put<UpdateTermTeacherResponse>(
-        API_ENDPOINTS.PANEL.ADMIN.TERM_TEACHERS.UPDATE(id),
-        payload
-      );
-      
-      if (!response) {
-        throw new Error('خطایی در بروزرسانی ترم مدرس رخ داده است');
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('Error updating term teacher:', error);
-      throw error;
-    }
-  }
-
   async delete(id: string): Promise<void> {
     try {
       await apiClient.delete(

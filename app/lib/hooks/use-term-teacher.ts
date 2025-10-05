@@ -17,7 +17,6 @@ export const useTermTeacher = () => {
     // Actions
     fetchTermTeacherList: store.fetchTermTeacherList,
     createTermTeacher: store.createTermTeacher,
-    updateTermTeacher: store.updateTermTeacher,
     deleteTermTeacher: store.deleteTermTeacher,
     fetchTermTeacherById: store.fetchTermTeacherById,
     setLoading: store.setLoading,

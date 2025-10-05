@@ -26,7 +26,6 @@ interface TermTeacherState {
 
   fetchTermTeacherList: () => Promise<void>;
   createTermTeacher: (payload: CreateTermTeacherRequest) => Promise<CreateTermTeacherResponse>;
-  updateTermTeacher: (id: string, payload: UpdateTermTeacherRequest) => Promise<UpdateTermTeacherResponse>;
   deleteTermTeacher: (id: string) => Promise<void>;
   fetchTermTeacherById: (id: string) => Promise<void>;
 }
@@ -78,26 +77,6 @@ export const useTermTeacherStore = create<TermTeacherState>()(
         const apiError = error as ApiError;
         set({
           error: apiError.message || 'خطا در ایجاد ترم مدرس',
-          loading: false,
-        });
-        throw error;
-      }
-    },
-
-    updateTermTeacher: async (id: string, payload: UpdateTermTeacherRequest) => {
-      try {
-        set({ loading: true, error: null });
-        const response = await termTeacherService.update(id, payload);
-        
-        // Optimistic update
-        await get().fetchTermTeacherList();
-        
-        set({ loading: false });
-        return response;
-      } catch (error) {
-        const apiError = error as ApiError;
-        set({
-          error: apiError.message || 'خطا در بروزرسانی ترم مدرس',
           loading: false,
         });
         throw error;

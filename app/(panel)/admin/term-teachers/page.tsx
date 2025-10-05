@@ -205,7 +205,6 @@ export default function Page() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ ترم مدرسی یافت نشد"
-            onEdit={(termTeacher) => router.push(`/admin/term-teachers/${termTeacher.id}`)}
             onDelete={handleDeleteClick}
             onView={(termTeacher) => router.push(`/admin/term-teachers/${termTeacher.id}/view`)}
           />

@@ -60,7 +60,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     loading: termTeacherLoading,
     fetchTermTeacherById,
     createTermTeacher,
-    updateTermTeacher,
   } = useTermTeacher();
 
   const {
@@ -119,16 +118,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Load terms and teachers
+        // Load terms and teachers for dropdowns
         await Promise.all([
           fetchTermList(),
           fetchTeacherList(),
         ]);
-
-        // If editing, load the specific term-teacher
-        if (!isNew) {
-          await fetchTermTeacherById(resolvedParams.id);
-        }
       } catch (error) {
         console.error('Error loading data:', error);
         toast.error('خطا در بارگذاری اطلاعات');
@@ -137,49 +131,32 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNew, resolvedParams.id]);
+  }, []);
 
-  // Reset form when data is loaded
+  // Initialize form with default values for new term-teacher
   useEffect(() => {
-    if (!loading) {
-      if (!isNew && currentTermTeacher) {
-        const termId = currentTermTeacher.term_id;
-        const teacherId = currentTermTeacher.teacher_id;
-
-        reset({
-          term_id: typeof termId === 'string' ? parseInt(termId) : termId,
-          teacher_id: typeof teacherId === 'string' ? parseInt(teacherId) : teacherId,
-          days: currentTermTeacher.days || [],
-        });
-        initializedRef.current = true;
-      } else if (isNew && termOptions.length > 0 && teacherOptions.length > 0 && !initializedRef.current) {
-        // Only reset once for new forms to prevent infinite loop
-        reset({
-          term_id: parseInt(termOptions[0].value),
-          teacher_id: parseInt(teacherOptions[0].value),
-          days: [
-            {
-              day_of_week: 'شنبه',
-              start_time: '09:00',
-              end_time: '10:00',
-            },
-          ],
-        });
-        initializedRef.current = true;
-      }
+    if (!loading && termOptions.length > 0 && teacherOptions.length > 0 && !initializedRef.current) {
+      // Set default values for new term-teachers
+      reset({
+        term_id: parseInt(termOptions[0].value),
+        teacher_id: parseInt(teacherOptions[0].value),
+        days: [
+          {
+            day_of_week: 'شنبه',
+            start_time: '09:00',
+            end_time: '10:00',
+          },
+        ],
+      });
+      initializedRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, isNew, currentTermTeacher, termOptions.length, teacherOptions.length]);
+  }, [loading, termOptions.length, teacherOptions.length]);
 
   const onSubmit = async (data: TermTeacherFormData) => {
     try {
-      if (isNew) {
-        await createTermTeacher(data);
-        toast.success('ترم مدرس با موفقیت ایجاد شد');
-      } else {
-        await updateTermTeacher(resolvedParams.id, data);
-        toast.success('ترم مدرس با موفقیت بروزرسانی شد');
-      }
+      await createTermTeacher(data);
+      toast.success('ترم مدرس با موفقیت ایجاد شد');
       router.push('/admin/term-teachers');
     } catch (error) {
       // Error is already handled by the hook and store
@@ -219,8 +196,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         breadcrumbs={[
           { label: 'ترم مدرسین', href: '/admin/term-teachers' },
           {
-            label: isNew ? 'ایجاد ترم مدرس' : 'ویرایش ترم مدرس',
-            href: `/admin/term-teachers/${resolvedParams.id}`,
+            label: 'ایجاد ترم مدرس',
+            href: '/admin/term-teachers/new',
             active: true,
           },
         ]}

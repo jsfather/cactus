@@ -73,13 +73,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               جزئیات ترم مدرس
             </h1>
           </div>
-          <Button
-            onClick={() => router.push(`/admin/term-teachers/${resolvedParams.id}`)}
-            className="flex items-center gap-2"
-          >
-            <Edit className="h-4 w-4" />
-            ویرایش
-          </Button>
         </div>
 
         {/* Teacher Info */}
@@ -256,13 +249,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
         {/* Actions */}
         <div className="flex justify-start gap-3">
-          <Button
-            onClick={() => router.push(`/admin/term-teachers/${resolvedParams.id}`)}
-            className="flex items-center gap-2"
-          >
-            <Edit className="h-4 w-4" />
-            ویرایش
-          </Button>
           <Button
             type="button"
             variant="white"
