@@ -1,44 +1,53 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { getTermTeacher } from '@/app/lib/api/admin/term-teachers';
-import { SessionRecord } from '@/app/lib/types/term_teacher';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { Eye, Edit, Calendar, Clock, Users, Video } from 'lucide-react';
+import { Eye, Edit, Calendar, Clock, User, BookOpen } from 'lucide-react';
+
+// New implementation
+import { useTermTeacher } from '@/app/lib/hooks/use-term-teacher';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  const [termTeacher, setTermTeacher] = useState<SessionRecord | null>(null);
-  const [loading, setLoading] = useState(true);
+  
+  const {
+    currentTermTeacher,
+    loading,
+    error,
+    fetchTermTeacherById,
+  } = useTermTeacher();
 
   useEffect(() => {
-    const fetchTermTeacher = async () => {
+    const loadData = async () => {
       try {
-        setLoading(true);
-        const response = await getTermTeacher(resolvedParams.id);
-        setTermTeacher(response.data);
+        await fetchTermTeacherById(resolvedParams.id);
       } catch (error) {
         console.error('Error fetching term teacher:', error);
         toast.error('خطا در بارگذاری اطلاعات ترم مدرس');
         router.push('/admin/term-teachers');
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchTermTeacher();
-  }, [resolvedParams.id, router]);
+    loadData();
+  }, [resolvedParams.id, fetchTermTeacherById, router]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      router.push('/admin/term-teachers');
+    }
+  }, [error, router]);
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
-  if (!termTeacher) {
+  if (!currentTermTeacher) {
     return null;
   }
 
@@ -48,7 +57,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         breadcrumbs={[
           { label: 'ترم مدرسین', href: '/admin/term-teachers' },
           {
-            label: `${termTeacher.user?.first_name || 'نامشخص'} ${termTeacher.user?.last_name || ''}`,
+            label: `${currentTermTeacher.user?.first_name || 'نامشخص'} ${currentTermTeacher.user?.last_name || ''}`,
             href: `/admin/term-teachers/${resolvedParams.id}/view`,
             active: true,
           },
@@ -75,16 +84,19 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
         {/* Teacher Info */}
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-            اطلاعات مدرس
-          </h2>
+          <div className="mb-4 flex items-center gap-2">
+            <User className="h-5 w-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              اطلاعات مدرس
+            </h2>
+          </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 نام کامل
               </label>
               <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                {termTeacher.user?.first_name || 'نامشخص'} {termTeacher.user?.last_name || ''}
+                {currentTermTeacher.user?.first_name || 'نامشخص'} {currentTermTeacher.user?.last_name || ''}
               </p>
             </div>
             <div>
@@ -92,7 +104,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 شماره تماس
               </label>
               <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                {termTeacher.user?.phone || 'ثبت نشده'}
+                {currentTermTeacher.user?.phone || 'ثبت نشده'}
               </p>
             </div>
             <div>
@@ -100,7 +112,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 ایمیل
               </label>
               <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                {termTeacher.user?.email || 'ثبت نشده'}
+                {currentTermTeacher.user?.email || 'ثبت نشده'}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                نام کاربری
+              </label>
+              <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                {currentTermTeacher.user?.username || 'ثبت نشده'}
               </p>
             </div>
             <div>
@@ -108,123 +128,131 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 کد ملی
               </label>
               <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                {termTeacher.user?.national_code || 'ثبت نشده'}
+                {currentTermTeacher.user?.national_code || 'ثبت نشده'}
+              </p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                نقش
+              </label>
+              <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                {currentTermTeacher.user?.role || 'ثبت نشده'}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Class Schedule */}
+        {/* Schedule (Days) */}
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="mb-4 flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-blue-600" />
+            <Calendar className="h-5 w-5 text-green-600" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               برنامه کلاس‌ها
             </h2>
           </div>
-          {termTeacher.days && termTeacher.days.length > 0 ? (
+          {currentTermTeacher.days && currentTermTeacher.days.length > 0 ? (
             <div className="space-y-3">
-              {termTeacher.days.map((day, index) => (
+              {currentTermTeacher.days.map((day: any, index: number) => (
                 <div
-                  key={index}
-                  className="flex items-center justify-between rounded-lg border border-gray-100 p-3 dark:border-gray-600"
+                  key={day.id || index}
+                  className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700"
                 >
-                  <span className="font-medium text-gray-900 dark:text-white">
-                    {day.day_of_week}
-                  </span>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <Clock className="h-4 w-4" />
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {day.day_of_week}
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
                     {day.start_time} - {day.end_time}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              برنامه کلاسی تعریف نشده است
+            <p className="text-gray-500 dark:text-gray-400">
+              هیچ برنامه‌ای برای این ترم تعریف نشده است
             </p>
           )}
         </div>
 
-        {/* Sessions */}
+        {/* Sessions (Schedules) */}
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <div className="mb-4 flex items-center gap-2">
-            <Users className="h-5 w-5 text-green-600" />
+            <Calendar className="h-5 w-5 text-purple-600" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              جلسات برگزار شده ({termTeacher.schedules?.length || 0})
+              جلسات برنامه‌ریزی شده ({currentTermTeacher.schedules?.length || 0})
             </h2>
           </div>
-          {termTeacher.schedules && termTeacher.schedules.length > 0 ? (
+          {currentTermTeacher.schedules && currentTermTeacher.schedules.length > 0 ? (
             <div className="space-y-3">
-              {termTeacher.schedules.map((schedule, index) => (
+              {currentTermTeacher.schedules.slice(0, 10).map((schedule: any, index: number) => (
                 <div
-                  key={index}
-                  className="flex items-center justify-between rounded-lg border border-gray-100 p-3 dark:border-gray-600"
+                  key={schedule.id || index}
+                  className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700"
                 >
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {new Date(schedule.session_date).toLocaleDateString('fa-IR')}
-                    </p>
-                    {schedule.homeworks.length > 0 && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {schedule.homeworks.length} تکلیف
-                      </p>
-                    )}
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-4 w-4 text-green-600" />
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {schedule.session_date}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <Clock className="h-4 w-4" />
+                    <Clock className="h-3 w-3" />
                     {schedule.start_time} - {schedule.end_time}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              هنوز جلسه‌ای برگزار نشده است
-            </p>
-          )}
-        </div>
-
-        {/* Offline Sessions */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <div className="mb-4 flex items-center gap-2">
-            <Video className="h-5 w-5 text-purple-600" />
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              جلسات ضبط شده ({termTeacher.offline_sessions?.length || 0})
-            </h2>
-          </div>
-          {termTeacher.offline_sessions && termTeacher.offline_sessions.length > 0 ? (
-            <div className="space-y-3">
-              {termTeacher.offline_sessions.map((session, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border border-gray-100 p-3 dark:border-gray-600"
-                >
-                  <h3 className="font-medium text-gray-900 dark:text-white">
-                    {session.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                    {session.description}
-                  </p>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(session.created_at).toLocaleDateString('fa-IR')}
-                    </span>
-                    {session.homeworks.length > 0 && (
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {session.homeworks.length} تکلیف
+                    {schedule.is_canceled === 1 && (
+                      <span className="rounded-full bg-red-100 px-2 py-1 text-xs text-red-800 dark:bg-red-900/20 dark:text-red-400">
+                        لغو شده
                       </span>
                     )}
                   </div>
                 </div>
               ))}
+              {currentTermTeacher.schedules.length > 10 && (
+                <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+                  و {currentTermTeacher.schedules.length - 10} جلسه دیگر...
+                </p>
+              )}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              جلسه ضبط شده‌ای وجود ندارد
+            <p className="text-gray-500 dark:text-gray-400">
+              هیچ جلسه‌ای برای این ترم برنامه‌ریزی نشده است
             </p>
           )}
         </div>
+
+        {/* Files */}
+        {currentTermTeacher.user?.files && currentTermTeacher.user.files.length > 0 && (
+          <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+            <div className="mb-4 flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-orange-600" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                فایل‌های مدرس
+              </h2>
+            </div>
+            <div className="space-y-3">
+              {currentTermTeacher.user.files.map((file: any, index: number) => (
+                <div
+                  key={file.id || index}
+                  className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 p-3 dark:border-gray-600 dark:bg-gray-700"
+                >
+                  <div className="flex items-center gap-3">
+                    <BookOpen className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {file.type === 'certificate' ? 'مدرک' : file.type === 'national_card' ? 'کارت ملی' : file.type}
+                    </span>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={() => window.open(file.file_path, '_blank')}
+                  >
+                    مشاهده
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Actions */}
         <div className="flex justify-start gap-3">
