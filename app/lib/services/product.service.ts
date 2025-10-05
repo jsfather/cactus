@@ -5,6 +5,8 @@ import {
   GetProductResponse,
   CreateProductRequest,
   UpdateProductRequest,
+  CreateProductFormData,
+  UpdateProductFormData,
   GetProductCategoryListResponse,
   GetProductCategoryResponse,
   CreateProductCategoryRequest,
@@ -12,6 +14,36 @@ import {
 } from '@/app/lib/types';
 
 export class ProductService {
+  // Helper method to create FormData for file uploads
+  private createFormData(
+    data: CreateProductFormData | UpdateProductFormData
+  ): FormData {
+    const formData = new FormData();
+
+    formData.append('title', data.title);
+    formData.append('category_id', data.category_id.toString());
+    formData.append('description', data.description);
+    formData.append('price', data.price.toString());
+    formData.append('stock', data.stock.toString());
+
+    // Handle image - can be File or string (for updates)
+    if (data.image instanceof File) {
+      formData.append('image', data.image);
+    } else if (typeof data.image === 'string' && data.image) {
+      formData.append('image', data.image);
+    }
+
+    // Handle attributes
+    if (data.attributes && data.attributes.length > 0) {
+      data.attributes.forEach((attr, index) => {
+        formData.append(`attributes[${index}][key]`, attr.key);
+        formData.append(`attributes[${index}][value]`, attr.value);
+      });
+    }
+
+    return formData;
+  }
+
   // Product methods
   async getList(): Promise<GetProductListResponse> {
     return apiClient.get<GetProductListResponse>(
@@ -25,17 +57,32 @@ export class ProductService {
     );
   }
 
-  async create(payload: CreateProductRequest): Promise<GetProductResponse> {
+  async create(payload: CreateProductFormData): Promise<GetProductResponse> {
+    const formData = this.createFormData(payload);
     return apiClient.post<GetProductResponse>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.CREATE,
-      payload
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
   }
 
-  async update(id: string, payload: UpdateProductRequest): Promise<GetProductResponse> {
-    return apiClient.put<GetProductResponse>(
+  async update(
+    id: string,
+    payload: UpdateProductFormData
+  ): Promise<GetProductResponse> {
+    const formData = this.createFormData(payload);
+    return apiClient.post<GetProductResponse>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.UPDATE(id),
-      payload
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
     );
   }
 
@@ -58,14 +105,19 @@ export class ProductService {
     );
   }
 
-  async createCategory(payload: CreateProductCategoryRequest): Promise<GetProductCategoryResponse> {
+  async createCategory(
+    payload: CreateProductCategoryRequest
+  ): Promise<GetProductCategoryResponse> {
     return apiClient.post<GetProductCategoryResponse>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCT_CATEGORIES.CREATE,
       payload
     );
   }
 
-  async updateCategory(id: string, payload: UpdateProductCategoryRequest): Promise<GetProductCategoryResponse> {
+  async updateCategory(
+    id: string,
+    payload: UpdateProductCategoryRequest
+  ): Promise<GetProductCategoryResponse> {
     return apiClient.put<GetProductCategoryResponse>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCT_CATEGORIES.UPDATE(id),
       payload

@@ -30,7 +30,7 @@ export interface CreateProductRequest {
   description: string;
   price: number;
   stock: number;
-  image?: string;
+  image?: string | File;
   attributes?: ProductAttribute[];
 }
 
@@ -40,7 +40,28 @@ export interface UpdateProductRequest {
   description: string;
   price: number;
   stock: number;
-  image?: string;
+  image?: string | File;
+  attributes?: ProductAttribute[];
+}
+
+// Form data interfaces for file uploads
+export interface CreateProductFormData {
+  title: string;
+  category_id: number;
+  description: string;
+  price: number;
+  stock: number;
+  image?: File | null;
+  attributes?: ProductAttribute[];
+}
+
+export interface UpdateProductFormData {
+  title: string;
+  category_id: number;
+  description: string;
+  price: number;
+  stock: number;
+  image?: File | string | null;
   attributes?: ProductAttribute[];
 }
 

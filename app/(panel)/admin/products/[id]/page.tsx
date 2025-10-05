@@ -3,17 +3,21 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useProduct } from '@/app/lib/hooks/use-product';
 import { useProductCategory } from '@/app/lib/hooks/use-product-category';
-import { CreateProductRequest, UpdateProductRequest } from '@/app/lib/types/product';
+import {
+  CreateProductFormData,
+  UpdateProductFormData,
+} from '@/app/lib/types/product';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
 import Textarea from '@/app/components/ui/Textarea';
+import FileUpload from '@/app/components/ui/FileUpload';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Plus, X, Save, ArrowRight } from 'lucide-react';
 
@@ -23,11 +27,15 @@ const productSchema = z.object({
   description: z.string().min(1, 'توضیحات محصول نمی‌تواند خالی باشد'),
   price: z.coerce.number().min(0, 'قیمت نمی‌تواند منفی باشد'),
   stock: z.coerce.number().min(0, 'موجودی نمی‌تواند منفی باشد'),
-  image: z.string().optional(),
-  attributes: z.array(z.object({
-    key: z.string().min(1, 'کلید ویژگی نمی‌تواند خالی باشد'),
-    value: z.string().min(1, 'مقدار ویژگی نمی‌تواند خالی باشد'),
-  })).optional(),
+  image: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
+  attributes: z
+    .array(
+      z.object({
+        key: z.string().min(1, 'کلید ویژگی نمی‌تواند خالی باشد'),
+        value: z.string().min(1, 'مقدار ویژگی نمی‌تواند خالی باشد'),
+      })
+    )
+    .optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -41,15 +49,19 @@ export default function ProductFormPage({ params }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  
-  const { 
-    createProduct, 
-    updateProduct, 
-    fetchProductById, 
-    currentProduct, 
-    loading 
+
+  const {
+    createProduct,
+    updateProduct,
+    fetchProductById,
+    currentProduct,
+    loading,
   } = useProduct();
-  const { categories, fetchCategories, loading: categoriesLoading } = useProductCategory();
+  const {
+    categories,
+    fetchCategories,
+    loading: categoriesLoading,
+  } = useProductCategory();
 
   const {
     register,
@@ -65,7 +77,7 @@ export default function ProductFormPage({ params }: Props) {
       description: '',
       price: 0,
       stock: 0,
-      image: '',
+      image: null,
       attributes: [{ key: '', value: '' }],
     },
   });
@@ -77,7 +89,7 @@ export default function ProductFormPage({ params }: Props) {
 
   useEffect(() => {
     fetchCategories();
-    
+
     if (resolvedParams.id !== 'new') {
       setIsEditing(true);
       fetchProductById(resolvedParams.id);
@@ -86,8 +98,11 @@ export default function ProductFormPage({ params }: Props) {
 
   useEffect(() => {
     if (isEditing && currentProduct) {
-      const attributesArray = currentProduct.attributes 
-        ? Object.entries(currentProduct.attributes).map(([key, value]) => ({ key, value }))
+      const attributesArray = currentProduct.attributes
+        ? Object.entries(currentProduct.attributes).map(([key, value]) => ({
+            key,
+            value,
+          }))
         : [{ key: '', value: '' }];
 
       reset({
@@ -96,7 +111,7 @@ export default function ProductFormPage({ params }: Props) {
         description: currentProduct.description,
         price: currentProduct.price,
         stock: currentProduct.stock,
-        image: currentProduct.image || '',
+        image: currentProduct.image || null,
         attributes: attributesArray,
       });
     }
@@ -105,40 +120,41 @@ export default function ProductFormPage({ params }: Props) {
   const onSubmit = async (data: ProductFormData) => {
     try {
       setSubmitting(true);
-      
+
       // Filter out empty attributes
-      const filteredAttributes = data.attributes?.filter(
-        attr => attr.key.trim() && attr.value.trim()
-      ) || [];
+      const filteredAttributes =
+        data.attributes?.filter(
+          (attr) => attr.key.trim() && attr.value.trim()
+        ) || [];
 
       if (isEditing) {
-        const productData: UpdateProductRequest = {
+        const productData: UpdateProductFormData = {
           title: data.title,
           category_id: Number(data.category_id),
           description: data.description,
           price: data.price,
           stock: data.stock,
-          image: data.image || '',
+          image: data.image,
           attributes: filteredAttributes,
         };
 
         await updateProduct(resolvedParams.id, productData);
         toast.success('محصول با موفقیت بروزرسانی شد');
       } else {
-        const productData: CreateProductRequest = {
+        const productData: CreateProductFormData = {
           title: data.title,
           category_id: Number(data.category_id),
           description: data.description,
           price: data.price,
           stock: data.stock,
-          image: data.image || '',
+          image: data.image instanceof File ? data.image : null,
           attributes: filteredAttributes,
         };
 
         await createProduct(productData);
         toast.success('محصول با موفقیت ایجاد شد');
       }
-      
+
       router.push('/admin/products');
     } catch (error) {
       toast.error(isEditing ? 'خطا در بروزرسانی محصول' : 'خطا در ایجاد محصول');
@@ -157,10 +173,10 @@ export default function ProductFormPage({ params }: Props) {
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت محصولات', href: '/admin/products' },
-          { 
-            label: isEditing ? 'ویرایش محصول' : 'افزودن محصول', 
-            href: `/admin/products/${resolvedParams.id}`, 
-            active: true 
+          {
+            label: isEditing ? 'ویرایش محصول' : 'افزودن محصول',
+            href: `/admin/products/${resolvedParams.id}`,
+            active: true,
           },
         ]}
       />
@@ -172,7 +188,9 @@ export default function ProductFormPage({ params }: Props) {
               {isEditing ? 'ویرایش محصول' : 'افزودن محصول جدید'}
             </h1>
             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-              {isEditing ? 'اطلاعات محصول را ویرایش کنید' : 'اطلاعات محصول جدید را وارد کنید'}
+              {isEditing
+                ? 'اطلاعات محصول را ویرایش کنید'
+                : 'اطلاعات محصول جدید را وارد کنید'}
             </p>
           </div>
           <Button
@@ -204,7 +222,7 @@ export default function ProductFormPage({ params }: Props) {
                   required
                   placeholder="دسته‌بندی محصول را انتخاب کنید..."
                   error={errors.category_id?.message}
-                  options={categories.map(cat => ({
+                  options={categories.map((cat) => ({
                     label: cat.name,
                     value: cat.id.toString(),
                   }))}
@@ -222,7 +240,7 @@ export default function ProductFormPage({ params }: Props) {
                 rows={4}
               />
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Input
                   id="price"
                   label="قیمت (تومان)"
@@ -241,14 +259,25 @@ export default function ProductFormPage({ params }: Props) {
                   error={errors.stock?.message}
                   {...register('stock')}
                 />
-                <Input
-                  id="image"
-                  label="تصویر محصول"
-                  placeholder="URL تصویر محصول..."
-                  error={errors.image?.message}
-                  {...register('image')}
-                />
               </div>
+
+              {/* Image Upload */}
+              <Controller
+                name="image"
+                control={control}
+                render={({ field }) => (
+                  <FileUpload
+                    id="image"
+                    label="تصویر محصول"
+                    accept="image/*"
+                    placeholder="تصویر محصول را انتخاب کنید..."
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.image?.message as string}
+                  />
+                )}
+              />
 
               {/* Attributes */}
               <div>

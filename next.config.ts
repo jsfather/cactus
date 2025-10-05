@@ -24,6 +24,16 @@ const nextConfig: NextConfig = {
         hostname: 'kaktos.kanoonbartarha.ir',
         pathname: '/user_files/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'kaktos.kanoonbartarha.ir',
+        pathname: '/storage/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'kaktos.kanoonbartarha.ir',
+        pathname: '/storage/**',
+      },
     ],
   },
 };

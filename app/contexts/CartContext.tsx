@@ -50,7 +50,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ),
           totalItems: state.totalItems + 1,
           totalPrice:
-            state.totalPrice +
+            (state.totalPrice || 0) +
             parseInt(action.payload.price.replace(/[^0-9]/g, '')),
         };
       }
@@ -60,7 +60,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         items: [...state.items, { ...action.payload, quantity: 1 }],
         totalItems: state.totalItems + 1,
         totalPrice:
-          state.totalPrice +
+          (state.totalPrice || 0) +
           parseInt(action.payload.price.replace(/[^0-9]/g, '')),
       };
     }
@@ -76,7 +76,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         items: state.items.filter((item) => item.id !== action.payload.id),
         totalItems: state.totalItems - itemToRemove.quantity,
         totalPrice:
-          state.totalPrice -
+          (state.totalPrice || 0) -
           parseInt(itemToRemove.price.replace(/[^0-9]/g, '')) *
             itemToRemove.quantity,
       };
@@ -98,7 +98,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         ),
         totalItems: state.totalItems + action.payload.change,
         totalPrice:
-          state.totalPrice +
+          (state.totalPrice || 0) +
           parseInt(item.price.replace(/[^0-9]/g, '')) * action.payload.change,
       };
     }
@@ -131,7 +131,15 @@ function getInitialState(): CartState {
   const savedCart = localStorage.getItem('cart');
   if (savedCart) {
     try {
-      return JSON.parse(savedCart);
+      const parsed = JSON.parse(savedCart);
+      // Validate the parsed data structure
+      if (parsed && typeof parsed === 'object' && Array.isArray(parsed.items)) {
+        return {
+          items: parsed.items || [],
+          totalItems: parsed.totalItems || 0,
+          totalPrice: parsed.totalPrice || 0,
+        };
+      }
     } catch (error) {
       console.error('Failed to parse cart from localStorage:', error);
     }

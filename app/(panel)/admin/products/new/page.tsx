@@ -3,17 +3,21 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useProduct } from '@/app/lib/hooks/use-product';
 import { useProductCategory } from '@/app/lib/hooks/use-product-category';
-import { CreateProductRequest, ProductAttribute } from '@/app/lib/types/product';
+import {
+  CreateProductFormData,
+  ProductAttribute,
+} from '@/app/lib/types/product';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
 import Textarea from '@/app/components/ui/Textarea';
+import FileUpload from '@/app/components/ui/FileUpload';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Package, Plus, X, Save } from 'lucide-react';
 
@@ -23,11 +27,15 @@ const productSchema = z.object({
   description: z.string().min(1, 'توضیحات محصول نمی‌تواند خالی باشد'),
   price: z.coerce.number().min(0, 'قیمت نمی‌تواند منفی باشد'),
   stock: z.coerce.number().min(0, 'موجودی نمی‌تواند منفی باشد'),
-  image: z.string().optional(),
-  attributes: z.array(z.object({
-    key: z.string().min(1, 'کلید ویژگی نمی‌تواند خالی باشد'),
-    value: z.string().min(1, 'مقدار ویژگی نمی‌تواند خالی باشد'),
-  })).optional(),
+  image: z.union([z.instanceof(File), z.string(), z.null()]).optional(),
+  attributes: z
+    .array(
+      z.object({
+        key: z.string().min(1, 'کلید ویژگی نمی‌تواند خالی باشد'),
+        value: z.string().min(1, 'مقدار ویژگی نمی‌تواند خالی باشد'),
+      })
+    )
+    .optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -35,9 +43,13 @@ type ProductFormData = z.infer<typeof productSchema>;
 export default function NewProductPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
-  
+
   const { createProduct, loading } = useProduct();
-  const { categories, fetchCategories, loading: categoriesLoading } = useProductCategory();
+  const {
+    categories,
+    fetchCategories,
+    loading: categoriesLoading,
+  } = useProductCategory();
 
   const {
     register,
@@ -53,7 +65,7 @@ export default function NewProductPage() {
       description: '',
       price: 0,
       stock: 0,
-      image: '',
+      image: null,
       attributes: [{ key: '', value: '' }],
     },
   });
@@ -70,19 +82,20 @@ export default function NewProductPage() {
   const onSubmit = async (data: ProductFormData) => {
     try {
       setSubmitting(true);
-      
-      // Filter out empty attributes
-      const filteredAttributes = data.attributes?.filter(
-        attr => attr.key.trim() && attr.value.trim()
-      ) || [];
 
-      const productData: CreateProductRequest = {
+      // Filter out empty attributes
+      const filteredAttributes =
+        data.attributes?.filter(
+          (attr) => attr.key.trim() && attr.value.trim()
+        ) || [];
+
+      const productData: CreateProductFormData = {
         title: data.title,
         category_id: Number(data.category_id),
         description: data.description,
         price: data.price,
         stock: data.stock,
-        image: data.image || '',
+        image: data.image instanceof File ? data.image : null,
         attributes: filteredAttributes,
       };
 
@@ -141,7 +154,7 @@ export default function NewProductPage() {
                   required
                   placeholder="دسته‌بندی محصول را انتخاب کنید..."
                   error={errors.category_id?.message}
-                  options={categories.map(cat => ({
+                  options={categories.map((cat) => ({
                     label: cat.name,
                     value: cat.id.toString(),
                   }))}
@@ -159,7 +172,7 @@ export default function NewProductPage() {
                 rows={4}
               />
 
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <Input
                   id="price"
                   label="قیمت (تومان)"
@@ -178,14 +191,25 @@ export default function NewProductPage() {
                   error={errors.stock?.message}
                   {...register('stock')}
                 />
-                <Input
-                  id="image"
-                  label="تصویر محصول"
-                  placeholder="URL تصویر محصول..."
-                  error={errors.image?.message}
-                  {...register('image')}
-                />
               </div>
+
+              {/* Image Upload */}
+              <Controller
+                name="image"
+                control={control}
+                render={({ field }) => (
+                  <FileUpload
+                    id="image"
+                    label="تصویر محصول"
+                    accept="image/*"
+                    placeholder="تصویر محصول را انتخاب کنید..."
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.image?.message as string}
+                  />
+                )}
+              />
 
               {/* Attributes */}
               <div>

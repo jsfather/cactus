@@ -158,3 +158,53 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+// Public API client for unauthenticated requests
+class PublicApiClient {
+  private client: AxiosInstance;
+
+  constructor() {
+    this.client = axios.create({
+      baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+      timeout: 10000,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    this.setupInterceptors();
+  }
+
+  private setupInterceptors(): void {
+    // Response interceptor for error handling
+    this.client.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const apiError: ApiError = {
+          message:
+            error.response?.data?.message || error.message || 'خطای ناشناخته',
+          status: error.response?.status || 500,
+          code: error.response?.data?.code,
+          errors: error.response?.data?.errors,
+        };
+        return Promise.reject(apiError);
+      }
+    );
+  }
+
+  async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.client.get<T>(url, config);
+    return response.data;
+  }
+
+  async post<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const response = await this.client.post<T>(url, data, config);
+    return response.data;
+  }
+}
+
+export const publicApiClient = new PublicApiClient();
