@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { Controller, useFieldArray } from 'react-hook-form';
@@ -90,19 +90,30 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     name: 'days',
   });
 
+  // Track if form has been initialized to prevent infinite loops
+  const initializedRef = useRef(false);
+
   // Loading states
   const loading = termTeacherLoading || teacherLoading || termLoading;
 
-  // Options for selects
-  const termOptions = termList.map((term) => ({
-    value: term.id.toString(),
-    label: term.title,
-  }));
+  // Memoized options for selects to prevent infinite re-renders
+  const termOptions = useMemo(
+    () =>
+      termList.map((term) => ({
+        value: term.id.toString(),
+        label: term.title,
+      })),
+    [termList]
+  );
 
-  const teacherOptions = teacherList.map((teacher: any) => ({
-    value: teacher.user_id.toString(),
-    label: `${teacher.user.first_name} ${teacher.user.last_name}`,
-  }));
+  const teacherOptions = useMemo(
+    () =>
+      teacherList.map((teacher: any) => ({
+        value: teacher.user_id.toString(),
+        label: `${teacher.user.first_name} ${teacher.user.last_name}`,
+      })),
+    [teacherList]
+  );
 
   // Load data on component mount
   useEffect(() => {
@@ -125,7 +136,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     };
 
     loadData();
-  }, [isNew, resolvedParams.id, fetchTermList, fetchTeacherList, fetchTermTeacherById]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNew, resolvedParams.id]);
 
   // Reset form when data is loaded
   useEffect(() => {
@@ -139,22 +151,25 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           teacher_id: typeof teacherId === 'string' ? parseInt(teacherId) : teacherId,
           days: currentTermTeacher.days || [],
         });
-      } else if (isNew && termOptions.length > 0 && teacherOptions.length > 0) {
-        // Set default values for new term-teachers
+        initializedRef.current = true;
+      } else if (isNew && termOptions.length > 0 && teacherOptions.length > 0 && !initializedRef.current) {
+        // Only reset once for new forms to prevent infinite loop
         reset({
           term_id: parseInt(termOptions[0].value),
           teacher_id: parseInt(teacherOptions[0].value),
           days: [
             {
               day_of_week: 'شنبه',
-              start_time: '',
-              end_time: '',
+              start_time: '09:00',
+              end_time: '10:00',
             },
           ],
         });
+        initializedRef.current = true;
       }
     }
-  }, [loading, isNew, currentTermTeacher, termOptions, teacherOptions, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, isNew, currentTermTeacher, termOptions.length, teacherOptions.length]);
 
   const onSubmit = async (data: TermTeacherFormData) => {
     try {
@@ -183,8 +198,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const addDay = () => {
     append({
       day_of_week: 'شنبه',
-      start_time: '',
-      end_time: '',
+      start_time: '09:00',
+      end_time: '10:00',
     });
   };
 
