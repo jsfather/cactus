@@ -1,13 +1,30 @@
+export interface ExamQuestionOption {
+  id: number;
+  text: string;
+  is_correct: number;
+}
+
+export interface ExamQuestion {
+  id: number;
+  text: string;
+  file_path: string | null;
+  options: ExamQuestionOption[];
+}
+
+export interface ExamAttempt {
+  // Add attempt fields as needed based on API
+}
+
 export interface Exam {
-  id: number | string;
+  id: number;
   title: string;
   description: string;
   date: string | null;
   duration: number | null;
   term_id: number | null;
-  created_at: string;
-  updated_at: string;
   created_by: number;
+  questions: ExamQuestion[];
+  attempts: ExamAttempt[];
 }
 
 // Admin exam management types
@@ -28,8 +45,8 @@ export interface CreateExamRequest {
 }
 
 export interface UpdateExamRequest {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
   date?: string | null;
   duration?: number | null;
   term_id?: number | null;
@@ -37,9 +54,9 @@ export interface UpdateExamRequest {
 
 // Question types
 export interface ExamQuestion {
-  id: number | string;
+  id: number;
   text: string;
-  exam_id: number | string;
+  exam_id: number;
   file_url?: string | null;
   created_at: string;
   updated_at: string;
@@ -47,10 +64,10 @@ export interface ExamQuestion {
 }
 
 export interface ExamQuestionOption {
-  id: number | string;
+  id: number;
   text: string;
   is_correct: number;
-  question_id: number | string;
+  question_id: number;
 }
 
 export interface CreateQuestionRequest {
@@ -65,7 +82,7 @@ export interface CreateQuestionRequest {
 export interface UpdateQuestionRequest {
   text?: string;
   options?: Array<{
-    id?: number | string;
+    id?: number;
     text: string;
     is_correct: number;
   }>;

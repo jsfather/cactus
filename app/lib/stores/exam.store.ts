@@ -4,7 +4,7 @@ import {
   Exam,
   CreateExamRequest,
   UpdateExamRequest,
-} from '@/app/lib/types';
+} from '@/app/lib/types/exam';
 import toast from 'react-hot-toast';
 
 interface ExamStore {

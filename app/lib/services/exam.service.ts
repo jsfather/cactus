@@ -5,7 +5,7 @@ import {
   GetExamResponse,
   CreateExamRequest,
   UpdateExamRequest,
-} from '@/app/lib/types';
+} from '@/app/lib/types/exam';
 
 export class ExamService {
   async getList(): Promise<GetExamListResponse> {

@@ -1,63 +1,103 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Table, { Column } from '@/app/components/ui/Table';
-import { toast } from 'react-hot-toast';
-import { useExamStore } from '@/app/lib/stores/exam.store';
-import { Exam } from '@/app/lib/types';
-import ConfirmModal from '@/app/components/ui/ConfirmModal';
-import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
+import Table, { Column } from '@/app/components/ui/Table';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import { Button } from '@/app/components/ui/Button';
+import ConfirmModal from '@/app/components/ui/ConfirmModal';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { Exam } from '@/app/lib/types/exam';
+import { useExam } from '@/app/lib/hooks/use-exam';
+import { Plus, FileText, Clock, Calendar, Users } from 'lucide-react';
 
-export default function Page() {
+export default function ExamsPage() {
   const router = useRouter();
-  const {
-    exams,
-    isListLoading: loading,
-    deleteExam,
-    fetchExams,
-    error,
-  } = useExamStore();
-
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Exam | null>(null);
+  
+  const {
+    exams,
+    isListLoading: loading,
+    fetchExams,
+    deleteExam: deleteExamAction,
+    clearError,
+  } = useExam();
+
+  useEffect(() => {
+    fetchExams();
+  }, [fetchExams]);
+
+  // Calculate summary statistics
+  const totalExams = exams.length;
+  const timedExams = exams.filter(exam => exam.duration && exam.duration > 0).length;
+  const todayExams = exams.filter(exam => {
+    if (!exam.date) return false;
+    const today = new Date().toDateString();
+    const examDate = new Date(exam.date).toDateString();
+    return today === examDate;
+  }).length;
+  const termBasedExams = exams.filter(exam => exam.term_id).length;
 
   const columns: Column<Exam>[] = [
     {
       header: 'عنوان',
       accessor: 'title',
+      render: (value): string => {
+        return value as string;
+      },
     },
     {
       header: 'توضیحات',
       accessor: 'description',
-      render: (value) =>
-        value
-          ? String(value).substring(0, 100) +
-            (String(value).length > 100 ? '...' : '')
-          : '-',
+      render: (value): string => {
+        const desc = value as string;
+        return desc ? (desc.length > 100 ? desc.substring(0, 100) + '...' : desc) : '-';
+      },
     },
     {
       header: 'تاریخ آزمون',
       accessor: 'date',
-      render: (value) =>
-        value ? new Date(value).toLocaleDateString('fa-IR') : '-',
+      render: (value): string => {
+        return value ? new Date(value as string).toLocaleDateString('fa-IR') : '-';
+      },
     },
     {
       header: 'مدت زمان',
       accessor: 'duration',
-      render: (value) => (value ? `${value} دقیقه` : '-'),
+      render: (value): string => {
+        return value ? `${value} دقیقه` : 'نامحدود';
+      },
     },
     {
       header: 'ترم',
       accessor: 'term_id',
-      render: (value) => (value ? `ترم ${value}` : '-'),
+      render: (value): React.JSX.Element => {
+        const termId = value as number | null;
+        if (!termId) {
+          return (
+            <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+              آزاد
+            </span>
+          );
+        }
+        
+        return (
+          <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            ترم {termId}
+          </span>
+        );
+      },
     },
     {
-      header: 'ایجاد کننده',
-      accessor: 'created_by',
-      render: (value) => (value ? `کاربر ${value}` : '-'),
+      header: 'تعداد سوالات',
+      accessor: 'questions',
+      render: (value): string => {
+        const questions = value as Exam['questions'];
+        return questions ? questions.length.toString() : '0';
+      },
     },
   ];
 
@@ -71,7 +111,7 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await deleteExam(itemToDelete.id.toString());
+      await deleteExamAction(itemToDelete.id.toString());
       toast.success('آزمون با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
@@ -89,9 +129,9 @@ export default function Page() {
     }, 500);
   };
 
-  useEffect(() => {
-    fetchExams();
-  }, [fetchExams]);
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <main>
@@ -107,27 +147,15 @@ export default function Page() {
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg
-                  className="h-6 w-6 text-gray-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
+                <FileText className="h-6 w-6 text-gray-400" />
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                     کل آزمون‌ها
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {exams.length}
+                    {totalExams}
                   </dd>
                 </dl>
               </div>
@@ -139,30 +167,15 @@ export default function Page() {
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg
-                  className="h-6 w-6 text-blue-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <Clock className="h-6 w-6 text-blue-400" />
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                     آزمون‌های زمان‌دار
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {
-                      exams.filter((exam) => exam.duration && exam.duration > 0)
-                        .length
-                    }
+                    {timedExams}
                   </dd>
                 </dl>
               </div>
@@ -174,34 +187,15 @@ export default function Page() {
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg
-                  className="h-6 w-6 text-green-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
+                <Calendar className="h-6 w-6 text-green-400" />
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                     آزمون‌های امروز
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {
-                      exams.filter((exam) => {
-                        if (!exam.date) return false;
-                        const today = new Date().toDateString();
-                        const examDate = new Date(exam.date).toDateString();
-                        return today === examDate;
-                      }).length
-                    }
+                    {todayExams}
                   </dd>
                 </dl>
               </div>
@@ -213,27 +207,15 @@ export default function Page() {
           <div className="p-5">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg
-                  className="h-6 w-6 text-purple-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                </svg>
+                <Users className="h-6 w-6 text-purple-400" />
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                     آزمون‌های دارای ترم
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {exams.filter((exam) => exam.term_id).length}
+                    {termBasedExams}
                   </dd>
                 </dl>
               </div>
@@ -246,7 +228,11 @@ export default function Page() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           آزمون‌ها
         </h1>
-        <Button onClick={() => router.push('/admin/exams/new')}>
+        <Button 
+          onClick={() => router.push('/admin/exams/new')}
+          className="flex items-center gap-2"
+        >
+          <Plus className="h-4 w-4" />
           ایجاد آزمون
         </Button>
       </div>
