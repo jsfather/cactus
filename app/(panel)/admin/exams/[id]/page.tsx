@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
 import { useExamStore } from '@/app/lib/stores/exam.store';
+import { useTerm } from '@/app/lib/hooks/use-term';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
@@ -40,6 +41,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   } = useExamStore();
 
   const {
+    termList,
+    fetchTermList,
+    loading: termLoading,
+    error: termError,
+  } = useTerm();
+
+  const {
     register,
     handleSubmit,
     control,
@@ -50,12 +58,30 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   });
 
   useEffect(() => {
-    if (isNew) {
-      clearCurrentExam();
-    } else {
-      fetchExamById(resolvedParams.id);
-    }
-  }, [isNew, resolvedParams.id, fetchExamById, clearCurrentExam]);
+    const loadData = async () => {
+      try {
+        if (isNew) {
+          clearCurrentExam();
+        } else {
+          await fetchExamById(resolvedParams.id);
+        }
+        
+        // Fetch terms for the select dropdown
+        console.log('About to fetch terms...');
+        await fetchTermList();
+        console.log('Terms fetched, count:', termList.length);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+
+    loadData();
+  }, [isNew, resolvedParams.id, fetchExamById, clearCurrentExam, fetchTermList]);
+
+  // Debug termList changes
+  useEffect(() => {
+    console.log('termList updated:', termList);
+  }, [termList]);
 
   useEffect(() => {
     if (currentExam && !isNew) {
@@ -159,15 +185,25 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             })}
           />
 
-          <Input
-            id="term_id"
-            label="شناسه ترم"
-            type="number"
-            placeholder="شناسه ترم را وارد کنید"
-            error={errors.term_id?.message}
-            {...register('term_id', {
-              setValueAs: (value: string) => (value ? parseInt(value) : null),
-            })}
+          <Controller
+            name="term_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                id="term_id"
+                label="ترم"
+                placeholder={termLoading ? "در حال بارگذاری..." : termList.length === 0 ? "هیچ ترمی یافت نشد" : "ترم را انتخاب کنید"}
+                error={errors.term_id?.message || termError || undefined}
+                value={field.value?.toString() || ''}
+                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : null)}
+                onBlur={field.onBlur}
+                disabled={termLoading || termList.length === 0}
+                options={termList.map((term) => ({
+                  value: term.id.toString(),
+                  label: term.title,
+                }))}
+              />
+            )}
           />
         </div>
 

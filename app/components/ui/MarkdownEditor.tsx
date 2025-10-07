@@ -103,7 +103,6 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
               </div>
             )}
             <MDXEditor
-              key={value} // Force re-render when value changes
               ref={editorRef}
               markdown={value}
               onChange={(newValue) => onChange?.(newValue)}
