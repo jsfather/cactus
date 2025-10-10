@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useReducer, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 interface CartItem {
   id: number;
@@ -33,6 +34,24 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Helper function to convert Persian digits to English and extract numeric value
+function parsePrice(price: string): number {
+  // Convert Persian digits to English digits
+  const persianToEnglish: { [key: string]: string } = {
+    '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
+    '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9'
+  };
+  
+  let englishPrice = price;
+  Object.keys(persianToEnglish).forEach(persian => {
+    englishPrice = englishPrice.replace(new RegExp(persian, 'g'), persianToEnglish[persian]);
+  });
+  
+  // Remove all non-digit characters and convert to number
+  const numericValue = parseInt(englishPrice.replace(/[^0-9]/g, ''));
+  return isNaN(numericValue) ? 0 : numericValue;
+}
+
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
@@ -50,8 +69,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ),
           totalItems: state.totalItems + 1,
           totalPrice:
-            (state.totalPrice || 0) +
-            parseInt(action.payload.price.replace(/[^0-9]/g, '')),
+            (state.totalPrice || 0) + parsePrice(action.payload.price),
         };
       }
 
@@ -60,8 +78,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         items: [...state.items, { ...action.payload, quantity: 1 }],
         totalItems: state.totalItems + 1,
         totalPrice:
-          (state.totalPrice || 0) +
-          parseInt(action.payload.price.replace(/[^0-9]/g, '')),
+          (state.totalPrice || 0) + parsePrice(action.payload.price),
       };
     }
 
@@ -77,8 +94,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         totalItems: state.totalItems - itemToRemove.quantity,
         totalPrice:
           (state.totalPrice || 0) -
-          parseInt(itemToRemove.price.replace(/[^0-9]/g, '')) *
-            itemToRemove.quantity,
+          parsePrice(itemToRemove.price) * itemToRemove.quantity,
       };
     }
 
@@ -99,7 +115,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
         totalItems: state.totalItems + action.payload.change,
         totalPrice:
           (state.totalPrice || 0) +
-          parseInt(item.price.replace(/[^0-9]/g, '')) * action.payload.change,
+          parsePrice(item.price) * action.payload.change,
       };
     }
 
@@ -134,10 +150,17 @@ function getInitialState(): CartState {
       const parsed = JSON.parse(savedCart);
       // Validate the parsed data structure
       if (parsed && typeof parsed === 'object' && Array.isArray(parsed.items)) {
+        // Recalculate total price and items to fix any NaN values
+        const totalItems = parsed.items.reduce((sum: number, item: CartItem) => sum + (item.quantity || 0), 0);
+        const totalPrice = parsed.items.reduce((sum: number, item: CartItem) => {
+          const price = parsePrice(item.price);
+          return sum + (price * (item.quantity || 0));
+        }, 0);
+        
         return {
           items: parsed.items || [],
-          totalItems: parsed.totalItems || 0,
-          totalPrice: parsed.totalPrice || 0,
+          totalItems,
+          totalPrice,
         };
       }
     } catch (error) {
@@ -160,7 +183,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [state]);
 
   const addItem = (item: Omit<CartItem, 'quantity'>) => {
+    const existingItem = state.items.find(
+      (cartItem) => cartItem.id === item.id
+    );
+
     dispatch({ type: 'ADD_ITEM', payload: item });
+    
+    if (existingItem) {
+      toast.success(`تعداد ${item.title} در سبد خرید افزایش یافت`);
+    } else {
+      toast.success(`${item.title} به سبد خرید اضافه شد`);
+    }
   };
 
   const removeItem = (id: number) => {
