@@ -100,14 +100,14 @@ const convertApiProductToDisplayFormat = (
   };
 
   return {
-    id: `api-${apiProduct.id}`, // Prefix to avoid ID conflicts
+    id: apiProduct.id, // Use original ID without prefix
     title: apiProduct.title,
     price: formatPrice(apiProduct.price),
     discount: apiProduct.discount_price
       ? formatPrice(apiProduct.discount_price)
       : null,
     image: apiProduct.image || '/product-1.jpg', // Fallback image
-    category: apiProduct.category?.title || 'عمومی',
+    category: apiProduct.category?.name || 'عمومی', // Use 'name' instead of 'title'
     rating: apiProduct.rating || 4.0,
     reviews: apiProduct.reviews_count || 0,
     inStock: apiProduct.stock > 0,

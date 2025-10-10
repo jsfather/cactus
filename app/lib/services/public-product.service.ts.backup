@@ -1,0 +1,181 @@
+import { publicApiClient } from '@/app/lib/api/client';import { publicApiClient } from '@/app/lib/api/client';import { publicApiClient } from '@/app/lib/api/clien  async getProducts(): Promise<GetPublicProductsResponse> {
+
+import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
+
+import { API_ENDPOINTS } from '@/app/lib/api/endpoints';    return publicApiClient.get<GetPublicProductsResponse>(
+
+export interface PublicProduct {
+
+  id: number;      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS
+
+  title: string;
+
+  description: string;export interface PublicProduct {    );
+
+  price: number;
+
+  stock: number;  id: number;  }import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
+
+  image: string;
+
+  attributes?: Record<string, string>;  title: string;
+
+  category?: {
+
+    id: number;  description: string;export interface PublicProduct {
+
+    name: string;
+
+    type: string;  price: number;  id: number;
+
+  };
+
+  discount_price?: number | null;  stock: number;  title: string;
+
+  rating?: number;
+
+  reviews_count?: number;  image: string;  description: string;
+
+}
+
+  attributes?: Record<string, string>;  price: number;
+
+export interface GetPublicProductsResponse {
+
+  data: PublicProduct[];  category?: {  stock: number;
+
+  links: {
+
+    first: string;    id: number;  image: string;
+
+    last: string;
+
+    prev: string | null;    name: string;  attributes?: Record<string, string>;
+
+    next: string | null;
+
+  };    type: string;  category?: {
+
+  meta: {
+
+    current_page: number;  };    id: number;
+
+    from: number;
+
+    last_page: number;  discount_price?: number | null;    name: string;
+
+    links: Array<{
+
+      url: string | null;  rating?: number;    type: string;
+
+      label: string;
+
+      active: boolean;  reviews_count?: number;  };
+
+    }>;
+
+    path: string;}  discount_price?: number | null;
+
+    per_page: number;
+
+    to: number;  rating?: number;
+
+    total: number;
+
+  };export interface GetPublicProductsResponse {  reviews_count?: number;
+
+}
+
+  data: PublicProduct[];}
+
+export class PublicProductService {
+
+  async getHomeProducts(): Promise<GetPublicProductsResponse> {  links: {
+
+    return publicApiClient.get<GetPublicProductsResponse>(
+
+      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS    first: string;export interface GetPublicProductsResponse {
+
+    );
+
+  }    last: string;  data: PublicProduct[];
+
+
+
+  async getProducts(): Promise<GetPublicProductsResponse> {    prev: string | null;  links: {
+
+    return publicApiClient.get<GetPublicProductsResponse>(
+
+      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS    next: string | null;    first: string;
+
+    );
+
+  }  };    last: string;
+
+}
+
+  meta: {    prev: string | null;
+
+export const publicProductService = new PublicProductService();
+    current_page: number;    next: string | null;
+
+    from: number;  };
+
+    last_page: number;  meta: {
+
+    links: Array<{    current_page: number;
+
+      url: string | null;    from: number;
+
+      label: string;    last_page: number;
+
+      active: boolean;    links: Array<{
+
+    }>;      url: string | null;
+
+    path: string;      label: string;
+
+    per_page: number;      active: boolean;
+
+    to: number;    }>;
+
+    total: number;    path: string;
+
+  };    per_page: number;
+
+}    to: number;
+
+    total: number;
+
+export class PublicProductService {  };
+
+  async getHomeProducts(): Promise<GetPublicProductsResponse> {}
+
+    return publicApiClient.get<GetPublicProductsResponse>(
+
+      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTSexport class PublicProductService {
+
+    );  async getHomeProducts(): Promise<GetPublicProductsResponse> {
+
+  }    return publicApiClient.get<GetPublicProductsResponse>(
+
+      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS
+
+  async getProducts(): Promise<GetPublicProductsResponse> {    );
+
+    return publicApiClient.get<GetPublicProductsResponse>(  }
+
+      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS
+
+    );  async getAllProducts(): Promise<GetPublicProductsResponse> {
+
+  }    return publicApiClient.get<GetPublicProductsResponse>(
+
+}      API_ENDPOINTS.PUBLIC.SHOP.PRODUCTS
+
+    );
+
+export const publicProductService = new PublicProductService();  }
+}
+
+export const publicProductService = new PublicProductService();
