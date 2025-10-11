@@ -9,7 +9,14 @@ import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useProduct } from '@/app/lib/hooks/use-product';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import { Package, Plus, ShoppingCart, TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
+import {
+  Package,
+  Plus,
+  ShoppingCart,
+  TrendingUp,
+  DollarSign,
+  AlertTriangle,
+} from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 export default function ProductsPage() {
@@ -17,12 +24,8 @@ export default function ProductsPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Product | null>(null);
-  const {
-    productList,
-    loading,
-    fetchProductList,
-    deleteProduct,
-  } = useProduct();
+  const { productList, loading, fetchProductList, deleteProduct } =
+    useProduct();
 
   useEffect(() => {
     fetchProductList();
@@ -30,9 +33,18 @@ export default function ProductsPage() {
 
   // Calculate summary stats
   const totalProducts = productList.length;
-  const totalValue = productList.reduce((sum, product) => sum + (Number(product.price) * Number(product.stock || 0)), 0);
-  const lowStockProducts = productList.filter(product => Number(product.stock || 0) < 10).length;
-  const averagePrice = totalProducts > 0 ? productList.reduce((sum, product) => sum + Number(product.price), 0) / totalProducts : 0;
+  const totalValue = productList.reduce(
+    (sum, product) => sum + Number(product.price) * Number(product.stock || 0),
+    0
+  );
+  const lowStockProducts = productList.filter(
+    (product) => Number(product.stock || 0) < 10
+  ).length;
+  const averagePrice =
+    totalProducts > 0
+      ? productList.reduce((sum, product) => sum + Number(product.price), 0) /
+        totalProducts
+      : 0;
 
   const columns: Column<Product>[] = [
     {
@@ -53,7 +65,7 @@ export default function ProductsPage() {
         const stock = Number(value);
         const isLowStock = stock < 10;
         return (
-          <span className={isLowStock ? 'text-red-600 font-medium' : ''}>
+          <span className={isLowStock ? 'font-medium text-red-600' : ''}>
             {stock.toLocaleString('fa-IR')} عدد
             {isLowStock && ' ⚠️'}
           </span>
@@ -215,14 +227,18 @@ export default function ProductsPage() {
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <AlertTriangle className={`h-6 w-6 ${lowStockProducts > 0 ? 'text-red-600' : 'text-gray-400'}`} />
+                  <AlertTriangle
+                    className={`h-6 w-6 ${lowStockProducts > 0 ? 'text-red-600' : 'text-gray-400'}`}
+                  />
                 </div>
                 <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
                       موجودی کم
                     </dt>
-                    <dd className={`text-lg font-medium ${lowStockProducts > 0 ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'}`}>
+                    <dd
+                      className={`text-lg font-medium ${lowStockProducts > 0 ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'}`}
+                    >
                       {lowStockProducts.toLocaleString('fa-IR')} محصول
                     </dd>
                   </dl>
@@ -245,7 +261,8 @@ export default function ProductsPage() {
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                   <p>
-                    {lowStockProducts} محصول موجودی کمتر از ۱۰ عدد دارند. لطفاً موجودی آن‌ها را تکمیل کنید.
+                    {lowStockProducts} محصول موجودی کمتر از ۱۰ عدد دارند. لطفاً
+                    موجودی آن‌ها را تکمیل کنید.
                   </p>
                 </div>
               </div>
@@ -260,6 +277,7 @@ export default function ProductsPage() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ محصولی یافت نشد"
+            onView={(product) => router.push(`/shop/${product.id}`)}
             onEdit={(product) => router.push(`/admin/products/${product.id}`)}
             onDelete={handleDeleteClick}
           />
