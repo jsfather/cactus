@@ -18,7 +18,7 @@ interface TermStudentState {
     user_id: string;
     term_id: string;
     term_teacher_id: string;
-  }) => Promise<void>;
+  }) => Promise<TermStudent>;
   clearError: () => void;
   clearStudentActiveTerms: () => void;
 }
@@ -64,8 +64,9 @@ export const useTermStudentStore = create<TermStudentState>((set, get) => ({
   createTermStudent: async (data) => {
     set({ loading: true, error: null });
     try {
-      await termStudentService.createTermStudent(data);
+      const result = await termStudentService.createTermStudent(data);
       set({ loading: false });
+      return result;
     } catch (error) {
       set({
         error:
@@ -74,6 +75,7 @@ export const useTermStudentStore = create<TermStudentState>((set, get) => ({
             : 'خطایی در ایجاد ترم دانش‌پژو رخ داده است',
         loading: false,
       });
+      throw error;
     }
   },
 
