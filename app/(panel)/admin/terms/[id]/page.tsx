@@ -13,6 +13,7 @@ import Select from '@/app/components/ui/Select';
 import DatePicker from '@/app/components/ui/DatePicker';
 import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import MultiComboBox from '@/app/components/ui/MultiComboBox';
 
 // Hooks and Types
 import { useTerm } from '@/app/lib/hooks/use-term';
@@ -32,10 +33,15 @@ const termSchema = z.object({
   number_of_sessions: z.string().min(1, 'تعداد جلسات ضروری است'),
   capacity: z.string().min(1, 'ظرفیت ضروری است'),
   level_id: z.string().min(1, 'سطح ضروری است'),
-  type: z.enum(['normal', 'capacity_completion', 'project_based', 'specialized', 'ai'], {
-    errorMap: () => ({ message: 'نوع ترم ضروری است' })
-  }),
+  type: z.enum(
+    ['normal', 'capacity_completion', 'project_based', 'specialized', 'ai'],
+    {
+      errorMap: () => ({ message: 'نوع ترم ضروری است' }),
+    }
+  ),
   price: z.string().min(1, 'قیمت ضروری است'),
+  sort: z.string().min(1, 'ترتیب ضروری است'),
+  term_requirements: z.array(z.number()).optional(),
 });
 
 type TermFormData = z.infer<typeof termSchema>;
@@ -48,10 +54,19 @@ interface PageProps {
 
 const TermFormPage: React.FC<PageProps> = ({ params }) => {
   const router = useRouter();
-  const { createTerm, updateTerm, fetchTermById, currentTerm } = useTerm();
+  const {
+    createTerm,
+    updateTerm,
+    fetchTermById,
+    currentTerm,
+    termList,
+    fetchTermList,
+  } = useTerm();
   const { levelList, loading: levelsLoading, fetchLevelList } = useLevel();
 
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   const isNew = resolvedParams?.id === 'new';
@@ -65,7 +80,8 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
 
   useEffect(() => {
     fetchLevelList();
-  }, [fetchLevelList]);
+    fetchTermList();
+  }, [fetchLevelList, fetchTermList]);
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -83,7 +99,9 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
           capacity: '',
           level_id: '',
           type: 'normal',
-          price: '',
+          price: '0',
+          sort: '',
+          term_requirements: [],
         });
         setLoading(false);
         return;
@@ -107,7 +125,7 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
     if (currentTerm && !isNew && levelList.length > 0) {
       // Extract level_id from the nested level object or use level_id directly
       const levelId = currentTerm.level?.id || currentTerm.level_id;
-      
+
       reset({
         title: currentTerm.title,
         start_date: currentTerm.start_date,
@@ -118,6 +136,8 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
         level_id: levelId?.toString() || '',
         type: currentTerm.type,
         price: currentTerm.price.toString(),
+        sort: currentTerm.sort?.toString() || '',
+        term_requirements: currentTerm.term_requirements || [],
       });
     }
   }, [currentTerm, isNew, reset, levelList]);
@@ -130,11 +150,15 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
       start_date: data.start_date,
       end_date: data.end_date,
       duration: Number(convertToEnglishNumbers(data.duration)),
-      number_of_sessions: Number(convertToEnglishNumbers(data.number_of_sessions)),
+      number_of_sessions: Number(
+        convertToEnglishNumbers(data.number_of_sessions)
+      ),
       capacity: convertToEnglishNumbers(data.capacity), // Keep as string for API
       price: convertToEnglishNumbers(data.price), // Keep as string for API
+      sort: convertToEnglishNumbers(data.sort), // Keep as string for API
       type: data.type,
       level_id: Number(data.level_id),
+      term_requirements: data.term_requirements,
     };
 
     try {
@@ -157,8 +181,8 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
 
   if (!resolvedParams || loading || levelsLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
       </div>
     );
   }
@@ -191,9 +215,12 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <form onSubmit={handleSubmit(onSubmit, handleError)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <form
+          onSubmit={handleSubmit(onSubmit, handleError)}
+          className="space-y-6"
+        >
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* Title */}
             <div className="md:col-span-2">
               <Controller
@@ -344,6 +371,27 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
               />
             </div>
 
+            {/* Sort */}
+            <div>
+              <Controller
+                name="sort"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="sort"
+                    label="ترتیب ترم"
+                    type="number"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    error={errors.sort?.message}
+                    required
+                    placeholder="مثال: 1، 2، 3"
+                  />
+                )}
+              />
+            </div>
+
             {/* Start Date */}
             <div>
               <Controller
@@ -381,15 +429,57 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
                 )}
               />
             </div>
+
+            {/* Term Requirements */}
+            <div className="md:col-span-2">
+              <Controller
+                name="term_requirements"
+                control={control}
+                render={({ field }) => {
+                  // Prepare options for MultiComboBox
+                  const termOptions = termList
+                    .filter(
+                      (term) =>
+                        resolvedParams?.id === 'new' ||
+                        term.id.toString() !== resolvedParams?.id
+                    )
+                    .sort((a, b) => (a.sort || 0) - (b.sort || 0))
+                    .map((term) => ({
+                      value: Number(term.id),
+                      label: term.title,
+                      description: `ترتیب: ${term.sort || 'نامشخص'} - ${term.level?.label || 'سطح نامشخص'}`,
+                    }));
+
+                  return (
+                    <MultiComboBox
+                      id="term_requirements"
+                      label="پیش‌نیازهای ترم"
+                      placeholder="انتخاب پیش‌نیازها..."
+                      searchPlaceholder="جستجوی ترم..."
+                      options={termOptions}
+                      value={field.value || []}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      error={errors.term_requirements?.message}
+                      maxDisplayItems={3}
+                    />
+                  );
+                }}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-4 border-t border-gray-200 pt-6 dark:border-gray-700">
             <Button
               type="submit"
               disabled={isSubmitting}
               className="flex items-center gap-2"
             >
-              {isSubmitting ? 'در حال پردازش...' : (isNew ? 'ایجاد ترم' : 'بروزرسانی ترم')}
+              {isSubmitting
+                ? 'در حال پردازش...'
+                : isNew
+                  ? 'ایجاد ترم'
+                  : 'بروزرسانی ترم'}
             </Button>
             <Button
               type="button"
