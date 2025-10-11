@@ -1,114 +1,301 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getTerms } from '@/app/lib/api/student/terms';
-import { Term } from '@/app/lib/types';
+import { StudentTerm } from '@/app/lib/types/student-term';
 import { useRouter } from 'next/navigation';
-import { Eye } from 'lucide-react';
+import { useStudentTerm } from '@/app/lib/hooks/use-student-term';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import {
+  Calendar,
+  Clock,
+  Users,
+  BookOpen,
+  Eye,
+  CheckCircle,
+  AlertCircle,
+  PlayCircle,
+} from 'lucide-react';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { Card } from '@/app/components/ui/Card';
 
-export default function Page() {
+export default function StudentTermsPage() {
   const router = useRouter();
-  const [terms, setTerms] = useState<Term[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { termList, stats, loading, error, getTermList, resetError } =
+    useStudentTerm();
 
-  const columns: Column<Term>[] = [
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await getTermList();
+      } catch (error) {
+        toast.error('خطا در دریافت لیست ترم‌ها');
+      }
+    };
+
+    fetchData();
+  }, [getTermList]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      resetError();
+    }
+  }, [error, resetError]);
+
+  const getTermTypeLabel = (type: string): string => {
+    const typeLabels: Record<string, string> = {
+      normal: 'عادی',
+      capacity_completion: 'تکمیل ظرفیت',
+      project_based: 'پروژه محور',
+      specialized: 'گرایش تخصصی',
+      ai: 'هوش مصنوعی',
+    };
+    return typeLabels[type] || type;
+  };
+
+  const getTermStatus = (
+    term: StudentTerm
+  ): { label: string; color: string } => {
+    const now = new Date();
+    const startDate = new Date(term.term.start_date);
+    const endDate = new Date(term.term.end_date);
+
+    if (startDate > now) {
+      return {
+        label: 'آینده',
+        color:
+          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+      };
+    } else if (endDate < now) {
+      return {
+        label: 'تمام شده',
+        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+      };
+    } else {
+      return {
+        label: 'در حال برگزاری',
+        color:
+          'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      };
+    }
+  };
+
+  const columns: Column<StudentTerm>[] = [
     {
-      header: 'عنوان',
-      accessor: 'title',
-    },
-    {
-      header: 'مدت زمان',
-      accessor: 'duration',
-    },
-    {
-      header: 'تعداد جلسات',
-      accessor: 'number_of_sessions',
-    },
-    {
-      header: 'تاریخ شروع',
-      accessor: 'start_date',
+      header: 'عنوان ترم',
+      accessor: 'term',
       render: (value) => {
-        if (!value || typeof value !== 'string') return '';
-        return new Date(value).toLocaleDateString('fa-IR');
+        const term = value as StudentTerm['term'];
+        return (
+          <div className="space-y-1">
+            <div className="font-medium text-gray-900 dark:text-white">
+              {term.title}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              سطح: {term.level.label} ({term.level.name})
+            </div>
+          </div>
+        );
       },
     },
     {
-      header: 'تاریخ پایان',
-      accessor: 'end_date',
+      header: 'مدرس',
+      accessor: 'user',
       render: (value) => {
-        if (!value || typeof value !== 'string') return '';
-        return new Date(value).toLocaleDateString('fa-IR');
+        const teacher = value as StudentTerm['user'];
+        return (
+          <div className="space-y-1">
+            <div className="font-medium text-gray-900 dark:text-white">
+              {teacher.first_name} {teacher.last_name}
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {teacher.phone}
+            </div>
+          </div>
+        );
       },
     },
     {
       header: 'نوع',
-      accessor: 'type',
-    },
-    {
-      header: 'ظرفیت',
-      accessor: 'capacity',
-    },
-    {
-      header: 'تاریخ ایجاد',
-      accessor: 'created_at',
+      accessor: 'term',
       render: (value) => {
-        if (!value || typeof value !== 'string') return '';
-        return new Date(value).toLocaleDateString('fa-IR');
+        const term = value as StudentTerm['term'];
+        return getTermTypeLabel(term.type);
+      },
+    },
+    {
+      header: 'مدت زمان / جلسات',
+      accessor: 'term',
+      render: (value) => {
+        const term = value as StudentTerm['term'];
+        return (
+          <div className="space-y-1">
+            <div className="text-sm text-gray-900 dark:text-white">
+              {term.duration} دقیقه
+            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {term.number_of_sessions} جلسه
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      header: 'تاریخ شروع',
+      accessor: 'term',
+      render: (value) => {
+        const term = value as StudentTerm['term'];
+        return new Date(term.start_date).toLocaleDateString('fa-IR');
+      },
+    },
+    {
+      header: 'تاریخ پایان',
+      accessor: 'term',
+      render: (value) => {
+        const term = value as StudentTerm['term'];
+        return new Date(term.end_date).toLocaleDateString('fa-IR');
+      },
+    },
+    {
+      header: 'وضعیت',
+      accessor: 'term',
+      render: (value, row) => {
+        const status = getTermStatus(row as StudentTerm);
+        return (
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${status.color}`}
+          >
+            {status.label}
+          </span>
+        );
       },
     },
   ];
 
-  const fetchTerms = async () => {
-    try {
-      setLoading(true);
-      const response = await getTerms();
-      if (response) {
-        setTerms(response.data);
-      }
-    } catch (error) {
-      toast.error('خطا در دریافت لیست ترم ها');
-      setTerms([]);
-    } finally {
-      setLoading(false);
-    }
+  const handleView = (term: StudentTerm) => {
+    router.push(`/student/terms/${term.term.id}`);
   };
 
-  useEffect(() => {
-    fetchTerms();
-  }, []);
-
-  const handleView = (term: Term) => {
-    router.push(`/student/terms/${term.id}`);
-  };
+  if (loading && termList.length === 0) {
+    return <LoadingSpinner />;
+  }
 
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          ترم ها
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          لیست ترم های آموزشی موجود
-        </p>
-      </div>
-      <Table
-        data={terms}
-        columns={columns}
-        loading={loading}
-        emptyMessage="هیچ ترمی یافت نشد"
-        actions={(term) => (
-          <button
-            onClick={() => handleView(term)}
-            className="inline-flex items-center gap-1 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
-            title="مشاهده جزئیات"
-          >
-            <Eye className="h-3 w-3" />
-            مشاهده
-          </button>
-        )}
+    <main>
+      <Breadcrumbs
+        breadcrumbs={[
+          { label: 'ترم‌ها', href: '/student/terms', active: true },
+        ]}
       />
-    </div>
+
+      <div className="mt-8 space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            ترم‌های من
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            لیست ترم‌های آموزشی که در آن‌ها شرکت کرده‌اید
+          </p>
+        </div>
+
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <BookOpen className="h-8 w-8 text-blue-600" />
+              </div>
+              <div className="mr-5 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    کل ترم‌ها
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {stats.total}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <PlayCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <div className="mr-5 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    در حال برگزاری
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {stats.active}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <CheckCircle className="h-8 w-8 text-gray-600" />
+              </div>
+              <div className="mr-5 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    تمام شده
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {stats.completed}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-8 w-8 text-yellow-600" />
+              </div>
+              <div className="mr-5 w-0 flex-1">
+                <dl>
+                  <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                    آینده
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                    {stats.upcoming}
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Terms Table */}
+        <Card className="p-6">
+          <Table
+            data={termList}
+            columns={columns}
+            loading={loading}
+            emptyMessage="هیچ ترمی یافت نشد"
+            actions={(term) => (
+              <button
+                onClick={() => handleView(term)}
+                className="inline-flex items-center gap-1 rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
+                title="مشاهده جزئیات"
+              >
+                <Eye className="h-3 w-3" />
+                مشاهده
+              </button>
+            )}
+          />
+        </Card>
+      </div>
+    </main>
   );
 }

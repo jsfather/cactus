@@ -175,6 +175,10 @@ export const API_ENDPOINTS = {
         SHOW_WITH_CODE: '/orders/show_with_code',
         BUY: '/order/buy',
       },
+      TERMS: {
+        GET_ALL: '/student/terms',
+        GET_BY_ID: (id: string) => `/student/terms/${id}`,
+      },
     },
 
     TEACHER: {
