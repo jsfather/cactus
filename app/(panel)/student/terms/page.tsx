@@ -16,6 +16,8 @@ import {
   CheckCircle,
   AlertCircle,
   PlayCircle,
+  CalendarDays,
+  ClockIcon,
 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Card } from '@/app/components/ui/Card';
@@ -58,17 +60,28 @@ export default function StudentTermsPage() {
   const getTermStatus = (
     term: StudentTerm
   ): { label: string; color: string } => {
+    // Use schedules to determine status since start_date and end_date are in Jalali format
     const now = new Date();
-    const startDate = new Date(term.term.start_date);
-    const endDate = new Date(term.term.end_date);
+    const schedules = term.schedules || [];
+    
+    if (schedules.length === 0) {
+      return {
+        label: 'بدون جلسه',
+        color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+      };
+    }
 
-    if (startDate > now) {
+    const sessionDates = schedules.map(s => new Date(s.session_date));
+    const firstSession = new Date(Math.min(...sessionDates.map(d => d.getTime())));
+    const lastSession = new Date(Math.max(...sessionDates.map(d => d.getTime())));
+
+    if (firstSession > now) {
       return {
         label: 'آینده',
         color:
           'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
       };
-    } else if (endDate < now) {
+    } else if (lastSession < now) {
       return {
         label: 'تمام شده',
         color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
@@ -80,6 +93,22 @@ export default function StudentTermsPage() {
           'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
       };
     }
+  };
+
+  const getAttendanceInfo = (schedules: StudentTerm['schedules']) => {
+    const now = new Date();
+    const pastSessions = schedules.filter(s => new Date(s.session_date) < now);
+    const upcomingSessions = schedules.filter(s => new Date(s.session_date) >= now);
+    
+    // Sort upcoming sessions by date to get the next one
+    upcomingSessions.sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime());
+    
+    return {
+      totalSessions: schedules.length,
+      pastSessions: pastSessions.length,
+      upcomingSessions: upcomingSessions.length,
+      nextSession: upcomingSessions.length > 0 ? upcomingSessions[0] : null
+    };
   };
 
   const columns: Column<StudentTerm>[] = [
@@ -147,7 +176,7 @@ export default function StudentTermsPage() {
       accessor: 'term',
       render: (value) => {
         const term = value as StudentTerm['term'];
-        return new Date(term.start_date).toLocaleDateString('fa-IR');
+        return term.start_date; // Already in Jalali format
       },
     },
     {
@@ -155,7 +184,51 @@ export default function StudentTermsPage() {
       accessor: 'term',
       render: (value) => {
         const term = value as StudentTerm['term'];
-        return new Date(term.end_date).toLocaleDateString('fa-IR');
+        return term.end_date; // Already in Jalali format
+      },
+    },
+    {
+      header: 'جلسات برگزار شده / کل',
+      accessor: 'schedules',
+      render: (value, row) => {
+        const schedules = value as StudentTerm['schedules'];
+        const attendanceInfo = getAttendanceInfo(schedules);
+        return (
+          <div className="space-y-1">
+            <div className="text-sm text-gray-900 dark:text-white">
+              {attendanceInfo.pastSessions} / {attendanceInfo.totalSessions}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {attendanceInfo.upcomingSessions} جلسه باقی‌مانده
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      header: 'آینده جلسه',
+      accessor: 'schedules',
+      render: (value) => {
+        const schedules = value as StudentTerm['schedules'];
+        const attendanceInfo = getAttendanceInfo(schedules);
+        if (!attendanceInfo.nextSession) {
+          return (
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              جلسه‌ای باقی نمانده
+            </span>
+          );
+        }
+        const nextSession = attendanceInfo.nextSession;
+        return (
+          <div className="space-y-1">
+            <div className="text-sm text-gray-900 dark:text-white">
+              {new Date(nextSession.session_date).toLocaleDateString('fa-IR')}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {nextSession.start_time} - {nextSession.end_time}
+            </div>
+          </div>
+        );
       },
     },
     {
