@@ -2,7 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
-import { ChevronDownIcon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import {
+  ChevronDownIcon,
+  XMarkIcon,
+  MagnifyingGlassIcon,
+} from '@heroicons/react/24/outline';
 
 export interface Option {
   label: string;
@@ -47,18 +51,24 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter options based on search term
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    option.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = options.filter(
+    (option) =>
+      option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      option.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Get selected options
-  const selectedOptions = options.filter(option => value.includes(option.value));
+  const selectedOptions = options.filter((option) =>
+    value.includes(option.value)
+  );
 
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchTerm('');
         onBlur?.();
@@ -80,17 +90,20 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
     if (disabled) return;
 
     const newValue = value.includes(optionValue)
-      ? value.filter(v => v !== optionValue)
+      ? value.filter((v) => v !== optionValue)
       : [...value, optionValue];
-    
+
     onChange?.(newValue);
   };
 
-  const handleRemoveOption = (optionValue: string | number, event: React.MouseEvent) => {
+  const handleRemoveOption = (
+    optionValue: string | number,
+    event: React.MouseEvent
+  ) => {
     event.stopPropagation();
     if (disabled) return;
-    
-    const newValue = value.filter(v => v !== optionValue);
+
+    const newValue = value.filter((v) => v !== optionValue);
     onChange?.(newValue);
   };
 
@@ -100,13 +113,13 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
     }
 
     if (selectedOptions.length <= maxDisplayItems) {
-      return selectedOptions.map(option => option.label).join('، ');
+      return selectedOptions.map((option) => option.label).join('، ');
     }
 
     const displayedOptions = selectedOptions.slice(0, maxDisplayItems);
     const remainingCount = selectedOptions.length - maxDisplayItems;
-    
-    return `${displayedOptions.map(option => option.label).join('، ')} و ${remainingCount} مورد دیگر`;
+
+    return `${displayedOptions.map((option) => option.label).join('، ')} و ${remainingCount} مورد دیگر`;
   };
 
   return (
@@ -120,14 +133,14 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
           {required && <span className="mr-1 text-red-500">*</span>}
         </label>
       )}
-      
+
       <div className="relative">
         {/* Main trigger button */}
         <button
           type="button"
           id={id}
           className={clsx(
-            'block w-full appearance-none rounded-lg border px-4 py-3 text-sm transition-all outline-none text-right',
+            'block w-full appearance-none rounded-lg border px-4 py-3 text-right text-sm transition-all outline-none',
             'bg-white dark:bg-gray-900',
             'disabled:cursor-not-allowed disabled:opacity-50',
             error
@@ -145,22 +158,22 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
         >
           <div className="flex items-center justify-between">
             <span className="truncate">{displayText()}</span>
-            <ChevronDownIcon 
+            <ChevronDownIcon
               className={clsx(
-                'h-5 w-5 text-gray-400 dark:text-gray-500 transition-transform',
+                'h-5 w-5 text-gray-400 transition-transform dark:text-gray-500',
                 isOpen && 'rotate-180'
-              )} 
+              )}
             />
           </div>
         </button>
 
         {/* Selected items as badges (when dropdown is closed and items are selected) */}
         {!isOpen && selectedOptions.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
+          <div className="mt-2 flex flex-wrap gap-1">
             {selectedOptions.slice(0, maxDisplayItems).map((option) => (
               <span
                 key={option.value}
-                className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-primary-100 text-primary-800 rounded-md dark:bg-primary-900 dark:text-primary-300"
+                className="bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300 inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium"
               >
                 {option.label}
                 <button
@@ -174,7 +187,7 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
               </span>
             ))}
             {selectedOptions.length > maxDisplayItems && (
-              <span className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-md dark:bg-gray-800 dark:text-gray-400">
+              <span className="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400">
                 +{selectedOptions.length - maxDisplayItems}
               </span>
             )}
@@ -183,18 +196,18 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
 
         {/* Dropdown */}
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg max-h-64 overflow-hidden">
+          <div className="absolute z-50 mt-1 max-h-64 w-full overflow-hidden rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
             {/* Search input */}
-            <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="border-b border-gray-200 p-3 dark:border-gray-700">
               <div className="relative">
-                <MagnifyingGlassIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                <MagnifyingGlassIcon className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-4 pr-10 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="focus:ring-primary-500 focus:border-primary-500 w-full rounded-md border border-gray-300 bg-white py-2 pr-10 pl-4 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
                 />
               </div>
             </div>
@@ -211,20 +224,20 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
                   return (
                     <label
                       key={option.value}
-                      className="flex items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                      className="flex cursor-pointer items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800"
                     >
                       <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleToggleOption(option.value)}
-                        className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 focus:ring-2"
+                        className="text-primary-600 focus:ring-primary-500 rounded border-gray-300 focus:ring-2 dark:border-gray-600"
                       />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-medium text-gray-900 dark:text-white">
                           {option.label}
                         </div>
                         {option.description && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          <div className="truncate text-xs text-gray-500 dark:text-gray-400">
                             {option.description}
                           </div>
                         )}
