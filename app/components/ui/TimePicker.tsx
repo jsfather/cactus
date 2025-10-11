@@ -7,6 +7,7 @@ import TimePicker from 'react-multi-date-picker/plugins/time_picker';
 import persian from 'react-date-object/calendars/persian';
 import persian_fa from 'react-date-object/locales/persian_fa';
 import DateObject from 'react-date-object';
+import './DatePicker.css';
 
 interface TimePickerProps {
   label?: string;
@@ -39,15 +40,12 @@ const TimePickerComponent = forwardRef<HTMLInputElement, TimePickerProps>(
     },
     ref
   ) => {
-    console.log('TimePicker value prop:', value);
-
     const handleTimeChange = (date: any) => {
       if (date) {
         // Convert to HH:MM format
         const hour = String(date.hour).padStart(2, '0');
         const minute = String(date.minute).padStart(2, '0');
         const formattedTime = `${hour}:${minute}`;
-        console.log('TimePicker onChange:', formattedTime);
 
         // Call react-hook-form onChange
         if (onChange) {

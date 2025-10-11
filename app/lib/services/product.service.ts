@@ -75,7 +75,7 @@ export class ProductService {
     payload: UpdateProductFormData
   ): Promise<GetProductResponse> {
     const formData = this.createFormData(payload);
-    return apiClient.post<GetProductResponse>(
+    return apiClient.put<GetProductResponse>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.UPDATE(id),
       formData,
       {

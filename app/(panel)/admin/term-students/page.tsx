@@ -1,15 +1,19 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { toast } from 'react-hot-toast';
-import { createTermStudent } from '@/app/lib/api/admin/term-students';
-import { getTerms } from '@/app/lib/api/admin/terms';
-import { getStudents } from '@/app/lib/api/admin/students';
-import { getTermTeachers } from '@/app/lib/api/admin/term-teachers';
+
+// Hooks
+import { useTermStudent } from '@/app/lib/hooks/use-term-student';
+import { useTerm } from '@/app/lib/hooks/use-term';
+import { useStudent } from '@/app/lib/hooks/use-student';
+import { useTermTeacher } from '@/app/lib/hooks/use-term-teacher';
+
+// Components
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Select from '@/app/components/ui/Select';
 import { Button } from '@/app/components/ui/Button';
@@ -27,19 +31,28 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
-  const [loading, setLoading] = useState(!isNew);
-  const [terms, setTerms] = useState<Array<{ label: string; value: string }>>(
-    []
-  );
-  const [students, setStudents] = useState<
-    Array<{ label: string; value: string }>
-  >([]);
-  const [termTeachers, setTermTeachers] = useState<
-    Array<{ label: string; value: string }>
-  >([]);
+
+  // Hooks
+  const {
+    createTermStudent,
+    loading: submitting,
+    error,
+    clearError,
+  } = useTermStudent();
+  const { termList, loading: termsLoading, fetchTermList } = useTerm();
+  const {
+    studentList,
+    loading: studentsLoading,
+    fetchStudentList,
+  } = useStudent();
+  const {
+    termTeacherList,
+    loading: termTeachersLoading,
+    fetchTermTeacherList,
+  } = useTermTeacher();
 
   const {
-    register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
@@ -47,62 +60,52 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     resolver: zodResolver(termStudentSchema),
   });
 
+  // Load dropdown data on mount
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Load all dropdown data
-        const [termsResponse, studentsResponse, termTeachersResponse] =
-          await Promise.all([getTerms(), getStudents(), getTermTeachers()]);
+    fetchTermList();
+    fetchStudentList();
+    fetchTermTeacherList();
+  }, [fetchTermList, fetchStudentList, fetchTermTeacherList]);
 
-        setTerms(
-          termsResponse.data.map((term: any) => ({
-            label: term.name || term.title || `ترم ${term.id}`,
-            value: term.id.toString(),
-          }))
-        );
-
-        setStudents(
-          studentsResponse.data.map((student: any) => ({
-            label:
-              student.user?.name || student.name || `دانش آموز ${student.id}`,
-            value: student.user?.id?.toString() || student.id.toString(),
-          }))
-        );
-
-        setTermTeachers(
-          termTeachersResponse.data
-            .filter((termTeacher: any) => termTeacher.id)
-            .map((termTeacher: any) => ({
-              label:
-                `${termTeacher.teacher?.user?.first_name || ''} ${termTeacher.teacher?.user?.last_name || ''}`.trim() ||
-                termTeacher.teacher?.user?.name ||
-                `مدرس ترم ${termTeacher.id}`,
-              value: termTeacher.id.toString(),
-            }))
-        );
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        if (!isNew) {
-          router.push('/admin/term-students');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [isNew, resolvedParams.id, reset, router]);
+  // Handle errors from store
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      clearError();
+    }
+  }, [error, clearError]);
 
   const onSubmit = async (data: TermStudentFormData) => {
     try {
       await createTermStudent(data);
-      toast.success('دانش آموز با موفقیت به ترم اضافه شد');
-
+      toast.success('دانش آموز با موفقیت ثبت نام شد.');
       router.push('/admin/term-students');
     } catch (error) {
       toast.error('خطا در اضافه کردن دانش آموز به ترم');
     }
   };
+
+  // Prepare options for dropdowns
+  const termOptions = termList.map((term) => ({
+    label: term.title || `ترم ${term.id}`,
+    value: term.id.toString(),
+  }));
+
+  const studentOptions = studentList.map((student) => ({
+    label:
+      `${student.user?.first_name || ''} ${student.user?.last_name || ''}`.trim() ||
+      `دانش آموز ${student.user_id}`,
+    value: student.user?.id?.toString() || student.user_id.toString(),
+  }));
+
+  const termTeacherOptions = termTeacherList.map((termTeacher) => ({
+    label:
+      `${termTeacher.user?.first_name || ''} ${termTeacher.user?.last_name || ''}`.trim() ||
+      `مدرس ترم ${termTeacher.id}`,
+    value: termTeacher.id.toString(),
+  }));
+
+  const loading = termsLoading || studentsLoading || termTeachersLoading;
 
   if (loading) {
     return <LoadingSpinner />;
@@ -125,34 +128,61 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Select
-            id="term_id"
-            label="ترم"
-            placeholder="ترم را انتخاب کنید"
-            required
-            options={terms}
-            error={errors.term_id?.message}
-            {...register('term_id')}
+          <Controller
+            name="term_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                id="term_id"
+                label="ترم"
+                placeholder="ترم را انتخاب کنید"
+                required
+                options={termOptions}
+                error={errors.term_id?.message}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+              />
+            )}
           />
 
-          <Select
-            id="user_id"
-            label="دانش آموز"
-            placeholder="دانش آموز را انتخاب کنید"
-            required
-            options={students}
-            error={errors.user_id?.message}
-            {...register('user_id')}
+          <Controller
+            name="user_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                id="user_id"
+                label="دانش آموز"
+                placeholder="دانش آموز را انتخاب کنید"
+                required
+                options={studentOptions}
+                error={errors.user_id?.message}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+              />
+            )}
           />
 
-          <Select
-            id="term_teacher_id"
-            label="مدرس ترم"
-            placeholder="مدرس ترم را انتخاب کنید"
-            required
-            options={termTeachers}
-            error={errors.term_teacher_id?.message}
-            {...register('term_teacher_id')}
+          <Controller
+            name="term_teacher_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                id="term_teacher_id"
+                label="مدرس ترم"
+                placeholder="مدرس ترم را انتخاب کنید"
+                required
+                options={termTeacherOptions}
+                error={errors.term_teacher_id?.message}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+              />
+            )}
           />
         </div>
 
@@ -164,7 +194,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           >
             انصراف
           </Button>
-          <Button type="submit" loading={isSubmitting}>
+          <Button type="submit" loading={isSubmitting || submitting}>
             {isNew ? 'اضافه کردن دانش آموز به ترم' : 'بروزرسانی ترم دانش آموز'}
           </Button>
         </div>

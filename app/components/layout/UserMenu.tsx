@@ -2,11 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import LogoutButton from '@/app/components/layout/LogoutButton';
-import { LayoutDashboard, GraduationCap, User, Settings } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, User, User2, Settings } from 'lucide-react';
 import Link from 'next/link';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { useUser } from '@/app/hooks/useUser';
+import { getImageUrl, isValidImageUrl } from '@/app/lib/utils/image';
 
 interface UserMenuProps {
   userName: string;
@@ -44,14 +46,27 @@ export function UserMenu({ userName }: UserMenuProps) {
     }
   };
 
+  // Check if avatar URL is valid
+  const hasValidAvatar = isValidImageUrl(user?.profile_picture);
+
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex cursor-pointer items-center gap-2 rounded-full transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
       >
-        <div className="bg-primary-100 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400 flex h-9 w-9 items-center justify-center rounded-full font-semibold transition-colors">
-          {userName.charAt(0).toUpperCase()}
+        <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gray-50 ring-2 ring-gray-100 dark:bg-gray-800 dark:ring-gray-800">
+          {hasValidAvatar ? (
+            <Image
+              src={getImageUrl(user?.profile_picture) || ''}
+              alt={`${user?.first_name} ${user?.last_name}`}
+              fill
+              className="object-cover"
+              unoptimized={true}
+            />
+          ) : (
+            <User2 className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+          )}
         </div>
       </button>
 
@@ -60,10 +75,27 @@ export function UserMenu({ userName }: UserMenuProps) {
           <div className="py-2">
             <div className="border-b border-gray-200 px-4 py-3 text-sm text-gray-900 dark:border-gray-800 dark:text-gray-100">
               <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{userName}</div>
-                  <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    حساب کاربری
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-shrink-0">
+                    <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gray-50 ring-2 ring-gray-100 dark:bg-gray-800 dark:ring-gray-800">
+                      {hasValidAvatar ? (
+                        <Image
+                          src={getImageUrl(user?.profile_picture) || ''}
+                          alt={`${user?.first_name} ${user?.last_name}`}
+                          fill
+                          className="object-cover"
+                          unoptimized={true}
+                        />
+                      ) : (
+                        <User2 className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium">{userName}</div>
+                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      حساب کاربری
+                    </div>
                   </div>
                 </div>
                 <Link

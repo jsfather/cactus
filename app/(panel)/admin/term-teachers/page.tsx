@@ -3,73 +3,106 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
-import Table from '@/app/components/ui/Table';
+import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { getTermTeachers, deleteTermTeacher } from '@/app/lib/api/admin/term-teachers';
-import { SessionRecord } from '@/app/lib/types/term_teacher';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import { 
+  Calendar, 
+  Users, 
+  Clock, 
+  BookOpen 
+} from 'lucide-react';
+
+// New implementation
+import { useTermTeacher } from '@/app/lib/hooks/use-term-teacher';
+import { TermTeacher } from '@/app/lib/types/term_teacher';
 
 export default function Page() {
   const router = useRouter();
-  const [termTeachers, setTermTeachers] = useState<SessionRecord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    termTeacherList,
+    loading,
+    error,
+    fetchTermTeacherList,
+    deleteTermTeacher,
+    clearError,
+  } = useTermTeacher();
+
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<SessionRecord | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<TermTeacher | null>(null);
 
-  const columns = [
+  const columns: Column<TermTeacher>[] = [
     {
       header: 'نام مدرس',
-      accessor: 'user' as keyof SessionRecord,
-      render: (item: SessionRecord) => {
+      accessor: 'user',
+      render: (value: any, item: TermTeacher) => {
         if (!item.user) return 'نامشخص';
         return `${item.user.first_name || ''} ${item.user.last_name || ''}`.trim();
       },
     },
     {
-      header: 'نام ترم',
-      accessor: 'term' as keyof SessionRecord,
-      render: (item: SessionRecord) => {
-        return item.term?.title || 'بدون ترم';
+      header: 'شماره تماس',
+      accessor: 'user',
+      render: (value: any, item: TermTeacher) => item.user?.phone || 'ندارد',
+    },
+    {
+      header: 'ترم',
+      accessor: 'term',
+      render: (value: any, item: TermTeacher) => item.term?.title || 'بدون ترم',
+    },
+    {
+      header: 'سطح',
+      accessor: 'term',
+      render: (value: any, item: TermTeacher) => {
+        if (!item.term?.level) return 'نامشخص';
+        return `${item.term.level.name} (${item.term.level.label})`;
       },
+    },
+    {
+      header: 'تعداد جلسات',
+      accessor: 'schedules',
+      render: (value: any, item: TermTeacher) => item.schedules?.length || 0,
+    },
+    {
+      header: 'تعداد روزهای تدریس',
+      accessor: 'days',
+      render: (value: any, item: TermTeacher) => item.days?.length || 0,
     },
   ];
 
-  const fetchTermTeachers = async () => {
-    try {
-      setLoading(true);
-      const response = await getTermTeachers();
-      if (response && response.data) {
-        console.log('Term Teachers Data:', response.data);
-        console.log('First item:', response.data[0]);
-        setTermTeachers(response.data);
-      } else {
-        setTermTeachers([]);
-      }
-    } catch (error) {
-      console.error('Error fetching term teachers:', error);
-      toast.error('خطا در دریافت لیست ترم مدرسین');
-      setTermTeachers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Summary stats
+  const stats = [
+    {
+      name: 'کل ترم مدرسین',
+      value: termTeacherList.length,
+      icon: Users,
+      color: 'bg-blue-500',
+    },
+    {
+      name: 'ترم‌های فعال',
+      value: termTeacherList.filter(item => item.term).length,
+      icon: BookOpen,
+      color: 'bg-green-500',
+    },
+    {
+      name: 'کل جلسات',
+      value: termTeacherList.reduce((sum, item) => sum + (item.schedules?.length || 0), 0),
+      icon: Calendar,
+      color: 'bg-purple-500',
+    },
+    {
+      name: 'میانگین جلسات',
+      value: termTeacherList.length > 0 
+        ? Math.round(termTeacherList.reduce((sum, item) => sum + (item.schedules?.length || 0), 0) / termTeacherList.length)
+        : 0,
+      icon: Clock,
+      color: 'bg-orange-500',
+    },
+  ];
 
-  const refreshTermTeacherList = async () => {
-    try {
-      const response = await getTermTeachers();
-      if (response && response.data) {
-        setTermTeachers(response.data);
-      } else {
-        setTermTeachers([]);
-      }
-    } catch (error) {
-      console.error('Error refreshing term teachers:', error);
-      toast.error('خطا در بروزرسانی لیست ترم مدرسین');
-    }
-  };
-
-  const handleDeleteClick = (termTeacher: SessionRecord) => {
+  const handleDeleteClick = (termTeacher: TermTeacher) => {
     setItemToDelete(termTeacher);
     setShowDeleteModal(true);
   };
@@ -79,32 +112,23 @@ export default function Page() {
 
     try {
       setDeleteLoading(true);
-      await deleteTermTeacher(itemToDelete.id);
+      await deleteTermTeacher(itemToDelete.id.toString());
 
-      // نمایش پیام موفقیت
       toast.success(
         `ترم مدرس "${itemToDelete.user?.first_name || 'نامشخص'} ${itemToDelete.user?.last_name || ''}" با موفقیت حذف شد`
       );
 
-      // بستن مدال
       closeDeleteModal();
-
-      // بروزرسانی لیست بدون loading
-      await refreshTermTeacherList();
     } catch (error: any) {
       console.error('Error deleting term teacher:', error);
-      const errorMessage = error?.message || 'خطا در حذف ترم مدرس';
-      toast.error(errorMessage);
-
-      // در صورت خطا هم مدال رو ببند
-      closeDeleteModal();
+      toast.error('خطا در حذف ترم مدرس');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
   const handleDeleteCancel = () => {
-    setShowDeleteModal(false);
-    setItemToDelete(null);
-    setDeleteLoading(false);
+    closeDeleteModal();
   };
 
   const closeDeleteModal = () => {
@@ -114,29 +138,78 @@ export default function Page() {
   };
 
   useEffect(() => {
-    fetchTermTeachers();
-  }, []);
+    fetchTermTeacherList();
+  }, [fetchTermTeacherList]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      clearError();
+    }
+  }, [error, clearError]);
 
   return (
-    <div className="w-full">
-      <div className="flex w-full items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          ترم مدرسین
-        </h1>
-        <Button onClick={() => router.push('/admin/term-teachers/new')}>
-          ایجاد ترم مدرس
-        </Button>
-      </div>
-      
-      <Table
-        data={termTeachers}
-        columns={columns}
-        loading={loading}
-        emptyMessage="هیچ ترم مدرسی یافت نشد"
-        onEdit={(termTeacher) => router.push(`/admin/term-teachers/${termTeacher.id}`)}
-        onDelete={handleDeleteClick}
-        onView={(termTeacher) => router.push(`/admin/term-teachers/${termTeacher.id}/view`)}
+    <main>
+      <Breadcrumbs
+        breadcrumbs={[
+          { label: 'ترم مدرسین', href: '/admin/term-teachers' },
+        ]}
       />
+
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex w-full items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            ترم مدرسین
+          </h1>
+          <Button onClick={() => router.push('/admin/term-teachers/new')}>
+            ایجاد ترم مدرس
+          </Button>
+        </div>
+
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={stat.name}
+                className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow dark:bg-gray-800"
+              >
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-md ${stat.color}`}>
+                      <Icon className="h-5 w-5 text-white" aria-hidden="true" />
+                    </div>
+                  </div>
+                  <div className="mr-5 w-0 flex-1">
+                    <dl>
+                      <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                        {stat.name}
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                        {stat.value.toLocaleString('fa-IR')}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Table */}
+        <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+          <Table
+            data={termTeacherList}
+            columns={columns}
+            loading={loading}
+            emptyMessage="هیچ ترم مدرسی یافت نشد"
+            onDelete={handleDeleteClick}
+            onView={(termTeacher) => router.push(`/admin/term-teachers/${termTeacher.id}/view`)}
+          />
+        </div>
+      </div>
 
       <ConfirmModal
         isOpen={showDeleteModal}
@@ -148,6 +221,6 @@ export default function Page() {
         loading={deleteLoading}
         variant="danger"
       />
-    </div>
+    </main>
   );
 }

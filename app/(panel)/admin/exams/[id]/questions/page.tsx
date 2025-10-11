@@ -10,6 +10,7 @@ import {
   deleteExamQuestion,
 } from '@/app/lib/api/admin/questions';
 import { PlacementExamQuestion } from '@/app/lib/types/placement-exam';
+import { ExamQuestion } from '@/app/lib/types/exam';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';

@@ -17,14 +17,9 @@ export default function TermsPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Term | null>(null);
-  
-  const {
-    termList,
-    loading,
-    fetchTermList,
-    deleteTerm,
-    clearError,
-  } = useTerm();
+
+  const { termList, loading, fetchTermList, deleteTerm, clearError } =
+    useTerm();
 
   useEffect(() => {
     fetchTermList();
@@ -32,12 +27,15 @@ export default function TermsPage() {
 
   // Calculate summary statistics
   const totalTerms = termList.length;
-  const activeTerms = termList.filter(term => {
+  const activeTerms = termList.filter((term) => {
     const today = new Date();
     const endDate = new Date(term.end_date);
     return endDate >= today;
   }).length;
-  const totalStudents = termList.reduce((sum, term) => sum + (term.students?.length || 0), 0);
+  const totalStudents = termList.reduce(
+    (sum, term) => sum + (term.students?.length || 0),
+    0
+  );
   const totalCapacity = termList.reduce((sum, term) => sum + term.capacity, 0);
 
   const columns: Column<Term>[] = [
@@ -46,6 +44,13 @@ export default function TermsPage() {
       accessor: 'title',
       render: (value): string => {
         return value as string;
+      },
+    },
+    {
+      header: 'ترتیب',
+      accessor: 'sort',
+      render: (value): string => {
+        return value ? `${value}` : 'نامشخص';
       },
     },
     {
@@ -60,7 +65,7 @@ export default function TermsPage() {
             </span>
           );
         }
-        
+
         return (
           <span className="inline-flex items-center rounded-full bg-indigo-100 px-2 py-1 text-xs font-medium text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
             {level.label} - {level.name}
@@ -87,16 +92,41 @@ export default function TermsPage() {
       accessor: 'type',
       render: (value): React.JSX.Element => {
         const typeMap = {
-          normal: { label: 'عادی', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' },
-          capacity_completion: { label: 'تکمیل ظرفیت', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' },
-          project_based: { label: 'پروژه محور(ویژه)', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' },
-          specialized: { label: 'گرایش تخصصی', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' },
-          ai: { label: 'هوش مصنوعی', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300' },
+          normal: {
+            label: 'عادی',
+            color:
+              'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+          },
+          capacity_completion: {
+            label: 'تکمیل ظرفیت',
+            color:
+              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+          },
+          project_based: {
+            label: 'پروژه محور(ویژه)',
+            color:
+              'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+          },
+          specialized: {
+            label: 'گرایش تخصصی',
+            color:
+              'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+          },
+          ai: {
+            label: 'هوش مصنوعی',
+            color:
+              'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+          },
         };
-        const type = typeMap[value as keyof typeof typeMap] || { label: value as string, color: 'bg-gray-100 text-gray-800' };
-        
+        const type = typeMap[value as keyof typeof typeMap] || {
+          label: value as string,
+          color: 'bg-gray-100 text-gray-800',
+        };
+
         return (
-          <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${type.color}`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${type.color}`}
+          >
             {type.label}
           </span>
         );
@@ -130,6 +160,47 @@ export default function TermsPage() {
       render: (value): string => {
         if (!value || typeof value !== 'string') return '---';
         return value; // Already in Persian format
+      },
+    },
+    {
+      header: 'پیش‌نیازها',
+      accessor: 'term_requirements',
+      render: (value, item): React.JSX.Element => {
+        const requirements = item.term_requirements;
+        if (!requirements || requirements.length === 0) {
+          return (
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              ندارد
+            </span>
+          );
+        }
+
+        return (
+          <div className="flex flex-wrap gap-1">
+            {requirements.slice(0, 2).map((reqId, index) => {
+              const reqTerm = termList.find(
+                (t) => t.id.toString() === reqId.toString()
+              );
+              return (
+                <span
+                  key={reqId}
+                  className="inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-xs font-medium text-orange-800 dark:bg-orange-900 dark:text-orange-300"
+                  title={reqTerm ? reqTerm.title : `ترم ${reqId}`}
+                >
+                  {reqTerm
+                    ? reqTerm.title.substring(0, 10) +
+                      (reqTerm.title.length > 10 ? '...' : '')
+                    : `ترم ${reqId}`}
+                </span>
+              );
+            })}
+            {requirements.length > 2 && (
+              <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                +{requirements.length - 2}
+              </span>
+            )}
+          </div>
+        );
       },
     },
   ];
@@ -188,7 +259,7 @@ export default function TermsPage() {
               مدیریت و ویرایش ترم‌های آموزشی
             </p>
           </div>
-          <Button 
+          <Button
             onClick={() => router.push('/admin/terms/new')}
             className="flex items-center gap-2"
           >

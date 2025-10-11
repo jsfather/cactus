@@ -11,9 +11,16 @@ export interface Term {
   };
   start_date: string; // Persian date format like "1404-01-20"
   end_date: string; // Persian date format like "1404-03-20"
-  type: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  type:
+    | 'normal'
+    | 'capacity_completion'
+    | 'project_based'
+    | 'specialized'
+    | 'ai';
   capacity: number;
   price: number;
+  sort: number; // Increment number for ordering terms
+  term_requirements?: number[]; // Array of term IDs that are required before this term
   project_type?: any;
   students?: any[];
   teachers?: any[];
@@ -38,9 +45,16 @@ export interface CreateTermRequest {
   level_id: number;
   start_date: string; // Persian date format like "1404-01-20"
   end_date: string; // Persian date format like "1404-03-20"
-  type: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  type:
+    | 'normal'
+    | 'capacity_completion'
+    | 'project_based'
+    | 'specialized'
+    | 'ai';
   capacity: string; // API expects string
-  price: string; // API expects string
+  price: string; // API expects string, required, default "0"
+  sort: string; // API expects string, required increment number
+  term_requirements?: number[]; // Optional array of term IDs
 }
 
 export interface UpdateTermRequest {
@@ -50,7 +64,14 @@ export interface UpdateTermRequest {
   level_id?: number;
   start_date?: string; // Persian date format like "1404-01-20"
   end_date?: string; // Persian date format like "1404-03-20"
-  type?: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  type?:
+    | 'normal'
+    | 'capacity_completion'
+    | 'project_based'
+    | 'specialized'
+    | 'ai';
   capacity?: string; // API expects string
   price?: string; // API expects string
+  sort?: string; // API expects string, increment number
+  term_requirements?: number[]; // Optional array of term IDs
 }

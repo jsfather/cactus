@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useExamStore } from '@/app/lib/stores/exam.store';
-import { CreateExamRequest, UpdateExamRequest } from '@/app/lib/types';
+import { CreateExamRequest, UpdateExamRequest } from '@/app/lib/types/exam';
 
 export const useExam = () => {
   const {

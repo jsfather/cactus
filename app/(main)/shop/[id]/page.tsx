@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, use } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -14,63 +14,428 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
+import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
+import { PublicProduct } from '@/app/lib/services/public-product.service';
 
-// Sample product data (replace with actual data fetching)
-const product = {
-  id: '1',
-  title: 'کیت آموزشی ربات مسیریاب',
-  price: '۲,۵۰۰,۰۰۰',
-  discount: '۲,۱۰۰,۰۰۰',
-  category: 'کیت آموزشی',
-  rating: 4.5,
-  reviews: 28,
-  inStock: true,
-  stockCount: 12,
-  description:
-    'کیت آموزشی ربات مسیریاب یک مجموعه کامل برای یادگیری مفاهیم پایه رباتیک و برنامه‌نویسی است. این کیت شامل تمام قطعات مورد نیاز برای ساخت یک ربات مسیریاب هوشمند می‌باشد.',
-  features: [
-    'قابلیت تشخیص و تعقیب خط',
-    'سنسورهای مادون قرمز با دقت بالا',
-    'موتورهای DC با کیفیت',
-    'برد کنترلر آردوینو',
-    'قطعات پلاستیکی با دوام',
-    'باتری قابل شارژ',
-  ],
-  specifications: [
-    { name: 'ابعاد', value: '۲۰×۱۵×۱۰ سانتی‌متر' },
-    { name: 'وزن', value: '۵۰۰ گرم' },
-    { name: 'ولتاژ کاری', value: '۷.۴ ولت' },
-    { name: 'زمان شارژ', value: '۲ ساعت' },
-    { name: 'مدت زمان کارکرد', value: '۳ ساعت' },
-  ],
-  images: [
-    '/product-1.jpg',
-    '/product-2.jpg',
-    '/product-3.jpg',
-    '/product-4.jpg',
-  ],
-  relatedProducts: [
-    {
-      id: '2',
-      title: 'بورد کنترلر آردوینو پرو',
-      price: '۸۵۰,۰۰۰',
-      image: '/product-2.jpg',
-      category: 'قطعات الکترونیکی',
-    },
-    {
-      id: '3',
-      title: 'سنسور فاصله‌سنج لیزری',
-      price: '۹۵۰,۰۰۰',
-      image: '/product-4.jpg',
-      category: 'سنسور',
-    },
-  ],
+interface ProductPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+// Enhanced interface for display with fallback data
+interface DisplayProductDetail {
+  id: string | number;
+  title: string;
+  price: string;
+  discount: string | null;
+  category: string;
+  rating: number;
+  reviews: number;
+  inStock: boolean;
+  stockCount: number;
+  description: string;
+  features: string[];
+  specifications: { name: string; value: string }[];
+  images: string[];
+  relatedProducts: {
+    id: string;
+    title: string;
+    price: string;
+    image: string;
+    category: string;
+  }[];
+  isFromApi: boolean;
+  originalId?: number;
+  actualPrice?: number;
+}
+
+// Static fallback data
+const staticProducts: Record<string, DisplayProductDetail> = {
+  '1': {
+    id: '1',
+    title: 'کیت آموزشی ربات مسیریاب',
+    price: '۲,۵۰۰,۰۰۰',
+    discount: '۲,۱۰۰,۰۰۰',
+    category: 'کیت آموزشی',
+    rating: 4.5,
+    reviews: 28,
+    inStock: true,
+    stockCount: 12,
+    description:
+      'کیت آموزشی ربات مسیریاب یک مجموعه کامل برای یادگیری مفاهیم پایه رباتیک و برنامه‌نویسی است. این کیت شامل تمام قطعات مورد نیاز برای ساخت یک ربات مسیریاب هوشمند می‌باشد.',
+    features: [
+      'قابلیت تشخیص و تعقیب خط',
+      'سنسورهای مادون قرمز با دقت بالا',
+      'موتورهای DC با کیفیت',
+      'برد کنترلر آردوینو',
+      'قطعات پلاستیکی با دوام',
+      'باتری قابل شارژ',
+    ],
+    specifications: [
+      { name: 'ابعاد', value: '۲۰×۱۵×۱۰ سانتی‌متر' },
+      { name: 'وزن', value: '۵۰۰ گرم' },
+      { name: 'ولتاژ کاری', value: '۷.۴ ولت' },
+      { name: 'زمان شارژ', value: '۲ ساعت' },
+      { name: 'مدت زمان کارکرد', value: '۳ ساعت' },
+    ],
+    images: [
+      '/product-1.jpg',
+      '/product-2.jpg',
+      '/product-3.jpg',
+      '/product-4.jpg',
+    ],
+    relatedProducts: [
+      {
+        id: '2',
+        title: 'بورد کنترلر آردوینو پرو',
+        price: '۸۵۰,۰۰۰',
+        image: '/product-2.jpg',
+        category: 'قطعات الکترونیکی',
+      },
+      {
+        id: '4',
+        title: 'سنسور فاصله‌سنج لیزری',
+        price: '۹۵۰,۰۰۰',
+        image: '/product-4.jpg',
+        category: 'سنسور',
+      },
+    ],
+    isFromApi: false,
+    originalId: 1,
+    actualPrice: 2100000,
+  },
+  '2': {
+    id: '2',
+    title: 'بورد کنترلر آردوینو پرو',
+    price: '۸۵۰,۰۰۰',
+    discount: null,
+    category: 'قطعات الکترونیکی',
+    rating: 5,
+    reviews: 42,
+    inStock: true,
+    stockCount: 25,
+    description:
+      'بورد کنترلر آردوینو پرو یک میکروکنترلر قدرتمند و انعطاف‌پذیر برای پروژه‌های رباتیک و الکترونیک است.',
+    features: [
+      'میکروکنترلر ATmega328P',
+      'فرکانس کاری 16 مگاهرتز',
+      '14 پین دیجیتال',
+      '6 پین آنالوگ',
+      'پشتیبانی از USB',
+      'قابلیت برنامه‌نویسی آسان',
+    ],
+    specifications: [
+      { name: 'ابعاد', value: '۶.۸×۵.۳ سانتی‌متر' },
+      { name: 'وزن', value: '۲۵ گرم' },
+      { name: 'ولتاژ ورودی', value: '۷-۱۲ ولت' },
+      { name: 'جریان خروجی', value: '۴۰ میلی‌آمپر' },
+      { name: 'حافظه Flash', value: '۳۲ کیلوبایت' },
+    ],
+    images: ['/product-2.jpg', '/product-1.jpg', '/product-3.jpg'],
+    relatedProducts: [
+      {
+        id: '1',
+        title: 'کیت آموزشی ربات مسیریاب',
+        price: '۲,۱۰۰,۰۰۰',
+        image: '/product-1.jpg',
+        category: 'کیت آموزشی',
+      },
+      {
+        id: '4',
+        title: 'سنسور فاصله‌سنج لیزری',
+        price: '۹۵۰,۰۰۰',
+        image: '/product-4.jpg',
+        category: 'سنسور',
+      },
+    ],
+    isFromApi: false,
+    originalId: 2,
+    actualPrice: 850000,
+  },
+  '3': {
+    id: '3',
+    title: 'ربات انسان‌نمای آموزشی',
+    price: '۱۲,۰۰۰,۰۰۰',
+    discount: '۱۰,۸۰۰,۰۰۰',
+    category: 'ربات کامل',
+    rating: 4.8,
+    reviews: 16,
+    inStock: false,
+    stockCount: 0,
+    description:
+      'ربات انسان‌نمای آموزشی برای آموزش مفاهیم پیشرفته رباتیک و هوش مصنوعی طراحی شده است.',
+    features: [
+      'سیستم حرکتی پیشرفته',
+      'سنسورهای تشخیص محیط',
+      'قابلیت تعامل صوتی',
+      'کنترل از راه دور',
+      'برنامه‌نویسی ساده',
+      'باتری بادوام',
+    ],
+    specifications: [
+      { name: 'ابعاد', value: '۴۰×۲۰×۱۵ سانتی‌متر' },
+      { name: 'وزن', value: '۲ کیلوگرم' },
+      { name: 'ولتاژ کاری', value: '۱۲ ولت' },
+      { name: 'زمان شارژ', value: '۴ ساعت' },
+      { name: 'مدت زمان کارکرد', value: '۶ ساعت' },
+    ],
+    images: ['/product-3.jpg', '/product-1.jpg', '/product-2.jpg'],
+    relatedProducts: [
+      {
+        id: '1',
+        title: 'کیت آموزشی ربات مسیریاب',
+        price: '۲,۱۰۰,۰۰۰',
+        image: '/product-1.jpg',
+        category: 'کیت آموزشی',
+      },
+      {
+        id: '2',
+        title: 'بورد کنترلر آردوینو پرو',
+        price: '۸۵۰,۰۰۰',
+        image: '/product-2.jpg',
+        category: 'قطعات الکترونیکی',
+      },
+    ],
+    isFromApi: false,
+    originalId: 3,
+    actualPrice: 10800000,
+  },
+  '4': {
+    id: '4',
+    title: 'سنسور فاصله‌سنج لیزری',
+    price: '۹۵۰,۰۰۰',
+    discount: null,
+    category: 'سنسور',
+    rating: 4.2,
+    reviews: 35,
+    inStock: true,
+    stockCount: 18,
+    description:
+      'سنسور فاصله‌سنج لیزری با دقت بالا برای اندازه‌گیری دقیق فاصله در پروژه‌های رباتیک.',
+    features: [
+      'دقت اندازه‌گیری بالا',
+      'سرعت پاسخ‌دهی فوق‌العاده',
+      'مقاوم در برابر نور محیط',
+      'اتصال آسان',
+      'مصرف انرژی کم',
+      'قابل استفاده در فضای باز',
+    ],
+    specifications: [
+      { name: 'ابعاد', value: '۳×۲×۱ سانتی‌متر' },
+      { name: 'وزن', value: '۱۰ گرم' },
+      { name: 'برد اندازه‌گیری', value: '۰.۱ تا ۴۰ متر' },
+      { name: 'دقت', value: '±۱ میلی‌متر' },
+      { name: 'ولتاژ کاری', value: '۳.۳-۵ ولت' },
+    ],
+    images: ['/product-4.jpg', '/product-1.jpg', '/product-2.jpg'],
+    relatedProducts: [
+      {
+        id: '1',
+        title: 'کیت آموزشی ربات مسیریاب',
+        price: '۲,۱۰۰,۰۰۰',
+        image: '/product-1.jpg',
+        category: 'کیت آموزشی',
+      },
+      {
+        id: '2',
+        title: 'بورد کنترلر آردوینو پرو',
+        price: '۸۵۰,۰۰۰',
+        image: '/product-2.jpg',
+        category: 'قطعات الکترونیکی',
+      },
+    ],
+    isFromApi: false,
+    originalId: 4,
+    actualPrice: 950000,
+  },
 };
 
-export default function Page() {
+// Helper function to convert API product to display format
+const convertApiProductToDisplayFormat = (
+  apiProduct: PublicProduct
+): DisplayProductDetail => {
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('fa-IR').format(price);
+  };
+
+  // Extract features from attributes or use defaults
+  const features = apiProduct.attributes
+    ? Object.values(apiProduct.attributes).filter(
+        (value) => value && value.length > 0
+      )
+    : [
+        'محصول با کیفیت',
+        'گارانتی معتبر',
+        'پشتیبانی فنی',
+        'ارسال سریع',
+      ];
+
+  // Extract specifications from attributes or use defaults
+  const specifications = apiProduct.attributes
+    ? Object.entries(apiProduct.attributes)
+        .filter(([key, value]) => key && value)
+        .map(([key, value]) => ({ name: key, value }))
+    : [
+        { name: 'وضعیت', value: 'جدید' },
+        { name: 'گارانتی', value: '۶ ماه' },
+      ];
+
+  return {
+    id: apiProduct.id.toString(),
+    title: apiProduct.title,
+    price: formatPrice(apiProduct.price),
+    discount: apiProduct.discount_price
+      ? formatPrice(apiProduct.discount_price)
+      : null,
+    category: apiProduct.category?.name || 'عمومی', // Use 'name' instead of 'title'
+    rating: apiProduct.rating || 4.0,
+    reviews: apiProduct.reviews_count || 0,
+    inStock: apiProduct.stock > 0,
+    stockCount: apiProduct.stock,
+    description: apiProduct.description || 'توضیحات محصول در دسترس نیست.',
+    features,
+    specifications,
+    images: apiProduct.image ? [apiProduct.image] : ['/product-1.jpg'],
+    relatedProducts: [], // Will be populated from the products list
+    isFromApi: true,
+    originalId: apiProduct.id,
+    actualPrice: apiProduct.discount_price || apiProduct.price,
+  };
+};
+
+export default function Page({ params }: ProductPageProps) {
+  const resolvedParams = use(params);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<DisplayProductDetail | null>(null);
   const { addItem } = useCart();
+
+  // Fetch API products
+  const {
+    allProducts,
+    allProductsLoading,
+    error,
+    fetchAllProducts,
+    findProductById,
+    clearError,
+  } = usePublicProduct();
+
+  useEffect(() => {
+    // Clear error and fetch all products if not already loaded
+    clearError();
+    
+    if (allProducts.length === 0 && !allProductsLoading) {
+      fetchAllProducts();
+    }
+  }, [allProducts.length, allProductsLoading, fetchAllProducts, clearError]);
+
+  useEffect(() => {
+    // Find product by ID once products are loaded
+    if (allProducts.length > 0) {
+      const productId = parseInt(resolvedParams.id);
+      const foundProduct = findProductById(productId);
+      
+      if (foundProduct) {
+        // Use API data
+        const displayProduct = convertApiProductToDisplayFormat(foundProduct);
+        
+        // Add related products from the same category
+        const relatedProducts = allProducts
+          .filter(p => 
+            p.id !== foundProduct.id && 
+            p.category?.name === foundProduct.category?.name
+          )
+          .slice(0, 3)
+          .map(p => ({
+            id: p.id.toString(),
+            title: p.title,
+            price: new Intl.NumberFormat('fa-IR').format(p.discount_price || p.price),
+            image: p.image || '/product-1.jpg',
+            category: p.category?.name || 'عمومی',
+          }));
+        
+        displayProduct.relatedProducts = relatedProducts;
+        setProduct(displayProduct);
+      } else {
+        // Fall back to static data if API product not found
+        const staticProduct = staticProducts[resolvedParams.id];
+        if (staticProduct) {
+          setProduct(staticProduct);
+        } else {
+          // If no static data either, use a default fallback
+          setProduct({
+            id: resolvedParams.id,
+            title: 'محصول یافت نشد',
+            price: '0',
+            discount: null,
+            category: 'عمومی',
+            rating: 0,
+            reviews: 0,
+            inStock: false,
+            stockCount: 0,
+            description: 'متأسفانه این محصول یافت نشد.',
+            features: [],
+            specifications: [],
+            images: ['/product-1.jpg'],
+            relatedProducts: [],
+            isFromApi: false,
+            originalId: parseInt(resolvedParams.id) || 0,
+            actualPrice: 0,
+          });
+        }
+      }
+    } else if (!allProductsLoading && allProducts.length === 0) {
+      // If API fails, use static data
+      const staticProduct = staticProducts[resolvedParams.id];
+      if (staticProduct) {
+        setProduct(staticProduct);
+      }
+    }
+  }, [allProducts, resolvedParams.id, findProductById, allProductsLoading]);
+
+  // Show loading state
+  if (allProductsLoading || !product) {
+    return (
+      <div
+        dir="rtl"
+        className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900"
+      >
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+            {/* Image skeleton */}
+            <div className="space-y-4">
+              <div className="aspect-square animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-700"></div>
+              <div className="grid grid-cols-4 gap-4">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="aspect-square animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"
+                  ></div>
+                ))}
+              </div>
+            </div>
+            {/* Content skeleton */}
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <div className="h-8 w-3/4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+                <div className="h-6 w-1/2 animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+              </div>
+              <div className="h-32 animate-pulse rounded-2xl bg-gray-200 dark:bg-gray-700"></div>
+              <div className="grid grid-cols-3 gap-4">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-20 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700"
+                  ></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const incrementQuantity = () => {
     if (quantity < product.stockCount) {
@@ -88,7 +453,7 @@ export default function Page() {
     if (product.inStock) {
       for (let i = 0; i < quantity; i++) {
         addItem({
-          id: parseInt(product.id),
+          id: product.originalId || parseInt(product.id.toString()),
           title: product.title,
           price: product.discount || product.price,
           image: product.images[0],
@@ -103,6 +468,34 @@ export default function Page() {
       className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900"
     >
       <div className="container mx-auto px-4">
+        {/* Error message */}
+        {error && (
+          <div className="mb-8 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-medium text-red-800 dark:text-red-200">
+                  خطا در بارگذاری محصولات
+                </h3>
+                <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                  {error}
+                  {!product?.isFromApi && product
+                    ? ' (نمایش داده‌های آفلاین)'
+                    : ''}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  clearError();
+                  fetchAllProducts();
+                }}
+                className="rounded-lg bg-red-100 px-3 py-1 text-sm font-medium text-red-800 transition-colors hover:bg-red-200 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700"
+              >
+                تلاش مجدد
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Breadcrumb */}
         <nav className="mb-8">
           <ol className="flex items-center gap-2 text-sm">
@@ -116,12 +509,9 @@ export default function Page() {
             </li>
             <ChevronLeft className="h-4 w-4 text-gray-400" />
             <li>
-              <Link
-                href={`/shop/category/${product.category}`}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-              >
+              <span className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
                 {product.category}
-              </Link>
+              </span>
             </li>
             <ChevronLeft className="h-4 w-4 text-gray-400" />
             <li className="text-gray-900 dark:text-white">{product.title}</li>
@@ -170,9 +560,22 @@ export default function Page() {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-                {product.title}
-              </h1>
+              <div className="flex items-start justify-between">
+                <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+                  {product.title}
+                </h1>
+                <div className="flex gap-2">
+                  {product.isFromApi ? (
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-200">
+                      آنلاین
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-200">
+                      آفلاین
+                    </span>
+                  )}
+                </div>
+              </div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
