@@ -148,7 +148,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
       reset({
         first_name: currentStudent.user?.first_name || '',
         last_name: currentStudent.user?.last_name || '',
-        username: '', // Username not available in current student data
+        username: currentStudent.user?.username || '',
         phone: currentStudent.user?.phone || '',
         email: currentStudent.user?.email || '',
         national_code: currentStudent.user?.national_code || '',
@@ -168,36 +168,57 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
 
   const onSubmit = async (data: StudentFormData) => {
     try {
-      const formData: CreateStudentRequest | UpdateStudentRequest = {
-        first_name: data.first_name.trim(),
-        last_name: data.last_name.trim(),
-        username: data.username.trim(),
-        phone: convertToEnglishNumbers(data.phone).trim(),
-        email: data.email?.trim() || undefined,
-        national_code: data.national_code?.trim() || undefined,
-        level_id: parseInt(data.level_id),
-        father_name: data.father_name.trim(),
-        mother_name: data.mother_name.trim(),
-        father_job: data.father_job.trim(),
-        mother_job: data.mother_job.trim(),
-        has_allergy: parseInt(data.has_allergy),
-        allergy_details: data.allergy_details?.trim() || undefined,
-        interest_level: parseInt(data.interest_level),
-        focus_level: parseInt(data.focus_level),
-        birth_date: data.birth_date,
-        profile_picture: profilePicture || undefined,
-        national_card: nationalCard || undefined,
-        certificate: certificate || undefined,
-      };
-
       if (isNew) {
-        await createStudent(formData as CreateStudentRequest);
+        const formData: CreateStudentRequest = {
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          username: data.username.trim(),
+          phone: convertToEnglishNumbers(data.phone).trim(),
+          email: data.email?.trim() || undefined,
+          national_code: data.national_code?.trim() || undefined,
+          level_id: parseInt(data.level_id),
+          father_name: data.father_name.trim(),
+          mother_name: data.mother_name.trim(),
+          father_job: data.father_job.trim(),
+          mother_job: data.mother_job.trim(),
+          has_allergy: parseInt(data.has_allergy),
+          allergy_details: data.allergy_details?.trim() || undefined,
+          interest_level: parseInt(data.interest_level),
+          focus_level: parseInt(data.focus_level),
+          birth_date: data.birth_date,
+          // TODO: Handle file uploads separately
+          // profile_picture: profilePicture || undefined,
+          // national_card: nationalCard || undefined,
+          // certificate: certificate || undefined,
+        };
+
+        await createStudent(formData);
         toast.success('دانش‌آموز با موفقیت ایجاد شد');
       } else {
-        await updateStudent(
-          resolvedParams!.id,
-          formData as UpdateStudentRequest
-        );
+        const formData: UpdateStudentRequest = {
+          first_name: data.first_name.trim(),
+          last_name: data.last_name.trim(),
+          username: data.username.trim(),
+          phone: convertToEnglishNumbers(data.phone).trim(),
+          email: data.email?.trim() || undefined,
+          national_code: data.national_code?.trim() || undefined,
+          level_id: parseInt(data.level_id),
+          father_name: data.father_name.trim(),
+          mother_name: data.mother_name.trim(),
+          father_job: data.father_job.trim(),
+          mother_job: data.mother_job.trim(),
+          has_allergy: parseInt(data.has_allergy),
+          allergy_details: data.allergy_details?.trim() || undefined,
+          interest_level: parseInt(data.interest_level),
+          focus_level: parseInt(data.focus_level),
+          birth_date: data.birth_date,
+          // TODO: Handle file uploads separately
+          // profile_picture: profilePicture || undefined,
+          // national_card: nationalCard || undefined,
+          // certificate: certificate || undefined,
+        };
+
+        await updateStudent(resolvedParams!.id, formData);
         toast.success('دانش‌آموز با موفقیت ویرایش شد');
       }
 
