@@ -25,7 +25,9 @@ interface TermTeacherState {
   clearError: () => void;
 
   fetchTermTeacherList: () => Promise<void>;
-  createTermTeacher: (payload: CreateTermTeacherRequest) => Promise<CreateTermTeacherResponse>;
+  createTermTeacher: (
+    payload: CreateTermTeacherRequest
+  ) => Promise<CreateTermTeacherResponse>;
   deleteTermTeacher: (id: string) => Promise<void>;
   fetchTermTeacherById: (id: string) => Promise<void>;
 }
@@ -67,10 +69,10 @@ export const useTermTeacherStore = create<TermTeacherState>()(
       try {
         set({ loading: true, error: null });
         const response = await termTeacherService.create(payload);
-        
+
         // Optimistic update
         await get().fetchTermTeacherList();
-        
+
         set({ loading: false });
         return response;
       } catch (error) {
@@ -87,11 +89,13 @@ export const useTermTeacherStore = create<TermTeacherState>()(
       try {
         set({ loading: true, error: null });
         await termTeacherService.delete(id);
-        
+
         // Optimistic update
         const currentList = get().termTeacherList;
         set({
-          termTeacherList: currentList.filter(item => item.id.toString() !== id),
+          termTeacherList: currentList.filter(
+            (item) => item.id.toString() !== id
+          ),
           loading: false,
         });
       } catch (error) {
@@ -109,7 +113,7 @@ export const useTermTeacherStore = create<TermTeacherState>()(
         set({ loading: true, error: null });
         const response = await termTeacherService.getById(id);
         set({
-          currentTermTeacher: response.data,
+          currentTermTeacher: response,
           loading: false,
         });
       } catch (error) {
