@@ -56,6 +56,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setValue,
   } = useForm<TermStudentFormData>({
     resolver: zodResolver(termStudentSchema),
   });
@@ -85,6 +86,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     }
   };
 
+  // Handle term teacher selection to auto-select term
+  const handleTermTeacherChange = (event: React.ChangeEvent<HTMLSelectElement>, onChange: (value: string) => void) => {
+    const termTeacherId = event.target.value;
+    onChange(termTeacherId);
+    
+    // Find the selected term teacher and auto-select its term
+    const selectedTermTeacher = termTeacherList.find(
+      (tt) => tt.id.toString() === termTeacherId
+    );
+    
+    if (selectedTermTeacher && selectedTermTeacher.term) {
+      // Auto-select the term using setValue
+      setValue('term_id', selectedTermTeacher.term.id.toString());
+    }
+  };
+
   // Prepare options for dropdowns
   const termOptions = termList.map((term) => ({
     label: term.title || `ترم ${term.id}`,
@@ -99,9 +116,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }));
 
   const termTeacherOptions = termTeacherList.map((termTeacher) => ({
-    label:
-      `${termTeacher.user?.first_name || ''} ${termTeacher.user?.last_name || ''}`.trim() ||
-      `مدرس ترم ${termTeacher.id}`,
+    label: termTeacher.term
+      ? `${termTeacher.user?.first_name || ''} ${termTeacher.user?.last_name || ''} - ${termTeacher.term.title}`.trim()
+      : `${termTeacher.user?.first_name || ''} ${termTeacher.user?.last_name || ''}`.trim() ||
+        `مدرس ترم ${termTeacher.id}`,
     value: termTeacher.id.toString(),
   }));
 
@@ -129,18 +147,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Controller
-            name="term_id"
+            name="term_teacher_id"
             control={control}
             render={({ field }) => (
               <Select
-                id="term_id"
-                label="ترم"
-                placeholder="ترم را انتخاب کنید"
+                id="term_teacher_id"
+                label="ترم مدرس"
+                placeholder="ترم مدرس را انتخاب کنید"
                 required
-                options={termOptions}
-                error={errors.term_id?.message}
+                options={termTeacherOptions}
+                error={errors.term_teacher_id?.message}
                 value={field.value}
-                onChange={field.onChange}
+                onChange={(event) => handleTermTeacherChange(event, field.onChange)}
                 onBlur={field.onBlur}
                 name={field.name}
               />
@@ -167,20 +185,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           />
 
           <Controller
-            name="term_teacher_id"
+            name="term_id"
             control={control}
             render={({ field }) => (
               <Select
-                id="term_teacher_id"
-                label="مدرس ترم"
-                placeholder="مدرس ترم را انتخاب کنید"
+                id="term_id"
+                label="ترم"
+                placeholder="ترم به صورت خودکار انتخاب می‌شود"
                 required
-                options={termTeacherOptions}
-                error={errors.term_teacher_id?.message}
+                options={termOptions}
+                error={errors.term_id?.message}
                 value={field.value}
                 onChange={field.onChange}
                 onBlur={field.onBlur}
                 name={field.name}
+                disabled={true}
               />
             )}
           />

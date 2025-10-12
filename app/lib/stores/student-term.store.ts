@@ -24,19 +24,27 @@ interface StudentTermState {
 
 const calculateStats = (terms: StudentTerm[]): StudentTermStats => {
   const now = new Date();
-  const today = now.toISOString().split('T')[0]; // YYYY-MM-DD format
 
   let active = 0;
   let completed = 0;
   let upcoming = 0;
 
   terms.forEach((term) => {
-    const startDate = new Date(term.term.start_date);
-    const endDate = new Date(term.term.end_date);
-
-    if (startDate > now) {
+    const schedules = term.schedules || [];
+    
+    if (schedules.length === 0) {
+      // If no schedules, consider it upcoming
       upcoming++;
-    } else if (endDate < now) {
+      return;
+    }
+
+    const sessionDates = schedules.map(s => new Date(s.session_date));
+    const firstSession = new Date(Math.min(...sessionDates.map(d => d.getTime())));
+    const lastSession = new Date(Math.max(...sessionDates.map(d => d.getTime())));
+
+    if (firstSession > now) {
+      upcoming++;
+    } else if (lastSession < now) {
       completed++;
     } else {
       active++;

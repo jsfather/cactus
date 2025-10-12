@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 import {
   GetTermTeacherListResponse,
   GetTermTeacherResponse,
+  TermTeacherDetail,
   CreateTermTeacherRequest,
   UpdateTermTeacherRequest,
   CreateTermTeacherResponse,
@@ -15,11 +16,11 @@ export class TermTeacherService {
       const response = await apiClient.get<GetTermTeacherListResponse>(
         API_ENDPOINTS.PANEL.ADMIN.TERM_TEACHERS.GET_ALL
       );
-      
+
       if (!response) {
         throw new Error('خطایی در دریافت لیست ترم مدرسین رخ داده است');
       }
-      
+
       return response;
     } catch (error) {
       console.error('Error fetching term teachers:', error);
@@ -27,16 +28,16 @@ export class TermTeacherService {
     }
   }
 
-  async getById(id: string): Promise<GetTermTeacherResponse> {
+  async getById(id: string): Promise<TermTeacherDetail> {
     try {
-      const response = await apiClient.get<GetTermTeacherResponse>(
+      const response = await apiClient.get<TermTeacherDetail>(
         API_ENDPOINTS.PANEL.ADMIN.TERM_TEACHERS.GET_BY_ID(id)
       );
-      
+
       if (!response) {
         throw new Error('خطایی در دریافت ترم مدرس رخ داده است');
       }
-      
+
       return response;
     } catch (error) {
       console.error('Error fetching term teacher:', error);
@@ -44,17 +45,19 @@ export class TermTeacherService {
     }
   }
 
-  async create(payload: CreateTermTeacherRequest): Promise<CreateTermTeacherResponse> {
+  async create(
+    payload: CreateTermTeacherRequest
+  ): Promise<CreateTermTeacherResponse> {
     try {
       const response = await apiClient.post<CreateTermTeacherResponse>(
         API_ENDPOINTS.PANEL.ADMIN.TERM_TEACHERS.CREATE,
         payload
       );
-      
+
       if (!response) {
         throw new Error('خطایی در ایجاد ترم مدرس رخ داده است');
       }
-      
+
       return response;
     } catch (error) {
       console.error('Error creating term teacher:', error);

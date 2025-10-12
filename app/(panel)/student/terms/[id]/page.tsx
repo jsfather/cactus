@@ -74,21 +74,63 @@ export default function StudentTermDetailPage({
     return new Intl.NumberFormat('fa-IR').format(price) + ' تومان';
   };
 
+  const getAttendanceStatus = (schedule: any) => {
+    const now = new Date();
+    const sessionDate = new Date(schedule.session_date);
+    
+    // If myAttendance exists, use it
+    if (schedule.myAttendance !== null && schedule.myAttendance !== undefined) {
+      return {
+        label: 'حاضر',
+        color: 'text-green-800 dark:text-green-300',
+        icon: CheckCircle,
+      };
+    }
+    
+    // If session is in the past and myAttendance is null, student was absent
+    if (sessionDate < now) {
+      return {
+        label: 'غایب',
+        color: 'text-red-800 dark:text-red-300',
+        icon: XCircle,
+      };
+    }
+    
+    // If session is in the future
+    return {
+      label: 'آینده',
+      color: 'text-blue-800 dark:text-blue-300',
+      icon: Clock,
+    };
+  };
+
   const getTermStatus = (): { label: string; color: string; icon: any } => {
     if (!currentTerm) return { label: '', color: '', icon: null };
 
+    // Use schedules to determine status since start_date and end_date are in Jalali format
     const now = new Date();
-    const startDate = new Date(currentTerm.term.start_date);
-    const endDate = new Date(currentTerm.term.end_date);
+    const schedules = currentTerm.schedules || [];
+    
+    if (schedules.length === 0) {
+      return {
+        label: 'بدون جلسه',
+        color: 'text-gray-800 bg-gray-100 dark:bg-gray-900 dark:text-gray-300',
+        icon: Clock,
+      };
+    }
 
-    if (startDate > now) {
+    const sessionDates = schedules.map(s => new Date(s.session_date));
+    const firstSession = new Date(Math.min(...sessionDates.map(d => d.getTime())));
+    const lastSession = new Date(Math.max(...sessionDates.map(d => d.getTime())));
+
+    if (firstSession > now) {
       return {
         label: 'آینده',
         color:
           'text-yellow-800 bg-yellow-100 dark:bg-yellow-900 dark:text-yellow-300',
         icon: Clock,
       };
-    } else if (endDate < now) {
+    } else if (lastSession < now) {
       return {
         label: 'تمام شده',
         color: 'text-gray-800 bg-gray-100 dark:bg-gray-900 dark:text-gray-300',
@@ -216,9 +258,7 @@ export default function StudentTermDetailPage({
                     تاریخ شروع
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {new Date(currentTerm.term.start_date).toLocaleDateString(
-                      'fa-IR'
-                    )}
+                    {currentTerm.term.start_date}
                   </dd>
                 </div>
                 <div>
@@ -226,9 +266,7 @@ export default function StudentTermDetailPage({
                     تاریخ پایان
                   </dt>
                   <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {new Date(currentTerm.term.end_date).toLocaleDateString(
-                      'fa-IR'
-                    )}
+                    {currentTerm.term.end_date}
                   </dd>
                 </div>
               </div>
@@ -342,13 +380,13 @@ export default function StudentTermDetailPage({
                     <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       تاریخ جلسه
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       زمان شروع
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       زمان پایان
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       حضور و غیاب
                     </th>
                   </tr>
@@ -362,35 +400,28 @@ export default function StudentTermDetailPage({
                     )
                     .map((schedule) => (
                       <tr key={schedule.id}>
-                        <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 text-sm text-right whitespace-nowrap text-gray-900 dark:text-white">
                           {new Date(schedule.session_date).toLocaleDateString(
                             'fa-IR'
                           )}
                         </td>
-                        <td
-                          className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"
-                          dir="ltr"
-                        >
+                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap text-gray-500 dark:text-gray-400">
                           {formatTime(schedule.start_time)}
                         </td>
-                        <td
-                          className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400"
-                          dir="ltr"
-                        >
+                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap text-gray-500 dark:text-gray-400">
                           {formatTime(schedule.end_time)}
                         </td>
-                        <td className="px-6 py-4 text-sm whitespace-nowrap">
-                          {schedule.myAttendance ? (
-                            <span className="inline-flex items-center gap-1 text-green-800 dark:text-green-300">
-                              <CheckCircle className="h-4 w-4" />
-                              حاضر
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-red-800 dark:text-red-300">
-                              <XCircle className="h-4 w-4" />
-                              غایب
-                            </span>
-                          )}
+                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap">
+                          {(() => {
+                            const attendanceStatus = getAttendanceStatus(schedule);
+                            const StatusIcon = attendanceStatus.icon;
+                            return (
+                              <span className={`inline-flex items-center gap-1 ${attendanceStatus.color}`}>
+                                <StatusIcon className="h-4 w-4" />
+                                {attendanceStatus.label}
+                              </span>
+                            );
+                          })()}
                         </td>
                       </tr>
                     ))}

@@ -27,8 +27,8 @@ export interface Schedule {
   term_teacher_id: number;
   sky_room_id: string | null;
   session_date: string; // format: YYYY-MM-DD
-  start_time: string;   // format: HH:MM:SS
-  end_time: string;     // format: HH:MM:SS
+  start_time: string; // format: HH:MM:SS
+  end_time: string; // format: HH:MM:SS
   is_canceled: number;
   another_person: number;
   another_person_name: string | null;
@@ -80,7 +80,22 @@ export interface TermTeacherDetail {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
-  user: User & {
+  user: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    username: string;
+    email: string;
+    email_verified_at: string | null;
+    profile_picture: string | null;
+    type: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    national_code: string;
+    address: string | null;
+    postal_code: string | null;
     files: UserFile[];
   };
   days: Day[];
