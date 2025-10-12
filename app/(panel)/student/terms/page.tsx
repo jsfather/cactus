@@ -6,7 +6,9 @@ import { toast } from 'react-hot-toast';
 import { StudentTerm } from '@/app/lib/types/student-term';
 import { useRouter } from 'next/navigation';
 import { useStudentTerm } from '@/app/lib/hooks/use-student-term';
+import { useAvailableTerm } from '@/app/lib/hooks/use-available-term';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import AvailableTermCard from '@/app/components/student/AvailableTermCard';
 import {
   Calendar,
   Clock,
@@ -18,6 +20,8 @@ import {
   PlayCircle,
   CalendarDays,
   ClockIcon,
+  Star,
+  PlusCircle,
 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Card } from '@/app/components/ui/Card';
@@ -26,18 +30,29 @@ export default function StudentTermsPage() {
   const router = useRouter();
   const { termList, stats, loading, error, getTermList, resetError } =
     useStudentTerm();
+  const { 
+    availableTerms, 
+    stats: availableStats, 
+    loading: availableLoading, 
+    error: availableError, 
+    getAvailableTerms, 
+    resetError: resetAvailableError 
+  } = useAvailableTerm();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await getTermList();
+        await Promise.all([
+          getTermList(),
+          getAvailableTerms()
+        ]);
       } catch (error) {
-        toast.error('خطا در دریافت لیست ترم‌ها');
+        toast.error('خطا در دریافت اطلاعات ترم‌ها');
       }
     };
 
     fetchData();
-  }, [getTermList]);
+  }, [getTermList, getAvailableTerms]);
 
   useEffect(() => {
     if (error) {
@@ -45,6 +60,13 @@ export default function StudentTermsPage() {
       resetError();
     }
   }, [error, resetError]);
+
+  useEffect(() => {
+    if (availableError) {
+      toast.error(availableError);
+      resetAvailableError();
+    }
+  }, [availableError, resetAvailableError]);
 
   const getTermTypeLabel = (type: string): string => {
     const typeLabels: Record<string, string> = {
@@ -251,6 +273,13 @@ export default function StudentTermsPage() {
     router.push(`/student/terms/${term.term.id}`);
   };
 
+  const handleRegisterTerm = (termId: number) => {
+    // Navigate to registration/purchase flow
+    // This could be implemented based on your registration process
+    toast.success('در حال هدایت به صفحه ثبت‌نام...');
+    // Example: router.push(`/student/terms/register/${termId}`);
+  };
+
   if (loading && termList.length === 0) {
     return <LoadingSpinner />;
   }
@@ -368,6 +397,128 @@ export default function StudentTermsPage() {
             )}
           />
         </Card>
+
+        {/* Available Terms Section */}
+        <div className="space-y-6">
+          {/* Available Terms Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <PlusCircle className="h-6 w-6 text-blue-600" />
+                ترم‌های قابل ثبت‌نام
+              </h2>
+              <p className="mt-1 text-gray-600 dark:text-gray-400">
+                ترم‌هایی که می‌توانید در آن‌ها ثبت‌نام کنید
+              </p>
+            </div>
+          </div>
+
+          {/* Available Terms Stats */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <Card className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Star className="h-8 w-8 text-blue-600" />
+                </div>
+                <div className="mr-5 w-0 flex-1">
+                  <dl>
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                      کل ترم‌های موجود
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      {availableStats.total}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-8 w-8 text-green-600" />
+                </div>
+                <div className="mr-5 w-0 flex-1">
+                  <dl>
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                      واجد شرایط
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      {availableStats.qualified}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <BookOpen className="h-8 w-8 text-purple-600" />
+                </div>
+                <div className="mr-5 w-0 flex-1">
+                  <dl>
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                      پیشنهادی
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      {availableStats.recommended}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <Users className="h-8 w-8 text-orange-600" />
+                </div>
+                <div className="mr-5 w-0 flex-1">
+                  <dl>
+                    <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                      در دسترس
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      {availableStats.affordable}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Available Terms Grid */}
+          {availableLoading ? (
+            <Card className="p-12">
+              <div className="flex items-center justify-center">
+                <LoadingSpinner />
+              </div>
+            </Card>
+          ) : availableTerms.length === 0 ? (
+            <Card className="p-12">
+              <div className="text-center">
+                <Star className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+                  ترم موجودی یافت نشد
+                </h3>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  در حال حاضر ترم جدیدی برای ثبت‌نام موجود نیست
+                </p>
+              </div>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+              {availableTerms.map((term) => (
+                <AvailableTermCard
+                  key={term.id}
+                  term={term}
+                  onRegister={handleRegisterTerm}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
