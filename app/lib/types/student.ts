@@ -56,9 +56,10 @@ export interface CreateStudentRequest {
   interest_level: number;
   focus_level: number;
   birth_date: string; // Format: 1375-12-10
-  profile_picture?: File;
-  national_card?: File;
-  certificate?: File;
+  // TODO: Add file support later
+  // profile_picture?: File;
+  // national_card?: File;
+  // certificate?: File;
 }
 
 export interface UpdateStudentRequest {
@@ -78,7 +79,8 @@ export interface UpdateStudentRequest {
   interest_level?: number;
   focus_level?: number;
   birth_date?: string; // Format: 1375-12-10
-  profile_picture?: File;
-  national_card?: File;
-  certificate?: File;
+  // TODO: Add file support later
+  // profile_picture?: File;
+  // national_card?: File;
+  // certificate?: File;
 }

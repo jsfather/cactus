@@ -36,9 +36,8 @@ export interface GetStudentTicketResponse {
 
 export interface CreateStudentTicketRequest {
   subject: string;
-  description: string; // تغییر از message به description
-  department: string; // تغییر از department_id به department
-  teacher?: string; // تغییر از teacher_id به teacher
+  message: string; // Use message as per API structure
+  department_id: number; // Use department_id as per API structure
 }
 
 export interface CreateStudentTicketResponse {

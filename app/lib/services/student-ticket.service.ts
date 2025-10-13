@@ -6,18 +6,18 @@ import {
   GetStudentTicketListResponse,
   GetStudentTicketResponse,
   GetTicketDepartmentListResponse,
-} from '@/app/lib/types';
+} from '@/app/lib/types/ticket';
 
 export class StudentTicketService {
   async getList(): Promise<GetStudentTicketListResponse> {
     return apiClient.get<GetStudentTicketListResponse>(
-      API_ENDPOINTS.PANEL.STUDENT.TICKETS.GET_ALL
+      API_ENDPOINTS.STUDENT.TICKETS.GET_ALL
     );
   }
 
   async getById(id: string): Promise<GetStudentTicketResponse> {
     return apiClient.get<GetStudentTicketResponse>(
-      API_ENDPOINTS.PANEL.STUDENT.TICKETS.GET_BY_ID(id)
+      API_ENDPOINTS.STUDENT.TICKETS.GET_BY_ID(id)
     );
   }
 
@@ -25,14 +25,14 @@ export class StudentTicketService {
     payload: CreateStudentTicketRequest
   ): Promise<CreateStudentTicketResponse> {
     return apiClient.post<CreateStudentTicketResponse>(
-      API_ENDPOINTS.PANEL.STUDENT.TICKETS.CREATE,
+      API_ENDPOINTS.STUDENT.TICKETS.CREATE,
       payload
     );
   }
 
   async getDepartments(): Promise<GetTicketDepartmentListResponse> {
     return apiClient.get<GetTicketDepartmentListResponse>(
-      API_ENDPOINTS.PANEL.STUDENT.TICKETS.DEPARTMENTS
+      API_ENDPOINTS.STUDENT.TICKETS.DEPARTMENTS
     );
   }
 }

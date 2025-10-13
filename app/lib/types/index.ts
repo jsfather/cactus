@@ -20,3 +20,4 @@ export * from './teacher';
 export * from './product';
 export * from './order';
 export * from './level';
+export * from './available-term';

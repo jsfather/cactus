@@ -1,231 +1,238 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useParams } from 'next/navigation';
 import { useStudentTicket } from '@/app/lib/hooks/use-student-ticket';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import {
-  ArrowRight,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  Calendar,
-  User,
-  Building,
+  Ticket as TicketIcon,
   MessageSquare,
+  Clock,
+  User,
+  ArrowLeft,
+  FileText,
 } from 'lucide-react';
+import { Message } from '@/app/lib/types/ticket';
 
-const statusColors: Record<string, string> = {
-  open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-  closed: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
-  pending:
-    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-};
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-const statusIcons: Record<string, React.ReactElement> = {
-  open: <Clock className="h-5 w-5" />,
-  closed: <CheckCircle className="h-5 w-5" />,
-  pending: <AlertCircle className="h-5 w-5" />,
-};
-
-const statusTranslations: Record<string, string> = {
-  open: 'باز',
-  closed: 'بسته',
-  pending: 'در انتظار',
-};
-
-const departmentTranslations: Record<string, string> = {
-  technical: 'فنی',
-  educational: 'آموزشی',
-  financial: 'مالی',
-  support: 'پشتیبانی',
-  other: 'سایر',
-};
-
-export default function TicketDetailPage() {
+const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
   const router = useRouter();
-  const params = useParams();
-  const ticketId = params.id as string;
+  const { currentTicket, isLoading, fetchTicketById } = useStudentTicket();
 
-  const {
-    currentTicket: ticket,
-    isDetailLoading,
-    fetchTicket,
-    error,
-  } = useStudentTicket();
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+    null
+  );
 
   useEffect(() => {
-    if (ticketId) {
-      fetchTicket(ticketId);
-    }
-  }, [ticketId, fetchTicket]);
+    const resolveParams = async () => {
+      const resolvedParamsData = await params;
+      setResolvedParams(resolvedParamsData);
+
+      if (resolvedParamsData.id) {
+        await fetchTicketById(resolvedParamsData.id);
+      }
+    };
+
+    resolveParams();
+  }, [params, fetchTicketById]);
 
   const breadcrumbItems = [
-    { label: 'پنل دانش‌آموز', href: '/student' },
+    { label: 'پنل دانشجو', href: '/student' },
     { label: 'تیکت‌ها', href: '/student/tickets' },
     {
-      label: ticket?.subject || 'جزئیات تیکت',
-      href: `/student/tickets/${ticketId}`,
-      active: true,
+      label: currentTicket?.subject || 'جزئیات تیکت',
+      href: `/student/tickets/${resolvedParams?.id}`,
     },
   ];
 
-  const handleBack = () => {
-    router.push('/student/tickets');
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'open':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      case 'closed':
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+    }
   };
 
-  if (isDetailLoading) {
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'open':
+        return 'باز';
+      case 'closed':
+        return 'بسته';
+      case 'pending':
+        return 'در انتظار';
+      default:
+        return status;
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('fa-IR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (!ticket) {
+  if (!currentTicket) {
     return (
-      <div className="space-y-6">
-        <Breadcrumbs breadcrumbs={breadcrumbItems} />
-        <div className="bg-white shadow sm:rounded-lg dark:bg-gray-800">
-          <div className="px-4 py-5 sm:p-6">
-            <div className="text-center">
-              <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                تیکت یافت نشد
-              </h3>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                تیکت مورد نظر شما یافت نشد
-              </p>
-              <div className="mt-6">
-                <Button onClick={handleBack}>
-                  <ArrowRight className="mr-2 h-4 w-4" />
-                  بازگشت به لیست تیکت‌ها
-                </Button>
-              </div>
-            </div>
-          </div>
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+            تیکت یافت نشد
+          </h2>
+          <p className="mb-4 text-gray-600 dark:text-gray-400">
+            تیکت مورد نظر شما یافت نشد یا ممکن است حذف شده باشد.
+          </p>
+          <Button onClick={() => router.push('/student/tickets')}>
+            بازگشت به لیست تیکت‌ها
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <Breadcrumbs breadcrumbs={breadcrumbItems} />
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            جزئیات تیکت
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            مشاهده جزئیات و وضعیت تیکت پشتیبانی
-          </p>
-        </div>
-        <Button variant="secondary" onClick={handleBack}>
-          <ArrowRight className="mr-2 h-4 w-4" />
-          بازگشت
-        </Button>
+    <div className="p-6">
+      <div className="mb-6">
+        <Breadcrumbs breadcrumbs={breadcrumbItems} />
       </div>
 
-      {/* Ticket Info */}
-      <div className="bg-white shadow sm:rounded-lg dark:bg-gray-800">
-        <div className="px-4 py-5 sm:p-6">
-          <div className="space-y-6">
-            {/* Status and Subject */}
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  {ticket.subject}
-                </h2>
-                <div className="mt-2 flex items-center space-x-4 space-x-reverse">
-                  <span
-                    className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
-                      statusColors[ticket.status]
-                    }`}
-                  >
-                    {statusIcons[ticket.status]}
-                    <span className="mr-2">
-                      {statusTranslations[ticket.status] || ticket.status}
-                    </span>
-                  </span>
-                  {ticket.created_at && (
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                      <Calendar className="ml-1 h-4 w-4" />
-                      تاریخ ایجاد:{' '}
-                      {new Date(ticket.created_at).toLocaleDateString('fa-IR')}
-                    </div>
-                  )}
-                </div>
-              </div>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center space-x-4 space-x-reverse">
+          <Button
+            variant="secondary"
+            onClick={() => router.push('/student/tickets')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            بازگشت
+          </Button>
+        </div>
+      </div>
+
+      {/* Ticket Header */}
+      <div className="mb-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-4 space-x-reverse">
+            <div className="flex-shrink-0">
+              <TicketIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
-
-            {/* Details Grid */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <Building className="h-5 w-5 text-gray-400" />
-                <div>
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                    بخش
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                    {departmentTranslations[ticket.department || ''] ||
-                      ticket.department ||
-                      '-'}
-                  </dd>
-                </div>
-              </div>
-
-              {ticket.teacher && (
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <User className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      مدرس
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">
-                      {ticket.teacher}
-                    </dd>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Description */}
             <div>
-              <h3 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">
-                توضیحات
-              </h3>
-              <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
-                <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-                  {ticket.description || 'توضیحاتی ارائه نشده است.'}
-                </p>
-              </div>
-            </div>
-
-            {/* Response Section */}
-            {ticket.response && (
-              <div>
-                <h3 className="mb-3 text-lg font-medium text-gray-900 dark:text-white">
-                  پاسخ پشتیبانی
-                </h3>
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
-                  <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-                    {ticket.response}
-                  </p>
-                  {ticket.updated_at && (
-                    <div className="mt-3 flex items-center text-sm text-blue-600 dark:text-blue-400">
-                      <Calendar className="ml-1 h-4 w-4" />
-                      تاریخ پاسخ:{' '}
-                      {new Date(ticket.updated_at).toLocaleDateString('fa-IR')}
-                    </div>
-                  )}
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {currentTicket.subject}
+              </h1>
+              <div className="mt-2 flex items-center space-x-4 space-x-reverse">
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <FileText className="ml-1 h-4 w-4" />
+                  ID: {currentTicket.id}
+                </div>
+                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <User className="ml-1 h-4 w-4" />
+                  {currentTicket.department}
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+          <div className="flex flex-col items-end space-y-2">
+            <span
+              className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(currentTicket.status)}`}
+            >
+              {getStatusText(currentTicket.status)}
+            </span>
           </div>
         </div>
       </div>
+
+      {/* Messages */}
+      <div className="space-y-4">
+        <h2 className="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
+          <MessageSquare className="ml-2 h-5 w-5" />
+          پیام‌ها ({currentTicket.messages?.length || 0})
+        </h2>
+
+        {currentTicket.messages && currentTicket.messages.length > 0 ? (
+          <div className="space-y-4">
+            {currentTicket.messages.map((message: Message, index: number) => (
+              <div
+                key={index}
+                className={`rounded-lg p-4 ${
+                  message.is_student
+                    ? 'border-l-4 border-blue-400 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
+                    : 'border-l-4 border-gray-400 bg-gray-50 dark:border-gray-400 dark:bg-gray-800/50'
+                }`}
+              >
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="flex items-center space-x-2 space-x-reverse">
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {message.sender}
+                    </span>
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                        message.is_student
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                          : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+                      }`}
+                    >
+                      {message.is_student ? 'دانشجو' : 'پشتیبانی'}
+                    </span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                    <Clock className="ml-1 h-4 w-4" />
+                    {formatDate(message.created_at)}
+                  </div>
+                </div>
+                <div className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                  {message.message}
+                </div>
+                {message.attachment && (
+                  <div className="mt-2">
+                    <a
+                      href={message.attachment}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      <FileText className="ml-1 h-4 w-4" />
+                      مشاهده پیوست
+                    </a>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg bg-white p-8 text-center shadow-sm dark:bg-gray-800">
+            <MessageSquare className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
+              هیچ پیامی وجود ندارد
+            </h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              هنوز پیامی برای این تیکت ثبت نشده است.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
+
+export default TicketDetailPage;

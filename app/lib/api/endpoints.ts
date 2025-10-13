@@ -178,6 +178,7 @@ export const API_ENDPOINTS = {
       TERMS: {
         GET_ALL: '/student/terms',
         GET_BY_ID: (id: string) => `/student/terms/${id}`,
+        GET_AVAILABLE: '/student/terms/available',
       },
     },
 

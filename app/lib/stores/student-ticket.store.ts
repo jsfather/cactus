@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { studentTicketService } from '@/app/lib/api/student/tickets';
+import { studentTicketService } from '@/app/lib/services/student-ticket.service';
 import {
   Ticket,
   TicketDepartment,
   CreateStudentTicketRequest,
-} from '@/app/lib/types';
+} from '@/app/lib/types/ticket';
 import toast from 'react-hot-toast';
 
 interface StudentTicketStore {
@@ -43,7 +43,7 @@ export const useStudentTicketStore = create<StudentTicketStore>()(
       fetchTickets: async () => {
         try {
           set({ isListLoading: true, error: null, tickets: [] });
-          const response = await studentTicketService.getTickets();
+          const response = await studentTicketService.getList();
 
           if (response.data) {
             set({ tickets: response.data });
@@ -65,7 +65,7 @@ export const useStudentTicketStore = create<StudentTicketStore>()(
       fetchTicketById: async (id: string) => {
         try {
           set({ isLoading: true, error: null, currentTicket: null });
-          const response = await studentTicketService.getTicketById(id);
+          const response = await studentTicketService.getById(id);
 
           if (response.data) {
             set({ currentTicket: response.data });
@@ -87,7 +87,7 @@ export const useStudentTicketStore = create<StudentTicketStore>()(
       createTicket: async (payload: CreateStudentTicketRequest) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await studentTicketService.createTicket(payload);
+          const response = await studentTicketService.create(payload);
 
           if (response.ticket) {
             const newTicket = response.ticket;
