@@ -169,7 +169,7 @@ export default function AvailableTermCard({ term, onRegister }: AvailableTermCar
               className="w-full"
               disabled
             >
-              قبلاً خریداری شده
+              قبلاً گذرانده شده
             </Button>
           ) : term.prerequisite_missing ? (
             <Button
