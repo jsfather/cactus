@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useStudentTicketStore } from '@/app/lib/stores/student-ticket.store';
-import { CreateStudentTicketRequest } from '@/app/lib/types';
+import { CreateStudentTicketRequest } from '@/app/lib/types/ticket';
 
 export const useStudentTicket = () => {
   const {
