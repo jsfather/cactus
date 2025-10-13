@@ -350,6 +350,7 @@ export default function TermsPage() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ ترمی یافت نشد"
+            onView={(term) => router.push(`/admin/terms/${term.id}/view`)}
             onEdit={(term) => router.push(`/admin/terms/${term.id}`)}
             onDelete={handleDeleteClick}
           />
