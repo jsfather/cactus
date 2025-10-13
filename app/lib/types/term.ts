@@ -15,6 +15,7 @@ export interface TermDay {
 
 export interface TermTeacher {
   id: number;
+  user?: User;
   schedules: Schedule[];
   offline_sessions: any[];
   days: TermDay[];
