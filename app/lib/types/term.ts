@@ -1,3 +1,56 @@
+export interface Schedule {
+  id: number;
+  session_date: string;
+  start_time: string;
+  end_time: string;
+  homeworks: any[];
+}
+
+export interface TermDay {
+  id: number;
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+}
+
+export interface TermTeacher {
+  id: number;
+  user?: User;
+  schedules: Schedule[];
+  offline_sessions: any[];
+  days: TermDay[];
+}
+
+export interface User {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  phone: string;
+  email: string | null;
+  address: string | null;
+  postal_code: string | null;
+  national_code: string;
+  profile_picture: string | null;
+  files: any[];
+}
+
+export interface TermStudent {
+  user_id: number | null;
+  level_id: number | null;
+  father_name: string | null;
+  mother_name: string | null;
+  father_job: string | null;
+  mother_job: string | null;
+  has_allergy: boolean | null;
+  allergy_details: string | null;
+  interest_level: string | null;
+  focus_level: string | null;
+  birth_date: string | null;
+  user: User;
+}
+
 export interface Term {
   id: number | string;
   title: string;
@@ -21,9 +74,11 @@ export interface Term {
   price: number;
   sort: number; // Increment number for ordering terms
   term_requirements?: number[]; // Array of term IDs that are required before this term
+  prerequisite_missing?: boolean;
   project_type?: any;
-  students?: any[];
-  teachers?: any[];
+  is_bought?: boolean;
+  students?: TermStudent[];
+  teachers?: TermTeacher[];
   created_at?: string;
   updated_at?: string;
   deleted_at?: string | null;

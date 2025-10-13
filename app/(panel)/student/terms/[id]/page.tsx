@@ -18,6 +18,8 @@ import {
   GraduationCap,
   CheckCircle,
   XCircle,
+  Video,
+  ExternalLink,
 } from 'lucide-react';
 
 export default function StudentTermDetailPage({
@@ -27,8 +29,18 @@ export default function StudentTermDetailPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  const { currentTerm, loading, error, getTermById, clearTerm, resetError } =
-    useStudentTerm();
+  const { 
+    currentTerm, 
+    loading, 
+    error, 
+    skyRoomLoading, 
+    skyRoomError, 
+    getTermById, 
+    clearTerm, 
+    resetError,
+    getSkyRoomUrl,
+    resetSkyRoomError 
+  } = useStudentTerm();
 
   useEffect(() => {
     const fetchTerm = async () => {
@@ -64,6 +76,35 @@ export default function StudentTermDetailPage({
       ai: 'هوش مصنوعی',
     };
     return typeLabels[type] || type;
+  };
+
+  const handleJoinSession = async (scheduleId: number) => {
+    try {
+      resetSkyRoomError();
+      const url = await getSkyRoomUrl(scheduleId.toString());
+      // Open the sky room URL in a new tab/window
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      toast.error(skyRoomError || 'خطا در دریافت لینک جلسه آنلاین');
+    }
+  };
+
+  const canJoinSession = (schedule: any): boolean => {
+    const now = new Date();
+    const sessionDate = new Date(schedule.session_date);
+    const [startHour, startMinute] = schedule.start_time.split(':').map(Number);
+    const [endHour, endMinute] = schedule.end_time.split(':').map(Number);
+    
+    const sessionStart = new Date(sessionDate);
+    sessionStart.setHours(startHour, startMinute, 0, 0);
+    
+    const sessionEnd = new Date(sessionDate);
+    sessionEnd.setHours(endHour, endMinute, 0, 0);
+    
+    // Allow joining 15 minutes before session starts and until session ends
+    const joinableStart = new Date(sessionStart.getTime() - 15 * 60 * 1000);
+    
+    return now >= joinableStart && now <= sessionEnd;
   };
 
   const formatTime = (time: string): string => {
@@ -389,6 +430,9 @@ export default function StudentTermDetailPage({
                     <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                       حضور و غیاب
                     </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                      جلسه آنلاین
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
@@ -422,6 +466,29 @@ export default function StudentTermDetailPage({
                               </span>
                             );
                           })()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap">
+                          {canJoinSession(schedule) ? (
+                            <Button
+                              type="button"
+                              variant="primary"
+                              onClick={() => handleJoinSession(schedule.id)}
+                              disabled={skyRoomLoading}
+                              className="inline-flex items-center gap-1 text-sm px-3 py-1.5"
+                            >
+                              {skyRoomLoading ? (
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                              ) : (
+                                <Video className="h-4 w-4" />
+                              )}
+                              ورود به جلسه
+                              <ExternalLink className="h-3 w-3" />
+                            </Button>
+                          ) : (
+                            <span className="text-gray-400 dark:text-gray-500 text-xs">
+                              غیرفعال
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}

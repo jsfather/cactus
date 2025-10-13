@@ -1,223 +1,336 @@
 'use client';
 
-import { useEffect, use } from 'react';
+import { useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { toast } from 'react-hot-toast';
 
 // Hooks
-import { useTermStudent } from '@/app/lib/hooks/use-term-student';
 import { useTerm } from '@/app/lib/hooks/use-term';
-import { useStudent } from '@/app/lib/hooks/use-student';
-import { useTermTeacher } from '@/app/lib/hooks/use-term-teacher';
 
 // Components
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import Select from '@/app/components/ui/Select';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import Card from '@/app/components/ui/Card';
 
-const termStudentSchema = z.object({
-  user_id: z.string().min(1, 'دانش آموز الزامی است'),
-  term_id: z.string().min(1, 'ترم الزامی است'),
-  term_teacher_id: z.string().min(1, 'مدرس ترم الزامی است'),
-});
+// Icons
+import { Plus, Users, Calendar, Clock, Trophy } from 'lucide-react';
 
-type TermStudentFormData = z.infer<typeof termStudentSchema>;
-
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
+export default function TermStudentsPage() {
   const router = useRouter();
-  const isNew = resolvedParams.id === 'new';
+  const { termList, loading, fetchTermList, error } = useTerm();
 
-  // Hooks
-  const {
-    createTermStudent,
-    loading: submitting,
-    error,
-    clearError,
-  } = useTermStudent();
-  const { termList, loading: termsLoading, fetchTermList } = useTerm();
-  const {
-    studentList,
-    loading: studentsLoading,
-    fetchStudentList,
-  } = useStudent();
-  const {
-    termTeacherList,
-    loading: termTeachersLoading,
-    fetchTermTeacherList,
-  } = useTermTeacher();
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-    setValue,
-  } = useForm<TermStudentFormData>({
-    resolver: zodResolver(termStudentSchema),
-  });
-
-  // Load dropdown data on mount
+  // Load terms on mount
   useEffect(() => {
     fetchTermList();
-    fetchStudentList();
-    fetchTermTeacherList();
-  }, [fetchTermList, fetchStudentList, fetchTermTeacherList]);
+  }, [fetchTermList]);
 
-  // Handle errors from store
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-      clearError();
-    }
-  }, [error, clearError]);
+  // Filter terms that have students
+  const termsWithStudents = termList?.filter(
+    (term) => term.students && term.students.length > 0
+  ) || [];
 
-  const onSubmit = async (data: TermStudentFormData) => {
-    try {
-      await createTermStudent(data);
-      toast.success('دانش آموز با موفقیت ثبت نام شد.');
-      router.push('/admin/term-students');
-    } catch (error) {
-      toast.error('خطا در اضافه کردن دانش آموز به ترم');
-    }
+  const getTermTypeLabel = (type: string) => {
+    const types = {
+      normal: 'عادی',
+      capacity_completion: 'تکمیل ظرفیت',
+      project_based: 'پروژه محور (ویژه)',
+      specialized: 'گرایش تخصصی',
+      ai: 'هوش مصنوعی',
+    };
+    return types[type as keyof typeof types] || type;
   };
 
-  // Handle term teacher selection to auto-select term
-  const handleTermTeacherChange = (event: React.ChangeEvent<HTMLSelectElement>, onChange: (value: string) => void) => {
-    const termTeacherId = event.target.value;
-    onChange(termTeacherId);
-    
-    // Find the selected term teacher and auto-select its term
-    const selectedTermTeacher = termTeacherList.find(
-      (tt) => tt.id.toString() === termTeacherId
-    );
-    
-    if (selectedTermTeacher && selectedTermTeacher.term) {
-      // Auto-select the term using setValue
-      setValue('term_id', selectedTermTeacher.term.id.toString());
-    }
-  };
-
-  // Prepare options for dropdowns
-  const termOptions = termList.map((term) => ({
-    label: term.title || `ترم ${term.id}`,
-    value: term.id.toString(),
-  }));
-
-  const studentOptions = studentList.map((student) => ({
-    label:
-      `${student.user?.first_name || ''} ${student.user?.last_name || ''}`.trim() ||
-      `دانش آموز ${student.user_id}`,
-    value: student.user?.id?.toString() || student.user_id.toString(),
-  }));
-
-  const termTeacherOptions = termTeacherList.map((termTeacher) => ({
-    label: termTeacher.term
-      ? `${termTeacher.user?.first_name || ''} ${termTeacher.user?.last_name || ''} - ${termTeacher.term.title}`.trim()
-      : `${termTeacher.user?.first_name || ''} ${termTeacher.user?.last_name || ''}`.trim() ||
-        `مدرس ترم ${termTeacher.id}`,
-    value: termTeacher.id.toString(),
-  }));
-
-  const loading = termsLoading || studentsLoading || termTeachersLoading;
+  const breadcrumbItems = [
+    { title: 'پنل مدیریت', href: '/admin' },
+    { title: 'دانش آموزان ترم', href: '/admin/term-students' },
+  ];
 
   if (loading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-center text-red-600 dark:text-red-400">
+          خطا در بارگذاری اطلاعات: {error}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <main>
-      <Breadcrumbs
-        breadcrumbs={[
-          { label: 'ترم دانش آموزان', href: '/admin/term-students' },
-          {
-            label: isNew
-              ? 'اضافه کردن دانش آموز به ترم'
-              : 'ویرایش ترم دانش آموز',
-            href: `/admin/term-students/${resolvedParams.id}`,
-            active: true,
-          },
-        ]}
-      />
-
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Controller
-            name="term_teacher_id"
-            control={control}
-            render={({ field }) => (
-              <Select
-                id="term_teacher_id"
-                label="ترم مدرس"
-                placeholder="ترم مدرس را انتخاب کنید"
-                required
-                options={termTeacherOptions}
-                error={errors.term_teacher_id?.message}
-                value={field.value}
-                onChange={(event) => handleTermTeacherChange(event, field.onChange)}
-                onBlur={field.onBlur}
-                name={field.name}
-              />
-            )}
-          />
-
-          <Controller
-            name="user_id"
-            control={control}
-            render={({ field }) => (
-              <Select
-                id="user_id"
-                label="دانش آموز"
-                placeholder="دانش آموز را انتخاب کنید"
-                required
-                options={studentOptions}
-                error={errors.user_id?.message}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                name={field.name}
-              />
-            )}
-          />
-
-          <Controller
-            name="term_id"
-            control={control}
-            render={({ field }) => (
-              <Select
-                id="term_id"
-                label="ترم"
-                placeholder="ترم به صورت خودکار انتخاب می‌شود"
-                required
-                options={termOptions}
-                error={errors.term_id?.message}
-                value={field.value}
-                onChange={field.onChange}
-                onBlur={field.onBlur}
-                name={field.name}
-                disabled={true}
-              />
-            )}
-          />
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <Breadcrumbs breadcrumbs={breadcrumbItems.map(item => ({ label: item.title, href: item.href }))} />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+            دانش آموزان ترم
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
+            مدیریت دانش آموزان تخصیص یافته به ترم‌ها
+          </p>
         </div>
+        <Link href="/admin/term-students/new">
+          <Button className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            اضافه کردن دانش آموز به ترم
+          </Button>
+        </Link>
+      </div>
 
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            variant="white"
-            onClick={() => router.push('/admin/term-students')}
-          >
-            انصراف
-          </Button>
-          <Button type="submit" loading={isSubmitting || submitting}>
-            {isNew ? 'اضافه کردن دانش آموز به ترم' : 'بروزرسانی ترم دانش آموز'}
-          </Button>
-        </div>
-      </form>
-    </main>
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+              <Trophy className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                تعداد ترم‌های فعال
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {termsWithStudents.length}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+              <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                کل دانش آموزان
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {termsWithStudents.reduce(
+                  (total, term) => total + (term.students?.length || 0),
+                  0
+                )}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+              <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                میانگین جلسات
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {termsWithStudents.length > 0
+                  ? Math.round(
+                      termsWithStudents.reduce(
+                        (total, term) => total + term.number_of_sessions,
+                        0
+                      ) / termsWithStudents.length
+                    )
+                  : 0}
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
+              <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                میانگین مدت ترم
+              </p>
+              <p className="text-xl font-bold text-gray-900 dark:text-white">
+                {termsWithStudents.length > 0
+                  ? Math.round(
+                      termsWithStudents.reduce(
+                        (total, term) => total + term.duration,
+                        0
+                      ) / termsWithStudents.length
+                    )
+                  : 0}{' '}
+                دقیقه
+              </p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Terms List */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          لیست ترم‌های دارای دانش آموز ({termsWithStudents.length} ترم)
+        </h2>
+
+        {termsWithStudents.length === 0 ? (
+          <Card className="p-8 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <Users className="w-16 h-16 text-gray-400" />
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  هیچ ترمی با دانش آموز یافت نشد
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                  ترم‌هایی که دانش آموز دارند اینجا نمایش داده می‌شوند
+                </p>
+                <Link href="/admin/term-students/new">
+                  <Button>
+                    <Plus className="w-4 h-4 ml-2" />
+                    اضافه کردن دانش آموز به ترم
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {termsWithStudents.map((term) => (
+              <Card key={term.id} className="p-6 hover:shadow-lg transition-shadow">
+                <div className="space-y-4">
+                  {/* Term Header */}
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {term.title}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">
+                          {getTermTypeLabel(term.type)}
+                        </span>
+                        <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
+                          {term.level.label} - {term.level.name}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        قیمت
+                      </p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
+                        {term.price.toLocaleString()} تومان
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Term Details */}
+                  <div className="grid grid-cols-2 gap-4 py-3 border-y border-gray-200 dark:border-gray-700">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        تاریخ شروع
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {term.start_date}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        تاریخ پایان
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {term.end_date}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        تعداد جلسات
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {term.number_of_sessions} جلسه
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        مدت هر جلسه
+                      </p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {term.duration} دقیقه
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Students Section */}
+                  <div>
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        دانش آموزان ({term.students?.length || 0} از {term.capacity})
+                      </h4>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        ظرفیت: {((term.students?.length || 0) / term.capacity * 100).toFixed(0)}%
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {term.students?.map((student, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                        >
+                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                              {student.user ? student.user.first_name[0] : '؟'}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              {student.user
+                                ? `${student.user.first_name} ${student.user.last_name}`
+                                : 'نام نامشخص'}
+                            </p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                              {student.user?.phone || 'شماره تلفن نامشخص'}
+                            </p>
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {student.user?.role}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Teachers Section */}
+                  {term.teachers && term.teachers.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                        مدرس‌ان ({term.teachers.length})
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {term.teachers.map((teacher) => (
+                          <span
+                            key={teacher.id}
+                            className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full"
+                          >
+                            {teacher.user
+                              ? `${teacher.user.first_name} ${teacher.user.last_name}`
+                              : `مدرس ${teacher.id}`}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
