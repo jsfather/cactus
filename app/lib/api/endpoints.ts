@@ -179,6 +179,7 @@ export const API_ENDPOINTS = {
         GET_ALL: '/student/terms',
         GET_BY_ID: (id: string) => `/student/terms/${id}`,
         GET_AVAILABLE: '/student/terms/available',
+        GET_SKY_ROOM_URL: (scheduleId: string) => `/sky_room_url/${scheduleId}`,
       },
     },
 

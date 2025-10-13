@@ -11,15 +11,21 @@ interface StudentTermState {
   stats: StudentTermStats;
   loading: boolean;
   error: string | null;
+  skyRoomLoading: boolean;
+  skyRoomError: string | null;
 
   // Actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
+  setSkyRoomLoading: (loading: boolean) => void;
+  setSkyRoomError: (error: string | null) => void;
+  clearSkyRoomError: () => void;
 
   fetchTermList: () => Promise<void>;
   fetchTermById: (id: string) => Promise<void>;
   clearCurrentTerm: () => void;
+  fetchSkyRoomUrl: (scheduleId: string) => Promise<string>;
 }
 
 const calculateStats = (terms: StudentTerm[]): StudentTermStats => {
@@ -73,6 +79,8 @@ export const useStudentTermStore = create<StudentTermState>()(
       },
       loading: false,
       error: null,
+      skyRoomLoading: false,
+      skyRoomError: null,
 
       // Actions
       setLoading: (loading) => set({ loading }),
@@ -130,6 +138,29 @@ export const useStudentTermStore = create<StudentTermState>()(
       },
 
       clearCurrentTerm: () => set({ currentTerm: null }),
+
+      setSkyRoomLoading: (skyRoomLoading) => set({ skyRoomLoading }),
+
+      setSkyRoomError: (skyRoomError) => set({ skyRoomError }),
+
+      clearSkyRoomError: () => set({ skyRoomError: null }),
+
+      fetchSkyRoomUrl: async (scheduleId: string) => {
+        try {
+          set({ skyRoomLoading: true, skyRoomError: null });
+          const response = await studentTermService.getSkyRoomUrl(scheduleId);
+          set({ skyRoomLoading: false });
+          return response.data.url;
+        } catch (error) {
+          const apiError = error as ApiError;
+          const errorMessage = apiError.message || 'خطا در دریافت لینک جلسه آنلاین';
+          set({
+            skyRoomError: errorMessage,
+            skyRoomLoading: false,
+          });
+          throw error;
+        }
+      },
     }),
     {
       name: 'student-term-store',

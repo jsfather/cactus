@@ -98,3 +98,16 @@ export interface StudentTermStats {
   completed: number;
   upcoming: number;
 }
+
+// Sky room URL response interface
+export interface SkyRoomUrlResponse {
+  data: {
+    url: string;
+  };
+}
+
+export interface GetSkyRoomUrlResponse {
+  data: {
+    url: string;
+  };
+}

@@ -8,12 +8,18 @@ export const useStudentTerm = () => {
     stats,
     loading,
     error,
+    skyRoomLoading,
+    skyRoomError,
     setLoading,
     setError,
     clearError,
+    setSkyRoomLoading,
+    setSkyRoomError,
+    clearSkyRoomError,
     fetchTermList,
     fetchTermById,
     clearCurrentTerm,
+    fetchSkyRoomUrl,
   } = useStudentTermStore();
 
   const getTermList = useCallback(async () => {
@@ -35,6 +41,17 @@ export const useStudentTerm = () => {
     clearError();
   }, [clearError]);
 
+  const getSkyRoomUrl = useCallback(
+    async (scheduleId: string) => {
+      return fetchSkyRoomUrl(scheduleId);
+    },
+    [fetchSkyRoomUrl]
+  );
+
+  const resetSkyRoomError = useCallback(() => {
+    clearSkyRoomError();
+  }, [clearSkyRoomError]);
+
   return {
     // State
     termList,
@@ -42,12 +59,16 @@ export const useStudentTerm = () => {
     stats,
     loading,
     error,
+    skyRoomLoading,
+    skyRoomError,
 
     // Actions
     getTermList,
     getTermById,
     clearTerm,
     resetError,
+    getSkyRoomUrl,
+    resetSkyRoomError,
     setLoading,
     setError,
   };
