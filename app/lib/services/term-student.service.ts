@@ -22,10 +22,10 @@ export class TermStudentService {
     user_id: string;
     term_id: string;
     term_teacher_id: string;
-  }): Promise<TermStudent> {
+  }): Promise<any> {
     try {
       const response = await createTermStudent(data);
-      return response.data;
+      return response; // Return full response instead of just data
     } catch (error) {
       console.error('Error creating term student:', error);
       throw error;
