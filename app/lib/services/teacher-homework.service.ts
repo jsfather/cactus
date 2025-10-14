@@ -8,6 +8,9 @@ import {
   UpdateTeacherHomeworkRequest,
   UpdateTeacherHomeworkResponse,
   TeacherHomework,
+  GetHomeworkConversationResponse,
+  SendHomeworkConversationMessageRequest,
+  SendHomeworkConversationMessageResponse,
 } from '@/app/lib/types/teacher-homework';
 
 export class TeacherHomeworkService {
@@ -137,6 +140,47 @@ export class TeacherHomeworkService {
       );
     } catch (error) {
       console.error('Error deleting teacher homework:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get homework conversation by conversation ID
+   */
+  async getConversation(conversationId: string): Promise<GetHomeworkConversationResponse> {
+    try {
+      const response = await apiClient.get<GetHomeworkConversationResponse>(
+        API_ENDPOINTS.PANEL.TEACHER.HOMEWORKS.CONVERSATION.GET(conversationId)
+      );
+
+      if (!response) {
+        throw new Error('خطایی در دریافت گفتگو رخ داده است');
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error fetching homework conversation:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Send a reply message to homework conversation
+   */
+  async sendConversationReply(payload: SendHomeworkConversationMessageRequest): Promise<SendHomeworkConversationMessageResponse> {
+    try {
+      const response = await apiClient.post<SendHomeworkConversationMessageResponse>(
+        API_ENDPOINTS.PANEL.TEACHER.HOMEWORKS.CONVERSATION.REPLY,
+        payload
+      );
+
+      if (!response) {
+        throw new Error('خطایی در ارسال پیام رخ داده است');
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error sending conversation reply:', error);
       throw error;
     }
   }

@@ -4,10 +4,33 @@ export interface TeacherHomeworkAnswer {
   [key: string]: any;
 }
 
+export interface TeacherHomeworkMessageSender {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  phone: string;
+  email: string | null;
+  address: string | null;
+  postal_code: string | null;
+  national_code: string | null;
+  profile_picture: string | null;
+  files: any[];
+}
+
+export interface TeacherHomeworkMessage {
+  id: number;
+  message: string;
+  sender_type: 'student' | 'teacher';
+  sender: TeacherHomeworkMessageSender | null;
+  created_at: string; // Format: "2025-04-01 15:04"
+}
+
 export interface TeacherHomeworkConversation {
   id: number;
-  // Add conversation properties when available from API
-  [key: string]: any;
+  sender: TeacherHomeworkMessageSender | null;
+  messages: TeacherHomeworkMessage[];
 }
 
 export interface TeacherHomeworkLevel {
@@ -102,6 +125,29 @@ export interface CreateTeacherHomeworkResponse {
 
 export interface UpdateTeacherHomeworkResponse {
   data: TeacherHomework;
+}
+
+// Conversation API types
+export interface GetHomeworkConversationResponse {
+  data: TeacherHomeworkConversation;
+}
+
+export interface SendHomeworkConversationMessageRequest {
+  conversation_id: string;
+  message: string;
+}
+
+export interface SendHomeworkConversationMessageResponse {
+  status: string;
+  message: {
+    id: number;
+    homework_conversation_id: string;
+    sender_id: number;
+    sender_type: 'teacher' | 'student';
+    message: string;
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 // Helper functions and constants

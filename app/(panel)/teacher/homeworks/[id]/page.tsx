@@ -6,6 +6,7 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Card } from '@/app/components/ui/Card';
+import ConversationComponent from '@/app/components/ui/ConversationComponent';
 import { useTeacherHomework } from '@/app/lib/hooks/use-teacher-homework';
 import { getTeacherHomeworkTermTypeLabel } from '@/app/lib/types/teacher-homework';
 import {
@@ -34,7 +35,7 @@ export default function TeacherHomeworkDetailPage() {
   const router = useRouter();
   const homeworkId = params.id as string;
 
-  const { currentHomework, loading, fetchHomeworkById, clearCurrentHomework } = useTeacherHomework();
+  const { currentHomework, loading, fetchHomeworkById, clearCurrentHomework, conversations, conversationLoading, sendingMessage, fetchConversation, sendConversationMessage } = useTeacherHomework();
 
   useEffect(() => {
     if (homeworkId) {
@@ -389,22 +390,20 @@ export default function TeacherHomeworkDetailPage() {
         )}
 
         {/* Conversations Section */}
-        {conversationsCount > 0 ? (
-          <Card className="mt-8 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-              گفتگوها ({conversationsCount} گفتگو)
-            </h2>
-            
-            <div className="text-center py-8">
-              <MessageCircle className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">
-                گفتگوها در این بخش نمایش داده خواهد شد.
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
-                (جزئیات گفتگوها بر اساس API پیاده‌سازی خواهد شد)
-              </p>
-            </div>
-          </Card>
+        {currentHomework.conversations && currentHomework.conversations.length > 0 ? (
+          <div className="mt-8 space-y-6">
+            {currentHomework.conversations.map((conversation) => (
+              <ConversationComponent
+                key={conversation.id}
+                conversationId={conversation.id.toString()}
+                conversation={conversations[conversation.id.toString()] || null}
+                loading={conversationLoading}
+                sendingMessage={sendingMessage}
+                onFetchConversation={fetchConversation}
+                onSendMessage={sendConversationMessage}
+              />
+            ))}
+          </div>
         ) : (
           <Card className="mt-8 p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">

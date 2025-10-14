@@ -6,16 +6,21 @@ export const useTeacherHomework = () => {
   const {
     homeworks,
     currentHomework,
+    conversations,
     loading,
     creating,
     updating,
     deleting,
+    conversationLoading,
+    sendingMessage,
     error,
     fetchHomeworks,
     fetchHomeworkById,
     createHomework,
     updateHomework,
     deleteHomework,
+    fetchConversation,
+    sendConversationMessage,
     clearCurrentHomework,
     clearError,
   } = useTeacherHomeworkStore();
@@ -49,14 +54,25 @@ export const useTeacherHomework = () => {
     clearError();
   }, [clearError]);
 
+  const handleFetchConversation = useCallback(async (conversationId: string) => {
+    await fetchConversation(conversationId);
+  }, [fetchConversation]);
+
+  const handleSendConversationMessage = useCallback(async (conversationId: string, message: string) => {
+    return await sendConversationMessage(conversationId, message);
+  }, [sendConversationMessage]);
+
   return {
     // State
     homeworks,
     currentHomework,
+    conversations,
     loading,
     creating,
     updating,
     deleting,
+    conversationLoading,
+    sendingMessage,
     error,
 
     // Actions
@@ -65,6 +81,8 @@ export const useTeacherHomework = () => {
     createHomework: handleCreateHomework,
     updateHomework: handleUpdateHomework,
     deleteHomework: handleDeleteHomework,
+    fetchConversation: handleFetchConversation,
+    sendConversationMessage: handleSendConversationMessage,
     clearCurrentHomework: handleClearCurrentHomework,
     clearError: handleClearError,
   };

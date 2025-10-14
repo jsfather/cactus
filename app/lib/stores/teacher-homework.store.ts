@@ -3,7 +3,9 @@ import { toast } from 'react-toastify';
 import { 
   TeacherHomework, 
   CreateTeacherHomeworkRequest, 
-  UpdateTeacherHomeworkRequest 
+  UpdateTeacherHomeworkRequest,
+  TeacherHomeworkConversation,
+  SendHomeworkConversationMessageRequest,
 } from '@/app/lib/types/teacher-homework';
 import { teacherHomeworkService } from '@/app/lib/services/teacher-homework.service';
 
@@ -11,10 +13,13 @@ interface TeacherHomeworkState {
   // State
   homeworks: TeacherHomework[];
   currentHomework: TeacherHomework | null;
+  conversations: { [conversationId: string]: TeacherHomeworkConversation };
   loading: boolean;
   creating: boolean;
   updating: boolean;
   deleting: boolean;
+  conversationLoading: boolean;
+  sendingMessage: boolean;
   error: string | null;
 
   // Actions
@@ -23,6 +28,8 @@ interface TeacherHomeworkState {
   createHomework: (payload: CreateTeacherHomeworkRequest) => Promise<TeacherHomework | null>;
   updateHomework: (id: string, payload: UpdateTeacherHomeworkRequest) => Promise<TeacherHomework | null>;
   deleteHomework: (id: string) => Promise<boolean>;
+  fetchConversation: (conversationId: string) => Promise<void>;
+  sendConversationMessage: (conversationId: string, message: string) => Promise<boolean>;
   clearCurrentHomework: () => void;
   clearError: () => void;
 }
@@ -31,10 +38,13 @@ export const useTeacherHomeworkStore = create<TeacherHomeworkState>((set, get) =
   // Initial state
   homeworks: [],
   currentHomework: null,
+  conversations: {},
   loading: false,
   creating: false,
   updating: false,
   deleting: false,
+  conversationLoading: false,
+  sendingMessage: false,
   error: null,
 
   // Actions
@@ -185,5 +195,64 @@ export const useTeacherHomeworkStore = create<TeacherHomeworkState>((set, get) =
 
   clearError: () => {
     set({ error: null });
+  },
+
+  fetchConversation: async (conversationId: string) => {
+    set({ conversationLoading: true, error: null });
+    
+    try {
+      const response = await teacherHomeworkService.getConversation(conversationId);
+      set(state => ({ 
+        conversations: {
+          ...state.conversations,
+          [conversationId]: response.data
+        },
+        conversationLoading: false,
+        error: null 
+      }));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'خطایی در دریافت گفتگو رخ داده است';
+      
+      set({ 
+        conversationLoading: false, 
+        error: errorMessage 
+      });
+      
+      toast.error(errorMessage);
+      console.error('Error fetching conversation:', error);
+    }
+  },
+
+  sendConversationMessage: async (conversationId: string, message: string) => {
+    set({ sendingMessage: true, error: null });
+    
+    try {
+      const response = await teacherHomeworkService.sendConversationReply({
+        conversation_id: conversationId,
+        message: message,
+      });
+      
+      if (response.status === 'sent') {
+        // Refresh the conversation to get the latest messages
+        await get().fetchConversation(conversationId);
+        
+        set({ sendingMessage: false, error: null });
+        toast.success('پیام با موفقیت ارسال شد');
+        return true;
+      } else {
+        throw new Error('خطایی در ارسال پیام رخ داده است');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'خطایی در ارسال پیام رخ داده است';
+      
+      set({ 
+        sendingMessage: false, 
+        error: errorMessage 
+      });
+      
+      toast.error(errorMessage);
+      console.error('Error sending conversation message:', error);
+      return false;
+    }
   },
 }));

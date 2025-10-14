@@ -200,6 +200,10 @@ export const API_ENDPOINTS = {
         CREATE: '/teacher/homeworks',
         UPDATE: (id: string) => `/teacher/homeworks/${id}`,
         DELETE: (id: string) => `/teacher/homeworks/${id}`,
+        CONVERSATION: {
+          GET: (conversationId: string) => `/teacher/homeworks-conversation/${conversationId}`,
+          REPLY: '/teacher/homeworks-conversation-reply',
+        },
       },
     },
 
