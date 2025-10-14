@@ -17,7 +17,9 @@ import { Save, X, FileText, Download } from 'lucide-react';
 // Form Validation Schema
 const homeworkSchema = z.object({
   description: z.string().min(1, 'شرح تکلیف ضروری است'),
-  schedule_id: z.string().min(1, 'انتخاب جلسه ضروری است'),
+  term_id: z.string().min(1, 'انتخاب ترم ضروری است'),
+  term_teacher_schedule_id: z.string().min(1, 'انتخاب جلسه ضروری است'),
+  offline_session_id: z.string().optional(),
   file: z.any().optional(),
 });
 
@@ -88,7 +90,9 @@ export default function EditHomeworkPage() {
     if (currentHomework && !loading) {
       reset({
         description: currentHomework.description,
-        schedule_id: currentHomework.schedule?.id.toString() || '',
+        term_id: currentHomework.term?.id.toString() || '',
+        term_teacher_schedule_id: currentHomework.schedule?.id.toString() || '',
+        offline_session_id: '', // This might not be in the response, leave empty
       });
       setInitialLoading(false);
     }
@@ -98,8 +102,14 @@ export default function EditHomeworkPage() {
     try {
       const payload: UpdateTeacherHomeworkRequest = {
         description: data.description,
-        schedule_id: parseInt(data.schedule_id),
+        term_id: parseInt(data.term_id),
+        term_teacher_schedule_id: parseInt(data.term_teacher_schedule_id),
       };
+
+      // Add offline_session_id if provided
+      if (data.offline_session_id) {
+        payload.offline_session_id = parseInt(data.offline_session_id);
+      }
 
       // Only include file if a new one was selected
       if (selectedFile) {
@@ -203,7 +213,7 @@ export default function EditHomeworkPage() {
                 {/* Schedule Selection */}
                 <div className="lg:col-span-2">
                   <Controller
-                    name="schedule_id"
+                    name="term_teacher_schedule_id"
                     control={control}
                     render={({ field }) => (
                       <div>
@@ -221,9 +231,44 @@ export default function EditHomeworkPage() {
                             </option>
                           ))}
                         </select>
-                        {errors.schedule_id && (
+                        {errors.term_teacher_schedule_id && (
                           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                            {errors.schedule_id.message}
+                            {errors.term_teacher_schedule_id.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  />
+                </div>
+
+                {/* Term ID (Hidden field - will be populated based on schedule selection) */}
+                <Controller
+                  name="term_id"
+                  control={control}
+                  render={({ field }) => (
+                    <input type="hidden" {...field} />
+                  )}
+                />
+
+                {/* Offline Session ID (Optional field) */}
+                <div className="lg:col-span-2">
+                  <Controller
+                    name="offline_session_id"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          شناسه جلسه آفلاین (اختیاری)
+                        </label>
+                        <input
+                          {...field}
+                          type="number"
+                          placeholder="شناسه جلسه آفلاین را وارد کنید"
+                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        />
+                        {errors.offline_session_id && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                            {errors.offline_session_id.message}
                           </p>
                         )}
                       </div>

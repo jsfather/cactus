@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 import { 
   TeacherHomework, 
   CreateTeacherHomeworkRequest, 
-  UpdateTeacherHomeworkRequest,
   TeacherHomeworkConversation,
   SendHomeworkConversationMessageRequest,
 } from '@/app/lib/types/teacher-homework';
@@ -26,7 +25,6 @@ interface TeacherHomeworkState {
   fetchHomeworks: () => Promise<void>;
   fetchHomeworkById: (id: string) => Promise<void>;
   createHomework: (payload: CreateTeacherHomeworkRequest) => Promise<TeacherHomework | null>;
-  updateHomework: (id: string, payload: UpdateTeacherHomeworkRequest) => Promise<TeacherHomework | null>;
   deleteHomework: (id: string) => Promise<boolean>;
   fetchConversation: (conversationId: string) => Promise<void>;
   sendConversationMessage: (conversationId: string, message: string) => Promise<boolean>;
@@ -122,39 +120,6 @@ export const useTeacherHomeworkStore = create<TeacherHomeworkState>((set, get) =
       
       toast.error(errorMessage);
       console.error('Error creating teacher homework:', error);
-      return null;
-    }
-  },
-
-  updateHomework: async (id: string, payload: UpdateTeacherHomeworkRequest) => {
-    set({ updating: true, error: null });
-    
-    try {
-      const response = await teacherHomeworkService.update(id, payload);
-      const updatedHomework = response.data;
-      
-      // Update in the list optimistically
-      set(state => ({ 
-        homeworks: state.homeworks.map(homework => 
-          homework.id.toString() === id ? updatedHomework : homework
-        ),
-        currentHomework: state.currentHomework?.id.toString() === id ? updatedHomework : state.currentHomework,
-        updating: false,
-        error: null 
-      }));
-      
-      toast.success('تکلیف با موفقیت بروزرسانی شد');
-      return updatedHomework;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'خطایی در بروزرسانی تکلیف رخ داده است';
-      
-      set({ 
-        updating: false, 
-        error: errorMessage 
-      });
-      
-      toast.error(errorMessage);
-      console.error('Error updating teacher homework:', error);
       return null;
     }
   },

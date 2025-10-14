@@ -346,7 +346,6 @@ export default function TeacherHomeworksPage() {
             loading={loading}
             emptyMessage="هیچ تکلیفی ایجاد نشده است"
             onView={(homework) => router.push(`/teacher/homeworks/${homework.id}`)}
-            onEdit={(homework) => router.push(`/teacher/homeworks/${homework.id}/edit`)}
             onDelete={handleDelete}
           />
         </div>

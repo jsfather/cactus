@@ -5,8 +5,6 @@ import {
   GetTeacherHomeworkResponse,
   CreateTeacherHomeworkRequest,
   CreateTeacherHomeworkResponse,
-  UpdateTeacherHomeworkRequest,
-  UpdateTeacherHomeworkResponse,
   TeacherHomework,
   GetHomeworkConversationResponse,
   SendHomeworkConversationMessageRequest,
@@ -61,8 +59,13 @@ export class TeacherHomeworkService {
     try {
       // If there's a file, we need to use FormData
       const formData = new FormData();
+      formData.append('term_id', payload.term_id.toString());
+      formData.append('term_teacher_schedule_id', payload.term_teacher_schedule_id.toString());
       formData.append('description', payload.description);
-      formData.append('schedule_id', payload.schedule_id.toString());
+      
+      if (payload.offline_session_id) {
+        formData.append('offline_session_id', payload.offline_session_id.toString());
+      }
       
       if (payload.file) {
         formData.append('file', payload.file);
@@ -85,47 +88,6 @@ export class TeacherHomeworkService {
       return response;
     } catch (error) {
       console.error('Error creating teacher homework:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Update an existing homework
-   */
-  async update(id: string, payload: UpdateTeacherHomeworkRequest): Promise<UpdateTeacherHomeworkResponse> {
-    try {
-      // If there's a file or we need to use FormData for updates
-      const formData = new FormData();
-      
-      if (payload.description !== undefined) {
-        formData.append('description', payload.description);
-      }
-      
-      if (payload.schedule_id !== undefined) {
-        formData.append('schedule_id', payload.schedule_id.toString());
-      }
-      
-      if (payload.file) {
-        formData.append('file', payload.file);
-      }
-
-      const response = await apiClient.put<UpdateTeacherHomeworkResponse>(
-        API_ENDPOINTS.PANEL.TEACHER.HOMEWORKS.UPDATE(id),
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
-      );
-
-      if (!response) {
-        throw new Error('خطایی در بروزرسانی تکلیف رخ داده است');
-      }
-
-      return response;
-    } catch (error) {
-      console.error('Error updating teacher homework:', error);
       throw error;
     }
   }

@@ -20,7 +20,6 @@ import {
   User,
   Phone,
   IdCard,
-  Edit,
   Trash2,
   MessageCircle,
   CheckCircle,
@@ -96,15 +95,7 @@ export default function TeacherHomeworkDetailPage() {
               مشاهده کامل اطلاعات تکلیف و پاسخ‌های دانش‌آموزان
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => router.push(`/teacher/homeworks/${currentHomework.id}/edit`)}
-              variant="secondary"
-              className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              ویرایش
-            </Button>
+          <div className="flex gap-4">
             <Button
               onClick={() => router.push('/teacher/homeworks')}
               variant="secondary"

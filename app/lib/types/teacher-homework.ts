@@ -100,14 +100,10 @@ export interface TeacherHomework {
 
 // API Request/Response types
 export interface CreateTeacherHomeworkRequest {
+  term_id: number;
+  term_teacher_schedule_id: number;
+  offline_session_id?: number;
   description: string;
-  schedule_id: number;
-  file?: File; // For file upload
-}
-
-export interface UpdateTeacherHomeworkRequest {
-  description?: string;
-  schedule_id?: number;
   file?: File; // For file upload
 }
 
@@ -120,10 +116,6 @@ export interface GetTeacherHomeworkResponse {
 }
 
 export interface CreateTeacherHomeworkResponse {
-  data: TeacherHomework;
-}
-
-export interface UpdateTeacherHomeworkResponse {
   data: TeacherHomework;
 }
 

@@ -18,7 +18,9 @@ import { Plus, Save, X, BookOpen, Calendar, FileText } from 'lucide-react';
 // Form Validation Schema
 const homeworkSchema = z.object({
   description: z.string().min(1, 'شرح تکلیف ضروری است'),
-  schedule_id: z.string().min(1, 'انتخاب جلسه ضروری است'),
+  term_id: z.string().min(1, 'انتخاب ترم ضروری است'),
+  term_teacher_schedule_id: z.string().min(1, 'انتخاب جلسه ضروری است'),
+  offline_session_id: z.string().optional(),
   file: z.any().optional(),
 });
 
@@ -69,9 +71,19 @@ export default function NewHomeworkPage() {
     try {
       const payload: CreateTeacherHomeworkRequest = {
         description: data.description,
-        schedule_id: parseInt(data.schedule_id),
-        file: selectedFile || undefined,
+        term_id: parseInt(data.term_id),
+        term_teacher_schedule_id: parseInt(data.term_teacher_schedule_id),
       };
+
+      // Add offline_session_id if provided
+      if (data.offline_session_id && data.offline_session_id.trim()) {
+        payload.offline_session_id = parseInt(data.offline_session_id);
+      }
+
+      // Only include file if one was selected
+      if (selectedFile) {
+        payload.file = selectedFile;
+      }
 
       const result = await createHomework(payload);
       if (result) {
@@ -146,10 +158,41 @@ export default function NewHomeworkPage() {
                   />
                 </div>
 
-                {/* Schedule Selection */}
-                <div className="lg:col-span-2">
+                {/* Term Selection */}
+                <div className="lg:col-span-1">
                   <Controller
-                    name="schedule_id"
+                    name="term_id"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          انتخاب ترم *
+                        </label>
+                        <select
+                          {...field}
+                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        >
+                          <option value="">انتخاب کنید...</option>
+                          {terms.map((term) => (
+                            <option key={term.id} value={term.id.toString()}>
+                              {term.title}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.term_id && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                            {errors.term_id.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  />
+                </div>
+
+                {/* Schedule Selection */}
+                <div className="lg:col-span-1">
+                  <Controller
+                    name="term_teacher_schedule_id"
                     control={control}
                     render={({ field }) => (
                       <div>
@@ -167,9 +210,35 @@ export default function NewHomeworkPage() {
                             </option>
                           ))}
                         </select>
-                        {errors.schedule_id && (
+                        {errors.term_teacher_schedule_id && (
                           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-                            {errors.schedule_id.message}
+                            {errors.term_teacher_schedule_id.message}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  />
+                </div>
+
+                {/* Offline Session ID (Optional) */}
+                <div className="lg:col-span-1">
+                  <Controller
+                    name="offline_session_id"
+                    control={control}
+                    render={({ field }) => (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                          شناسه جلسه آفلاین (اختیاری)
+                        </label>
+                        <input
+                          {...field}
+                          type="number"
+                          placeholder="شناسه جلسه آفلاین..."
+                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                        />
+                        {errors.offline_session_id && (
+                          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                            {errors.offline_session_id.message}
                           </p>
                         )}
                       </div>
