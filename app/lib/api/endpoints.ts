@@ -194,6 +194,13 @@ export const API_ENDPOINTS = {
         GET_ALL: '/teacher/terms',
         GET_BY_ID: (id: string) => `/teacher/terms/${id}`,
       },
+      HOMEWORKS: {
+        GET_ALL: '/teacher/homeworks',
+        GET_BY_ID: (id: string) => `/teacher/homeworks/${id}`,
+        CREATE: '/teacher/homeworks',
+        UPDATE: (id: string) => `/teacher/homeworks/${id}`,
+        DELETE: (id: string) => `/teacher/homeworks/${id}`,
+      },
     },
 
     USER: {
