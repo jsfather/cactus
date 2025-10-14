@@ -190,6 +190,20 @@ export const API_ENDPOINTS = {
       COURSES: '/teacher/courses',
       SCHEDULES: '/teacher/schedules',
       TICKETS: '/teacher/tickets',
+      TERMS: {
+        GET_ALL: '/teacher/terms',
+        GET_BY_ID: (id: string) => `/teacher/terms/${id}`,
+      },
+      HOMEWORKS: {
+        GET_ALL: '/teacher/homeworks',
+        GET_BY_ID: (id: string) => `/teacher/homeworks/${id}`,
+        CREATE: '/teacher/homeworks',
+        DELETE: (id: string) => `/teacher/homeworks/${id}`,
+        CONVERSATION: {
+          GET: (conversationId: string) => `/teacher/homeworks-conversation/${conversationId}`,
+          REPLY: '/teacher/homeworks-conversation-reply',
+        },
+      },
     },
 
     USER: {
