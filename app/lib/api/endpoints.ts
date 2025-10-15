@@ -204,6 +204,14 @@ export const API_ENDPOINTS = {
           REPLY: '/teacher/homeworks-conversation-reply',
         },
       },
+
+      OFFLINE_SESSIONS: {
+        GET_ALL: '/teacher/offline_sessions',
+        GET_BY_ID: (id: string) => `/teacher/offline_sessions/${id}`,
+        CREATE: '/teacher/offline_sessions',
+        UPDATE: (id: string) => `/teacher/offline_sessions/${id}`,
+        DELETE: (id: string) => `/teacher/offline_sessions/${id}`,
+      },
     },
 
     USER: {
