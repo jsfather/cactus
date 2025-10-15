@@ -79,35 +79,47 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
   // Watch term_id changes to update available teachers
   const watchedTermId = watch('term_id');
 
+  // Function to update teachers list based on term ID
+  const updateTeachersList = (termId: string) => {
+    if (termId && terms.length > 0) {
+      const selectedTerm = terms.find((term) => term.id.toString() === termId);
+      if (selectedTerm && selectedTerm.teachers) {
+        const teacherOptions = selectedTerm.teachers.map((teacher) => ({
+          value: teacher.id.toString(),
+          label: `مدرس ${teacher.id}`,
+        }));
+        setAvailableTeachers(teacherOptions);
+        return teacherOptions;
+      }
+    }
+    setAvailableTeachers([]);
+    return [];
+  };
+
   useEffect(() => {
     fetchTerms();
   }, [fetchTerms]);
 
-  // Update available teachers when term is selected
+  // Update available teachers when term is selected (only for user interactions, not initial data load)
   useEffect(() => {
     if (watchedTermId && terms.length > 0) {
+      // Only reset teacher selection if this is a new term selection by user (not initial data load)
+      const shouldResetTeacher =
+        watchedTermId !== selectedTermId && selectedTermId !== '';
+
+      updateTeachersList(watchedTermId);
       setSelectedTermId(watchedTermId);
-      const selectedTerm = terms.find(
-        (term) => term.id.toString() === watchedTermId
-      );
-      if (selectedTerm && selectedTerm.teachers) {
-        const teacherOptions = selectedTerm.teachers.map((teacher) => ({
-          value: teacher.id.toString(),
-          label: `مدرس ${teacher.id}`, // You can customize this label based on available teacher info
-        }));
-        setAvailableTeachers(teacherOptions);
-      } else {
-        setAvailableTeachers([]);
-      }
-      // Reset teacher selection when term changes
-      if (watchedTermId !== selectedTermId) {
+
+      if (shouldResetTeacher && isNew) {
         setValue('term_teacher_id', '');
       }
-    } else {
+    } else if (!watchedTermId) {
       setAvailableTeachers([]);
-      setValue('term_teacher_id', '');
+      if (isNew) {
+        setValue('term_teacher_id', '');
+      }
     }
-  }, [watchedTermId, terms, selectedTermId, setValue]);
+  }, [watchedTermId, terms, selectedTermId, setValue, isNew]);
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -146,6 +158,11 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
       const termId = currentOfflineSession.term_id.toString();
       const teacherId = currentOfflineSession.term_teacher_id.toString();
 
+      // First update the teachers list for the selected term
+      updateTeachersList(termId);
+      setSelectedTermId(termId);
+
+      // Then reset the form with all data including the teacher selection
       reset({
         title: currentOfflineSession.title,
         description: currentOfflineSession.description,
@@ -153,17 +170,6 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
         term_id: termId,
         term_teacher_id: teacherId,
       });
-
-      // Set selected term and update available teachers
-      setSelectedTermId(termId);
-      const selectedTerm = terms.find((term) => term.id.toString() === termId);
-      if (selectedTerm && selectedTerm.teachers) {
-        const teacherOptions = selectedTerm.teachers.map((teacher) => ({
-          value: teacher.id.toString(),
-          label: `مدرس ${teacher.id}`, // You can customize this label based on available teacher info
-        }));
-        setAvailableTeachers(teacherOptions);
-      }
     }
   }, [currentOfflineSession, isNew, reset, terms]);
 
