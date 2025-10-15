@@ -9,11 +9,13 @@ import { z } from 'zod';
 // UI Components
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
+import Select from '@/app/components/ui/Select';
 import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 
 // Hooks and Types
 import { useOfflineSession } from '@/app/lib/hooks/use-offline-session';
+import { useTeacherTerm } from '@/app/lib/hooks/use-teacher-term';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
 import {
   CreateOfflineSessionRequest,
@@ -52,10 +54,16 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
     currentOfflineSession,
   } = useOfflineSession();
 
+  const { terms, loading: termsLoading, fetchTerms } = useTeacherTerm();
+
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
     null
   );
   const [loading, setLoading] = useState(true);
+  const [selectedTermId, setSelectedTermId] = useState<string>('');
+  const [availableTeachers, setAvailableTeachers] = useState<
+    Array<{ value: string; label: string }>
+  >([]);
 
   const isNew = resolvedParams?.id === 'new';
 
@@ -63,8 +71,43 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
     control,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useFormWithBackendErrors<OfflineSessionFormData>(offlineSessionSchema);
+
+  // Watch term_id changes to update available teachers
+  const watchedTermId = watch('term_id');
+
+  useEffect(() => {
+    fetchTerms();
+  }, [fetchTerms]);
+
+  // Update available teachers when term is selected
+  useEffect(() => {
+    if (watchedTermId && terms.length > 0) {
+      setSelectedTermId(watchedTermId);
+      const selectedTerm = terms.find(
+        (term) => term.id.toString() === watchedTermId
+      );
+      if (selectedTerm && selectedTerm.teachers) {
+        const teacherOptions = selectedTerm.teachers.map((teacher) => ({
+          value: teacher.id.toString(),
+          label: `مدرس ${teacher.id}`, // You can customize this label based on available teacher info
+        }));
+        setAvailableTeachers(teacherOptions);
+      } else {
+        setAvailableTeachers([]);
+      }
+      // Reset teacher selection when term changes
+      if (watchedTermId !== selectedTermId) {
+        setValue('term_teacher_id', '');
+      }
+    } else {
+      setAvailableTeachers([]);
+      setValue('term_teacher_id', '');
+    }
+  }, [watchedTermId, terms, selectedTermId, setValue]);
 
   useEffect(() => {
     const resolveParams = async () => {
@@ -97,18 +140,32 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
     resolveParams();
   }, [fetchOfflineSessionById, reset, router]);
 
-  // Set form data when currentOfflineSession changes
+  // Set form data when currentOfflineSession changes and terms are loaded
   useEffect(() => {
-    if (currentOfflineSession && !isNew) {
+    if (currentOfflineSession && !isNew && terms.length > 0) {
+      const termId = currentOfflineSession.term_id.toString();
+      const teacherId = currentOfflineSession.term_teacher_id.toString();
+
       reset({
         title: currentOfflineSession.title,
         description: currentOfflineSession.description,
         video_url: currentOfflineSession.video_url,
-        term_id: currentOfflineSession.term_id.toString(),
-        term_teacher_id: currentOfflineSession.term_teacher_id.toString(),
+        term_id: termId,
+        term_teacher_id: teacherId,
       });
+
+      // Set selected term and update available teachers
+      setSelectedTermId(termId);
+      const selectedTerm = terms.find((term) => term.id.toString() === termId);
+      if (selectedTerm && selectedTerm.teachers) {
+        const teacherOptions = selectedTerm.teachers.map((teacher) => ({
+          value: teacher.id.toString(),
+          label: `مدرس ${teacher.id}`, // You can customize this label based on available teacher info
+        }));
+        setAvailableTeachers(teacherOptions);
+      }
     }
-  }, [currentOfflineSession, isNew, reset]);
+  }, [currentOfflineSession, isNew, reset, terms]);
 
   const onSubmit = async (data: OfflineSessionFormData) => {
     if (!resolvedParams) return;
@@ -148,13 +205,19 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
     );
   };
 
-  if (!resolvedParams || loading) {
+  if (!resolvedParams || loading || termsLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-gray-900"></div>
       </div>
     );
   }
+
+  // Prepare term options for select
+  const termOptions = terms.map((term) => ({
+    value: term.id.toString(),
+    label: term.title,
+  }));
 
   const breadcrumbItems = [
     { label: 'پنل مدیریت', href: '/teacher' },
@@ -249,14 +312,15 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
                 name="term_id"
                 control={control}
                 render={({ field }) => (
-                  <Input
+                  <Select
                     id="term_id"
-                    label="شناسه ترم"
-                    type="number"
+                    label="انتخاب ترم"
                     value={field.value}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     error={errors.term_id?.message}
+                    placeholder="ترم را انتخاب کنید"
+                    options={termOptions}
                     required
                   />
                 )}
@@ -269,14 +333,20 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
                 name="term_teacher_id"
                 control={control}
                 render={({ field }) => (
-                  <Input
+                  <Select
                     id="term_teacher_id"
-                    label="شناسه مدرس ترم"
-                    type="number"
+                    label="انتخاب مدرس ترم"
                     value={field.value}
                     onChange={field.onChange}
                     onBlur={field.onBlur}
                     error={errors.term_teacher_id?.message}
+                    placeholder={
+                      selectedTermId
+                        ? 'مدرس را انتخاب کنید'
+                        : 'ابتدا ترم را انتخاب کنید'
+                    }
+                    options={availableTeachers}
+                    disabled={!selectedTermId || availableTeachers.length === 0}
                     required
                   />
                 )}

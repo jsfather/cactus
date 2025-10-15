@@ -1,30 +1,30 @@
 // Message interfaces for homework conversations
-export interface HomeworkMessage {
+export interface OfflineSessionHomeworkMessage {
   id: number;
   message: string;
   sender_type: 'student' | 'teacher';
   created_at: string;
 }
 
-export interface HomeworkConversation {
+export interface OfflineSessionHomeworkConversation {
   id: number;
-  messages: HomeworkMessage[];
+  messages: OfflineSessionHomeworkMessage[];
 }
 
 // Homework answer interface
-export interface HomeworkAnswer {
+export interface OfflineSessionHomeworkAnswer {
   id: number;
   description: string;
   file_url: string;
 }
 
 // Homework interface
-export interface Homework {
+export interface OfflineSessionHomework {
   id: number;
   description: string;
   file_url: string;
-  answers: HomeworkAnswer[];
-  conversations: HomeworkConversation[];
+  answers: OfflineSessionHomeworkAnswer[];
+  conversations: OfflineSessionHomeworkConversation[];
 }
 
 // Main offline session interface
@@ -36,7 +36,7 @@ export interface OfflineSession {
   term_id: number;
   term_teacher_id: number;
   created_at: string;
-  homeworks: Homework[];
+  homeworks: OfflineSessionHomework[];
 }
 
 // API Response interfaces
