@@ -186,7 +186,11 @@ export const API_ENDPOINTS = {
     TEACHER: {
       DASHBOARD: '/teacher/dashboard',
       PROFILE: '/teacher/profile',
-      STUDENTS: '/teacher/students',
+      STUDENTS: {
+        GET_ALL: '/teacher/students',
+        GET_BY_ID: (id: string) => `/teacher/students/${id}`,
+        GET_BY_TERM: (termId: string) => `/teacher/term_students/${termId}`,
+      },
       COURSES: '/teacher/courses',
       SCHEDULES: '/teacher/schedules',
       TICKETS: '/teacher/tickets',

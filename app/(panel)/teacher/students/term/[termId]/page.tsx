@@ -1,33 +1,54 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Table, { Column } from '@/app/components/ui/Table';
 import { Student } from '@/app/lib/types/student';
 import { Button } from '@/app/components/ui/Button';
-import { useRouter } from 'next/navigation';
 import { useTeacherStudent } from '@/app/lib/hooks/use-teacher-student';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import { Users, UserCheck, GraduationCap, Phone, Eye } from 'lucide-react';
+import {
+  Users,
+  UserCheck,
+  GraduationCap,
+  Phone,
+  Eye,
+  ArrowRight,
+} from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
-export default function TeacherStudentsPage() {
+export default function TermStudentsPage() {
+  const params = useParams();
   const router = useRouter();
-  const { studentList, loading, pagination, fetchStudentList } =
-    useTeacherStudent();
+  const termId = params.termId as string;
+
+  const {
+    termStudents,
+    loading,
+    pagination,
+    fetchStudentsByTermId,
+    clearTermStudents,
+  } = useTeacherStudent();
 
   useEffect(() => {
-    fetchStudentList();
-  }, [fetchStudentList]);
+    if (termId) {
+      fetchStudentsByTermId(termId);
+    }
+
+    return () => {
+      clearTermStudents();
+    };
+  }, [termId, fetchStudentsByTermId, clearTermStudents]);
 
   // Calculate summary stats
-  const totalStudents = studentList.length;
-  const studentsWithLevel = studentList.filter(
+  const totalStudents = termStudents.length;
+  const studentsWithLevel = termStudents.filter(
     (student) => student.level_id !== null
   ).length;
-  const studentsWithProfile = studentList.filter(
+  const studentsWithProfile = termStudents.filter(
     (student) => student.user !== null
   ).length;
-  const studentsWithAllergy = studentList.filter(
+  const studentsWithAllergy = termStudents.filter(
     (student) => student.has_allergy === 1
   ).length;
 
@@ -186,20 +207,34 @@ export default function TeacherStudentsPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدرس', href: '/teacher' },
-          { label: 'دانش‌آموزان من', href: '/teacher/students', active: true },
+          { label: 'دانش‌آموزان من', href: '/teacher/students' },
+          {
+            label: `دانش‌آموزان ترم ${termId}`,
+            href: `/teacher/students/term/${termId}`,
+            active: true,
+          },
         ]}
       />
 
       <div className="mt-8">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              دانش‌آموزان من
-            </h1>
-            <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-              مشاهده و مدیریت دانش‌آموزان تحت نظر شما
-            </p>
+          <div className="flex items-center space-x-4 space-x-reverse">
+            <Button
+              variant="secondary"
+              onClick={() => router.push('/teacher/students')}
+            >
+              <ArrowRight className="ml-2 h-4 w-4" />
+              بازگشت
+            </Button>
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                دانش‌آموزان ترم {termId}
+              </h1>
+              <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                مشاهده دانش‌آموزان این ترم
+              </p>
+            </div>
           </div>
         </div>
 
@@ -291,10 +326,10 @@ export default function TeacherStudentsPage() {
         {/* Students Table */}
         <div className="mt-6">
           <Table
-            data={studentList}
+            data={termStudents}
             columns={columns}
             loading={loading}
-            emptyMessage="هیچ دانش‌آموزی یافت نشد"
+            emptyMessage="هیچ دانش‌آموزی در این ترم یافت نشد"
             onView={handleViewStudent}
             getRowId={(student) => String(student.user_id)}
           />
@@ -313,14 +348,18 @@ export default function TeacherStudentsPage() {
               <Button
                 variant="secondary"
                 disabled={pagination.current_page === 1}
-                onClick={() => fetchStudentList(pagination.current_page - 1)}
+                onClick={() =>
+                  fetchStudentsByTermId(termId, pagination.current_page - 1)
+                }
               >
                 قبلی
               </Button>
               <Button
                 variant="secondary"
                 disabled={pagination.current_page === pagination.last_page}
-                onClick={() => fetchStudentList(pagination.current_page + 1)}
+                onClick={() =>
+                  fetchStudentsByTermId(termId, pagination.current_page + 1)
+                }
               >
                 بعدی
               </Button>
