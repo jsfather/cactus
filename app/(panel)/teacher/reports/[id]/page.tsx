@@ -204,9 +204,13 @@ const ReportFormPage: React.FC<PageProps> = ({ params }) => {
 
   if (!resolvedParams || loading || reportLoading || termsLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <LoadingSpinner />
-      </div>
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex h-64 items-center justify-center">
+            <LoadingSpinner />
+          </div>
+        </div>
+      </main>
     );
   }
 
@@ -227,147 +231,149 @@ const ReportFormPage: React.FC<PageProps> = ({ params }) => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <Breadcrumbs breadcrumbs={breadcrumbItems} />
-      </div>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-6">
+          <Breadcrumbs breadcrumbs={breadcrumbItems} />
+        </div>
 
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {isNew ? 'ایجاد گزارش جدید' : 'ویرایش گزارش'}
-          </h1>
-          <div className="flex gap-3">
-            {!isNew && currentReport && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {isNew ? 'ایجاد گزارش جدید' : 'ویرایش گزارش'}
+            </h1>
+            <div className="flex gap-3">
+              {!isNew && currentReport && (
+                <Button
+                  variant="white"
+                  onClick={() =>
+                    router.push(`/teacher/reports/${resolvedParams?.id}/view`)
+                  }
+                  className="flex items-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                  </svg>
+                  مشاهده جزئیات
+                </Button>
+              )}
               <Button
-                variant="white"
-                onClick={() =>
-                  router.push(`/teacher/reports/${resolvedParams?.id}/view`)
-                }
+                variant="secondary"
+                onClick={() => router.push('/teacher/reports')}
                 className="flex items-center gap-2"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="h-5 w-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                  />
-                </svg>
-                مشاهده جزئیات
+                <span>←</span>
+                بازگشت به لیست
               </Button>
-            )}
-            <Button
-              variant="secondary"
-              onClick={() => router.push('/teacher/reports')}
-              className="flex items-center gap-2"
-            >
-              <span>←</span>
-              بازگشت به لیست
-            </Button>
+            </div>
           </div>
         </div>
+
+        <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+          <form
+            onSubmit={handleSubmit(onSubmit, handleError)}
+            className="space-y-6"
+          >
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* Term Selection */}
+              <div>
+                <Controller
+                  name="term_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="term_id"
+                      label="ترم"
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      error={errors.term_id?.message}
+                      placeholder="انتخاب ترم"
+                      required
+                      options={termOptions}
+                    />
+                  )}
+                />
+              </div>
+
+              {/* Schedule Selection */}
+              <div>
+                <Controller
+                  name="term_teacher_schedule_id"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      id="term_teacher_schedule_id"
+                      label="جلسه"
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      error={errors.term_teacher_schedule_id?.message}
+                      placeholder="انتخاب جلسه"
+                      required
+                      options={availableSchedules}
+                      disabled={!watchedTermId}
+                    />
+                  )}
+                />
+              </div>
+
+              {/* Content */}
+              <div className="md:col-span-2">
+                <Controller
+                  name="content"
+                  control={control}
+                  render={({ field }) => (
+                    <MarkdownEditor
+                      id="content"
+                      label="محتوای گزارش"
+                      value={field.value}
+                      onChange={field.onChange}
+                      error={errors.content?.message}
+                      required
+                    />
+                  )}
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-end gap-4">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => router.push('/teacher/reports')}
+              >
+                انصراف
+              </Button>
+              <Button
+                type="submit"
+                loading={isSubmitting}
+                disabled={isSubmitting}
+              >
+                {isNew ? 'ایجاد گزارش' : 'بروزرسانی گزارش'}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
-
-      <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
-        <form
-          onSubmit={handleSubmit(onSubmit, handleError)}
-          className="space-y-6"
-        >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Term Selection */}
-            <div>
-              <Controller
-                name="term_id"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    id="term_id"
-                    label="ترم"
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    error={errors.term_id?.message}
-                    placeholder="انتخاب ترم"
-                    required
-                    options={termOptions}
-                  />
-                )}
-              />
-            </div>
-
-            {/* Schedule Selection */}
-            <div>
-              <Controller
-                name="term_teacher_schedule_id"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    id="term_teacher_schedule_id"
-                    label="جلسه"
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    error={errors.term_teacher_schedule_id?.message}
-                    placeholder="انتخاب جلسه"
-                    required
-                    options={availableSchedules}
-                    disabled={!watchedTermId}
-                  />
-                )}
-              />
-            </div>
-
-            {/* Content */}
-            <div className="md:col-span-2">
-              <Controller
-                name="content"
-                control={control}
-                render={({ field }) => (
-                  <MarkdownEditor
-                    id="content"
-                    label="محتوای گزارش"
-                    value={field.value}
-                    onChange={field.onChange}
-                    error={errors.content?.message}
-                    required
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="flex justify-end gap-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => router.push('/teacher/reports')}
-            >
-              انصراف
-            </Button>
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              disabled={isSubmitting}
-            >
-              {isNew ? 'ایجاد گزارش' : 'بروزرسانی گزارش'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </div>
+    </main>
   );
 };
 

@@ -172,17 +172,19 @@ export default function ReportsPage() {
 
   if (loading) {
     return (
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex h-64 items-center justify-center">
-          <LoadingSpinner />
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
+          <div className="flex h-64 items-center justify-center">
+            <LoadingSpinner />
+          </div>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="mx-auto max-w-7xl">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8">
         {/* Breadcrumbs */}
         <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
