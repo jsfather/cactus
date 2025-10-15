@@ -7,7 +7,7 @@ export * from './term';
 export * from './user';
 export * from './schedule';
 export * from './attendance';
-export * from './offline_session';
+export * from './offline-session';
 export * from './report';
 export * from './ticket';
 export * from './error';

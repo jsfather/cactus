@@ -186,10 +186,18 @@ export const API_ENDPOINTS = {
     TEACHER: {
       DASHBOARD: '/teacher/dashboard',
       PROFILE: '/teacher/profile',
-      STUDENTS: '/teacher/students',
+      STUDENTS: {
+        GET_ALL: '/teacher/students',
+        GET_BY_ID: (id: string) => `/teacher/students/${id}`,
+        GET_BY_TERM: (termId: string) => `/teacher/term_students/${termId}`,
+      },
       COURSES: '/teacher/courses',
       SCHEDULES: '/teacher/schedules',
-      TICKETS: '/teacher/tickets',
+      TICKETS: {
+        GET_ALL: '/teacher/tickets',
+        GET_BY_ID: (id: string) => `/teacher/ticket/${id}`,
+        REPLY: (id: string) => `/teacher/ticket/${id}/reply`,
+      },
       TERMS: {
         GET_ALL: '/teacher/terms',
         GET_BY_ID: (id: string) => `/teacher/terms/${id}`,
@@ -200,9 +208,25 @@ export const API_ENDPOINTS = {
         CREATE: '/teacher/homeworks',
         DELETE: (id: string) => `/teacher/homeworks/${id}`,
         CONVERSATION: {
-          GET: (conversationId: string) => `/teacher/homeworks-conversation/${conversationId}`,
+          GET: (conversationId: string) =>
+            `/teacher/homeworks-conversation/${conversationId}`,
           REPLY: '/teacher/homeworks-conversation-reply',
         },
+      },
+
+      OFFLINE_SESSIONS: {
+        GET_ALL: '/teacher/offline_sessions',
+        GET_BY_ID: (id: string) => `/teacher/offline_sessions/${id}`,
+        CREATE: '/teacher/offline_sessions',
+        UPDATE: (id: string) => `/teacher/offline_sessions/${id}`,
+        DELETE: (id: string) => `/teacher/offline_sessions/${id}`,
+      },
+
+      REPORTS: {
+        GET_ALL: '/teacher/reports',
+        GET_BY_ID: (id: string) => `/teacher/reports/${id}`,
+        CREATE: '/teacher/reports',
+        DELETE: (id: string) => `/teacher/reports/${id}`,
       },
     },
 
