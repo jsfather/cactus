@@ -6,18 +6,31 @@ import { Student } from '@/app/lib/types/student';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useTeacherStudent } from '@/app/lib/hooks/use-teacher-student';
+import { useTeacherTerm } from '@/app/lib/hooks/use-teacher-term';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import { Users, UserCheck, GraduationCap, Phone, Eye } from 'lucide-react';
+import {
+  Users,
+  UserCheck,
+  GraduationCap,
+  Phone,
+  Eye,
+  CalendarDays,
+  BookOpen,
+} from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import Card from '@/app/components/ui/Card';
+import { getTeacherTermTypeLabel } from '@/app/lib/types/teacher-term';
 
 export default function TeacherStudentsPage() {
   const router = useRouter();
   const { studentList, loading, pagination, fetchStudentList } =
     useTeacherStudent();
+  const { terms, loading: termsLoading, fetchTerms } = useTeacherTerm();
 
   useEffect(() => {
     fetchStudentList();
-  }, [fetchStudentList]);
+    fetchTerms();
+  }, [fetchStudentList, fetchTerms]);
 
   // Calculate summary stats
   const totalStudents = studentList.length;
@@ -288,45 +301,148 @@ export default function TeacherStudentsPage() {
           </div>
         </div>
 
-        {/* Students Table */}
-        <div className="mt-6">
-          <Table
-            data={studentList}
-            columns={columns}
-            loading={loading}
-            emptyMessage="هیچ دانش‌آموزی یافت نشد"
-            onView={handleViewStudent}
-            getRowId={(student) => String(student.user_id)}
-          />
-        </div>
-
-        {/* Pagination */}
-        {pagination && pagination.last_page > 1 && (
-          <div className="mt-6 flex items-center justify-between">
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <span className="text-sm text-gray-700 dark:text-gray-300">
-                صفحه {pagination.current_page.toLocaleString('fa-IR')} از{' '}
-                {pagination.last_page.toLocaleString('fa-IR')}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2 space-x-reverse">
-              <Button
-                variant="secondary"
-                disabled={pagination.current_page === 1}
-                onClick={() => fetchStudentList(pagination.current_page - 1)}
-              >
-                قبلی
-              </Button>
-              <Button
-                variant="secondary"
-                disabled={pagination.current_page === pagination.last_page}
-                onClick={() => fetchStudentList(pagination.current_page + 1)}
-              >
-                بعدی
-              </Button>
+        {/* Teacher Terms Section */}
+        <div className="mt-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                ترم‌های من
+              </h2>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                برای مشاهده دانش‌آموزان هر ترم روی ترم مورد نظر کلیک کنید
+              </p>
             </div>
           </div>
-        )}
+
+          {termsLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="h-32 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+                </div>
+              ))}
+            </div>
+          ) : terms && terms.length > 0 ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {terms.map((term) => (
+                <Card
+                  key={term.id}
+                  className="cursor-pointer transition-shadow hover:shadow-md"
+                >
+                  <div className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                          {term.title}
+                        </h3>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                          {getTeacherTermTypeLabel(term.type)}
+                        </p>
+
+                        <div className="mt-4 space-y-2">
+                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <CalendarDays className="ml-2 h-4 w-4" />
+                            <span>
+                              {term.start_date} تا {term.end_date}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <BookOpen className="ml-2 h-4 w-4" />
+                            <span>{term.number_of_sessions} جلسه</span>
+                          </div>
+
+                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <Users className="ml-2 h-4 w-4" />
+                            <span>{term.students.length} دانش‌آموز</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6">
+                      <Button
+                        className="w-full"
+                        onClick={() =>
+                          router.push(`/teacher/students/term/${term.id}`)
+                        }
+                      >
+                        <Users className="ml-2 h-4 w-4" />
+                        مشاهده دانش‌آموزان ({term.students.length})
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <Card>
+              <div className="p-8 text-center">
+                <CalendarDays className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">
+                  هیچ ترمی یافت نشد
+                </h3>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  شما در حال حاضر در هیچ ترمی فعالیت ندارید.
+                </p>
+              </div>
+            </Card>
+          )}
+        </div>
+
+        {/* All Students Section */}
+        <div className="mt-8">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                تمام دانش‌آموزان
+              </h2>
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                لیست کامل تمام دانش‌آموزان شما از همه ترم‌ها
+              </p>
+            </div>
+          </div>
+
+          {/* Students Table */}
+          <div className="mt-6">
+            <Table
+              data={studentList}
+              columns={columns}
+              loading={loading}
+              emptyMessage="هیچ دانش‌آموزی یافت نشد"
+              onView={handleViewStudent}
+              getRowId={(student) => String(student.user_id)}
+            />
+          </div>
+
+          {/* Pagination */}
+          {pagination && pagination.last_page > 1 && (
+            <div className="mt-6 flex items-center justify-between">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  صفحه {pagination.current_page.toLocaleString('fa-IR')} از{' '}
+                  {pagination.last_page.toLocaleString('fa-IR')}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Button
+                  variant="secondary"
+                  disabled={pagination.current_page === 1}
+                  onClick={() => fetchStudentList(pagination.current_page - 1)}
+                >
+                  قبلی
+                </Button>
+                <Button
+                  variant="secondary"
+                  disabled={pagination.current_page === pagination.last_page}
+                  onClick={() => fetchStudentList(pagination.current_page + 1)}
+                >
+                  بعدی
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
