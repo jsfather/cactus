@@ -83,6 +83,23 @@ export interface ReplyTicketRequest {
   message: string;
 }
 
+// Teacher ticket management types
+export interface GetTeacherTicketListResponse {
+  data: Ticket[];
+}
+
+export interface GetTeacherTicketResponse {
+  data: Ticket;
+}
+
+export interface TeacherReplyTicketRequest {
+  message: string;
+}
+
+export interface TeacherReplyTicketResponse {
+  message: string;
+}
+
 export interface CreateTicketDepartmentRequest {
   title: string;
 }
