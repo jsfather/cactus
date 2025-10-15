@@ -2,12 +2,12 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { offlineSessionService } from '@/app/lib/services/offline-session.service';
 import type { ApiError } from '@/app/lib/api/client';
-import { 
-  OfflineSession, 
-  CreateOfflineSessionRequest, 
-  UpdateOfflineSessionRequest, 
+import {
+  OfflineSession,
+  CreateOfflineSessionRequest,
+  UpdateOfflineSessionRequest,
   CreateOfflineSessionResponse,
-  GetOfflineSessionResponse
+  GetOfflineSessionResponse,
 } from '@/app/lib/types/offline-session';
 
 interface OfflineSessionState {
@@ -23,8 +23,13 @@ interface OfflineSessionState {
   clearError: () => void;
 
   fetchOfflineSessionList: () => Promise<void>;
-  createOfflineSession: (payload: CreateOfflineSessionRequest) => Promise<CreateOfflineSessionResponse>;
-  updateOfflineSession: (id: string, payload: UpdateOfflineSessionRequest) => Promise<GetOfflineSessionResponse>;
+  createOfflineSession: (
+    payload: CreateOfflineSessionRequest
+  ) => Promise<CreateOfflineSessionResponse>;
+  updateOfflineSession: (
+    id: string,
+    payload: UpdateOfflineSessionRequest
+  ) => Promise<GetOfflineSessionResponse>;
   deleteOfflineSession: (id: string) => Promise<void>;
   fetchOfflineSessionById: (id: string) => Promise<void>;
 }
@@ -64,7 +69,10 @@ export const useOfflineSessionStore = create<OfflineSessionState>()(
         set({ loading: true, error: null });
         const newOfflineSession = await offlineSessionService.create(payload);
         set((state) => ({
-          offlineSessionList: [newOfflineSession.data, ...state.offlineSessionList],
+          offlineSessionList: [
+            newOfflineSession.data,
+            ...state.offlineSessionList,
+          ],
           loading: false,
         }));
         return newOfflineSession;
@@ -78,7 +86,10 @@ export const useOfflineSessionStore = create<OfflineSessionState>()(
     updateOfflineSession: async (id, payload) => {
       try {
         set({ loading: true, error: null });
-        const updatedOfflineSession = await offlineSessionService.update(id, payload);
+        const updatedOfflineSession = await offlineSessionService.update(
+          id,
+          payload
+        );
         set((state) => ({
           offlineSessionList: state.offlineSessionList.map((session) =>
             session.id.toString() === id ? updatedOfflineSession.data : session
@@ -99,7 +110,9 @@ export const useOfflineSessionStore = create<OfflineSessionState>()(
         set({ loading: true, error: null });
         await offlineSessionService.delete(id);
         set((state) => ({
-          offlineSessionList: state.offlineSessionList.filter((session) => session.id.toString() !== id),
+          offlineSessionList: state.offlineSessionList.filter(
+            (session) => session.id.toString() !== id
+          ),
           loading: false,
         }));
       } catch (error) {

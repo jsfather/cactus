@@ -15,7 +15,10 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 // Hooks and Types
 import { useOfflineSession } from '@/app/lib/hooks/use-offline-session';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-import { CreateOfflineSessionRequest, UpdateOfflineSessionRequest } from '@/app/lib/types/offline-session';
+import {
+  CreateOfflineSessionRequest,
+  UpdateOfflineSessionRequest,
+} from '@/app/lib/types/offline-session';
 
 // Utils
 import { convertToEnglishNumbers } from '@/app/lib/utils';
@@ -24,7 +27,10 @@ import { convertToEnglishNumbers } from '@/app/lib/utils';
 const offlineSessionSchema = z.object({
   title: z.string().min(1, 'عنوان ضروری است'),
   description: z.string().min(1, 'توضیحات ضروری است'),
-  video_url: z.string().url('آدرس ویدیو معتبر نیست').min(1, 'آدرس ویدیو ضروری است'),
+  video_url: z
+    .string()
+    .url('آدرس ویدیو معتبر نیست')
+    .min(1, 'آدرس ویدیو ضروری است'),
   term_id: z.string().min(1, 'شناسه ترم ضروری است'),
   term_teacher_id: z.string().min(1, 'شناسه مدرس ترم ضروری است'),
 });
@@ -46,7 +52,9 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
     currentOfflineSession,
   } = useOfflineSession();
 
-  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   const isNew = resolvedParams?.id === 'new';
@@ -115,20 +123,29 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
 
     try {
       if (resolvedParams.id === 'new') {
-        await createOfflineSession(processedData as CreateOfflineSessionRequest);
+        await createOfflineSession(
+          processedData as CreateOfflineSessionRequest
+        );
         toast.success('جلسه آفلاین با موفقیت ایجاد شد');
       } else {
-        await updateOfflineSession(resolvedParams.id, processedData as UpdateOfflineSessionRequest);
+        await updateOfflineSession(
+          resolvedParams.id,
+          processedData as UpdateOfflineSessionRequest
+        );
         toast.success('جلسه آفلاین با موفقیت به‌روزرسانی شد');
       }
       router.push('/teacher/offline_sessions');
     } catch (error) {
-      toast.error(isNew ? 'خطا در ایجاد جلسه آفلاین' : 'خطا در بروزرسانی جلسه آفلاین');
+      toast.error(
+        isNew ? 'خطا در ایجاد جلسه آفلاین' : 'خطا در بروزرسانی جلسه آفلاین'
+      );
     }
   };
 
   const handleError = () => {
-    toast.error(isNew ? 'خطا در ایجاد جلسه آفلاین' : 'خطا در بروزرسانی جلسه آفلاین');
+    toast.error(
+      isNew ? 'خطا در ایجاد جلسه آفلاین' : 'خطا در بروزرسانی جلسه آفلاین'
+    );
   };
 
   if (!resolvedParams || loading) {
@@ -160,7 +177,11 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
             {!isNew && currentOfflineSession && (
               <Button
                 variant="white"
-                onClick={() => router.push(`/teacher/offline_sessions/${resolvedParams?.id}/view`)}
+                onClick={() =>
+                  router.push(
+                    `/teacher/offline_sessions/${resolvedParams?.id}/view`
+                  )
+                }
                 className="flex items-center gap-2"
               >
                 <svg
@@ -169,7 +190,7 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -303,7 +324,7 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex items-center justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-600">
+          <div className="flex items-center justify-end space-x-3 border-t border-gray-200 pt-6 dark:border-gray-600">
             <Button
               type="button"
               variant="secondary"
@@ -320,8 +341,8 @@ const OfflineSessionFormPage: React.FC<PageProps> = ({ params }) => {
               {isSubmitting
                 ? 'در حال ذخیره...'
                 : isNew
-                ? 'ایجاد جلسه'
-                : 'به‌روزرسانی'}
+                  ? 'ایجاد جلسه'
+                  : 'به‌روزرسانی'}
             </Button>
           </div>
         </form>

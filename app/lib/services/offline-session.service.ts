@@ -21,14 +21,19 @@ export class OfflineSessionService {
     );
   }
 
-  async create(payload: CreateOfflineSessionRequest): Promise<CreateOfflineSessionResponse> {
+  async create(
+    payload: CreateOfflineSessionRequest
+  ): Promise<CreateOfflineSessionResponse> {
     return apiClient.post<CreateOfflineSessionResponse>(
       API_ENDPOINTS.PANEL.TEACHER.OFFLINE_SESSIONS.CREATE,
       payload
     );
   }
 
-  async update(id: string, payload: UpdateOfflineSessionRequest): Promise<GetOfflineSessionResponse> {
+  async update(
+    id: string,
+    payload: UpdateOfflineSessionRequest
+  ): Promise<GetOfflineSessionResponse> {
     return apiClient.put<GetOfflineSessionResponse>(
       API_ENDPOINTS.PANEL.TEACHER.OFFLINE_SESSIONS.UPDATE(id),
       payload
@@ -36,7 +41,9 @@ export class OfflineSessionService {
   }
 
   async delete(id: string): Promise<void> {
-    return apiClient.delete<void>(API_ENDPOINTS.PANEL.TEACHER.OFFLINE_SESSIONS.DELETE(id));
+    return apiClient.delete<void>(
+      API_ENDPOINTS.PANEL.TEACHER.OFFLINE_SESSIONS.DELETE(id)
+    );
   }
 }
 

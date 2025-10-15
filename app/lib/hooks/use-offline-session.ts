@@ -1,19 +1,27 @@
 import { useCallback } from 'react';
 import { useOfflineSessionStore } from '@/app/lib/stores/offline-session.store';
-import { CreateOfflineSessionRequest, UpdateOfflineSessionRequest } from '@/app/lib/types/offline-session';
+import {
+  CreateOfflineSessionRequest,
+  UpdateOfflineSessionRequest,
+} from '@/app/lib/types/offline-session';
 
 export const useOfflineSession = () => {
   const store = useOfflineSessionStore();
 
-  const fetchOfflineSessionList = useCallback(() => store.fetchOfflineSessionList(), [store.fetchOfflineSessionList]);
+  const fetchOfflineSessionList = useCallback(
+    () => store.fetchOfflineSessionList(),
+    [store.fetchOfflineSessionList]
+  );
 
   const createOfflineSession = useCallback(
-    (payload: CreateOfflineSessionRequest) => store.createOfflineSession(payload),
+    (payload: CreateOfflineSessionRequest) =>
+      store.createOfflineSession(payload),
     [store.createOfflineSession]
   );
 
   const updateOfflineSession = useCallback(
-    (id: string, payload: UpdateOfflineSessionRequest) => store.updateOfflineSession(id, payload),
+    (id: string, payload: UpdateOfflineSessionRequest) =>
+      store.updateOfflineSession(id, payload),
     [store.updateOfflineSession]
   );
 

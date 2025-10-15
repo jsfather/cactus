@@ -9,7 +9,14 @@ import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useOfflineSession } from '@/app/lib/hooks/use-offline-session';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import { Video, Plus, Calendar, BookOpen, TrendingUp, PlayCircle } from 'lucide-react';
+import {
+  Video,
+  Plus,
+  Calendar,
+  BookOpen,
+  TrendingUp,
+  PlayCircle,
+} from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 export default function OfflineSessionsPage() {
@@ -30,17 +37,21 @@ export default function OfflineSessionsPage() {
 
   // Calculate summary stats
   const totalSessions = offlineSessionList.length;
-  const sessionsWithHomeworks = offlineSessionList.filter(session => 
-    session.homeworks && session.homeworks.length > 0
+  const sessionsWithHomeworks = offlineSessionList.filter(
+    (session) => session.homeworks && session.homeworks.length > 0
   ).length;
-  const totalHomeworks = offlineSessionList.reduce((total, session) => 
-    total + (session.homeworks ? session.homeworks.length : 0), 0
+  const totalHomeworks = offlineSessionList.reduce(
+    (total, session) =>
+      total + (session.homeworks ? session.homeworks.length : 0),
+    0
   );
-  const thisMonthSessions = offlineSessionList.filter(session => {
+  const thisMonthSessions = offlineSessionList.filter((session) => {
     const sessionDate = new Date(session.created_at);
     const thisMonth = new Date();
-    return sessionDate.getMonth() === thisMonth.getMonth() && 
-           sessionDate.getFullYear() === thisMonth.getFullYear();
+    return (
+      sessionDate.getMonth() === thisMonth.getMonth() &&
+      sessionDate.getFullYear() === thisMonth.getFullYear()
+    );
   }).length;
 
   const columns: Column<OfflineSession>[] = [
@@ -52,7 +63,7 @@ export default function OfflineSessionsPage() {
       header: 'توضیحات',
       accessor: 'description',
       render: (value): string => {
-        return String(value).length > 50 
+        return String(value).length > 50
           ? String(value).substring(0, 50) + '...'
           : String(value);
       },
@@ -64,13 +75,13 @@ export default function OfflineSessionsPage() {
         const videoUrl = value as string;
         if (!videoUrl) return '-';
         return (
-          <a 
-            href={videoUrl} 
-            target="_blank" 
+          <a
+            href={videoUrl}
+            target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
-            <PlayCircle className="h-4 w-4 ml-1" />
+            <PlayCircle className="ml-1 h-4 w-4" />
             مشاهده ویدیو
           </a>
         );
@@ -139,7 +150,11 @@ export default function OfflineSessionsPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/teacher' },
-          { label: 'جلسات آفلاین', href: '/teacher/offline_sessions', active: true },
+          {
+            label: 'جلسات آفلاین',
+            href: '/teacher/offline_sessions',
+            active: true,
+          },
         ]}
       />
 
@@ -155,7 +170,7 @@ export default function OfflineSessionsPage() {
             </p>
           </div>
           <Button onClick={() => router.push('/teacher/offline_sessions/new')}>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             افزودن جلسه جدید
           </Button>
         </div>
@@ -250,7 +265,9 @@ export default function OfflineSessionsPage() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ جلسه آفلاینی یافت نشد"
-            onEdit={(session) => router.push(`/teacher/offline_sessions/${session.id}`)}
+            onEdit={(session) =>
+              router.push(`/teacher/offline_sessions/${session.id}`)
+            }
             onDelete={handleDeleteClick}
           />
         </div>
