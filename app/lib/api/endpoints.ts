@@ -213,6 +213,13 @@ export const API_ENDPOINTS = {
         UPDATE: (id: string) => `/teacher/offline_sessions/${id}`,
         DELETE: (id: string) => `/teacher/offline_sessions/${id}`,
       },
+
+      REPORTS: {
+        GET_ALL: '/teacher/reports',
+        GET_BY_ID: (id: string) => `/teacher/reports/${id}`,
+        CREATE: '/teacher/reports',
+        DELETE: (id: string) => `/teacher/reports/${id}`,
+      },
     },
 
     USER: {
