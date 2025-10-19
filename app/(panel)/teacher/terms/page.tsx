@@ -5,17 +5,21 @@ import { useRouter } from 'next/navigation';
 import Table, { Column } from '@/app/components/ui/Table';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { TeacherTerm, getTeacherTermTypeLabel } from '@/app/lib/types/teacher-term';
+import {
+  TeacherTerm,
+  getTeacherTermTypeLabel,
+} from '@/app/lib/types/teacher-term';
 import { useTeacherTerm } from '@/app/lib/hooks/use-teacher-term';
-import { 
-  Calendar, 
-  Users, 
-  BookOpen, 
-  Clock, 
+import { formatDateToPersian } from '@/app/lib/utils';
+import {
+  Calendar,
+  Users,
+  BookOpen,
+  Clock,
   GraduationCap,
   Eye,
   CalendarDays,
-  UserCheck
+  UserCheck,
 } from 'lucide-react';
 
 export default function TeacherTermsPage() {
@@ -35,7 +39,7 @@ export default function TeacherTermsPage() {
     return endDate >= today;
   }).length;
   const totalStudents = terms.reduce(
-    (sum, term) => sum + (term.students?.filter(s => s.user).length || 0),
+    (sum, term) => sum + (term.students?.filter((s) => s.user).length || 0),
     0
   );
   const totalSessions = terms.reduce(
@@ -78,23 +82,28 @@ export default function TeacherTermsPage() {
         const typeMap = {
           normal: {
             label: 'عادی',
-            color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+            color:
+              'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
           },
           capacity_completion: {
             label: 'تکمیل ظرفیت',
-            color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+            color:
+              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
           },
           project_based: {
             label: 'پروژه محور(ویژه)',
-            color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+            color:
+              'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
           },
           specialized: {
             label: 'گرایش تخصصی',
-            color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+            color:
+              'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
           },
           ai: {
             label: 'هوش مصنوعی',
-            color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
+            color:
+              'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
           },
         };
         const type = typeMap[value as keyof typeof typeMap] || {
@@ -136,19 +145,22 @@ export default function TeacherTermsPage() {
       header: 'دانش‌آموزان',
       accessor: 'students',
       render: (value, item): React.JSX.Element => {
-        const studentsWithUser = item.students?.filter(s => s.user) || [];
+        const studentsWithUser = item.students?.filter((s) => s.user) || [];
         const enrolledCount = studentsWithUser.length;
         const capacity = item.capacity;
-        
+
         return (
           <div className="flex flex-col">
             <span className="text-sm font-medium">
-              {enrolledCount.toLocaleString('fa-IR')} / {capacity.toLocaleString('fa-IR')}
+              {enrolledCount.toLocaleString('fa-IR')} /{' '}
+              {capacity.toLocaleString('fa-IR')}
             </span>
-            <div className="mt-1 w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-              <div 
-                className="bg-blue-600 h-2 rounded-full" 
-                style={{ width: `${Math.min((enrolledCount / capacity) * 100, 100)}%` }}
+            <div className="mt-1 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+              <div
+                className="h-2 rounded-full bg-blue-600"
+                style={{
+                  width: `${Math.min((enrolledCount / capacity) * 100, 100)}%`,
+                }}
               ></div>
             </div>
           </div>
@@ -160,7 +172,7 @@ export default function TeacherTermsPage() {
       accessor: 'start_date',
       render: (value): string => {
         if (!value || typeof value !== 'string') return '---';
-        return value; // Already in Persian format
+        return formatDateToPersian(value);
       },
     },
     {
@@ -168,14 +180,14 @@ export default function TeacherTermsPage() {
       accessor: 'end_date',
       render: (value): string => {
         if (!value || typeof value !== 'string') return '---';
-        return value; // Already in Persian format
+        return formatDateToPersian(value);
       },
     },
     {
       header: 'برنامه کلاس‌ها',
       accessor: 'teachers',
       render: (value, item): React.JSX.Element => {
-        const teacher = item.teachers?.find(t => t.days?.length > 0);
+        const teacher = item.teachers?.find((t) => t.days?.length > 0);
         if (!teacher || !teacher.days?.length) {
           return (
             <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -189,8 +201,9 @@ export default function TeacherTermsPage() {
             {teacher.days.slice(0, 2).map((day, index) => (
               <div key={index} className="text-xs">
                 <span className="font-medium">{day.day_of_week}</span>
-                <span className="text-gray-500 mr-2">
-                  {day.start_time.substring(0, 5)} - {day.end_time.substring(0, 5)}
+                <span className="mr-2 text-gray-500">
+                  {day.start_time.substring(0, 5)} -{' '}
+                  {day.end_time.substring(0, 5)}
                 </span>
               </div>
             ))}
