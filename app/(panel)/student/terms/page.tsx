@@ -7,6 +7,7 @@ import { StudentTerm } from '@/app/lib/types/student-term';
 import { useRouter } from 'next/navigation';
 import { useStudentTerm } from '@/app/lib/hooks/use-student-term';
 import { useAvailableTerm } from '@/app/lib/hooks/use-available-term';
+import { useCart } from '@/app/contexts/CartContext';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import AvailableTermCard from '@/app/components/student/AvailableTermCard';
 import {
@@ -38,6 +39,7 @@ export default function StudentTermsPage() {
     getAvailableTerms, 
     resetError: resetAvailableError 
   } = useAvailableTerm();
+  const { addItem } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -274,10 +276,30 @@ export default function StudentTermsPage() {
   };
 
   const handleRegisterTerm = (termId: number) => {
-    // Navigate to registration/purchase flow
-    // This could be implemented based on your registration process
-    toast.success('در حال هدایت به صفحه ثبت‌نام...');
-    // Example: router.push(`/student/terms/register/${termId}`);
+    // Find the selected term from available terms
+    const selectedTerm = availableTerms.find(term => term.id === termId);
+    
+    if (!selectedTerm) {
+      toast.error('ترم مورد نظر یافت نشد');
+      return;
+    }
+
+    // Add term to cart as a product
+    try {
+      addItem({
+        id: selectedTerm.id,
+        title: selectedTerm.title,
+        price: selectedTerm.price.toString(),
+        image: '/course-robotics-intro.png', // Default course image
+      });
+      
+      toast.success('ترم به سبد خرید اضافه شد');
+      
+      // Navigate to checkout page
+      router.push('/shop/checkout');
+    } catch (error) {
+      toast.error('خطا در اضافه کردن ترم به سبد خرید');
+    }
   };
 
   if (loading && termList.length === 0) {
