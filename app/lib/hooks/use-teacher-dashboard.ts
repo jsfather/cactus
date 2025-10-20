@@ -224,7 +224,9 @@ export const useTeacherDashboard = () => {
       activities.push({
         title: 'تیکت جدید',
         description: `تیکت "${ticket.subject}" دریافت شد`,
-        time: ticket.created_at ? formatDateToPersian(ticket.created_at) : 'نامشخص',
+        time: ticket.created_at
+          ? formatDateToPersian(ticket.created_at)
+          : 'نامشخص',
         type: 'ticket',
       });
     });
