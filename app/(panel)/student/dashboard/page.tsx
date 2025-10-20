@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   BookOpenCheck,
   UserCheck,
@@ -7,121 +9,35 @@ import {
   Clock,
   Calendar,
   Ticket,
-  MessageSquare,
-  Settings,
   ArrowUpRight,
   ArrowDownRight,
+  ShoppingCart,
 } from 'lucide-react';
-
-const stats = [
-  {
-    title: 'ترم های فعال',
-    value: '۲',
-    change: '+۱۰٪',
-    trend: 'up',
-    icon: <BookType className="h-6 w-6" />,
-    color: 'blue',
-  },
-  {
-    title: 'تکالیف باز',
-    value: '۳',
-    change: '+۵٪',
-    trend: 'up',
-    icon: <BookOpenCheck className="h-6 w-6" />,
-    color: 'purple',
-  },
-  {
-    title: 'حضور و غیاب',
-    value: '۹۰٪',
-    change: '+۲٪',
-    trend: 'up',
-    icon: <UserCheck className="h-6 w-6" />,
-    color: 'emerald',
-  },
-  {
-    title: 'تیکت های باز',
-    value: '۱',
-    change: '-۵۰٪',
-    trend: 'down',
-    icon: <Ticket className="h-6 w-6" />,
-    color: 'amber',
-  },
-];
-
-const recentActivities = [
-  {
-    title: 'تکلیف جدید',
-    description: 'تکلیف جدید برای درس برنامه نویسی اضافه شد',
-    time: '۲ ساعت پیش',
-    icon: <BookOpenCheck className="h-5 w-5" />,
-    color: 'purple',
-    category: 'education',
-  },
-  {
-    title: 'ثبت حضور',
-    description: 'حضور شما در کلاس برنامه نویسی ثبت شد',
-    time: '۳ ساعت پیش',
-    icon: <UserCheck className="h-5 w-5" />,
-    color: 'emerald',
-    category: 'education',
-  },
-  {
-    title: 'پاسخ تیکت',
-    description: 'به تیکت پشتیبانی شما پاسخ داده شد',
-    time: '۵ ساعت پیش',
-    icon: <Ticket className="h-5 w-5" />,
-    color: 'amber',
-    category: 'communications',
-  },
-];
-
-const currentTerms = [
-  {
-    title: 'ترم بهار ۱۴۰۳',
-    status: 'فعال',
-    courses: ['برنامه نویسی پیشرفته', 'ریاضی مهندسی', 'مدارهای منطقی'],
-    progress: 75,
-    startDate: '۱۴۰۳/۰۱/۰۱',
-    endDate: '۱۴۰۳/۰۳/۳۱',
-  },
-  {
-    title: 'ترم تابستان ۱۴۰۳',
-    status: 'در انتظار',
-    courses: ['کارآموزی', 'پروژه نرم افزار'],
-    progress: 0,
-    startDate: '۱۴۰۳/۰۴/۰۱',
-    endDate: '۱۴۰۳/۰۶/۳۱',
-  },
-];
-
-const quickActions = [
-  {
-    title: 'مشاهده تکالیف',
-    icon: <BookOpenCheck className="h-5 w-5" />,
-    href: '/student/homeworks',
-    color: 'purple',
-  },
-  {
-    title: 'حضور و غیاب',
-    icon: <UserCheck className="h-5 w-5" />,
-    href: '/student/attendances',
-    color: 'emerald',
-  },
-  {
-    title: 'برنامه کلاس‌ها',
-    icon: <Calendar className="h-5 w-5" />,
-    href: '/student/schedule',
-    color: 'blue',
-  },
-  {
-    title: 'ارسال تیکت',
-    icon: <MessageSquare className="h-5 w-5" />,
-    href: '/student/tickets/new',
-    color: 'amber',
-  },
-];
+import { useStudentDashboard } from '@/app/lib/hooks/use-student-dashboard';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { Button } from '@/app/components/ui/Button';
 
 const Page = () => {
+  const router = useRouter();
+  const {
+    stats,
+    recentActivities,
+    upcomingSessions,
+    termList,
+    availableTerms,
+    loading,
+    fetchAllData,
+  } = useStudentDashboard();
+
+
+
+  if (loading) {
+    return (
+      <div className="flex min-h-96 items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -136,67 +52,117 @@ const Page = () => {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div
-            key={stat.title}
-            className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800"
-          >
-            <div
-              className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-[0.03] transition-all group-hover:opacity-[0.06]"
-              style={{
-                backgroundImage:
-                  stat.color === 'blue'
-                    ? 'linear-gradient(to right, transparent, #60a5fa)'
-                    : stat.color === 'purple'
-                      ? 'linear-gradient(to right, transparent, #a78bfa)'
-                      : stat.color === 'emerald'
-                        ? 'linear-gradient(to right, transparent, #34d399)'
-                        : 'linear-gradient(to right, transparent, #fbbf24)',
-              }}
-            />
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  {stat.title}
-                </p>
-                <div
-                  className={`rounded-full p-2.5 ${
-                    stat.color === 'blue'
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                      : stat.color === 'purple'
-                        ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-                        : stat.color === 'emerald'
-                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
-                          : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
-                  }`}
-                >
-                  {stat.icon}
-                </div>
+        {/* Active Terms */}
+        <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-blue-500/5 opacity-0 transition-all group-hover:opacity-100" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                ترم‌های فعال
+              </p>
+              <div className="rounded-full bg-blue-50 p-2.5 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                <BookType className="h-6 w-6" />
               </div>
-              <div>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {stat.value}
-                </p>
-                <div className="mt-1 flex items-center gap-1">
-                  {stat.trend === 'up' ? (
-                    <ArrowUpRight className="h-4 w-4 text-green-500 dark:text-green-400" />
-                  ) : (
-                    <ArrowDownRight className="h-4 w-4 text-red-500 dark:text-red-400" />
-                  )}
-                  <span
-                    className={`text-sm font-medium ${
-                      stat.trend === 'up'
-                        ? 'text-green-500 dark:text-green-400'
-                        : 'text-red-500 dark:text-red-400'
-                    }`}
-                  >
-                    {stat.change}
-                  </span>
-                </div>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                {stats.activeTerms.toLocaleString('fa-IR')}
+              </p>
+              <div className="mt-1 flex items-center gap-1">
+                <ArrowUpRight className="h-4 w-4 text-green-500 dark:text-green-400" />
+                <span className="text-sm font-medium text-green-500 dark:text-green-400">
+                  {stats.totalTerms > 0 ? '+' + Math.round((stats.activeTerms / stats.totalTerms) * 100) + '%' : '0%'}
+                </span>
               </div>
             </div>
           </div>
-        ))}
+        </div>
+
+        {/* Homework Stats */}
+        <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-purple-500/5 opacity-0 transition-all group-hover:opacity-100" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                کل تکالیف
+              </p>
+              <div className="rounded-full bg-purple-50 p-2.5 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
+                <BookOpenCheck className="h-6 w-6" />
+              </div>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                {stats.totalHomeworks.toLocaleString('fa-IR')}
+              </p>
+              <div className="mt-1 flex items-center gap-1">
+                <ArrowUpRight className="h-4 w-4 text-green-500 dark:text-green-400" />
+                <span className="text-sm font-medium text-green-500 dark:text-green-400">
+                  در ترم‌های فعال
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Attendance Rate */}
+        <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-emerald-500/5 opacity-0 transition-all group-hover:opacity-100" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                نرخ حضور
+              </p>
+              <div className="rounded-full bg-emerald-50 p-2.5 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                <UserCheck className="h-6 w-6" />
+              </div>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                {stats.attendanceRate.toLocaleString('fa-IR')}%
+              </p>
+              <div className="mt-1 flex items-center gap-1">
+                {stats.attendanceRate >= 80 ? (
+                  <ArrowUpRight className="h-4 w-4 text-green-500 dark:text-green-400" />
+                ) : (
+                  <ArrowDownRight className="h-4 w-4 text-red-500 dark:text-red-400" />
+                )}
+                <span className={`text-sm font-medium ${stats.attendanceRate >= 80 ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'}`}>
+                  {stats.attendanceRate >= 80 ? 'عالی' : 'نیاز به بهبود'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Support Tickets */}
+        <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-lg transition-all hover:shadow-xl dark:bg-gray-800">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-amber-500/5 opacity-0 transition-all group-hover:opacity-100" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                تیکت‌های باز
+              </p>
+              <div className="rounded-full bg-amber-50 p-2.5 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+                <Ticket className="h-6 w-6" />
+              </div>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                {stats.openTickets.toLocaleString('fa-IR')}
+              </p>
+              <div className="mt-1 flex items-center gap-1">
+                {stats.openTickets === 0 ? (
+                  <ArrowDownRight className="h-4 w-4 text-green-500 dark:text-green-400" />
+                ) : (
+                  <ArrowUpRight className="h-4 w-4 text-amber-500 dark:text-amber-400" />
+                )}
+                <span className={`text-sm font-medium ${stats.openTickets === 0 ? 'text-green-500 dark:text-green-400' : 'text-amber-500 dark:text-amber-400'}`}>
+                  از {stats.totalTickets.toLocaleString('fa-IR')} کل
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Content Grid */}
@@ -210,53 +176,89 @@ const Page = () => {
               </h2>
             </div>
             <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {recentActivities.map((activity) => (
-                <div
-                  key={activity.title}
-                  className="group relative overflow-hidden p-6 transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                >
-                  <div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-0 transition-all group-hover:opacity-[0.03]"
-                    style={{
-                      backgroundImage:
-                        activity.color === 'blue'
-                          ? 'linear-gradient(to right, transparent, #60a5fa)'
-                          : activity.color === 'purple'
-                            ? 'linear-gradient(to right, transparent, #a78bfa)'
-                            : activity.color === 'emerald'
-                              ? 'linear-gradient(to right, transparent, #34d399)'
-                              : 'linear-gradient(to right, transparent, #fbbf24)',
-                    }}
-                  />
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={`shrink-0 rounded-full p-2 ${
-                        activity.color === 'blue'
-                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                          : activity.color === 'purple'
-                            ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
-                            : activity.color === 'emerald'
-                              ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
-                              : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
-                      }`}
-                    >
-                      {activity.icon}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        {activity.title}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        {activity.description}
-                      </p>
-                      <div className="mt-2 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
-                        <Clock className="h-3 w-3" />
-                        <span>{activity.time}</span>
-                      </div>
-                    </div>
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <LoadingSpinner />
+                </div>
+              ) : recentActivities.length === 0 ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <Calendar className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" />
+                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                      فعالیت جدیدی وجود ندارد
+                    </p>
                   </div>
                 </div>
-              ))}
+              ) : (
+                recentActivities.map((activity, index) => {
+                  const getActivityIcon = () => {
+                    switch (activity.type) {
+                      case 'homework':
+                        return <BookOpenCheck className="h-5 w-5" />;
+                      case 'attendance':
+                        return <UserCheck className="h-5 w-5" />;
+                      case 'ticket':
+                        return <Ticket className="h-5 w-5" />;
+                      case 'term':
+                        return <BookType className="h-5 w-5" />;
+                      case 'order':
+                        return <Calendar className="h-5 w-5" />;
+                      default:
+                        return <Calendar className="h-5 w-5" />;
+                    }
+                  };
+
+                  const color = activity.color;
+
+                  return (
+                    <div
+                      key={index}
+                      className="group relative overflow-hidden p-6 transition-all hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                    >
+                      <div
+                        className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent opacity-0 transition-all group-hover:opacity-[0.03]"
+                        style={{
+                          backgroundImage:
+                            color === 'blue'
+                              ? 'linear-gradient(to right, transparent, #60a5fa)'
+                              : color === 'purple'
+                                ? 'linear-gradient(to right, transparent, #a78bfa)'
+                                : color === 'emerald'
+                                  ? 'linear-gradient(to right, transparent, #34d399)'
+                                  : 'linear-gradient(to right, transparent, #fbbf24)',
+                        }}
+                      />
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`shrink-0 rounded-full p-2 ${
+                            color === 'blue'
+                              ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                              : color === 'purple'
+                                ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400'
+                                : color === 'emerald'
+                                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                  : 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+                          }`}
+                        >
+                          {getActivityIcon()}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900 dark:text-white">
+                            {activity.title}
+                          </h3>
+                          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            {activity.description}
+                          </p>
+                          <div className="mt-2 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+                            <Clock className="h-3 w-3" />
+                            <span>{activity.time}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -270,42 +272,70 @@ const Page = () => {
               </h2>
             </div>
             <div className="space-y-2 p-4">
-              {quickActions.map((action) => (
-                <button
-                  key={action.title}
-                  className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-gray-50 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
-                >
-                  <div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent opacity-0 transition-all group-hover:opacity-100"
-                    style={{
-                      backgroundImage:
-                        action.color === 'blue'
-                          ? 'linear-gradient(to right, transparent, #60a5fa/10)'
-                          : action.color === 'purple'
-                            ? 'linear-gradient(to right, transparent, #a78bfa/10)'
-                            : action.color === 'emerald'
-                              ? 'linear-gradient(to right, transparent, #34d399/10)'
-                              : 'linear-gradient(to right, transparent, #fbbf24/10)',
-                    }}
-                  />
-                  <span className="font-medium text-gray-700 dark:text-gray-200">
-                    {action.title}
-                  </span>
-                  <div
-                    className={
-                      action.color === 'blue'
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : action.color === 'purple'
-                          ? 'text-purple-600 dark:text-purple-400'
-                          : action.color === 'emerald'
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-amber-600 dark:text-amber-400'
-                    }
-                  >
-                    {action.icon}
-                  </div>
-                </button>
-              ))}
+              <button
+                onClick={() => router.push('/student/terms')}
+                className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-gray-50 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-blue-500/10 opacity-0 transition-all group-hover:opacity-100" />
+                <span className="font-medium text-gray-700 dark:text-gray-200">
+                  ترم‌های من
+                </span>
+                <div className="text-blue-600 dark:text-blue-400">
+                  <BookType className="h-5 w-5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => router.push('/student/homeworks')}
+                className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-gray-50 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-purple-500/10 opacity-0 transition-all group-hover:opacity-100" />
+                <span className="font-medium text-gray-700 dark:text-gray-200">
+                  تکلیف‌ها
+                </span>
+                <div className="text-purple-600 dark:text-purple-400">
+                  <BookOpenCheck className="h-5 w-5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => router.push('/student/attendances')}
+                className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-gray-50 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-emerald-500/10 opacity-0 transition-all group-hover:opacity-100" />
+                <span className="font-medium text-gray-700 dark:text-gray-200">
+                  حضور و غیاب
+                </span>
+                <div className="text-emerald-600 dark:text-emerald-400">
+                  <UserCheck className="h-5 w-5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => router.push('/student/tickets')}
+                className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-gray-50 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-amber-500/10 opacity-0 transition-all group-hover:opacity-100" />
+                <span className="font-medium text-gray-700 dark:text-gray-200">
+                  پشتیبانی
+                </span>
+                <div className="text-amber-600 dark:text-amber-400">
+                  <Ticket className="h-5 w-5" />
+                </div>
+              </button>
+
+              <button
+                onClick={() => router.push('/student/orders')}
+                className="group relative flex w-full items-center justify-between overflow-hidden rounded-xl bg-gray-50 p-4 transition-all hover:bg-gray-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-indigo-500/10 opacity-0 transition-all group-hover:opacity-100" />
+                <span className="font-medium text-gray-700 dark:text-gray-200">
+                  سفارش‌ها
+                </span>
+                <div className="text-indigo-600 dark:text-indigo-400">
+                  <ShoppingCart className="h-5 w-5" />
+                </div>
+              </button>
             </div>
           </div>
         </div>
