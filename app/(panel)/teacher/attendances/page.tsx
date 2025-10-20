@@ -13,6 +13,7 @@ import { useAttendance } from '@/app/lib/hooks/use-attendance';
 import { useTeacherTerm } from '@/app/lib/hooks/use-teacher-term';
 import { Attendance } from '@/app/lib/types/attendance';
 import { TeacherTerm } from '@/app/lib/types/teacher-term';
+import { formatDateToPersian } from '@/app/lib/utils';
 import { toast } from 'react-hot-toast';
 import {
   UserCheck,
@@ -111,7 +112,7 @@ export default function TeacherAttendancesPage() {
       accessor: 'schedule',
       render: (value, item): string => {
         if (!item.schedule) return 'نامشخص';
-        return new Date(item.schedule.session_date).toLocaleDateString('fa-IR');
+        return formatDateToPersian(item.schedule.session_date);
       },
     },
     {
@@ -177,7 +178,7 @@ export default function TeacherAttendancesPage() {
       accessor: 'created_at',
       render: (value): string => {
         if (!value || typeof value !== 'string') return '';
-        return new Date(value).toLocaleDateString('fa-IR');
+        return formatDateToPersian(value);
       },
     },
   ];

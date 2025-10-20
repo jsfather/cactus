@@ -119,7 +119,7 @@ export default function TeacherStudentsPage() {
       accessor: 'birth_date',
       render: (value): string => {
         if (!value || typeof value !== 'string') return '-';
-        return new Date(value).toLocaleDateString('fa-IR');
+        return value;
       },
     },
     {
@@ -199,7 +199,7 @@ export default function TeacherStudentsPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدرس', href: '/teacher' },
-          { label: 'دانش‌آموزان من', href: '/teacher/students', active: true },
+          { label: 'دانش‌پژوهان من', href: '/teacher/students', active: true },
         ]}
       />
 
@@ -208,10 +208,10 @@ export default function TeacherStudentsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              دانش‌آموزان من
+              دانش‌پژوهان من
             </h1>
             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-              مشاهده و مدیریت دانش‌آموزان تحت نظر شما
+              مشاهده و مدیریت دانش‌پژوهان تحت نظر شما
             </p>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function TeacherStudentsPage() {
                 <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                      کل دانش‌آموزان
+                      کل دانش‌پژوهان
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
                       {totalStudents.toLocaleString('fa-IR')}
@@ -309,7 +309,7 @@ export default function TeacherStudentsPage() {
                 ترم‌های من
               </h2>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                برای مشاهده دانش‌آموزان هر ترم روی ترم مورد نظر کلیک کنید
+                برای مشاهده دانش‌پژوهان هر ترم روی ترم مورد نظر کلیک کنید
               </p>
             </div>
           </div>
@@ -354,7 +354,7 @@ export default function TeacherStudentsPage() {
 
                           <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                             <Users className="ml-2 h-4 w-4" />
-                            <span>{term.students.length} دانش‌آموز</span>
+                            <span>{term.students.length} دانش‌پژو</span>
                           </div>
                         </div>
                       </div>
@@ -368,7 +368,7 @@ export default function TeacherStudentsPage() {
                         }
                       >
                         <Users className="ml-2 h-4 w-4" />
-                        مشاهده دانش‌آموزان ({term.students.length})
+                        مشاهده دانش‌پژوهان ({term.students.length})
                       </Button>
                     </div>
                   </div>
@@ -395,10 +395,10 @@ export default function TeacherStudentsPage() {
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                تمام دانش‌آموزان
+                تمام دانش‌پژوهان
               </h2>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                لیست کامل تمام دانش‌آموزان شما از همه ترم‌ها
+                لیست کامل تمام دانش‌پژوهان شما از همه ترم‌ها
               </p>
             </div>
           </div>
@@ -409,7 +409,7 @@ export default function TeacherStudentsPage() {
               data={studentList}
               columns={columns}
               loading={loading}
-              emptyMessage="هیچ دانش‌آموزی یافت نشد"
+              emptyMessage="هیچ دانش‌پژویی یافت نشد"
               onView={handleViewStudent}
               getRowId={(student) => String(student.user_id)}
             />

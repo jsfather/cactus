@@ -121,7 +121,7 @@ export default function Page() {
       closeDeleteModal();
     } catch (error: any) {
       console.error('Error deleting term teacher:', error);
-      toast.error('خطا در حذف ترم مدرس');
+      toast.error(`خطا در حذف ترم مدرس: ${error.message || 'خطای نامشخص'}`);
     } finally {
       setDeleteLoading(false);
     }
@@ -147,6 +147,8 @@ export default function Page() {
       clearError();
     }
   }, [error, clearError]);
+
+
 
   return (
     <main>
@@ -205,6 +207,7 @@ export default function Page() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ ترم مدرسی یافت نشد"
+            onEdit={(termTeacher) => router.push(`/admin/term-teachers/${termTeacher.id}`)}
             onDelete={handleDeleteClick}
             onView={(termTeacher) => router.push(`/admin/term-teachers/${termTeacher.id}/view`)}
           />

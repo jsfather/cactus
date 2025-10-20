@@ -19,6 +19,34 @@ export const formatDateToLocal = (
   return formatter.format(date);
 };
 
+// Convert Gregorian date to Persian (Jalali) date format
+export const formatDateToPersian = (dateStr: string): string => {
+  if (!dateStr) return '';
+
+  try {
+    // If the date is already in Persian format (contains Persian digits), return as is
+    if (/[۰-۹]/.test(dateStr)) {
+      return dateStr;
+    }
+
+    // Parse the date (assuming it's in YYYY-MM-DD or ISO format)
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return dateStr; // Return original if parsing fails
+    }
+
+    // Use Persian locale to format the date
+    return date.toLocaleDateString('fa-IR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+  } catch (error) {
+    console.error('Error formatting date to Persian:', error);
+    return dateStr;
+  }
+};
+
 export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the total number of pages is 7 or less,
   // display all pages without any ellipsis.

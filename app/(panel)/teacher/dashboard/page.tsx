@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useTeacherDashboard } from '@/app/lib/hooks/use-teacher-dashboard';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { formatDateToPersian } from '@/app/lib/utils';
 import { useRouter } from 'next/navigation';
 
 const Page = () => {
@@ -48,7 +49,7 @@ const Page = () => {
 
   const dashboardStats = [
     {
-      title: 'کل دانش‌آموزان',
+      title: 'کل دانش‌پژوهان',
       value: stats.totalStudents.toLocaleString('fa-IR'),
       change: `+${((stats.studentsWithProfile / stats.totalStudents) * 100).toFixed(0)}٪`,
       trend: 'up' as const,
@@ -85,7 +86,7 @@ const Page = () => {
     },
     { text: 'مدیریت تکالیف', icon: FileText, route: '/teacher/homeworks' },
     { text: 'برنامه ترم‌ها', icon: Calendar, route: '/teacher/terms' },
-    { text: 'لیست دانش‌آموزان', icon: Users, route: '/teacher/students' },
+    { text: 'لیست دانش‌پژوهان', icon: Users, route: '/teacher/students' },
     { text: 'گزارش‌ها', icon: FileText, route: '/teacher/reports' },
     { text: 'تیکت‌ها', icon: MessageSquare, route: '/teacher/tickets' },
   ];
@@ -265,7 +266,7 @@ const Page = () => {
                       <div className="mb-3 grid grid-cols-3 gap-4 text-sm">
                         <div>
                           <p className="text-gray-500 dark:text-gray-400">
-                            تعداد دانش‌آموزان
+                            تعداد دانش‌پژوهان
                           </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {studentsCount} نفر
