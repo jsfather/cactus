@@ -5,6 +5,7 @@ import { useTeacherHomework } from './use-teacher-homework';
 import { useAttendance } from './use-attendance';
 import { useReport } from './use-report';
 import { useTeacherTicket } from './use-teacher-ticket';
+import { formatDateToPersian } from '../utils';
 
 export interface DashboardStats {
   totalTerms: number;
@@ -201,8 +202,8 @@ export const useTeacherDashboard = () => {
       if (homework.schedule?.session_date) {
         activities.push({
           title: 'تکلیف جدید',
-          description: `تکلیف جدید برای جلسه ${homework.schedule.session_date} ایجاد شد`,
-          time: homework.schedule.session_date,
+          description: `تکلیف جدید برای جلسه ${formatDateToPersian(homework.schedule.session_date)} ایجاد شد`,
+          time: formatDateToPersian(homework.schedule.session_date),
           type: 'homework',
         });
       }
@@ -212,8 +213,8 @@ export const useTeacherDashboard = () => {
     reportList.slice(0, 2).forEach((report) => {
       activities.push({
         title: 'گزارش جدید',
-        description: `گزارش جلسه ${report.schedule?.session_date || 'نامشخص'} ثبت شد`,
-        time: new Date(report.created_at).toLocaleDateString('fa-IR'),
+        description: `گزارش جلسه ${report.schedule?.session_date ? formatDateToPersian(report.schedule.session_date) : 'نامشخص'} ثبت شد`,
+        time: formatDateToPersian(report.created_at),
         type: 'report',
       });
     });
@@ -223,9 +224,7 @@ export const useTeacherDashboard = () => {
       activities.push({
         title: 'تیکت جدید',
         description: `تیکت "${ticket.subject}" دریافت شد`,
-        time: ticket.created_at
-          ? new Date(ticket.created_at).toLocaleDateString('fa-IR')
-          : 'نامشخص',
+        time: ticket.created_at ? formatDateToPersian(ticket.created_at) : 'نامشخص',
         type: 'ticket',
       });
     });
