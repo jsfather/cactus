@@ -1,20 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
-import { toast } from 'react-hot-toast';
 import { Ticket } from '@/app/lib/types/ticket';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useStudentTicket } from '@/app/lib/hooks/use-student-ticket';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import {
-  Ticket as TicketIcon,
+  MessageCircle,
+  User,
+  Clock,
+  CheckCircle,
+  AlertCircle,
   Plus,
-  MessageSquare,
-  Users,
-  TrendingUp,
-  Eye,
 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
@@ -38,102 +37,94 @@ export default function TicketsPage() {
     (ticket) => ticket.status === 'pending'
   ).length;
 
-  const breadcrumbItems = [
-    { label: 'پنل دانشجو', href: '/student' },
-    { label: 'تیکت‌ها', href: '/student/tickets' },
-  ];
+  const handleViewTicket = (ticket: Ticket) => {
+    router.push(`/student/tickets/${ticket.id}`);
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusClasses = {
+      open: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300',
+      closed:
+        'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300',
+      pending:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300',
+    };
+
+    const statusTexts = {
+      open: 'باز',
+      closed: 'بسته',
+      pending: 'در انتظار',
+    };
+
+    return (
+      <span
+        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClasses[status as keyof typeof statusClasses]}`}
+      >
+        {statusTexts[status as keyof typeof statusTexts]}
+      </span>
+    );
+  };
 
   const columns: Column<Ticket>[] = [
     {
       header: 'موضوع',
       accessor: 'subject',
+      render: (value, ticket: Ticket) => (
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {ticket.subject}
+        </div>
+      ),
     },
     {
-      header: 'دپارتمان',
+      header: 'بخش',
       accessor: 'department',
-    },
-    {
-      header: 'وضعیت',
-      accessor: 'status',
-      render: (value): any => {
-        const statusColors = {
-          open: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-          closed:
-            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-          pending:
-            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-        };
-        const statusText = {
-          open: 'باز',
-          closed: 'بسته',
-          pending: 'در انتظار',
-        };
-        const status = value as keyof typeof statusColors;
-        return (
-          <span
-            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[status]}`}
-          >
-            {statusText[status]}
-          </span>
-        );
-      },
+      render: (value, ticket: Ticket) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {ticket.department || 'عمومی'}
+        </div>
+      ),
     },
     {
       header: 'تعداد پیام‌ها',
       accessor: 'messages',
-      render: (value): string => {
-        const messages = value as any[];
-        return Array.isArray(messages) ? messages.length.toString() : '0';
-      },
-    },
-    {
-      header: 'آخرین پیام',
-      accessor: 'messages',
-      render: (value): string => {
-        const messages = value as any[];
-        if (!Array.isArray(messages) || messages.length === 0) return '-';
-        const lastMessage = messages[messages.length - 1];
-        return new Date(lastMessage.created_at).toLocaleDateString('fa-IR');
-      },
-    },
-    {
-      header: 'عملیات',
-      accessor: 'id',
-      render: (value, row): any => (
-        <div className="flex gap-2">
-          <Button
-            variant="secondary"
-            onClick={() => router.push(`/student/tickets/${value}`)}
-          >
-            <Eye className="h-4 w-4" />
-            مشاهده
-          </Button>
+      render: (value, ticket: Ticket) => (
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {ticket.messages?.length || 0} پیام
         </div>
       ),
     },
+    {
+      header: 'وضعیت',
+      accessor: 'status',
+      render: (value, ticket: Ticket) => getStatusBadge(ticket.status),
+    },
+  ];
+
+  const breadcrumbItems = [
+    { label: 'پنل دانش‌آموز', href: '/student' },
+    { label: 'تیکت‌ها', href: '/student/tickets' },
   ];
 
   if (isListLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <Breadcrumbs breadcrumbs={breadcrumbItems} />
-      </div>
+    <div className="space-y-6">
+      <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4 space-x-reverse">
-          <TicketIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              مدیریت تیکت‌ها
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              مدیریت و پیگیری تیکت‌های پشتیبانی
-            </p>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            تیکت‌های پشتیبانی
+          </h1>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            مدیریت و پیگیری درخواست‌های پشتیبانی شما
+          </p>
         </div>
         <Button
           onClick={() => router.push('/student/tickets/create')}
@@ -144,80 +135,97 @@ export default function TicketsPage() {
         </Button>
       </div>
 
-      {/* Summary Cards */}
-      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <TicketIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+              <MessageCircle className="h-8 w-8 text-blue-600" />
             </div>
-            <div className="mr-4 flex-1">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                کل تیکت‌ها
-              </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {totalTickets}
-              </p>
+            <div className="mr-5 w-0 flex-1">
+              <dl>
+                <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                  کل تیکت‌ها
+                </dt>
+                <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {totalTickets}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+        <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <MessageSquare className="h-8 w-8 text-green-600 dark:text-green-400" />
+              <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <div className="mr-4 flex-1">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                تیکت‌های باز
-              </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {openTickets}
-              </p>
+            <div className="mr-5 w-0 flex-1">
+              <dl>
+                <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                  تیکت‌های باز
+                </dt>
+                <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {openTickets}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+        <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <Users className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
+              <Clock className="h-8 w-8 text-yellow-600" />
             </div>
-            <div className="mr-4 flex-1">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                در انتظار پاسخ
-              </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {pendingTickets}
-              </p>
+            <div className="mr-5 w-0 flex-1">
+              <dl>
+                <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                  در انتظار پاسخ
+                </dt>
+                <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {pendingTickets}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
 
-        <div className="rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
+        <div className="rounded-lg bg-white p-6 shadow dark:bg-gray-800">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <TrendingUp className="h-8 w-8 text-gray-600 dark:text-gray-400" />
+              <AlertCircle className="h-8 w-8 text-gray-600" />
             </div>
-            <div className="mr-4 flex-1">
-              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                تیکت‌های بسته
-              </h3>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {closedTickets}
-              </p>
+            <div className="mr-5 w-0 flex-1">
+              <dl>
+                <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
+                  تیکت‌های بسته
+                </dt>
+                <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                  {closedTickets}
+                </dd>
+              </dl>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="rounded-lg bg-white shadow-sm dark:bg-gray-800">
+      {/* Tickets Table */}
+      <div className="rounded-lg bg-white shadow dark:bg-gray-800">
         <Table
           data={tickets}
           columns={columns}
-          loading={isListLoading}
           emptyMessage="هیچ تیکتی یافت نشد"
+          actions={(ticket: Ticket) => (
+            <Button
+              variant="primary"
+              onClick={() => handleViewTicket(ticket)}
+              className="flex items-center gap-1 px-3 py-1 text-sm"
+            >
+              <MessageCircle className="h-4 w-4" />
+              مشاهده
+            </Button>
+          )}
         />
       </div>
     </div>
