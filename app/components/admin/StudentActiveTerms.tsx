@@ -2,7 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { Card } from '@/app/components/ui/Card';
 import { useTermStudent } from '@/app/lib/hooks/use-term-student';
 import { useTerm } from '@/app/lib/hooks/use-term';
-import { GraduationCap, Calendar, Clock, Users, BookOpen, Eye } from 'lucide-react';
+import {
+  GraduationCap,
+  Calendar,
+  Clock,
+  Users,
+  BookOpen,
+  Eye,
+} from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Term } from '@/app/lib/types/term';
 import { TermStudent } from '@/app/lib/types/term_student';
@@ -27,9 +34,11 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
     fetchStudentActiveTerms,
     clearStudentActiveTerms,
   } = useTermStudent();
-  
+
   const { termList, loading: termLoading, fetchTermList } = useTerm();
-  const [termsWithDetails, setTermsWithDetails] = useState<TermWithDetails[]>([]);
+  const [termsWithDetails, setTermsWithDetails] = useState<TermWithDetails[]>(
+    []
+  );
 
   useEffect(() => {
     if (studentId && studentId !== 'new') {
@@ -40,21 +49,30 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
     return () => {
       clearStudentActiveTerms();
     };
-  }, [studentId, fetchStudentActiveTerms, clearStudentActiveTerms, fetchTermList]);
+  }, [
+    studentId,
+    fetchStudentActiveTerms,
+    clearStudentActiveTerms,
+    fetchTermList,
+  ]);
 
   useEffect(() => {
     if (studentActiveTerms && termList) {
-      const enrichedTerms: TermWithDetails[] = studentActiveTerms.map(termStudent => {
-        const termDetails = termList.find(term => term.id.toString() === termStudent.term_id.toString());
-        if (termDetails) {
-          return {
-            ...termDetails,
-            registration_date: termStudent.created_at
-          };
-        }
-        return null;
-      }).filter(Boolean) as TermWithDetails[];
-      
+      const enrichedTerms: TermWithDetails[] = studentActiveTerms
+        .map((termStudent) => {
+          const termDetails = termList.find(
+            (term) => term.id.toString() === termStudent.term_id.toString()
+          );
+          if (termDetails) {
+            return {
+              ...termDetails,
+              registration_date: termStudent.created_at,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean) as TermWithDetails[];
+
       setTermsWithDetails(enrichedTerms);
     }
   }, [studentActiveTerms, termList]);
@@ -72,7 +90,9 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
     return typeLabels[type] || type;
   };
 
-  const getTermStatus = (term: TermWithDetails): { label: string; color: string } => {
+  const getTermStatus = (
+    term: TermWithDetails
+  ): { label: string; color: string } => {
     const now = new Date();
     const startDate = new Date(term.start_date);
     const endDate = new Date(term.end_date);
@@ -80,7 +100,8 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
     if (startDate > now) {
       return {
         label: 'آینده',
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+        color:
+          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
       };
     } else if (endDate < now) {
       return {
@@ -90,7 +111,8 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
     } else {
       return {
         label: 'در حال برگزاری',
-        color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+        color:
+          'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
       };
     }
   };
@@ -165,7 +187,9 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
                     </span>
                   </div>
                 </div>
-                <span className={`rounded-full px-2 py-1 text-xs font-medium ${status.color}`}>
+                <span
+                  className={`rounded-full px-2 py-1 text-xs font-medium ${status.color}`}
+                >
                   {status.label}
                 </span>
               </div>
@@ -183,16 +207,21 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
 
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <Clock className="h-4 w-4" />
-                  <span>{term.number_of_sessions} جلسه، {term.duration} دقیقه</span>
+                  <span>
+                    {term.number_of_sessions} جلسه، {term.duration} دقیقه
+                  </span>
                 </div>
               </div>
 
               {term.registration_date && (
-                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                <div className="mt-3 border-t border-gray-200 pt-3 dark:border-gray-600">
                   <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                     <BookOpen className="h-4 w-4" />
                     <span>
-                      تاریخ ثبت‌نام: {new Date(term.registration_date).toLocaleDateString('fa-IR')}
+                      تاریخ ثبت‌نام:{' '}
+                      {new Date(term.registration_date).toLocaleDateString(
+                        'fa-IR'
+                      )}
                     </span>
                   </div>
                 </div>
