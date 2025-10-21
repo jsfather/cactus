@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { termStudentService } from '@/app/lib/services/term-student.service';
-import { TermStudent } from '@/app/lib/types';
+import { TermStudent } from '@/app/lib/types/term_student';
 
 interface TermStudentState {
   termStudentList: TermStudent[];
