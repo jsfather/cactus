@@ -2,7 +2,7 @@ import {
   getTermStudents,
   createTermStudent,
 } from '@/app/lib/api/admin/term-students';
-import { TermStudent } from '@/app/lib/types';
+import { TermStudent } from '@/app/lib/types/term_student';
 
 export class TermStudentService {
   async getTermStudents(filters?: {

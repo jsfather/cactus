@@ -1,5 +1,5 @@
 import { apiClient } from '@/app/lib/api/client';
-import { TermStudent } from '@/app/lib/types';
+import { TermStudent } from '@/app/lib/types/term_student';
 
 export const getTermStudents = async (filters?: {
   student_id?: string;
