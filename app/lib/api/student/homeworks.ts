@@ -1,8 +1,9 @@
 import request from '@/app/lib/api/client';
 import { Homework } from '@/app/lib/types';
 
-export const getHomeworks = async () => {
-  const response = await request<{ data: Homework[] }>('student/homeworks');
+export const getHomeworks = async (termId?: string) => {
+  const url = termId ? `student/term_homeworks/${termId}` : 'student/homeworks';
+  const response = await request<{ data: Homework[] }>(url);
 
   if (!response) {
     throw new Error('خطایی در دریافت لیست تکالیف رخ داده است');

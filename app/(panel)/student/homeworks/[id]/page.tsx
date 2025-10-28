@@ -64,6 +64,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     return <LoadingSpinner />;
   }
 
+  if (!homework) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+            تکلیف یافت نشد
+          </h2>
+          <p className="mb-4 text-gray-600 dark:text-gray-400">
+            تکلیف مورد نظر شما یافت نشد یا ممکن است حذف شده باشد.
+          </p>
+          <Button onClick={() => router.push('/student/homeworks')}>
+            بازگشت به لیست تکالیف
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main>
       <Breadcrumbs

@@ -127,7 +127,7 @@ export default function HomeworksPage() {
               </div>
 
               <Button
-                onClick={() => router.push(`/student/homeworks/${studentTerm.term.id}`)}
+                onClick={() => router.push(`/student/homeworks/term/${studentTerm.term.id}`)}
                 className="w-full"
                 variant="secondary"
               >

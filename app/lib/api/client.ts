@@ -159,6 +159,16 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
+// Default request function for backward compatibility
+const request = async <T>(
+  url: string,
+  config?: AxiosRequestConfig
+): Promise<T> => {
+  return apiClient.get<T>(url, config);
+};
+
+export default request;
+
 // Public API client for unauthenticated requests
 class PublicApiClient {
   private client: AxiosInstance;

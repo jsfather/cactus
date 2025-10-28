@@ -34,6 +34,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     return <LoadingSpinner />;
   }
 
+  if (!attendance) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+            حضور و غیاب یافت نشد
+          </h2>
+          <p className="mb-4 text-gray-600 dark:text-gray-400">
+            اطلاعات حضور و غیاب مورد نظر شما یافت نشد یا ممکن است حذف شده باشد.
+          </p>
+          <Button onClick={() => router.push('/student/attendances')}>
+            بازگشت به لیست حضور و غیاب
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main>
       <Breadcrumbs
