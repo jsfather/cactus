@@ -10,7 +10,7 @@ import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Student } from '@/app/lib/types';
 import { useStudent } from '@/app/lib/hooks/use-student';
-import { Plus, Users, UserCheck, Phone, GraduationCap } from 'lucide-react';
+import { Plus, Users, UserCheck, Phone, GraduationCap, Eye } from 'lucide-react';
 
 export default function StudentsPage() {
   const router = useRouter();
@@ -261,6 +261,9 @@ export default function StudentsPage() {
           columns={columns}
           loading={loading}
           emptyMessage="هیچ دانش‌آموزی یافت نشد"
+          onView={(student) =>
+            router.push(`/admin/students/${student.user_id}/view`)
+          }
           onEdit={(student) =>
             router.push(`/admin/students/${student.user_id}`)
           }
