@@ -107,10 +107,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const teacherOptions = useMemo(
     () =>
-      teacherList.map((teacher: any) => ({
-        value: teacher.user_id.toString(),
-        label: `${teacher.user.first_name} ${teacher.user.last_name}`,
-      })),
+      teacherList
+        .filter((teacher: any) => teacher.user !== null)
+        .map((teacher: any) => ({
+          value: teacher.user_id.toString(),
+          label: `${teacher.user.first_name} ${teacher.user.last_name}`,
+        })),
     [teacherList]
   );
 
