@@ -1,78 +1,42 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Card } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-import { getHomeworks } from '@/app/lib/api/student/homeworks';
-import { BookOpen, Calendar, Clock, AlertCircle, FileText, CheckCircle, XCircle } from 'lucide-react';
+import { useStudentTerm } from '@/app/lib/hooks/use-student-term';
+import { BookOpen, Calendar, Clock, AlertCircle, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 
 export default function HomeworksPage() {
   const router = useRouter();
-  const [homeworks, setHomeworks] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { termList, loading, error, getTermList, resetError } = useStudentTerm();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getHomeworks();
-        setHomeworks(response.data || []);
+        await getTermList();
       } catch (error) {
-        toast.error('خطا در دریافت اطلاعات تکالیف');
-      } finally {
-        setLoading(false);
+        toast.error('خطا در دریافت اطلاعات ترم‌ها');
       }
     };
 
     fetchData();
-  }, []);
+  }, [getTermList]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      resetError();
+    }
+  }, [error, resetError]);
 
   const breadcrumbItems = [
     { label: 'داشبورد', href: '/student/dashboard' },
     { label: 'تکالیف', href: '/student/homeworks', active: true },
   ];
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return (
-          <span className="flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
-            <Clock className="h-3 w-3" />
-            در انتظار
-          </span>
-        );
-      case 'submitted':
-        return (
-          <span className="flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-            <CheckCircle className="h-3 w-3" />
-            ارسال شده
-          </span>
-        );
-      case 'graded':
-        return (
-          <span className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-100">
-            <CheckCircle className="h-3 w-3" />
-            نمره داده شده
-          </span>
-        );
-      case 'rejected':
-        return (
-          <span className="flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800 dark:bg-red-900 dark:text-red-100">
-            <XCircle className="h-3 w-3" />
-            رد شده
-          </span>
-        );
-      default:
-        return (
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-800 dark:bg-gray-900 dark:text-gray-100">
-            {status}
-          </span>
-        );
-    }
-  };
 
   if (loading) {
     return (
@@ -85,7 +49,7 @@ export default function HomeworksPage() {
     );
   }
 
-  if (!homeworks || homeworks.length === 0) {
+  if (!termList || termList.length === 0) {
     return (
       <div className="space-y-6">
         <Breadcrumbs breadcrumbs={breadcrumbItems} />
@@ -94,17 +58,17 @@ export default function HomeworksPage() {
           <div className="text-center">
             <AlertCircle className="mx-auto mb-4 h-16 w-16 text-yellow-500" />
             <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-              هیچ تکلیفی وجود ندارد
+              هنوز در هیچ کلاسی ثبت‌نام نکرده‌اید
             </h3>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
-              در حال حاضر هیچ تکلیفی برای شما ثبت نشده است.
+              برای مشاهده تکالیف، ابتدا باید در یک ترم ثبت‌نام کنید.
             </p>
             <Button
               onClick={() => router.push('/student/terms')}
               className="inline-flex items-center gap-2"
             >
               <BookOpen className="h-4 w-4" />
-              مشاهده ترم‌های من
+              مشاهده ترم‌های موجود
             </Button>
           </div>
         </Card>
@@ -122,51 +86,53 @@ export default function HomeworksPage() {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        {homeworks.map((homework) => (
-          <Card key={homework.id} className="p-6 transition-shadow hover:shadow-lg">
-            <div className="flex items-start justify-between">
-              <div className="flex-1 space-y-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {homework.title}
-                  </h3>
-                  {getStatusBadge(homework.status)}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {termList.map((studentTerm) => (
+          <Card key={studentTerm.term.id} className="p-6 transition-shadow hover:shadow-lg">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {studentTerm.term.title}
+                </h3>
+                <span className="rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-800 dark:bg-purple-900 dark:text-purple-100">
+                  {studentTerm.term.type === 'normal'
+                    ? 'عادی'
+                    : studentTerm.term.type === 'capacity_completion'
+                      ? 'تکمیل ظرفیت'
+                      : studentTerm.term.type === 'project_based'
+                        ? 'پروژه‌محور'
+                        : studentTerm.term.type === 'specialized'
+                          ? 'تخصصی'
+                          : studentTerm.term.type === 'ai'
+                            ? 'هوش مصنوعی'
+                            : studentTerm.term.type}
+                </span>
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                  <Calendar className="h-4 w-4" />
+                  <span>شروع: {studentTerm.term.start_date}</span>
                 </div>
-
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {homework.description || 'بدون توضیحات'}
-                </p>
-
-                <div className="flex flex-wrap gap-4 text-sm">
-                  {homework.term?.title && (
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <BookOpen className="h-4 w-4" />
-                      <span>{homework.term.title}</span>
-                    </div>
-                  )}
-                  {homework.due_date && (
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <Calendar className="h-4 w-4" />
-                      <span>مهلت: {homework.due_date}</span>
-                    </div>
-                  )}
-                  {homework.mark && (
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <FileText className="h-4 w-4" />
-                      <span>نمره: {homework.mark}</span>
-                    </div>
-                  )}
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                  <Calendar className="h-4 w-4" />
+                  <span>پایان: {studentTerm.term.end_date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                  <Clock className="h-4 w-4" />
+                  <span>
+                    {studentTerm.term.number_of_sessions} جلسه، {studentTerm.term.duration} دقیقه
+                  </span>
                 </div>
               </div>
 
               <Button
-                onClick={() => router.push(`/student/homeworks/${homework.id}`)}
-                className="mr-4"
+                onClick={() => router.push(`/student/homeworks/term/${studentTerm.term.id}`)}
+                className="w-full"
                 variant="secondary"
               >
                 <FileText className="mr-2 h-4 w-4" />
-                مشاهده جزئیات
+                مشاهده تکالیف
               </Button>
             </div>
           </Card>
