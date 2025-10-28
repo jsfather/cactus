@@ -11,7 +11,7 @@ import {
   MessageSquare,
   Clock,
   User,
-  ArrowLeft,
+  ArrowRight,
   FileText,
 } from 'lucide-react';
 import { Message } from '@/app/lib/types/ticket';
@@ -117,13 +117,13 @@ const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
       </div>
 
       <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-4 space-x-reverse">
+        <div className="flex items-center gap-4">
           <Button
             variant="secondary"
             onClick={() => router.push('/student/tickets')}
             className="flex items-center gap-2"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" />
             بازگشت
           </Button>
         </div>
@@ -132,7 +132,7 @@ const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
       {/* Ticket Header */}
       <div className="mb-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800">
         <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-4 space-x-reverse">
+          <div className="flex items-center gap-4">
             <div className="flex-shrink-0">
               <TicketIcon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
             </div>
@@ -140,13 +140,13 @@ const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {currentTicket.subject}
               </h1>
-              <div className="mt-2 flex items-center space-x-4 space-x-reverse">
+              <div className="mt-2 flex items-center gap-4">
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <FileText className="ml-1 h-4 w-4" />
+                  <FileText className="mr-1 h-4 w-4" />
                   ID: {currentTicket.id}
                 </div>
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <User className="ml-1 h-4 w-4" />
+                  <User className="mr-1 h-4 w-4" />
                   {currentTicket.department}
                 </div>
               </div>
@@ -165,7 +165,7 @@ const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
       {/* Messages */}
       <div className="space-y-4">
         <h2 className="flex items-center text-lg font-semibold text-gray-900 dark:text-white">
-          <MessageSquare className="ml-2 h-5 w-5" />
+          <MessageSquare className="mr-2 h-5 w-5" />
           پیام‌ها ({currentTicket.messages?.length || 0})
         </h2>
 
@@ -176,12 +176,12 @@ const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
                 key={index}
                 className={`rounded-lg p-4 ${
                   message.is_student
-                    ? 'border-l-4 border-blue-400 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
-                    : 'border-l-4 border-gray-400 bg-gray-50 dark:border-gray-400 dark:bg-gray-800/50'
+                    ? 'border-r-4 border-blue-400 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/20'
+                    : 'border-r-4 border-gray-400 bg-gray-50 dark:border-gray-400 dark:bg-gray-800/50'
                 }`}
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <div className="flex items-center space-x-2 space-x-reverse">
+                  <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900 dark:text-white">
                       {message.sender}
                     </span>
@@ -196,7 +196,7 @@ const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
                     </span>
                   </div>
                   <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                    <Clock className="ml-1 h-4 w-4" />
+                    <Clock className="mr-1 h-4 w-4" />
                     {formatDate(message.created_at)}
                   </div>
                 </div>
@@ -211,7 +211,7 @@ const TicketDetailPage: React.FC<PageProps> = ({ params }) => {
                       rel="noopener noreferrer"
                       className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                     >
-                      <FileText className="ml-1 h-4 w-4" />
+                      <FileText className="mr-1 h-4 w-4" />
                       مشاهده پیوست
                     </a>
                   </div>
