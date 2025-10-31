@@ -69,11 +69,11 @@ export default function Page() {
     try {
       setDeleteLoading(true);
       await deletePanelGuide(itemToDelete.id.toString());
-      toast.success('راهنمای پنل با موفقیت حذف شد');
+      toast.success('اعلان با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
     } catch (error) {
-      toast.error('خطا در حذف راهنمای پنل');
+      toast.error('خطا در حذف اعلان');
     } finally {
       setDeleteLoading(false);
     }
@@ -91,15 +91,15 @@ export default function Page() {
   }, [fetchPanelGuides]);
 
   return (
-    <main>
+    <main className="space-y-6">
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'راهنماهای پنل', href: '/admin/panel-guides', active: true },
+          { label: 'تابلوی اعلانات', href: '/admin/panel-guides', active: true },
         ]}
       />
 
       {/* Summary Stats */}
-      <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
           <div className="p-5">
             <div className="flex items-center">
@@ -118,10 +118,10 @@ export default function Page() {
                   />
                 </svg>
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                    کل راهنماها
+                    کل اعلانات
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {panelGuides.length}
@@ -150,10 +150,10 @@ export default function Page() {
                   />
                 </svg>
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                    راهنمای دانش پژوه
+                    اعلان دانش پژوه
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {
@@ -185,10 +185,10 @@ export default function Page() {
                   />
                 </svg>
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                    راهنمای مدرس
+                    اعلان مدرس
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {
@@ -226,10 +226,10 @@ export default function Page() {
                   />
                 </svg>
               </div>
-              <div className="ml-5 w-0 flex-1">
+              <div className="mr-5 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                    راهنمای مدیر
+                    اعلان مدیر
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {
@@ -244,21 +244,21 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="mt-8 flex w-full items-center justify-between">
+      <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          راهنماهای پنل
+          تابلوی اعلانات
         </h1>
         <Button onClick={() => router.push('/admin/panel-guides/new')}>
-          ایجاد راهنمای پنل
+          ایجاد اعلان جدید
         </Button>
       </div>
 
-      <div className="mt-8">
+      <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
         <Table
           data={panelGuides}
           columns={columns}
           loading={loading}
-          emptyMessage="هیچ راهنمای پنلی یافت نشد"
+          emptyMessage="هیچ اعلانی یافت نشد"
           onEdit={(panelGuide) =>
             router.push(`/admin/panel-guides/${panelGuide.id}`)
           }
@@ -270,8 +270,8 @@ export default function Page() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف راهنمای پنل"
-        description={`آیا از حذف راهنمای پنل "${itemToDelete?.title}" اطمینان دارید؟`}
+        title="حذف اعلان"
+        description={`آیا از حذف اعلان "${itemToDelete?.title}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

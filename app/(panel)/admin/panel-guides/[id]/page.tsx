@@ -101,10 +101,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       if (isNew) {
         await createPanelGuide(formData);
-        toast.success('راهنمای پنل با موفقیت ایجاد شد');
+        toast.success('اعلان با موفقیت ایجاد شد');
       } else {
         await updatePanelGuide(resolvedParams.id, formData);
-        toast.success('راهنمای پنل با موفقیت بروزرسانی شد');
+        toast.success('اعلان با موفقیت بروزرسانی شد');
       }
       router.push('/admin/panel-guides');
     } catch (error) {
@@ -117,24 +117,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   return (
-    <main>
+    <main className="space-y-6">
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'راهنماهای پنل', href: '/admin/panel-guides' },
+          { label: 'تابلوی اعلانات', href: '/admin/panel-guides' },
           {
-            label: isNew ? 'ایجاد راهنمای پنل' : 'ویرایش راهنمای پنل',
+            label: isNew ? 'ایجاد اعلان جدید' : 'ویرایش اعلان',
             href: `/admin/panel-guides/${resolvedParams.id}`,
             active: true,
           },
         ]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Input
             id="title"
             label="عنوان"
-            placeholder="عنوان راهنما را وارد کنید"
+            placeholder="عنوان اعلان را وارد کنید"
             required
             error={errors.title?.message}
             {...register('title')}
@@ -164,7 +164,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           <Textarea
             id="description"
             label="توضیحات"
-            placeholder="توضیحات راهنما را وارد کنید"
+            placeholder="توضیحات اعلان را وارد کنید"
             required
             error={errors.description?.message}
             {...register('description')}
@@ -174,9 +174,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         <div className="w-full">
           <FileUpload
             id="file"
-            label="فایل"
-            accept=".pdf,.doc,.docx"
-            placeholder="فایل راهنما را انتخاب کنید"
+            label="فایل ضمیمه"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            placeholder="فایل ضمیمه را انتخاب کنید (اختیاری)"
             required={isNew}
             onChange={(file) => setSelectedFile(file)}
           />
@@ -191,7 +191,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             انصراف
           </Button>
           <Button type="submit" loading={isSubmitting}>
-            {isNew ? 'ایجاد راهنمای پنل' : 'بروزرسانی راهنمای پنل'}
+            {isNew ? 'ایجاد اعلان' : 'بروزرسانی اعلان'}
           </Button>
         </div>
       </form>
