@@ -19,7 +19,7 @@ const panelGuideSchema = z.object({
   title: z.string().min(1, 'عنوان الزامی است'),
   description: z.string().min(1, 'توضیحات الزامی است'),
   type: z.enum(['student', 'admin', 'teacher'], {
-    required_error: 'نوع راهنما الزامی است',
+    required_error: 'نوع اعلان الزامی است',
   }),
 });
 
