@@ -1,92 +1,18 @@
 'use client';
 
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Users, BookOpen } from 'lucide-react';
-
-interface Teacher {
-  id: string;
-  name: string;
-  title: string;
-  expertise: string[];
-  rating: number;
-  reviewCount: number;
-  studentCount: number;
-  courseCount: number;
-  image: string;
-}
-
-const teachers: Teacher[] = [
-  {
-    id: '1',
-    name: 'سارا محمدی',
-    title: 'مربی ارشد هوش مصنوعی و یادگیری ماشین',
-    expertise: ['هوش مصنوعی', 'یادگیری عمیق', 'پردازش زبان طبیعی'],
-    rating: 4.9,
-    reviewCount: 87,
-    studentCount: 500,
-    courseCount: 15,
-    image: '/sara-mohammadi.jpg',
-  },
-  {
-    id: '2',
-    name: 'علی رضایی',
-    title: 'متخصص برنامه‌نویسی وب و موبایل',
-    expertise: ['React', 'Next.js', 'React Native'],
-    rating: 4.8,
-    reviewCount: 92,
-    studentCount: 450,
-    courseCount: 12,
-    image: '/sara-mohammadi.jpg',
-  },
-  {
-    id: '3',
-    name: 'مریم حسینی',
-    title: 'مدرس ارشد علوم داده',
-    expertise: ['تحلیل داده', 'یادگیری ماشین', 'پایتون'],
-    rating: 4.9,
-    reviewCount: 75,
-    studentCount: 380,
-    courseCount: 10,
-    image: '/sara-mohammadi.jpg',
-  },
-  {
-    id: '4',
-    name: 'محمد کریمی',
-    title: 'متخصص امنیت سایبری',
-    expertise: ['امنیت شبکه', 'رمزنگاری', 'تست نفوذ'],
-    rating: 4.7,
-    reviewCount: 68,
-    studentCount: 320,
-    courseCount: 8,
-    image: '/sara-mohammadi.jpg',
-  },
-  {
-    id: '5',
-    name: 'زهرا نوری',
-    title: 'مدرس طراحی رابط کاربری',
-    expertise: ['UI/UX', 'طراحی تجربه کاربری', 'Figma'],
-    rating: 4.8,
-    reviewCount: 82,
-    studentCount: 420,
-    courseCount: 11,
-    image: '/sara-mohammadi.jpg',
-  },
-  {
-    id: '6',
-    name: 'امیر حیدری',
-    title: 'متخصص DevOps و مهندسی نرم‌افزار',
-    expertise: ['Docker', 'Kubernetes', 'CI/CD'],
-    rating: 4.9,
-    reviewCount: 71,
-    studentCount: 290,
-    courseCount: 9,
-    image: '/sara-mohammadi.jpg',
-  },
-];
+import { Star, MapPin, Calendar, Award, User } from 'lucide-react';
+import { usePublicTeacher } from '@/app/lib/hooks/use-public-teacher';
 
 export default function Page() {
+  const { teachers, loading, error, fetchHomeTeachers } = usePublicTeacher();
+
+  useEffect(() => {
+    fetchHomeTeachers();
+  }, [fetchHomeTeachers]);
   return (
     <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
@@ -112,68 +38,137 @@ export default function Page() {
 
       <section className="py-8">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {teachers.map((teacher, index) => (
-              <motion.div
-                key={teacher.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link href={`/teachers/${teacher.id}`}>
-                  <div className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
-                    <div className="relative h-64">
-                      <Image
-                        src={teacher.image}
-                        alt={teacher.name}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h2 className="mb-2 text-xl font-bold">{teacher.name}</h2>
-                      <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                        {teacher.title}
-                      </p>
-                      <div className="mb-4 flex flex-wrap gap-2">
-                        {teacher.expertise.map((skill, idx) => (
-                          <span
-                            key={idx}
-                            className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 rounded-full px-3 py-1 text-sm"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{teacher.rating}</span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            ({teacher.reviewCount} نظر)
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <Users className="h-5 w-5 text-gray-400" />
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {teacher.studentCount}+
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <BookOpen className="h-5 w-5 text-gray-400" />
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {teacher.courseCount}
-                            </span>
-                          </div>
-                        </div>
+          {loading && (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800">
+                    <div className="mb-4 aspect-video rounded-xl bg-gray-200 dark:bg-gray-700"></div>
+                    <div className="space-y-3">
+                      <div className="h-6 w-3/4 rounded bg-gray-200 dark:bg-gray-700"></div>
+                      <div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700"></div>
+                      <div className="flex gap-2">
+                        <div className="h-8 w-20 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                        <div className="h-8 w-24 rounded-full bg-gray-200 dark:bg-gray-700"></div>
                       </div>
                     </div>
                   </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {error && (
+            <div className="rounded-lg bg-red-50 p-4 text-center text-red-600 dark:bg-red-900/20 dark:text-red-400">
+              {error}
+            </div>
+          )}
+
+          {!loading && !error && teachers.length === 0 && (
+            <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+              هیچ مدرسی یافت نشد
+            </div>
+          )}
+
+          {!loading && !error && teachers.length > 0 && (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {teachers.map((teacher, index) => {
+                const fullName = teacher.user
+                  ? `${teacher.user.first_name} ${teacher.user.last_name}`
+                  : 'نام نامشخص';
+                const profilePicture = teacher.user?.profile_picture
+                  ? `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '')}/${teacher.user.profile_picture}`
+                  : null;
+                const skills = teacher.skills || [];
+                const topSkills = skills.slice(0, 3);
+                const hasAdditionalInfo =
+                  teacher.city || teacher.member_since || teacher.achievements;
+
+                return (
+                  <motion.div
+                    key={teacher.user_id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <div className="overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-gray-800">
+                      <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+                        {profilePicture ? (
+                          <Image
+                            src={profilePicture}
+                            alt={fullName}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center">
+                            <User className="h-32 w-32 text-gray-400 dark:text-gray-600" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-6">
+                        <h2 className="mb-2 text-xl font-bold">{fullName}</h2>
+                        {teacher.bio && (
+                          <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                            {teacher.bio}
+                          </p>
+                        )}
+
+                        {/* Skills */}
+                        {topSkills.length > 0 && (
+                          <div className="mb-4 flex flex-wrap gap-2">
+                            {topSkills.map((skill, idx) => (
+                              <span
+                                key={idx}
+                                className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 rounded-full px-3 py-1 text-sm"
+                              >
+                                {skill.name}
+                              </span>
+                            ))}
+                            {skills.length > 3 && (
+                              <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                                +{skills.length - 3}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Additional Info */}
+                        {hasAdditionalInfo && (
+                          <div className="space-y-2 border-t border-gray-100 pt-4 dark:border-gray-700">
+                            {teacher.city && (
+                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <MapPin className="h-4 w-4" />
+                                <span>{teacher.city}</span>
+                              </div>
+                            )}
+                            {teacher.member_since && (
+                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <Calendar className="h-4 w-4" />
+                                <span>عضو از {teacher.member_since}</span>
+                              </div>
+                            )}
+                            {teacher.achievements && (
+                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <Award className="h-4 w-4" />
+                                <span className="line-clamp-1">
+                                  {teacher.achievements}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
     </div>
