@@ -86,6 +86,7 @@ export default function Page() {
               muted
               playsInline
               autoPlay
+              loop
               preload="metadata"
             />
             {/* Gradient overlay */}
@@ -149,46 +150,46 @@ export default function Page() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
-                          {[
-                            {
-                              number: '+۵۰۰',
-                              label: 'دانشجو',
-                              description: 'دانشجوی فعال',
-                            },
-                            {
-                              number: '+۵۰',
-                              label: 'دوره',
-                              description: 'دوره تخصصی',
-                            },
-                            {
-                              number: '٪۹۵',
-                              label: 'رضایت',
-                              description: 'رضایت دانشجویان',
-                            },
-                            {
-                              number: '+۲۰',
-                              label: 'مدرس',
-                              description: 'اساتید مجرب',
-                            },
-                          ].map((stat, index) => (
-                            <div key={index} className="group relative">
-                              <div className="relative space-y-2 text-center">
-                                <div className="text-primary-600 dark:text-primary-400 relative text-4xl font-bold sm:text-5xl">
-                                  {stat.number}
-                                  <div className="bg-primary-400 absolute top-0 -right-2 h-2 w-2 rounded-full" />
-                                </div>
-                                <div className="text-sm font-medium text-gray-800 sm:text-base dark:text-gray-300">
-                                  {stat.label}
-                                </div>
-                                <p className="text-xs text-gray-600 dark:text-gray-400">
-                                  {stat.description}
-                                </p>
-                              </div>
-                              {/* Hover effect line */}
-                              <div className="bg-primary-500 absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full transition-all duration-300 group-hover:w-1/2" />
-                            </div>
-                          ))}
+                    {[
+                      {
+                        number: '+۵۰۰',
+                        label: 'دانشجو',
+                        description: 'دانشجوی فعال',
+                      },
+                      {
+                        number: '+۵۰',
+                        label: 'دوره',
+                        description: 'دوره تخصصی',
+                      },
+                      {
+                        number: '٪۹۵',
+                        label: 'رضایت',
+                        description: 'رضایت دانشجویان',
+                      },
+                      {
+                        number: '+۲۰',
+                        label: 'مدرس',
+                        description: 'اساتید مجرب',
+                      },
+                    ].map((stat, index) => (
+                      <div key={index} className="group relative">
+                        <div className="relative space-y-2 text-center">
+                          <div className="text-primary-600 dark:text-primary-400 relative text-4xl font-bold sm:text-5xl">
+                            {stat.number}
+                            <div className="bg-primary-400 absolute top-0 -right-2 h-2 w-2 rounded-full" />
+                          </div>
+                          <div className="text-sm font-medium text-gray-800 sm:text-base dark:text-gray-300">
+                            {stat.label}
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            {stat.description}
+                          </p>
                         </div>
+                        {/* Hover effect line */}
+                        <div className="bg-primary-500 absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full transition-all duration-300 group-hover:w-1/2" />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             </div>
