@@ -14,6 +14,7 @@ import DatePicker from '@/app/components/ui/DatePicker';
 import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import MultiComboBox from '@/app/components/ui/MultiComboBox';
+import Checkbox from '@/app/components/ui/Checkbox';
 
 // Hooks and Types
 import { useTerm } from '@/app/lib/hooks/use-term';
@@ -42,6 +43,9 @@ const termSchema = z.object({
   price: z.string().min(1, 'قیمت ضروری است'),
   sort: z.string().min(1, 'ترتیب ضروری است'),
   term_requirements: z.array(z.number()).optional(),
+  is_in_person: z.boolean(),
+  is_online: z.boolean(),
+  is_downloadable: z.boolean(),
 });
 
 type TermFormData = z.infer<typeof termSchema>;
@@ -102,6 +106,9 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
           price: '0',
           sort: '',
           term_requirements: [],
+          is_in_person: false,
+          is_online: false,
+          is_downloadable: false,
         });
         setLoading(false);
         return;
@@ -138,6 +145,9 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
         price: currentTerm.price.toString(),
         sort: currentTerm.sort?.toString() || '',
         term_requirements: currentTerm.term_requirements || [],
+        is_in_person: currentTerm.is_in_person || false,
+        is_online: currentTerm.is_online || false,
+        is_downloadable: currentTerm.is_downloadable || false,
       });
     }
   }, [currentTerm, isNew, reset, levelList]);
@@ -159,6 +169,9 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
       type: data.type,
       level_id: Number(data.level_id),
       term_requirements: data.term_requirements,
+      is_in_person: data.is_in_person,
+      is_online: data.is_online,
+      is_downloadable: data.is_downloadable,
     };
 
     try {
@@ -208,7 +221,9 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
             {!isNew && currentTerm && (
               <Button
                 variant="white"
-                onClick={() => router.push(`/admin/terms/${resolvedParams?.id}/view`)}
+                onClick={() =>
+                  router.push(`/admin/terms/${resolvedParams?.id}/view`)
+                }
                 className="flex items-center gap-2"
               >
                 <svg
@@ -217,7 +232,7 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -496,6 +511,57 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
                   );
                 }}
               />
+            </div>
+
+            {/* Delivery Options */}
+            <div className="md:col-span-2">
+              <label className="mb-3 block text-sm font-medium text-gray-900 dark:text-white">
+                نحوه ارائه
+              </label>
+              <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800">
+                <Controller
+                  name="is_in_person"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="is_in_person"
+                      label="حضوری"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      description="این ترم به صورت حضوری برگزار می‌شود"
+                    />
+                  )}
+                />
+                <Controller
+                  name="is_online"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="is_online"
+                      label="آنلاین"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      description="این ترم به صورت آنلاین برگزار می‌شود"
+                    />
+                  )}
+                />
+                <Controller
+                  name="is_downloadable"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="is_downloadable"
+                      label="قابل دانلود"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      description="محتوای این ترم قابل دانلود است"
+                    />
+                  )}
+                />
+              </div>
             </div>
           </div>
 

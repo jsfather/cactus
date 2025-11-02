@@ -203,6 +203,56 @@ export default function TermsPage() {
         );
       },
     },
+    {
+      header: 'نحوه ارائه',
+      accessor: 'is_in_person',
+      render: (value, item): React.JSX.Element => {
+        const badges = [];
+
+        if (item.is_in_person) {
+          badges.push(
+            <span
+              key="in-person"
+              className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300"
+            >
+              حضوری
+            </span>
+          );
+        }
+
+        if (item.is_online) {
+          badges.push(
+            <span
+              key="online"
+              className="inline-flex items-center rounded-full bg-sky-100 px-2 py-1 text-xs font-medium text-sky-800 dark:bg-sky-900 dark:text-sky-300"
+            >
+              آنلاین
+            </span>
+          );
+        }
+
+        if (item.is_downloadable) {
+          badges.push(
+            <span
+              key="downloadable"
+              className="inline-flex items-center rounded-full bg-violet-100 px-2 py-1 text-xs font-medium text-violet-800 dark:bg-violet-900 dark:text-violet-300"
+            >
+              قابل دانلود
+            </span>
+          );
+        }
+
+        if (badges.length === 0) {
+          return (
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              نامشخص
+            </span>
+          );
+        }
+
+        return <div className="flex flex-wrap gap-1">{badges}</div>;
+      },
+    },
   ];
 
   const handleDeleteClick = (term: Term) => {

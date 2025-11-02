@@ -74,6 +74,9 @@ export interface Term {
   price: number;
   sort: number; // Increment number for ordering terms
   term_requirements?: number[]; // Array of term IDs that are required before this term
+  is_in_person: boolean; // Whether the term is offered in-person
+  is_online: boolean; // Whether the term is offered online
+  is_downloadable: boolean; // Whether the term content is downloadable
   prerequisite_missing?: boolean;
   project_type?: any;
   is_bought?: boolean;
@@ -110,6 +113,9 @@ export interface CreateTermRequest {
   price: string; // API expects string, required, default "0"
   sort: string; // API expects string, required increment number
   term_requirements?: number[]; // Optional array of term IDs
+  is_in_person: boolean;
+  is_online: boolean;
+  is_downloadable: boolean;
 }
 
 export interface UpdateTermRequest {
@@ -129,4 +135,7 @@ export interface UpdateTermRequest {
   price?: string; // API expects string
   sort?: string; // API expects string, increment number
   term_requirements?: number[]; // Optional array of term IDs
+  is_in_person?: boolean;
+  is_online?: boolean;
+  is_downloadable?: boolean;
 }
