@@ -69,3 +69,33 @@ export interface AttendanceStats {
   absent: number;
   averageMark: number;
 }
+
+// Student term response (from /student/terms)
+export interface StudentTermDay {
+  id: number;
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+}
+
+export interface StudentTermSchedule {
+  id: number;
+  session_date: string;
+  start_time: string;
+  end_time: string;
+  sky_room_id: string | null;
+  homeworks: Homework[];
+}
+
+export interface StudentTerm {
+  id: number;
+  user: User;
+  term: Term;
+  schedules: StudentTermSchedule[];
+  offline_sessions: any[];
+  days: StudentTermDay[];
+}
+
+export interface GetStudentTermsResponse {
+  data: StudentTerm[];
+}

@@ -9,6 +9,7 @@ import {
   GetAttendanceResponse,
   CreateAttendanceResponse,
   AttendanceStats,
+  StudentTerm,
 } from '@/app/lib/types/attendance';
 
 interface AttendanceState {
@@ -19,6 +20,8 @@ interface AttendanceState {
   scheduleAttendances: Attendance[];
   absentStudents: Attendance[];
   currentAttendance: Attendance | null;
+  studentTerms: StudentTerm[];
+  studentAbsents: Attendance[];
   loading: boolean;
   error: string | null;
 
@@ -44,6 +47,12 @@ interface AttendanceState {
   ) => Promise<GetAttendanceResponse>;
   deleteAttendance: (id: string) => Promise<void>;
 
+  // Student actions
+  fetchStudentTerms: () => Promise<void>;
+  fetchStudentTermAttendances: (termId: string) => Promise<void>;
+  fetchStudentScheduleAttendances: (scheduleId: string) => Promise<void>;
+  fetchStudentAbsents: () => Promise<void>;
+
   // Utility actions
   getAttendanceStats: (attendances?: Attendance[]) => AttendanceStats;
   clearCurrentAttendance: () => void;
@@ -58,6 +67,8 @@ export const useAttendanceStore = create<AttendanceState>()(
     scheduleAttendances: [],
     absentStudents: [],
     currentAttendance: null,
+    studentTerms: [],
+    studentAbsents: [],
     loading: false,
     error: null,
 
@@ -235,6 +246,70 @@ export const useAttendanceStore = create<AttendanceState>()(
         absent,
         averageMark: Math.round(averageMark * 100) / 100,
       };
+    },
+
+    // Student-specific actions
+    fetchStudentTerms: async () => {
+      try {
+        set({ loading: true, error: null });
+        const response = await attendanceService.getStudentTerms();
+        set({
+          studentTerms: response.data,
+          loading: false,
+        });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    fetchStudentTermAttendances: async (termId: string) => {
+      try {
+        set({ loading: true, error: null });
+        const response =
+          await attendanceService.getStudentTermAttendances(termId);
+        set({
+          termAttendances: response.data,
+          attendanceList: response.data,
+          loading: false,
+        });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    fetchStudentScheduleAttendances: async (scheduleId: string) => {
+      try {
+        set({ loading: true, error: null });
+        const response =
+          await attendanceService.getStudentScheduleAttendances(scheduleId);
+        set({
+          scheduleAttendances: response.data,
+          loading: false,
+        });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
+    },
+
+    fetchStudentAbsents: async () => {
+      try {
+        set({ loading: true, error: null });
+        const response = await attendanceService.getStudentAbsents();
+        set({
+          studentAbsents: response.data,
+          loading: false,
+        });
+      } catch (error) {
+        const apiError = error as ApiError;
+        set({ error: apiError.message, loading: false });
+        throw error;
+      }
     },
   }))
 );

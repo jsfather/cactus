@@ -6,6 +6,7 @@ import {
   CreateAttendanceResponse,
   UpdateAttendanceRequest,
   UpdateAttendanceResponse,
+  GetStudentTermsResponse,
 } from '@/app/lib/types/attendance';
 
 /**
@@ -99,6 +100,50 @@ class AttendanceService {
   async getAttendance(id: string): Promise<GetAttendanceResponse> {
     return await apiClient.get<GetAttendanceResponse>(
       `/teacher/attendances/${id}`
+    );
+  }
+
+  // ============ STUDENT METHODS ============
+
+  /**
+   * Get student's terms
+   * GET /student/terms
+   */
+  async getStudentTerms(): Promise<GetStudentTermsResponse> {
+    return await apiClient.get<GetStudentTermsResponse>('/student/terms');
+  }
+
+  /**
+   * Get student's attendances for a specific term
+   * GET /student/attendances/term/{termId}
+   */
+  async getStudentTermAttendances(
+    termId: string
+  ): Promise<GetAttendanceListResponse> {
+    return await apiClient.get<GetAttendanceListResponse>(
+      `/student/attendances/term/${termId}`
+    );
+  }
+
+  /**
+   * Get student's attendances for a specific schedule
+   * GET /student/attendances/schedule/{scheduleId}
+   */
+  async getStudentScheduleAttendances(
+    scheduleId: string
+  ): Promise<GetAttendanceListResponse> {
+    return await apiClient.get<GetAttendanceListResponse>(
+      `/student/attendances/schedule/${scheduleId}`
+    );
+  }
+
+  /**
+   * Get student's absent attendances
+   * GET /student/attendances/absents
+   */
+  async getStudentAbsents(): Promise<GetAttendanceListResponse> {
+    return await apiClient.get<GetAttendanceListResponse>(
+      '/student/attendances/absents'
     );
   }
 }
