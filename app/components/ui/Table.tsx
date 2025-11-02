@@ -69,7 +69,7 @@ export default function Table<T>({
                       </th>
                     ))}
                     {(actions || onEdit || onDelete || onView) && (
-                      <th scope="col" className="relative py-3 pl-3 pr-6">
+                      <th scope="col" className="relative py-3 pr-6 pl-3">
                         <span className="sr-only">Actions</span>
                       </th>
                     )}
@@ -90,7 +90,7 @@ export default function Table<T>({
                         </td>
                       ))}
                       {(actions || onEdit || onDelete || onView) && (
-                        <td className="py-3 pl-3 pr-6 whitespace-nowrap">
+                        <td className="py-3 pr-6 pl-3 whitespace-nowrap">
                           <div className="flex justify-start gap-3">
                             <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
                             <div className="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -158,7 +158,7 @@ export default function Table<T>({
                           {onView && (
                             <button
                               onClick={() => onView(item)}
-                              className="rounded-md bg-gray-50 p-2 text-gray-600 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400 dark:hover:bg-gray-900/30"
+                              className="cursor-pointer rounded-md bg-gray-50 p-2 text-gray-600 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400 dark:hover:bg-gray-900/30"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -184,7 +184,7 @@ export default function Table<T>({
                           {onEdit && (
                             <button
                               onClick={() => onEdit(item)}
-                              className="rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                              className="cursor-pointer rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -205,7 +205,7 @@ export default function Table<T>({
                           {onDelete && (
                             <button
                               onClick={() => onDelete(item)}
-                              className="rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
+                              className="cursor-pointer rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -240,7 +240,7 @@ export default function Table<T>({
                   </th>
                 ))}
                 {(actions || onEdit || onDelete || onView) && (
-                  <th scope="col" className="relative py-3 pl-3 pr-6">
+                  <th scope="col" className="relative py-3 pr-6 pl-3">
                     <span className="sr-only">Actions</span>
                   </th>
                 )}
@@ -279,7 +279,7 @@ export default function Table<T>({
                       </td>
                     ))}
                     {(actions || onEdit || onDelete || onView) && (
-                      <td className="py-3 pl-3 pr-6 whitespace-nowrap">
+                      <td className="py-3 pr-6 pl-3 whitespace-nowrap">
                         <div className="flex justify-start gap-3">
                           {actions?.(item)}
                           {(onEdit || onDelete || onView) && (
@@ -287,7 +287,7 @@ export default function Table<T>({
                               {onView && (
                                 <button
                                   onClick={() => onView(item)}
-                                  className="rounded-md bg-gray-50 p-2 text-gray-600 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400 dark:hover:bg-gray-900/30"
+                                  className="cursor-pointer rounded-md bg-gray-50 p-2 text-gray-600 hover:bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400 dark:hover:bg-gray-900/30"
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -313,7 +313,7 @@ export default function Table<T>({
                               {onEdit && (
                                 <button
                                   onClick={() => onEdit(item)}
-                                  className="rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                                  className="cursor-pointer rounded-md bg-blue-50 p-2 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -334,7 +334,7 @@ export default function Table<T>({
                               {onDelete && (
                                 <button
                                   onClick={() => onDelete(item)}
-                                  className="rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
+                                  className="cursor-pointer rounded-md bg-red-50 p-2 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
                                 >
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"

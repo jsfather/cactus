@@ -1,13 +1,15 @@
 import { ApiService } from '@/app/lib/api/client';
 import { PanelGuide } from '@/app/lib/types';
 
-export const getPanelGuides = async () => {
-  const response = await ApiService.get<{ data: PanelGuide[] }>(
+export const getAllPanelGuides = async (): Promise<
+  ApiResponse<PanelGuide[]>
+> => {
+  const response = await apiClient.get<ApiResponse<PanelGuide[]>>(
     'admin/panel-guides'
   );
 
   if (!response) {
-    throw new Error('خطایی در دریافت لیست راهنماهای پنل رخ داده است');
+    throw new Error('خطایی در دریافت لیست اعلانات رخ داده است');
   }
 
   return response;
@@ -19,7 +21,7 @@ export const getPanelGuide = async (id: number | string) => {
   );
 
   if (!response) {
-    throw new Error('خطایی در دریافت راهنمای پنل رخ داده است');
+    throw new Error('خطایی در دریافت اعلان رخ داده است');
   }
 
   return response;
@@ -58,7 +60,7 @@ export const createPanelGuide = async (
   );
 
   if (!response) {
-    throw new Error('خطایی در ایجاد راهنمای پنل رخ داده است');
+    throw new Error('خطایی در ایجاد اعلان رخ داده است');
   }
 
   return response;
@@ -98,7 +100,7 @@ export const updatePanelGuide = async (
   );
 
   if (!response) {
-    throw new Error('خطایی در بروزرسانی راهنمای پنل رخ داده است');
+    throw new Error('خطایی در بروزرسانی اعلان رخ داده است');
   }
 
   return response;

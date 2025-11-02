@@ -17,12 +17,7 @@ export default function BlogsPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Blog | null>(null);
-  const {
-    blogList,
-    loading,
-    fetchBlogList,
-    deleteBlog,
-  } = useBlog();
+  const { blogList, loading, fetchBlogList, deleteBlog } = useBlog();
 
   useEffect(() => {
     fetchBlogList();
@@ -30,16 +25,18 @@ export default function BlogsPage() {
 
   // Calculate summary stats
   const totalBlogs = blogList.length;
-  const publishedBlogs = blogList.filter(blog => {
+  const publishedBlogs = blogList.filter((blog) => {
     const publishDate = new Date(blog.publish_at);
     return publishDate <= new Date();
   }).length;
   const draftBlogs = totalBlogs - publishedBlogs;
-  const thisMonthBlogs = blogList.filter(blog => {
+  const thisMonthBlogs = blogList.filter((blog) => {
     const blogDate = new Date(blog.created_at);
     const thisMonth = new Date();
-    return blogDate.getMonth() === thisMonth.getMonth() && 
-           blogDate.getFullYear() === thisMonth.getFullYear();
+    return (
+      blogDate.getMonth() === thisMonth.getMonth() &&
+      blogDate.getFullYear() === thisMonth.getFullYear()
+    );
   }).length;
 
   const columns: Column<Blog>[] = [
@@ -51,32 +48,9 @@ export default function BlogsPage() {
       header: 'توضیحات کوتاه',
       accessor: 'little_description',
       render: (value): string => {
-        return String(value).length > 50 
+        return String(value).length > 50
           ? String(value).substring(0, 50) + '...'
           : String(value);
-      },
-    },
-    {
-      header: 'برچسب‌ها',
-      accessor: 'tags',
-      render: (value): any => {
-        const tags = value as string[];
-        if (!Array.isArray(tags) || tags.length === 0) return '-';
-        return (
-          <div className="flex flex-wrap gap-1">
-            {tags.slice(0, 3).map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-              >
-                {tag}
-              </span>
-            ))}
-            {tags.length > 3 && (
-              <span className="text-xs text-gray-500">+{tags.length - 3}</span>
-            )}
-          </div>
-        );
       },
     },
     {
@@ -95,13 +69,15 @@ export default function BlogsPage() {
         const publishDate = new Date(value as string);
         const now = new Date();
         const isPublished = publishDate <= now;
-        
+
         return (
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-            isPublished 
-              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-          }`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+              isPublished
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+            }`}
+          >
             {isPublished ? 'منتشر شده' : 'پیش‌نویس'}
           </span>
         );
@@ -110,9 +86,8 @@ export default function BlogsPage() {
     {
       header: 'تاریخ ایجاد',
       accessor: 'created_at',
-      render: (value): string => {
-        if (!value || typeof value !== 'string') return '';
-        return new Date(value).toLocaleDateString('fa-IR');
+      render: (value): any => {
+        return <span className="dir-ltr inline-block">{String(value)}</span>;
       },
     },
   ];
@@ -171,7 +146,7 @@ export default function BlogsPage() {
             </p>
           </div>
           <Button onClick={() => router.push('/admin/blogs/new')}>
-            <Plus className="h-4 w-4 ml-2" />
+            <Plus className="ml-2 h-4 w-4" />
             افزودن مقاله جدید
           </Button>
         </div>
@@ -266,6 +241,7 @@ export default function BlogsPage() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ مقاله‌ای یافت نشد"
+            onView={(blog) => window.open(`/blog/${blog.id}`, '_blank')}
             onEdit={(blog) => router.push(`/admin/blogs/${blog.id}`)}
             onDelete={handleDeleteClick}
           />

@@ -78,7 +78,7 @@ const menuItems = [
         href: '/admin/faqs',
       },
       {
-        title: 'راهنماهای پنل',
+        title: 'تابلوی اعلانات',
         href: '/admin/panel-guides',
       },
     ],

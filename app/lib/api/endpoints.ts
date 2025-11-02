@@ -181,6 +181,14 @@ export const API_ENDPOINTS = {
         GET_AVAILABLE: '/student/terms/available',
         GET_SKY_ROOM_URL: (scheduleId: string) => `/sky_room_url/${scheduleId}`,
       },
+      HOMEWORKS: {
+        GET_BY_TERM: (termId: string) => `/student/term_homeworks/${termId}`,
+        SUBMIT_ANSWER: '/student/homeworks_answer',
+        SEND_MESSAGE: '/student/homeworks-conversation-message',
+        REPLY_MESSAGE: '/student/homeworks-conversation-reply',
+        GET_CONVERSATION: (conversationId: string) =>
+          `/student/homeworks-conversation/${conversationId}`,
+      },
     },
 
     TEACHER: {
@@ -241,8 +249,8 @@ export const API_ENDPOINTS = {
   // Public endpoints for main website
   PUBLIC: {
     BLOG: {
-      GET_ALL: '/blogs',
-      GET_BY_ID: (id: string) => `/blogs/${id}`,
+      GET_ALL: '/home/blogs',
+      GET_BY_ID: (id: string) => `/home/blog/${id}`,
     },
 
     COURSES: {

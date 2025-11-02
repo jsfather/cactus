@@ -39,7 +39,7 @@ export default function StudentGuidesPage() {
         }
       } catch (error) {
         console.error('Error fetching guides:', error);
-        setError('خطا در بارگذاری راهنماها');
+        setError('خطا در بارگذاری اعلانات');
       } finally {
         setLoading(false);
       }
@@ -50,7 +50,7 @@ export default function StudentGuidesPage() {
 
   const breadcrumbItems = [
     { label: 'داشبورد', href: '/student/dashboard' },
-    { label: 'راهنمای کار با پنل', href: '/student/guides', active: true },
+    { label: 'تابلوی اعلانات', href: '/student/guides', active: true },
   ];
 
   if (loading) {
@@ -72,7 +72,7 @@ export default function StudentGuidesPage() {
           <div className="text-center">
             <AlertCircle className="mx-auto mb-4 h-16 w-16 text-red-500" />
             <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-              خطا در بارگذاری راهنماها
+              خطا در بارگذاری اعلانات
             </h3>
             <p className="text-gray-600 dark:text-gray-400">{error}</p>
           </div>
@@ -89,10 +89,10 @@ export default function StudentGuidesPage() {
           <div className="text-center">
             <HelpCircle className="mx-auto mb-4 h-16 w-16 text-blue-500" />
             <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-              راهنمایی در دسترس نیست
+              اعلانی در دسترس نیست
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              در حال حاضر راهنمایی برای دانش‌پژوها موجود نیست.
+              در حال حاضر اعلانی برای دانش‌پژوها موجود نیست.
             </p>
           </div>
         </Card>
@@ -106,7 +106,7 @@ export default function StudentGuidesPage() {
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          راهنمای کار با پنل
+          تابلوی اعلانات
         </h1>
       </div>
 

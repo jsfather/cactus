@@ -58,6 +58,27 @@ export const useAttendance = () => {
     [store.getAttendanceStats]
   );
 
+  // Student actions
+  const fetchStudentTerms = useCallback(
+    () => store.fetchStudentTerms(),
+    [store.fetchStudentTerms]
+  );
+
+  const fetchStudentTermAttendances = useCallback(
+    (termId: string) => store.fetchStudentTermAttendances(termId),
+    [store.fetchStudentTermAttendances]
+  );
+
+  const fetchStudentScheduleAttendances = useCallback(
+    (scheduleId: string) => store.fetchStudentScheduleAttendances(scheduleId),
+    [store.fetchStudentScheduleAttendances]
+  );
+
+  const fetchStudentAbsents = useCallback(
+    () => store.fetchStudentAbsents(),
+    [store.fetchStudentAbsents]
+  );
+
   return {
     // State
     attendanceList: store.attendanceList,
@@ -66,6 +87,8 @@ export const useAttendance = () => {
     scheduleAttendances: store.scheduleAttendances,
     absentStudents: store.absentStudents,
     currentAttendance: store.currentAttendance,
+    studentTerms: store.studentTerms,
+    studentAbsents: store.studentAbsents,
     loading: store.loading,
     error: store.error,
 
@@ -79,6 +102,10 @@ export const useAttendance = () => {
     updateAttendance,
     deleteAttendance,
     getAttendanceStats,
+    fetchStudentTerms,
+    fetchStudentTermAttendances,
+    fetchStudentScheduleAttendances,
+    fetchStudentAbsents,
     clearError: store.clearError,
     clearCurrentAttendance: store.clearCurrentAttendance,
   };

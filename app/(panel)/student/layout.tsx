@@ -66,11 +66,11 @@ const menuItems = [
     ],
   },
   {
-    title: 'راهنما',
+    title: 'اعلانات',
     isGroupTitle: true,
     subItems: [
       {
-        title: 'راهنمای کار با پنل',
+        title: 'تابلوی اعلانات',
         href: '/student/guides',
       },
     ],

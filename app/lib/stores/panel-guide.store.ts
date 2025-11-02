@@ -50,15 +50,11 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
           if (response.data) {
             set({ panelGuides: response.data });
           } else {
-            throw new Error('خطا در دریافت راهنماهای پنل');
+            throw new Error('خطا در دریافت اعلانات');
           }
-        } catch (error: any) {
-          const errorMessage =
-            error.response?.data?.message ||
-            error.message ||
-            'خطا در دریافت راهنماهای پنل';
-          set({ error: errorMessage });
-          toast.error(errorMessage);
+        } catch (error) {
+          set({ error: error as string });
+          throw new Error('خطا در دریافت اعلانات');
         } finally {
           set({ isListLoading: false });
         }
@@ -72,13 +68,13 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
           if (response.data) {
             set({ currentPanelGuide: response.data });
           } else {
-            throw new Error('خطا در دریافت راهنمای پنل');
+            throw new Error('خطا در دریافت اعلان');
           }
         } catch (error: any) {
           const errorMessage =
             error.response?.data?.message ||
             error.message ||
-            'خطا در دریافت راهنمای پنل';
+            'خطا در دریافت اعلان';
           set({ error: errorMessage });
           toast.error(errorMessage);
         } finally {
@@ -98,13 +94,13 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
               currentPanelGuide: newPanelGuide,
             }));
           } else {
-            throw new Error('خطا در ایجاد راهنمای پنل');
+            throw new Error('خطا در ایجاد اعلان');
           }
         } catch (error: any) {
           const errorMessage =
             error.response?.data?.message ||
             error.message ||
-            'خطا در ایجاد راهنمای پنل';
+            'خطا در ایجاد اعلان';
           set({ error: errorMessage });
           toast.error(errorMessage);
           throw error;
@@ -134,13 +130,13 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
                   : state.currentPanelGuide,
             }));
           } else {
-            throw new Error('خطا در ویرایش راهنمای پنل');
+            throw new Error('خطا در ویرایش اعلان');
           }
         } catch (error: any) {
           const errorMessage =
             error.response?.data?.message ||
             error.message ||
-            'خطا در ویرایش راهنمای پنل';
+            'خطا در ویرایش اعلان';
           set({ error: errorMessage });
           toast.error(errorMessage);
           throw error;
@@ -168,7 +164,7 @@ export const usePanelGuideStore = create<PanelGuideStore>()(
           const errorMessage =
             error.response?.data?.message ||
             error.message ||
-            'خطا در حذف راهنمای پنل';
+            'خطا در حذف اعلان';
           set({ error: errorMessage });
           toast.error(errorMessage);
           throw error;
