@@ -241,8 +241,8 @@ export const API_ENDPOINTS = {
   // Public endpoints for main website
   PUBLIC: {
     BLOG: {
-      GET_ALL: '/blogs',
-      GET_BY_ID: (id: string) => `/blogs/${id}`,
+      GET_ALL: '/home/blogs',
+      GET_BY_ID: (id: string) => `/home/blog/${id}`,
     },
 
     COURSES: {

@@ -1,100 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Filter } from 'lucide-react';
-
-interface BlogPost {
-  id: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  image: string;
-  readTime: string;
-  category: string;
-  tags: string[];
-}
-
-const categories = [
-  { name: 'همه', count: 42 },
-  { name: 'برنامه‌نویسی', count: 24 },
-  { name: 'هوش مصنوعی', count: 18 },
-  { name: 'علم داده', count: 12 },
-  { name: 'توسعه وب', count: 21 },
-  { name: 'توسعه موبایل', count: 9 },
-];
-
-const tags = [
-  'پایتون',
-  'جاوااسکریپت',
-  'یادگیری ماشین',
-  'React',
-  'Django',
-  'Node.js',
-  'SQL',
-  'NoSQL',
-  'الگوریتم',
-  'ساختار داده',
-];
-
-const blogPosts: BlogPost[] = [
-  {
-    id: '1',
-    title: 'آینده رباتیک در آموزش',
-    excerpt:
-      'کشف کنید چگونه رباتیک در حال تغییر چشم‌انداز آموزشی و آماده‌سازی دانش‌آموزان برای آینده است.',
-    date: '۲۵ اسفند ۱۴۰۲',
-    author: 'دکتر سارا چن',
-    image: '/blog-robotics-education.png',
-    readTime: '۵ دقیقه مطالعه',
-    category: 'هوش مصنوعی',
-    tags: ['رباتیک', 'آموزش', 'تکنولوژی'],
-  },
-  {
-    id: '2',
-    title: '۵ پروژه برتر رباتیک برای مبتدیان',
-    excerpt:
-      'سفر خود در رباتیک را با این پروژه‌های جذاب و آموزشی مناسب برای مبتدیان آغاز کنید.',
-    date: '۲۲ اسفند ۱۴۰۲',
-    author: 'جیمز ویلسون',
-    image: '/blog-robotics-projects.png',
-    readTime: '۸ دقیقه مطالعه',
-    category: 'برنامه‌نویسی',
-    tags: ['رباتیک', 'پروژه', 'مبتدی'],
-  },
-  {
-    id: '3',
-    title: 'هوش مصنوعی و رباتیک: مشارکتی کامل',
-    excerpt:
-      'بررسی کنید چگونه هوش مصنوعی در حال ارتقای قابلیت‌های رباتیک و ایجاد امکانات جدید است.',
-    date: '۲۰ اسفند ۱۴۰۲',
-    author: 'دکتر مایکل لی',
-    image: '/blog-ai-robotics.png',
-    readTime: '۶ دقیقه مطالعه',
-    category: 'هوش مصنوعی',
-    tags: ['هوش مصنوعی', 'رباتیک', 'تکنولوژی'],
-  },
-];
+import { Search, Filter, User } from 'lucide-react';
+import { publicBlogService } from '@/app/lib/services/public-blog.service';
+import { Blog } from '@/app/lib/types';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 export default function Page() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('همه');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredPosts = blogPosts.filter((post) => {
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await publicBlogService.getList();
+        setBlogs(response.data);
+      } catch (error) {
+        console.error('Error fetching blogs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  // Extract all unique tags from blogs
+  const allTags = Array.from(
+    new Set(
+      blogs.flatMap((blog) =>
+        blog.tags.flatMap((tagString) =>
+          tagString.split(',').map((t) => t.trim())
+        )
+      )
+    )
+  );
+
+  const filteredPosts = blogs.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === 'همه' || post.category === selectedCategory;
+      post.little_description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesTags =
       selectedTags.length === 0 ||
-      selectedTags.some((tag) => post.tags.includes(tag));
-    return matchesSearch && matchesCategory && matchesTags;
+      selectedTags.some((tag) =>
+        post.tags.some((postTag) =>
+          postTag.split(',').some((t) => t.trim() === tag)
+        )
+      );
+    return matchesSearch && matchesTags;
   });
 
   const toggleTag = (tag: string) => {
@@ -102,6 +62,10 @@ export default function Page() {
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
@@ -154,42 +118,20 @@ export default function Page() {
             </div>
 
             {/* Filters Panel */}
-            {showFilters && (
+            {showFilters && allTags.length > 0 && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 className="mt-4 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
               >
-                {/* Categories */}
-                <div className="mb-4">
-                  <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    دسته‌بندی‌ها
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
-                      <button
-                        key={category.name}
-                        onClick={() => setSelectedCategory(category.name)}
-                        className={`rounded-full px-4 py-1 text-sm ${
-                          selectedCategory === category.name
-                            ? 'bg-primary-600 dark:bg-primary-500 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        {category.name} ({category.count})
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 {/* Tags */}
                 <div>
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
                     برچسب‌ها
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {tags.map((tag) => (
+                    {allTags.map((tag) => (
                       <button
                         key={tag}
                         onClick={() => toggleTag(tag)}
@@ -210,63 +152,89 @@ export default function Page() {
 
           {/* Blog Posts Grid */}
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredPosts.map((post, index) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800"
-              >
-                <Link href={`/blog/${post.id}`}>
-                  <div className="relative h-48">
-                    <Image
-                      src={post.image}
-                      alt={post.title}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <div className="mb-4 flex flex-wrap gap-2">
-                      <span className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 rounded-full px-3 py-1 text-sm">
-                        {post.category}
-                      </span>
-                      {post.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+            {filteredPosts.map((post, index) => {
+              const postTags = post.tags
+                .flatMap((tagString) =>
+                  tagString.split(',').map((t) => t.trim())
+                )
+                .filter(Boolean);
+
+              return (
+                <motion.article
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800"
+                >
+                  <Link href={`/blog/${post.id}`}>
+                    <div className="from-primary-100 to-primary-200 dark:from-primary-900 dark:to-primary-800 relative h-48 bg-gradient-to-br">
+                      <div className="text-primary-600 dark:text-primary-300 flex h-full items-center justify-center">
+                        <svg
+                          className="h-16 w-16 opacity-50"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <h2 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-xl font-bold text-gray-900 dark:text-white">
-                      {post.title}
-                    </h2>
-                    <p className="mb-4 text-gray-600 dark:text-gray-300">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          {post.author}
-                        </span>
-                        <span className="text-gray-300 dark:text-gray-600">
-                          •
-                        </span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          {post.readTime}
-                        </span>
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                          />
+                        </svg>
                       </div>
-                      <time className="text-sm text-gray-500 dark:text-gray-400">
-                        {post.date}
-                      </time>
                     </div>
-                  </div>
-                </Link>
-              </motion.article>
-            ))}
+                    <div className="p-6">
+                      <div className="mb-4 flex flex-wrap gap-2">
+                        {postTags.slice(0, 3).map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {postTags.length > 3 && (
+                          <span className="text-sm text-gray-500">
+                            +{postTags.length - 3}
+                          </span>
+                        )}
+                      </div>
+                      <h2 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 mb-2 text-xl font-bold text-gray-900 dark:text-white">
+                        {post.title}
+                      </h2>
+                      <p className="mb-4 line-clamp-3 text-gray-600 dark:text-gray-300">
+                        {post.little_description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        {post.user && (
+                          <div className="flex items-center gap-2">
+                            {post.user.profile_picture ? (
+                              <Image
+                                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${post.user.profile_picture}`}
+                                alt={`${post.user.first_name} ${post.user.last_name}`}
+                                width={24}
+                                height={24}
+                                className="rounded-full"
+                              />
+                            ) : (
+                              <User className="h-5 w-5 text-gray-400" />
+                            )}
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              {post.user.first_name} {post.user.last_name}
+                            </span>
+                          </div>
+                        )}
+                        <time className="text-sm text-gray-500 dark:text-gray-400">
+                          {post.created_at}
+                        </time>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.article>
+              );
+            })}
           </div>
 
           {/* No Results Message */}
