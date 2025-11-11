@@ -1,30 +1,31 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import Breadcrumbs from "@/app/components/ui/Breadcrumbs";
-import Input from "@/app/components/ui/Input";
-import Textarea from "@/app/components/ui/Textarea";
-import { Button } from "@/app/components/ui/Button";
-import LoadingSpinner from "@/app/components/ui/LoadingSpinner";
-import { z } from "zod";
-import { useFormWithBackendErrors } from "@/app/hooks/useFormWithBackendErrors";
-import { useSettingsStore } from "@/app/lib/stores/settings.store";
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import Input from '@/app/components/ui/Input';
+import Textarea from '@/app/components/ui/Textarea';
+import { Button } from '@/app/components/ui/Button';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { z } from 'zod';
+import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
+import { useSettingsStore } from '@/app/lib/stores/settings.store';
 
 const schema = z.object({
-  phone: z.string().min(1, "شماره تماس الزامی است"),
-  email: z.string().email("ایمیل معتبر نیست"),
-  address: z.string().min(1, "آدرس الزامی است"),
-  about_us: z.string().min(1, "درباره ما الزامی است"),
-  our_mission: z.string().min(1, "ماموریت ما الزامی است"),
-  our_vision: z.string().min(1, "چشم انداز ما الزامی است"),
-  footer_text: z.string().min(1, "متن فوتر الزامی است"),
+  phone: z.string().min(1, 'شماره تماس الزامی است'),
+  email: z.string().email('ایمیل معتبر نیست'),
+  address: z.string().min(1, 'آدرس الزامی است'),
+  about_us: z.string().min(1, 'درباره ما الزامی است'),
+  our_mission: z.string().min(1, 'ماموریت ما الزامی است'),
+  our_vision: z.string().min(1, 'چشم انداز ما الزامی است'),
+  footer_text: z.string().min(1, 'متن فوتر الزامی است'),
 });
 
 type FormData = z.infer<typeof schema>;
 
 export default function AboutUsPage() {
-  const { settings, loading, fetchSettings, updateSettings } = useSettingsStore();
+  const { settings, loading, fetchSettings, updateSettings } =
+    useSettingsStore();
 
   const {
     register,
@@ -41,7 +42,7 @@ export default function AboutUsPage() {
         const data = await fetchSettings();
         reset(data);
       } catch (e: any) {
-        toast.error(e.message || "خطا در دریافت اطلاعات");
+        toast.error(e.message || 'خطا در دریافت اطلاعات');
       }
     };
     loadSettings();
@@ -49,14 +50,18 @@ export default function AboutUsPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      const updateData = { ...settings, ...data };
+      // Create the payload with the current id and form data
+      const updateData = {
+        id: settings.id || 1, // Use existing id or default to 1
+        ...data,
+      };
       const res = await updateSettings(updateData);
-      toast.success("اطلاعات با موفقیت ذخیره شد");
+      toast.success('اطلاعات با موفقیت ذخیره شد');
     } catch (e: any) {
       if (e && typeof e === 'object' && 'status' in e && 'message' in e) {
-        toast.error(e.message || "خطا در ذخیره اطلاعات");
+        toast.error(e.message || 'خطا در ذخیره اطلاعات');
       } else {
-        toast.error("خطا در ذخیره اطلاعات");
+        toast.error('خطا در ذخیره اطلاعات');
       }
     }
   };
@@ -67,13 +72,15 @@ export default function AboutUsPage() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: "درباره ما", href: "/admin/about-us", active: true },
+          { label: 'درباره ما', href: '/admin/about-us', active: true },
         ]}
       />
       <form
-        onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, (error) => {
-          toast.error(error?.message || "خطا در ذخیره اطلاعات");
-        }))}
+        onSubmit={handleSubmit(
+          submitWithErrorHandling(onSubmit, (error) => {
+            toast.error(error?.message || 'خطا در ذخیره اطلاعات');
+          })
+        )}
         className="mt-8 space-y-6"
       >
         {globalError && (
@@ -88,7 +95,7 @@ export default function AboutUsPage() {
             placeholder="شماره تماس را وارد کنید"
             required
             error={errors.phone?.message}
-            {...register("phone")}
+            {...register('phone')}
           />
           <Input
             id="email"
@@ -96,7 +103,7 @@ export default function AboutUsPage() {
             placeholder="ایمیل را وارد کنید"
             required
             error={errors.email?.message}
-            {...register("email")}
+            {...register('email')}
           />
         </div>
         <div className="w-full">
@@ -106,7 +113,7 @@ export default function AboutUsPage() {
             placeholder="آدرس را وارد کنید"
             required
             error={errors.address?.message}
-            {...register("address")}
+            {...register('address')}
           />
         </div>
         <div className="w-full">
@@ -116,7 +123,7 @@ export default function AboutUsPage() {
             placeholder="درباره ما را وارد کنید"
             required
             error={errors.about_us?.message}
-            {...register("about_us")}
+            {...register('about_us')}
           />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -126,7 +133,7 @@ export default function AboutUsPage() {
             placeholder="ماموریت ما را وارد کنید"
             required
             error={errors.our_mission?.message}
-            {...register("our_mission")}
+            {...register('our_mission')}
           />
           <Textarea
             id="our_vision"
@@ -134,7 +141,7 @@ export default function AboutUsPage() {
             placeholder="چشم انداز ما را وارد کنید"
             required
             error={errors.our_vision?.message}
-            {...register("our_vision")}
+            {...register('our_vision')}
           />
         </div>
         <div className="w-full">
@@ -144,7 +151,7 @@ export default function AboutUsPage() {
             placeholder="متن فوتر را وارد کنید"
             required
             error={errors.footer_text?.message}
-            {...register("footer_text")}
+            {...register('footer_text')}
           />
         </div>
         <div className="flex justify-end gap-3">

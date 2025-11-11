@@ -1,5 +1,5 @@
 export interface Settings {
-  id: string;
+  id: number;
   phone: string;
   email: string;
   address: string;

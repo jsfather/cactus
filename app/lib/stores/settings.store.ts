@@ -23,7 +23,7 @@ export const useSettingsStore = create<SettingsState>()(
   devtools((set, get) => ({
     // Initial state
     settings: {
-      id: '',
+      id: 0,
       about_us: '',
       phone: '',
       email: '',
@@ -70,12 +70,11 @@ export const useSettingsStore = create<SettingsState>()(
     updateSettings: async (payload) => {
       try {
         set({ loading: true, error: null });
-        const updatedSettings =
-          await settingsService.updateSettings(payload);
-        set((state) => ({
-          settings: state.settings,
+        const updatedSettings = await settingsService.updateSettings(payload);
+        set({
+          settings: updatedSettings.data,
           loading: false,
-        }));
+        });
         return updatedSettings;
       } catch (error) {
         const apiError = error as ApiError;
