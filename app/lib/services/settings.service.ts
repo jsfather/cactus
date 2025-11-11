@@ -8,7 +8,7 @@ export class SettingsService {
   }
 
   async updateSettings(payload: Settings): Promise<GetSettingsResponse> {
-    return apiClient.put<GetSettingsResponse>(
+    return apiClient.post<GetSettingsResponse>(
       API_ENDPOINTS.SETTINGS.UPDATE,
       payload
     );

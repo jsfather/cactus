@@ -19,7 +19,6 @@ interface DisplayProduct {
   rating: number;
   reviews: number;
   inStock: boolean;
-  isPlaceholder: boolean;
   originalId?: number;
   actualPrice?: number;
 }
@@ -30,65 +29,6 @@ const categories = [
   { id: 'electronics', name: 'قطعات الکترونیکی', count: 12 },
   { id: 'robots', name: 'ربات کامل', count: 8 },
   { id: 'sensors', name: 'سنسور', count: 7 },
-];
-
-const placeholderProducts: DisplayProduct[] = [
-  {
-    id: 1,
-    title: 'کیت آموزشی ربات مسیریاب',
-    price: '۲,۵۰۰,۰۰۰',
-    discount: '۲,۱۰۰,۰۰۰',
-    image: '/product-1.jpg',
-    category: 'کیت آموزشی',
-    rating: 4.5,
-    reviews: 28,
-    inStock: true,
-    isPlaceholder: true,
-    originalId: 1,
-    actualPrice: 2100000,
-  },
-  {
-    id: 2,
-    title: 'بورد کنترلر آردوینو پرو',
-    price: '۸۵۰,۰۰۰',
-    discount: null,
-    image: '/product-2.jpg',
-    category: 'قطعات الکترونیکی',
-    rating: 5,
-    reviews: 42,
-    inStock: true,
-    isPlaceholder: true,
-    originalId: 2,
-    actualPrice: 850000,
-  },
-  {
-    id: 3,
-    title: 'ربات انسان‌نمای آموزشی',
-    price: '۱۲,۰۰۰,۰۰۰',
-    discount: '۱۰,۸۰۰,۰۰۰',
-    image: '/product-3.jpg',
-    category: 'ربات کامل',
-    rating: 4.8,
-    reviews: 16,
-    inStock: false,
-    isPlaceholder: true,
-    originalId: 3,
-    actualPrice: 10800000,
-  },
-  {
-    id: 4,
-    title: 'سنسور فاصله‌سنج لیزری',
-    price: '۹۵۰,۰۰۰',
-    discount: null,
-    image: '/product-4.jpg',
-    category: 'سنسور',
-    rating: 4.2,
-    reviews: 35,
-    inStock: true,
-    isPlaceholder: true,
-    originalId: 4,
-    actualPrice: 950000,
-  },
 ];
 
 // Helper function to convert API product to display format
@@ -111,7 +51,6 @@ const convertApiProductToDisplayFormat = (
     rating: apiProduct.rating || 4.0,
     reviews: apiProduct.reviews_count || 0,
     inStock: apiProduct.stock > 0,
-    isPlaceholder: false,
     originalId: apiProduct.id, // Keep original ID for cart
     actualPrice: apiProduct.discount_price || apiProduct.price, // Numeric price for cart
   };
@@ -136,11 +75,8 @@ export default function Page() {
     fetchHomeProducts();
   }, [fetchHomeProducts]);
 
-  // Combine placeholder and API products
-  const allProducts = [
-    ...placeholderProducts,
-    ...apiProducts.map(convertApiProductToDisplayFormat),
-  ];
+  // Convert API products to display format
+  const allProducts = apiProducts.map(convertApiProductToDisplayFormat);
 
   const filteredProducts = allProducts.filter((product) => {
     const matchesSearch = product.title
