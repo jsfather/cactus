@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { Controller } from 'react-hook-form';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
+import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { z } from 'zod';
@@ -34,6 +36,7 @@ export default function AboutUsPage() {
     submitWithErrorHandling,
     globalError,
     reset,
+    control,
   } = useFormWithBackendErrors<FormData>(schema);
 
   useEffect(() => {
@@ -117,31 +120,49 @@ export default function AboutUsPage() {
           />
         </div>
         <div className="w-full">
-          <Textarea
-            id="about_us"
-            label="درباره ما"
-            placeholder="درباره ما را وارد کنید"
-            required
-            error={errors.about_us?.message}
-            {...register('about_us')}
+          <Controller
+            name="about_us"
+            control={control}
+            render={({ field }) => (
+              <MarkdownEditor
+                id="about_us"
+                label="درباره ما"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.about_us?.message}
+                required
+              />
+            )}
           />
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <Textarea
-            id="our_mission"
-            label="ماموریت ما"
-            placeholder="ماموریت ما را وارد کنید"
-            required
-            error={errors.our_mission?.message}
-            {...register('our_mission')}
+          <Controller
+            name="our_mission"
+            control={control}
+            render={({ field }) => (
+              <MarkdownEditor
+                id="our_mission"
+                label="ماموریت ما"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.our_mission?.message}
+                required
+              />
+            )}
           />
-          <Textarea
-            id="our_vision"
-            label="چشم انداز ما"
-            placeholder="چشم انداز ما را وارد کنید"
-            required
-            error={errors.our_vision?.message}
-            {...register('our_vision')}
+          <Controller
+            name="our_vision"
+            control={control}
+            render={({ field }) => (
+              <MarkdownEditor
+                id="our_vision"
+                label="چشم انداز ما"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.our_vision?.message}
+                required
+              />
+            )}
           />
         </div>
         <div className="w-full">
