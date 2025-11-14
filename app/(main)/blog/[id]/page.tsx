@@ -101,7 +101,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
           {/* Article Content */}
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>{blog.description}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+              {blog.description}
+            </ReactMarkdown>
           </div>
 
           {/* Article Tags */}
