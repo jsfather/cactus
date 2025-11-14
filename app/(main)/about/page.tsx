@@ -15,6 +15,8 @@ import {
 import { useEffect, useState } from 'react';
 import { useSettings } from '@/app/lib/hooks/use-settings';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 
 interface FAQ {
   question: string;
@@ -132,8 +134,10 @@ export default function Page() {
                 </div>
               ) : (
                 <>
-                  <div className="prose prose-lg max-w-none text-gray-600 dark:text-gray-300 dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:leading-relaxed">
-                    <ReactMarkdown>{settings?.about_us || 'محتوایی برای نمایش وجود ندارد.'}</ReactMarkdown>
+                  <div className="prose prose-lg dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:leading-relaxed max-w-none text-gray-600 dark:text-gray-300">
+                    <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+                      {settings?.about_us || 'محتوایی برای نمایش وجود ندارد.'}
+                    </ReactMarkdown>
                   </div>
                 </>
               )}
@@ -182,8 +186,11 @@ export default function Page() {
                   {loading ? (
                     <div className="h-20 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
                   ) : (
-                    <div className="prose max-w-none text-gray-600 dark:text-gray-300 dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white">
-                      <ReactMarkdown>{settings?.our_mission || 'محتوایی برای نمایش وجود ندارد.'}</ReactMarkdown>
+                    <div className="prose dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white max-w-none text-gray-600 dark:text-gray-300">
+                      <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+                        {settings?.our_mission ||
+                          'محتوایی برای نمایش وجود ندارد.'}
+                      </ReactMarkdown>
                     </div>
                   )}
                 </div>
@@ -192,8 +199,10 @@ export default function Page() {
                   <h3 className="text-2xl font-bold dark:text-white">
                     چشم‌انداز
                   </h3>
-                  <div className="prose max-w-none text-gray-600 dark:text-gray-300 dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white">
-                    <ReactMarkdown>{settings?.our_vision || 'محتوایی برای نمایش وجود ندارد.'}</ReactMarkdown>
+                  <div className="prose dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white max-w-none text-gray-600 dark:text-gray-300">
+                    <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+                      {settings?.our_vision || 'محتوایی برای نمایش وجود ندارد.'}
+                    </ReactMarkdown>
                   </div>
                 </div>
               )}

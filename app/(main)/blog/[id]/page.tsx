@@ -9,6 +9,8 @@ import { publicBlogService } from '@/app/lib/services/public-blog.service';
 import { Blog } from '@/app/lib/types';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -99,7 +101,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
           {/* Article Content */}
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <ReactMarkdown>{blog.description}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>{blog.description}</ReactMarkdown>
           </div>
 
           {/* Article Tags */}
