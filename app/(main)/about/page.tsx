@@ -61,15 +61,18 @@ export default function Page() {
   const faqs: FAQ[] = [
     {
       question: 'چگونه می‌توانم در دوره‌ها ثبت نام کنم؟',
-      answer: 'برای ثبت نام در دوره‌ها، کافیست وارد صفحه دوره‌ها شوید و دوره مورد نظر خود را انتخاب کنید. سپس روی دکمه ثبت نام کلیک کنید و مراحل ثبت نام را تکمیل نمایید.',
+      answer:
+        'برای ثبت نام در دوره‌ها، کافیست وارد صفحه دوره‌ها شوید و دوره مورد نظر خود را انتخاب کنید. سپس روی دکمه ثبت نام کلیک کنید و مراحل ثبت نام را تکمیل نمایید.',
     },
     {
       question: 'آیا دوره‌ها گواهینامه دارند؟',
-      answer: 'بله، تمامی دوره‌های ما دارای گواهینامه معتبر می‌باشند که پس از اتمام موفقیت‌آمیز دوره برای شما صادر خواهد شد.',
+      answer:
+        'بله، تمامی دوره‌های ما دارای گواهینامه معتبر می‌باشند که پس از اتمام موفقیت‌آمیز دوره برای شما صادر خواهد شد.',
     },
     {
       question: 'آیا امکان پرداخت اقساطی وجود دارد؟',
-      answer: 'بله، برای دوره‌های خاص امکان پرداخت اقساطی فراهم شده است. برای اطلاعات بیشتر با بخش پشتیبانی تماس بگیرید.',
+      answer:
+        'بله، برای دوره‌های خاص امکان پرداخت اقساطی فراهم شده است. برای اطلاعات بیشتر با بخش پشتیبانی تماس بگیرید.',
     },
   ];
 
@@ -248,7 +251,9 @@ export default function Page() {
                     <MapPin className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="mb-2 font-semibold dark:text-white">آدرس</h3>
+                    <h3 className="mb-2 font-semibold dark:text-white">
+                      {dir === 'rtl' ? 'آدرس' : 'Address'}
+                    </h3>
                     <p className="text-gray-600 dark:text-gray-300">
                       {settings?.address || '---'}
                     </p>
@@ -263,7 +268,9 @@ export default function Page() {
                     <Phone className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="mb-2 font-semibold dark:text-white">تلفن</h3>
+                    <h3 className="mb-2 font-semibold dark:text-white">
+                      {dir === 'rtl' ? 'تلفن' : 'Phone'}
+                    </h3>
                     <p className="text-gray-600 dark:text-gray-300">
                       {settings?.phone || '---'}
                     </p>
@@ -279,7 +286,7 @@ export default function Page() {
                   </div>
                   <div>
                     <h3 className="mb-2 font-semibold dark:text-white">
-                      ایمیل
+                      {dir === 'rtl' ? 'ایمیل' : 'Email'}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300">
                       {settings?.email || '---'}
@@ -297,13 +304,17 @@ export default function Page() {
                   </div>
                   <div>
                     <h3 className="mb-2 font-semibold dark:text-white">
-                      ساعات کاری
+                      {dir === 'rtl' ? 'ساعات کاری' : 'Working Hours'}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300">
-                      شنبه تا چهارشنبه: ۸ صبح تا ۵ عصر
+                      {dir === 'rtl'
+                        ? 'شنبه تا چهارشنبه: ۸ صبح تا ۵ عصر'
+                        : 'Saturday to Wednesday: 8 AM to 5 PM'}
                     </p>
                     <p className="text-gray-600 dark:text-gray-300">
-                      پنجشنبه: ۸ صبح تا ۱۲ ظهر
+                      {dir === 'rtl'
+                        ? 'پنجشنبه: ۸ صبح تا ۱۲ ظهر'
+                        : 'Thursday: 8 AM to 12 PM'}
                     </p>
                   </div>
                 </motion.div>
@@ -332,7 +343,7 @@ export default function Page() {
                   <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        نام و نام خانوادگی
+                        {dir === 'rtl' ? 'نام و نام خانوادگی' : 'Full Name'}
                       </label>
                       <input
                         type="text"
@@ -341,7 +352,7 @@ export default function Page() {
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        ایمیل
+                        {dir === 'rtl' ? 'ایمیل' : 'Email'}
                       </label>
                       <input
                         type="email"
@@ -350,7 +361,7 @@ export default function Page() {
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        شماره تماس
+                        {dir === 'rtl' ? 'شماره تماس' : 'Phone Number'}
                       </label>
                       <input
                         type="tel"
@@ -359,7 +370,7 @@ export default function Page() {
                     </div>
                     <div>
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        موضوع
+                        {dir === 'rtl' ? 'موضوع' : 'Subject'}
                       </label>
                       <input
                         type="text"
@@ -368,7 +379,7 @@ export default function Page() {
                     </div>
                     <div className="md:col-span-2">
                       <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        پیام شما
+                        {dir === 'rtl' ? 'پیام شما' : 'Your Message'}
                       </label>
                       <textarea
                         rows={4}
@@ -377,7 +388,7 @@ export default function Page() {
                     </div>
                   </div>
                   <button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 w-full rounded-lg px-6 py-3 text-white transition-colors">
-                    ارسال پیام
+                    {dir === 'rtl' ? 'ارسال پیام' : 'Send Message'}
                   </button>
                 </motion.form>
               </div>
@@ -394,7 +405,9 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               className="mb-12 text-center"
             >
-              <h2 className="mb-4 text-3xl font-bold">موقعیت ما روی نقشه</h2>
+              <h2 className="mb-4 text-3xl font-bold">
+                {dir === 'rtl' ? 'موقعیت ما روی نقشه' : 'Our Location on Map'}
+              </h2>
               <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 
@@ -420,7 +433,12 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               className="mb-12 text-center"
             >
-              <h2 className="mb-4 text-3xl font-bold">سوالات متداول</h2>
+              <h2 className="mb-4 text-3xl font-bold">
+                {t.about.faq.title}{' '}
+                <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
+                  {t.about.faq.titleHighlight}
+                </span>
+              </h2>
               <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 
