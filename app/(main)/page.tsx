@@ -633,22 +633,22 @@ export default function Page() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-bold">
-                  فروشگاه
+                  {t.home.shop.sectionTitle}
                   <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                     {' '}
-                    کاکتوس
+                    {t.home.shop.sectionTitleHighlight}
                   </span>
                 </h2>
                 <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
-                  تجهیزات و کیت‌های آموزشی رباتیک
+                  {t.home.shop.sectionSubtitle}
                 </p>
               </div>
               <div className="flex items-center gap-4">
                 <button className="rounded-full bg-gray-100 px-6 py-2 font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                  همه محصولات
+                  {t.home.shop.allProductsButton}
                 </button>
                 <button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 rounded-full px-6 py-2 font-medium text-white transition-colors">
-                  تخفیف‌دار
+                  {t.home.shop.discountedButton}
                 </button>
               </div>
             </div>
@@ -663,7 +663,7 @@ export default function Page() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Link href={`/shop/${index + 1}`}>
-                  <div className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
+                  <div className="group flex h-full flex-col rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
                     <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
                       <Image
                         src={product.image || '/placeholder-image.jpg'}
@@ -698,7 +698,7 @@ export default function Page() {
                         </svg>
                       </button>
                     </div>
-                    <div className="space-y-2">
+                    <div className="flex flex-1 flex-col space-y-2">
                       <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
                         {product.category}
                       </div>
@@ -726,43 +726,41 @@ export default function Page() {
                           ({product.reviews})
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {product.discount ? (
-                            <>
-                              <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
-                                {product.discount}
-                              </span>
-                              <span className="mr-2 text-sm text-gray-500 line-through dark:text-gray-400">
-                                {product.price}
-                              </span>
-                            </>
-                          ) : (
+                      <div className="mb-3 flex items-baseline">
+                        {product.discount ? (
+                          <>
                             <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
+                              {product.discount}
+                            </span>
+                            <span className="mx-2 text-sm text-gray-500 line-through dark:text-gray-400">
                               {product.price}
                             </span>
-                          )}
-                          <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
-                            {t.home.shop.toman}
+                          </>
+                        ) : (
+                          <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
+                            {product.price}
                           </span>
-                        </div>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // Add to cart logic will be implemented
-                          }}
-                          className={`rounded-lg px-3 py-1 text-sm font-medium transition-colors ${
-                            product.inStock
-                              ? 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white'
-                              : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
-                          }`}
-                          disabled={!product.inStock}
-                        >
-                          {product.inStock
-                            ? t.home.shop.addToCart
-                            : t.home.shop.outOfStock}
-                        </button>
+                        )}
+                        <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
+                          {t.home.shop.toman}
+                        </span>
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // Add to cart logic will be implemented
+                        }}
+                        className={`mt-auto w-full rounded-lg py-2.5 text-sm font-medium transition-colors ${
+                          product.inStock
+                            ? 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white'
+                            : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
+                        }`}
+                        disabled={!product.inStock}
+                      >
+                        {product.inStock
+                          ? t.home.shop.addToCart
+                          : t.home.shop.outOfStock}
+                      </button>
                     </div>
                   </div>
                 </Link>
