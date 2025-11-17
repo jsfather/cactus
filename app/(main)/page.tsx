@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { VideoModal } from '@/app/components/ui/VideoModal';
 import { Play } from 'lucide-react';
 import { ClientVideo } from '@/app/components/ui/ClientVideo';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface Feature {
   title: string;
@@ -41,6 +42,7 @@ interface VideoThumbnail {
 }
 
 export default function Page() {
+  const { t, dir } = useLocale();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
@@ -52,27 +54,146 @@ export default function Page() {
     }
   }, []);
 
+  const getFeatures = (): Feature[] => [
+    {
+      title: t.home.features.handsOn.title,
+      description: t.home.features.handsOn.description,
+      icon: (
+        <svg
+          className="text-primary-600 h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: t.home.features.expertInstructors.title,
+      description: t.home.features.expertInstructors.description,
+      icon: (
+        <svg
+          className="text-primary-600 h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: t.home.features.projectBased.title,
+      description: t.home.features.projectBased.description,
+      icon: (
+        <svg
+          className="text-primary-600 h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: t.home.features.careerSupport.title,
+      description: t.home.features.careerSupport.description,
+      icon: (
+        <svg
+          className="text-primary-600 h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: t.home.features.flexibleLearning.title,
+      description: t.home.features.flexibleLearning.description,
+      icon: (
+        <svg
+          className="text-primary-600 h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: t.home.features.innovationLab.title,
+      description: t.home.features.innovationLab.description,
+      icon: (
+        <svg
+          className="text-primary-600 h-8 w-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+          />
+        </svg>
+      ),
+    },
+  ];
+
+  const features = getFeatures();
+
   const videoThumbnails: VideoThumbnail[] = [
     {
       videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-1.mp4',
-      title: 'فعالیت دانش پژوهان',
+      title: t.home.about.videoTitle1,
       aspectRatio: 'square',
     },
     {
       videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-2.mp4',
-      title: 'رضایت دانش آموزان',
+      title: t.home.about.videoTitle2,
       aspectRatio: 'video',
     },
     {
       videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-3.mp4',
-      title: 'معرفی کاکتوس',
+      title: t.home.about.videoTitle3,
       aspectRatio: 'video',
     },
   ];
 
   return (
     <div
-      dir="rtl"
+      dir={dir}
       className="min-h-screen text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
       {/* Hero Section */}
@@ -106,15 +227,14 @@ export default function Page() {
                 className="space-y-6"
               >
                 <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
-                  <span className="from-primary-400 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
-                    آینده رباتیک
+                  <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
+                    {t.home.hero.title}
                   </span>
                   <br />
-                  را با ما بسازید
+                  {t.home.hero.subtitle}
                 </h1>
                 <p className="mx-auto max-w-2xl text-lg text-gray-700 sm:text-xl dark:text-gray-300">
-                  با اساتید مجرب در حوزه رباتیک آموزش ببینید و با تجربه عملی با
-                  ربات‌های واقعی، به نسل آینده مبتکران بپیوندید.
+                  {t.home.hero.description}
                 </p>
               </motion.div>
 
@@ -125,13 +245,13 @@ export default function Page() {
                 className="mt-8 flex flex-wrap items-center justify-center gap-4"
               >
                 <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-                  شروع یادگیری
+                  {t.home.hero.startLearning}
                 </Button>
                 <Button
                   variant="secondary"
                   className="rounded-full px-8 py-3 text-lg"
                 >
-                  مشاهده دوره‌ها
+                  {t.home.hero.viewCourses}
                 </Button>
               </motion.div>
 
@@ -152,24 +272,30 @@ export default function Page() {
                   <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
                     {[
                       {
-                        number: '+۵۰۰',
-                        label: 'دانشجو',
-                        description: 'دانشجوی فعال',
+                        number: dir === 'rtl' ? '+۵۰۰' : '+500',
+                        label: t.home.stats.students,
+                        description:
+                          dir === 'rtl' ? 'دانشجوی فعال' : 'Active Students',
                       },
                       {
-                        number: '+۵۰',
-                        label: 'دوره',
-                        description: 'دوره تخصصی',
+                        number: dir === 'rtl' ? '+۵۰' : '+50',
+                        label: t.home.stats.courses,
+                        description:
+                          dir === 'rtl' ? 'دوره تخصصی' : 'Specialized Courses',
                       },
                       {
-                        number: '٪۹۵',
-                        label: 'رضایت',
-                        description: 'رضایت دانشجویان',
+                        number: dir === 'rtl' ? '٪۹۵' : '95%',
+                        label: t.home.stats.satisfaction,
+                        description:
+                          dir === 'rtl'
+                            ? 'رضایت دانشجویان'
+                            : 'Student Satisfaction',
                       },
                       {
-                        number: '+۲۰',
-                        label: 'مدرس',
-                        description: 'اساتید مجرب',
+                        number: dir === 'rtl' ? '+۲۰' : '+20',
+                        label: dir === 'rtl' ? 'مدرس' : 'Instructors',
+                        description:
+                          dir === 'rtl' ? 'اساتید مجرب' : 'Expert Instructors',
                       },
                     ].map((stat, index) => (
                       <div key={index} className="group relative">
@@ -202,20 +328,20 @@ export default function Page() {
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold">
-              چرا
+              {t.home.features.title}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                مدرسه رباتیک ما{' '}
+                {t.home.features.titleHighlight}{' '}
               </span>
-              را انتخاب کنید؟
+              {dir === 'rtl' ? 'را انتخاب کنید؟' : '?'}
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              تجربه آموزش پیشرفته رباتیک با یادگیری عملی و راهنمایی متخصصان
+              {t.home.features.subtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
+            {getFeatures().map((feature, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -249,45 +375,46 @@ export default function Page() {
             >
               <h2 className="text-3xl font-bold">
                 <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
-                  آموزشگاه رباتیک کاکتوس
+                  {t.home.about.title}
                 </span>
               </h2>
               <div className="space-y-4">
                 <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                  شرکت کاکتوس پویان گستر با شماره ثبت 7308 ، با برند کاکتوس در
-                  دو بخش فنی و مهندسی و تجارت الکترونیک در حال فعالیت می باشد.
-                  شرکت کاکتوس فعالیت حقوقی خود را در بخش فنی و مهندسی از سال
-                  1395 به طور رسمی با روباتیک آغاز نموده ولی از سال 1388 تا 1395
-                  به صورت حقیقی در این زمینه و از سال 1399 به صورت هوشمند و با
-                  هوش مصنوعی در حیطه دانش آموزی و در عرصه جهانی و بین المللی
-                  فعالیت داشته است. در بخش تجارت الکترونیک، شخص مدیر عامل به
-                  صورت حقیقی در حال فعالیت می باشند.
+                  {t.home.about.description1}
                 </p>
 
                 <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                  رشته فنی و مهندسی روباتیک تلفیقی از سه رشته مهندسی الکترونیک،
-                  مکانیک و برنامه نویسی می باشد. هدف شرکت کاکتوس پویان گستر در
-                  حیطه فنی و مهندسی، آموزش اصولی رشته های تخصصی و تربیت مهندسین
-                  واقعی در حوزه صنعت و تولید می باشد. تمامی آموزش ها به صورت
-                  مهارتی و کارگاهی می باشد. در گرایش الکترونیک با نرم افزارهایی
-                  چون پرتئوس، مولتی سیم و آلتیوم دیزاینر و ... در گرایش مکانیک
-                  با برنامه هایی چون آلگودو، ویرچوال مک، لگوتیک، سالیدورکس، کتیا
-                  و کار با دستگاه پرینتر سه بعدی و سی ان سی و... در گرایش برنامه
-                  نویسی با پلتفرم هایی چون آردوینو، VS Code، کدویژن، اسکرچ، اتمل
-                  استودیو، ام بلاگ، پایتون و... آموزش داده می شود.
+                  {t.home.about.description2}
                 </p>
 
                 <p className="text-lg leading-relaxed text-gray-600 dark:text-gray-300">
-                  پس از گذراندن دوره های تخصصی و پروسه آموزشی با تایید مدیریت و
-                  نظارت شرکت کاکتوس مدرک و گواهی به دانش آموزان تعلق می گیرد .
+                  {t.home.about.description3}
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {[
-                  { title: 'تجربه', value: '+۱۰ سال' },
-                  { title: 'پروژه‌های موفق', value: '+۲۰۰' },
-                  { title: 'جوایز', value: '+۵۰' },
-                  { title: 'همکاران', value: '+۳۰' },
+                  {
+                    title: t.home.about.experience,
+                    value:
+                      dir === 'rtl'
+                        ? t.home.about.experienceValue
+                        : '+10 Years',
+                  },
+                  {
+                    title: t.home.about.successfulProjects,
+                    value:
+                      dir === 'rtl'
+                        ? t.home.about.successfulProjectsValue
+                        : '+200',
+                  },
+                  {
+                    title: t.home.about.awards,
+                    value: dir === 'rtl' ? t.home.about.awardsValue : '+50',
+                  },
+                  {
+                    title: t.home.about.colleagues,
+                    value: dir === 'rtl' ? t.home.about.colleaguesValue : '+30',
+                  },
                 ].map((item, index) => (
                   <div
                     key={index}
@@ -304,10 +431,10 @@ export default function Page() {
               </div>
               <div className="flex flex-wrap gap-4">
                 {[
-                  'آموزش تخصصی',
-                  'تجهیزات پیشرفته',
-                  'پشتیبانی ۲۴/۷',
-                  'گواهینامه معتبر',
+                  t.home.about.specializedTraining,
+                  t.home.about.advancedEquipment,
+                  t.home.about.support247,
+                  t.home.about.validCertificate,
                 ].map((tag, index) => (
                   <span
                     key={index}
@@ -581,7 +708,7 @@ export default function Page() {
           <div className="mt-12 text-center">
             <Link href="/shop">
               <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-                مشاهده همه محصولات
+                {t.home.shop.viewAllProducts}
               </Button>
             </Link>
           </div>
@@ -592,14 +719,14 @@ export default function Page() {
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold">
-              دوره‌های
+              {t.home.courses.title}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                ویژه
+                {t.home.courses.titleHighlight}
               </span>
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              سفر خود را در دنیای رباتیک با محبوب‌ترین دوره‌های ما آغاز کنید
+              {t.home.courses.subtitle}
             </p>
           </div>
 
@@ -654,7 +781,7 @@ export default function Page() {
           <div className="mt-12 text-center">
             <Link href="/courses">
               <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-                مشاهده همه دوره‌ها
+                {t.home.courses.viewAllCourses}
               </Button>
             </Link>
           </div>
@@ -665,14 +792,14 @@ export default function Page() {
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <h2 className="mb-4 text-3xl font-bold">
-              آخرین مطالب
+              {t.home.blog.title}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                بلاگ
+                {t.home.blog.titleHighlight}
               </span>
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              از آخرین اخبار و بینش‌ها در دنیای رباتیک مطلع شوید
+              {t.home.blog.subtitle}
             </p>
           </div>
 
@@ -726,7 +853,7 @@ export default function Page() {
 
           <div className="mt-12 text-center">
             <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-              مشاهده همه مقالات
+              {t.home.blog.viewAllArticles}
             </Button>
           </div>
         </div>
@@ -762,129 +889,6 @@ const blogPosts: BlogPost[] = [
     author: 'دکتر مایکل لی',
     image: '/blog-ai-robotics.png',
     readTime: '۶ دقیقه مطالعه',
-  },
-];
-
-const features: Feature[] = [
-  {
-    title: 'یادگیری عملی',
-    description:
-      'کار با ربات‌های واقعی و کسب تجربه عملی در امکانات پیشرفته ما.',
-    icon: (
-      <svg
-        className="text-primary-600 h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-        />
-      </svg>
-    ),
-  },
-  {
-    title: 'اساتید متخصص',
-    description:
-      'یادگیری از متخصصان صنعت با سال‌ها تجربه در زمینه رباتیک و اتوماسیون.',
-    icon: (
-      <svg
-        className="text-primary-600 h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-        />
-      </svg>
-    ),
-  },
-  {
-    title: 'یادگیری پروژه محور',
-    description:
-      'ساخت نمونه کار با پروژه‌های دنیای واقعی و نمایش مهارت‌های خود به کارفرمایان بالقوه.',
-    icon: (
-      <svg
-        className="text-primary-600 h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-        />
-      </svg>
-    ),
-  },
-  {
-    title: 'پشتیبانی شغلی',
-    description:
-      'راهنمایی در فرصت‌های شغلی و ارتباط با شرکای صنعتی ما برای کاریابی.',
-    icon: (
-      <svg
-        className="text-primary-600 h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-        />
-      </svg>
-    ),
-  },
-  {
-    title: 'یادگیری انعطاف‌پذیر',
-    description:
-      'انتخاب از بین فرمت‌های مختلف دوره شامل آنلاین، ترکیبی و آموزش حضوری.',
-    icon: (
-      <svg
-        className="text-primary-600 h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-  },
-  {
-    title: 'آزمایشگاه نوآوری',
-    description:
-      'دسترسی به آزمایشگاه پیشرفته رباتیک مجهز به جدیدترین فناوری ها و ابزارها.',
-    icon: (
-      <svg
-        className="text-primary-600 h-8 w-8"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-        />
-      </svg>
-    ),
   },
 ];
 
