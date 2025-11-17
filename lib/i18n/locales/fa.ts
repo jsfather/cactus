@@ -128,6 +128,25 @@ export const home = {
     addToCart: 'افزودن به سبد',
     toman: 'تومان',
     reviews: 'نظر',
+    outOfStock: 'ناموجود',
+    products: {
+      lineFollowerKit: {
+        title: 'کیت آموزشی ربات مسیریاب',
+        category: 'کیت آموزشی',
+      },
+      arduinoProController: {
+        title: 'بورد کنترلر آردوینو پرو',
+        category: 'قطعات الکترونیکی',
+      },
+      humanoidRobot: {
+        title: 'ربات انسان‌نمای آموزشی',
+        category: 'ربات کامل',
+      },
+      laserDistanceSensor: {
+        title: 'سنسور فاصله‌سنج لیزری',
+        category: 'سنسور',
+      },
+    },
   },
   courses: {
     title: 'دوره‌های',
@@ -135,10 +154,29 @@ export const home = {
     subtitle: 'سفر خود را در دنیای رباتیک با محبوب‌ترین دوره‌های ما آغاز کنید',
     viewAllCourses: 'مشاهده همه دوره‌ها',
     week: 'هفته',
+    weeks: 'هفته',
     beginner: 'مبتدی',
     advanced: 'پیشرفته',
     intermediate: 'متوسط',
     toman: 'تومان',
+    moreInfo: 'اطلاعات بیشتر',
+    items: {
+      roboticsBasics: {
+        title: 'مبانی رباتیک',
+        description:
+          'آشنایی با اصول اولیه رباتیک، شامل مکانیک، الکترونیک و برنامه‌نویسی.',
+      },
+      advancedRobotProgramming: {
+        title: 'برنامه‌نویسی پیشرفته ربات',
+        description:
+          'تسلط بر مفاهیم پیچیده برنامه‌نویسی و الگوریتم‌ها برای ربات‌های خودکار.',
+      },
+      robotVisionSystems: {
+        title: 'سیستم‌های بینایی ربات',
+        description:
+          'بررسی تکنیک‌های بینایی کامپیوتر و پیاده‌سازی پردازش تصویر در ربات‌ها.',
+      },
+    },
   },
   blog: {
     title: 'آخرین مطالب',
@@ -146,6 +184,32 @@ export const home = {
     subtitle: 'از آخرین اخبار و بینش‌ها در دنیای رباتیک مطلع شوید',
     viewAllArticles: 'مشاهده همه مقالات',
     readTime: 'دقیقه مطالعه',
+    minuteRead: 'دقیقه مطالعه',
+    author: 'نویسنده',
+    continueReading: 'ادامه مطلب',
+    posts: {
+      futureOfRobotics: {
+        title: 'آینده رباتیک در آموزش',
+        excerpt:
+          'کشف کنید چگونه رباتیک در حال تغییر چشم‌انداز آموزشی و آماده‌سازی دانش‌آموزان برای آینده است.',
+        date: '۲۵ اسفند ۱۴۰۲',
+        author: 'دکتر سارا چن',
+      },
+      top5Projects: {
+        title: '۵ پروژه برتر رباتیک برای مبتدیان',
+        excerpt:
+          'سفر خود در رباتیک را با این پروژه‌های جذاب و آموزشی مناسب برای مبتدیان آغاز کنید.',
+        date: '۲۲ اسفند ۱۴۰۲',
+        author: 'جیمز ویلسون',
+      },
+      aiAndRobotics: {
+        title: 'هوش مصنوعی و رباتیک: مشارکتی کامل',
+        excerpt:
+          'بررسی کنید چگونه هوش مصنوعی در حال ارتقای قابلیت‌های رباتیک و ایجاد امکانات جدید است.',
+        date: '۲۰ اسفند ۱۴۰۲',
+        author: 'دکتر مایکل لی',
+      },
+    },
   },
 };
 

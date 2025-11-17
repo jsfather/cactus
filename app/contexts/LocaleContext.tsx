@@ -33,6 +33,16 @@ export function LocaleProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('locale', locale);
       document.documentElement.lang = locale;
       document.documentElement.dir = localeDirections[locale];
+
+      // Update font based on language
+      const body = document.body;
+      if (locale === 'en') {
+        body.classList.remove('font-dana-fanum');
+        body.classList.add('font-dana');
+      } else {
+        body.classList.remove('font-dana');
+        body.classList.add('font-dana-fanum');
+      }
     }
   }, [locale, mounted]);
 

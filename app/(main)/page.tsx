@@ -173,6 +173,106 @@ export default function Page() {
 
   const features = getFeatures();
 
+  const getProducts = () => [
+    {
+      title: t.home.shop.products.lineFollowerKit.title,
+      price: dir === 'rtl' ? '۲,۵۰۰,۰۰۰' : '2,500,000',
+      discount: dir === 'rtl' ? '۲,۱۰۰,۰۰۰' : '2,100,000',
+      image: '/product-1.jpg',
+      category: t.home.shop.products.lineFollowerKit.category,
+      rating: 4.5,
+      reviews: dir === 'rtl' ? '۲۸' : '28',
+      inStock: true,
+    },
+    {
+      title: t.home.shop.products.arduinoProController.title,
+      price: dir === 'rtl' ? '۸۵۰,۰۰۰' : '850,000',
+      discount: null,
+      image: '/product-2.jpg',
+      category: t.home.shop.products.arduinoProController.category,
+      rating: 5,
+      reviews: dir === 'rtl' ? '۴۲' : '42',
+      inStock: true,
+    },
+    {
+      title: t.home.shop.products.humanoidRobot.title,
+      price: dir === 'rtl' ? '۱۲,۰۰۰,۰۰۰' : '12,000,000',
+      discount: dir === 'rtl' ? '۱۰,۸۰۰,۰۰۰' : '10,800,000',
+      image: '/product-3.jpg',
+      category: t.home.shop.products.humanoidRobot.category,
+      rating: 4.8,
+      reviews: dir === 'rtl' ? '۱۶' : '16',
+      inStock: true,
+    },
+    {
+      title: t.home.shop.products.laserDistanceSensor.title,
+      price: dir === 'rtl' ? '۹۵۰,۰۰۰' : '950,000',
+      discount: null,
+      image: '/product-4.jpg',
+      category: t.home.shop.products.laserDistanceSensor.category,
+      rating: 4.2,
+      reviews: dir === 'rtl' ? '۳۵' : '35',
+      inStock: true,
+    },
+  ];
+
+  const getCourses = (): Course[] => [
+    {
+      title: t.home.courses.items.roboticsBasics.title,
+      description: t.home.courses.items.roboticsBasics.description,
+      duration: dir === 'rtl' ? '۸ هفته' : '8 Weeks',
+      level: t.home.courses.beginner,
+      image: '/course-robotics-intro.png',
+      price: dir === 'rtl' ? '۲,۹۹۰,۰۰۰' : '2,990,000',
+    },
+    {
+      title: t.home.courses.items.advancedRobotProgramming.title,
+      description: t.home.courses.items.advancedRobotProgramming.description,
+      duration: dir === 'rtl' ? '۱۲ هفته' : '12 Weeks',
+      level: t.home.courses.advanced,
+      image: '/course-robot-programming.png',
+      price: dir === 'rtl' ? '۴,۹۹۰,۰۰۰' : '4,990,000',
+    },
+    {
+      title: t.home.courses.items.robotVisionSystems.title,
+      description: t.home.courses.items.robotVisionSystems.description,
+      duration: dir === 'rtl' ? '۱۰ هفته' : '10 Weeks',
+      level: t.home.courses.intermediate,
+      image: '/course-robot-vision.png',
+      price: dir === 'rtl' ? '۳,۹۹۰,۰۰۰' : '3,990,000',
+    },
+  ];
+
+  const getBlogPosts = (): BlogPost[] => [
+    {
+      title: t.home.blog.posts.futureOfRobotics.title,
+      excerpt: t.home.blog.posts.futureOfRobotics.excerpt,
+      date: t.home.blog.posts.futureOfRobotics.date,
+      author: t.home.blog.posts.futureOfRobotics.author,
+      image: '/blog-robotics-education.png',
+      readTime: dir === 'rtl' ? '۵ دقیقه مطالعه' : '5 min read',
+    },
+    {
+      title: t.home.blog.posts.top5Projects.title,
+      excerpt: t.home.blog.posts.top5Projects.excerpt,
+      date: t.home.blog.posts.top5Projects.date,
+      author: t.home.blog.posts.top5Projects.author,
+      image: '/blog-robotics-projects.png',
+      readTime: dir === 'rtl' ? '۸ دقیقه مطالعه' : '8 min read',
+    },
+    {
+      title: t.home.blog.posts.aiAndRobotics.title,
+      excerpt: t.home.blog.posts.aiAndRobotics.excerpt,
+      date: t.home.blog.posts.aiAndRobotics.date,
+      author: t.home.blog.posts.aiAndRobotics.author,
+      image: '/blog-ai-robotics.png',
+      readTime: dir === 'rtl' ? '۶ دقیقه مطالعه' : '6 min read',
+    },
+  ];
+
+  const courses = getCourses();
+  const blogPosts = getBlogPosts();
+
   const videoThumbnails: VideoThumbnail[] = [
     {
       videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-1.mp4',
@@ -555,51 +655,14 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                title: 'کیت آموزشی ربات مسیریاب',
-                price: '۲,۵۰۰,۰۰۰',
-                discount: '۲,۱۰۰,۰۰۰',
-                image: '/product-1.jpg',
-                category: 'کیت آموزشی',
-                rating: 4.5,
-                reviews: 28,
-              },
-              {
-                title: 'بورد کنترلر آردوینو پرو',
-                price: '۸۵۰,۰۰۰',
-                discount: null,
-                image: '/product-2.jpg',
-                category: 'قطعات الکترونیکی',
-                rating: 5,
-                reviews: 42,
-              },
-              {
-                title: 'ربات انسان‌نمای آموزشی',
-                price: '۱۲,۰۰۰,۰۰۰',
-                discount: '۱۰,۸۰۰,۰۰۰',
-                image: '/product-3.jpg',
-                category: 'ربات کامل',
-                rating: 4.8,
-                reviews: 16,
-              },
-              {
-                title: 'سنسور فاصله‌سنج لیزری',
-                price: '۹۵۰,۰۰۰',
-                discount: null,
-                image: '/product-4.jpg',
-                category: 'سنسور',
-                rating: 4.2,
-                reviews: 35,
-              },
-            ].map((product, index) => (
+            {getProducts().map((product, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href={`/shop/${product.id}`}>
+                <Link href={`/shop/${index + 1}`}>
                   <div className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
                     <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
                       <Image
@@ -610,7 +673,7 @@ export default function Page() {
                       />
                       {product.discount && (
                         <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
-                          تخفیف
+                          {t.home.shop.discount}
                         </div>
                       )}
                       <button
@@ -680,7 +743,7 @@ export default function Page() {
                             </span>
                           )}
                           <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
-                            تومان
+                            {t.home.shop.toman}
                           </span>
                         </div>
                         <button
@@ -695,7 +758,9 @@ export default function Page() {
                           }`}
                           disabled={!product.inStock}
                         >
-                          {product.inStock ? 'افزودن به سبد' : 'ناموجود'}
+                          {product.inStock
+                            ? t.home.shop.addToCart
+                            : t.home.shop.outOfStock}
                         </button>
                       </div>
                     </div>
@@ -765,13 +830,13 @@ export default function Page() {
                       {course.duration}
                     </span>
                     <span className="text-primary-600 dark:text-primary-400 font-bold">
-                      {course.price} تومان
+                      {course.price} {t.home.courses.toman}
                     </span>
                   </div>
                 </div>
                 <div className="px-6 pb-6">
                   <button className="text-primary-600 dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                    اطلاعات بیشتر
+                    {t.home.courses.moreInfo}
                   </button>
                 </div>
               </motion.div>
@@ -840,10 +905,10 @@ export default function Page() {
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                      نویسنده: {post.author}
+                      {t.home.blog.author}: {post.author}
                     </span>
                     <button className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
-                      ادامه مطلب ←
+                      {t.home.blog.continueReading} {dir === 'rtl' ? '←' : '→'}
                     </button>
                   </div>
                 </div>
@@ -861,63 +926,3 @@ export default function Page() {
     </div>
   );
 }
-
-const blogPosts: BlogPost[] = [
-  {
-    title: 'آینده رباتیک در آموزش',
-    excerpt:
-      'کشف کنید چگونه رباتیک در حال تغییر چشم‌انداز آموزشی و آماده‌سازی دانش‌آموزان برای آینده است.',
-    date: '۲۵ اسفند ۱۴۰۲',
-    author: 'دکتر سارا چن',
-    image: '/blog-robotics-education.png',
-    readTime: '۵ دقیقه مطالعه',
-  },
-  {
-    title: '۵ پروژه برتر رباتیک برای مبتدیان',
-    excerpt:
-      'سفر خود در رباتیک را با این پروژه‌های جذاب و آموزشی مناسب برای مبتدیان آغاز کنید.',
-    date: '۲۲ اسفند ۱۴۰۲',
-    author: 'جیمز ویلسون',
-    image: '/blog-robotics-projects.png',
-    readTime: '۸ دقیقه مطالعه',
-  },
-  {
-    title: 'هوش مصنوعی و رباتیک: مشارکتی کامل',
-    excerpt:
-      'بررسی کنید چگونه هوش مصنوعی در حال ارتقای قابلیت‌های رباتیک و ایجاد امکانات جدید است.',
-    date: '۲۰ اسفند ۱۴۰۲',
-    author: 'دکتر مایکل لی',
-    image: '/blog-ai-robotics.png',
-    readTime: '۶ دقیقه مطالعه',
-  },
-];
-
-const courses: Course[] = [
-  {
-    title: 'مبانی رباتیک',
-    description:
-      'آشنایی با اصول اولیه رباتیک، شامل مکانیک، الکترونیک و برنامه‌نویسی.',
-    duration: '۸ هفته',
-    level: 'مبتدی',
-    image: '/course-robotics-intro.png',
-    price: '۲,۹۹۰,۰۰۰',
-  },
-  {
-    title: 'برنامه‌نویسی پیشرفته ربات',
-    description:
-      'تسلط بر مفاهیم پیچیده برنامه‌نویسی و الگوریتم‌ها برای ربات‌های خودکار.',
-    duration: '۱۲ هفته',
-    level: 'پیشرفته',
-    image: '/course-robot-programming.png',
-    price: '۴,۹۹۰,۰۰۰',
-  },
-  {
-    title: 'سیستم‌های بینایی ربات',
-    description:
-      'بررسی تکنیک‌های بینایی کامپیوتر و پیاده‌سازی پردازش تصویر در ربات‌ها.',
-    duration: '۱۰ هفته',
-    level: 'متوسط',
-    image: '/course-robot-vision.png',
-    price: '۳,۹۹۰,۰۰۰',
-  },
-];

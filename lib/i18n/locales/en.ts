@@ -129,6 +129,25 @@ export const home = {
     addToCart: 'Add to Cart',
     toman: 'Toman',
     reviews: 'Reviews',
+    outOfStock: 'Out of Stock',
+    products: {
+      lineFollowerKit: {
+        title: 'Line Follower Robot Kit',
+        category: 'Educational Kit',
+      },
+      arduinoProController: {
+        title: 'Arduino Pro Controller Board',
+        category: 'Electronic Parts',
+      },
+      humanoidRobot: {
+        title: 'Educational Humanoid Robot',
+        category: 'Complete Robot',
+      },
+      laserDistanceSensor: {
+        title: 'Laser Distance Sensor',
+        category: 'Sensor',
+      },
+    },
   },
   courses: {
     title: 'Special',
@@ -137,10 +156,29 @@ export const home = {
       'Start your journey in the world of robotics with our most popular courses',
     viewAllCourses: 'View All Courses',
     week: 'Week',
+    weeks: 'Weeks',
     beginner: 'Beginner',
     advanced: 'Advanced',
     intermediate: 'Intermediate',
     toman: 'Toman',
+    moreInfo: 'More Info',
+    items: {
+      roboticsBasics: {
+        title: 'Robotics Basics',
+        description:
+          'Introduction to robotics fundamentals, including mechanics, electronics, and programming.',
+      },
+      advancedRobotProgramming: {
+        title: 'Advanced Robot Programming',
+        description:
+          'Master complex programming concepts and algorithms for autonomous robots.',
+      },
+      robotVisionSystems: {
+        title: 'Robot Vision Systems',
+        description:
+          'Explore computer vision techniques and implement image processing in robots.',
+      },
+    },
   },
   blog: {
     title: 'Latest Articles',
@@ -149,6 +187,32 @@ export const home = {
       'Stay updated with the latest news and insights from the world of robotics',
     viewAllArticles: 'View All Articles',
     readTime: 'Read Time',
+    minuteRead: 'min read',
+    author: 'Author',
+    continueReading: 'Continue Reading',
+    posts: {
+      futureOfRobotics: {
+        title: 'The Future of Robotics in Education',
+        excerpt:
+          'Discover how robotics is transforming the educational landscape and preparing students for the future.',
+        date: 'March 15, 2024',
+        author: 'Dr. Sarah Chen',
+      },
+      top5Projects: {
+        title: 'Top 5 Robotics Projects for Beginners',
+        excerpt:
+          'Start your robotics journey with these engaging and educational projects suitable for beginners.',
+        date: 'March 12, 2024',
+        author: 'James Wilson',
+      },
+      aiAndRobotics: {
+        title: 'AI and Robotics: A Perfect Partnership',
+        excerpt:
+          'Explore how artificial intelligence is enhancing robotic capabilities and creating new possibilities.',
+        date: 'March 10, 2024',
+        author: 'Dr. Michael Lee',
+      },
+    },
   },
 };
 
