@@ -21,6 +21,10 @@ export const common = {
   yes: 'بله',
   no: 'خیر',
   more: 'بیشتر',
+  home: 'خانه',
+  hour: 'ساعت',
+  hours: 'ساعت',
+  toman: 'تومان',
 };
 
 export const nav = {
@@ -221,9 +225,76 @@ export const home = {
 export const about = {
   title: 'درباره ما',
   description: 'بیشتر درباره آکادمی کاکتوس بدانید',
+  pageTitle: 'آکادمی تخصصی',
+  pageTitleHighlight: 'کاکتوس',
+  pageSubtitle:
+    'با بیش از ۱۰ سال تجربه در زمینه آموزش تخصصی و تولید محتوای باکیفیت',
+  stats: {
+    students: 'دانشجو',
+    studentsValue: '۵۰۰۰+',
+    studentsDesc: 'تاکنون در دوره‌های ما ثبت‌نام کرده‌اند',
+    instructors: 'مربی',
+    instructorsValue: '۵۰+',
+    instructorsDesc: 'متخصص و با تجربه',
+    courses: 'دوره',
+    coursesValue: '۱۵۰+',
+    coursesDesc: 'آموزشی تخصصی',
+    awards: 'جایزه',
+    awardsValue: '۱۰+',
+    awardsDesc: 'در جشنواره‌های آموزشی',
+  },
+  ourStory: 'داستان ما',
   mission: 'ماموریت ما',
   vision: 'چشم‌انداز ما',
-  team: 'تیم ما',
+  values: 'ارزش‌های ما',
+  missionTitle: 'توانمندسازی نسل آینده',
+  missionDesc:
+    'ماموریت ما ارائه آموزش با کیفیت در زمینه رباتیک و فناوری است، توانمندسازی دانش‌آموزان با مهارت‌های عملی مورد نیاز در دنیای مدرن.',
+  visionTitle: 'پیشرو در آموزش رباتیک',
+  visionDesc:
+    'ما تلاش می‌کنیم تا به یک موسسه پیشرو در آموزش رباتیک تبدیل شویم، شناخته شده برای روش‌های آموزشی نوآورانه و فارغ‌التحصیلان موفق.',
+  valuesTitle: 'تعالی، نوآوری، صداقت',
+  valuesDesc:
+    'ما به حفظ بالاترین استانداردهای آموزشی، تقویت نوآوری و عملکرد با صداقت کامل اعتقاد داریم.',
+  features: {
+    title: 'چرا',
+    titleHighlight: 'کاکتوس',
+    feature1: {
+      title: 'مدرسین متخصص',
+      desc: 'آموزش از متخصصان صنعت',
+    },
+    feature2: {
+      title: 'یادگیری عملی',
+      desc: 'پروژه‌های عملی و ربات‌های واقعی',
+    },
+    feature3: {
+      title: 'تجهیزات مدرن',
+      desc: 'آخرین فناوری و ابزارها',
+    },
+    feature4: {
+      title: 'پشتیبانی شغلی',
+      desc: 'کمک به یافتن شغل',
+    },
+    feature5: {
+      title: 'برنامه انعطاف‌پذیر',
+      desc: 'زمان‌هایی که برای شما مناسب است را انتخاب کنید',
+    },
+    feature6: {
+      title: 'گواهینامه معتبر',
+      desc: 'گواهینامه‌های شناخته شده صنعت',
+    },
+  },
+  location: 'موقعیت ما',
+  faq: {
+    title: 'سوالات',
+    titleHighlight: 'متداول',
+    q1: 'چگونه می‌توانم در دوره‌ها ثبت‌نام کنم؟',
+    a1: 'شما می‌توانید با مراجعه به صفحه دوره‌ها و انتخاب دوره مورد نظر خود، از طریق درگاه پرداخت آنلاین ثبت‌نام کنید.',
+    q2: 'آیا دوره‌ها گواهینامه معتبر دارند؟',
+    a2: 'بله، تمامی دوره‌های ما دارای گواهینامه معتبر از آکادمی کاکتوس هستند.',
+    q3: 'آیا امکان پرداخت اقساطی وجود دارد؟',
+    a3: 'بله، برای دوره‌های بلندمدت امکان پرداخت اقساطی فراهم شده است.',
+  },
 };
 
 export const courses = {
@@ -236,6 +307,41 @@ export const courses = {
   instructor: 'مدرس',
   enroll: 'ثبت نام',
   viewDetails: 'مشاهده جزئیات',
+  pageTitle: 'دوره‌های آموزشی',
+  pageTitleHighlight: 'رباتیک',
+  pageSubtitle:
+    'با بهترین اساتید، جدیدترین تکنولوژی‌ها را در حوزه رباتیک بیاموزید',
+  searchPlaceholder: 'جستجو در دوره‌ها...',
+  filterCourses: 'فیلتر دوره‌ها',
+  specialCourses: 'دوره‌های ویژه',
+  sortBy: 'مرتب‌سازی',
+  newest: 'جدیدترین',
+  popular: 'محبوب‌ترین',
+  stats: {
+    courses: 'دوره آموزشی',
+    coursesValue: '+۵۰',
+    hours: 'ساعت آموزش',
+    hoursValue: '+۱۰۰۰',
+    students: 'دانشجو',
+    studentsValue: '+۲۰۰۰',
+  },
+  cta: {
+    title: 'آماده شروع یادگیری هستید؟',
+    subtitle: 'با ما تماس بگیرید و مشاوره رایگان دریافت کنید',
+    button: 'دریافت مشاوره رایگان',
+  },
+  detail: {
+    price: 'قیمت دوره',
+    schedule: 'زمان‌بندی دوره',
+    day: 'روز',
+    time: 'زمان',
+    description: 'توضیحات دوره',
+    prerequisites: 'پیش‌نیازهای دوره',
+    whatYouLearn: 'چه چیزهایی یاد خواهید گرفت',
+    courseInstructor: 'مدرس دوره',
+    enroll: 'ثبت‌نام در دوره',
+    guarantee: '۷ روز ضمانت بازگشت وجه',
+  },
 };
 
 export const blog = {
@@ -249,6 +355,8 @@ export const blog = {
   categories: 'دسته‌بندی‌ها',
   tags: 'برچسب‌ها',
   searchPlaceholder: 'جستجو در مقالات...',
+  backToList: 'بازگشت به لیست مقالات',
+  articleNotFound: 'مقاله یافت نشد',
 };
 
 export const shop = {
@@ -264,32 +372,122 @@ export const shop = {
   checkout: 'تسویه حساب',
   cart: 'سبد خرید',
   cartEmpty: 'سبد خرید شما خالی است',
-  total: 'جمع کل',
+  total: 'مجموع',
   quantity: 'تعداد',
+  pageTitle: 'فروشگاه',
+  pageTitleHighlight: 'کاکتوس',
+  pageSubtitle: 'خرید آنلاین تجهیزات و کیت‌های آموزشی رباتیک',
+  searchPlaceholder: 'جستجو در محصولات...',
+  categories: {
+    all: 'همه محصولات',
+    educationalKits: 'کیت آموزشی',
+    electronics: 'قطعات الکترونیکی',
+    robots: 'ربات کامل',
+    sensors: 'سنسور',
+  },
+  filters: {
+    title: 'فیلترها',
+    category: 'دسته‌بندی',
+    availability: 'موجودی',
+    all: 'همه',
+    inStockOnly: 'فقط موجود',
+  },
+  productDetail: {
+    notFound: 'محصول یافت نشد',
+    backToShop: 'بازگشت به فروشگاه',
+    description: 'توضیحات',
+    features: 'ویژگی‌ها',
+    specifications: 'مشخصات',
+    relatedProducts: 'محصولات مرتبط',
+    stock: 'موجودی',
+    available: 'موجود',
+    unavailable: 'ناموجود',
+    reviews: 'نظرات',
+  },
+  checkoutPage: {
+    title: 'تکمیل خرید',
+    shippingInfo: 'اطلاعات ارسال',
+    orderSummary: 'خلاصه سفارش',
+    fullName: 'نام و نام خانوادگی',
+    email: 'ایمیل',
+    phone: 'شماره تماس',
+    address: 'آدرس',
+    city: 'شهر',
+    postalCode: 'کد پستی',
+    subtotal: 'جمع جزء',
+    shipping: 'هزینه ارسال',
+    freeShipping: 'رایگان',
+    completeOrder: 'تکمیل سفارش',
+    emptyCart: 'سبد خرید شما خالی است',
+    emptyCartDesc: 'برای خرید به فروشگاه بازگردید',
+    backToShop: 'بازگشت به فروشگاه',
+    remove: 'حذف',
+  },
 };
 
 export const teachers = {
   title: 'مربیان',
-  description: 'با مربیان مجرب ما آشنا شوید',
+  description: 'با مدرسین متخصص ما آشنا شوید',
   allTeachers: 'همه مربیان',
-  noTeachers: 'مربی‌ای موجود نیست',
+  noTeachers: 'مربی موجود نیست',
   expertise: 'تخصص',
   experience: 'تجربه',
   viewProfile: 'مشاهده پروفایل',
+  pageTitle: 'مربیان',
+  pageTitleHighlight: 'کاکتوس',
+  pageSubtitle: 'با بهترین اساتید و متخصصان در حوزه‌های مختلف فناوری آشنا شوید',
+  noInstructors: 'هیچ مدرسی یافت نشد',
+  skills: 'مهارت‌ها',
+  city: 'شهر',
+  memberSince: 'عضو از',
+  achievements: 'دستاوردها',
 };
 
 export const certifications = {
   title: 'گواهینامه‌ها و افتخارات',
   description: 'دستاوردها و گواهینامه‌های ما',
   viewCertificate: 'مشاهده گواهینامه',
+  pageTitle: 'گواهینامه‌ها',
+  pageTitleHighlight: 'کاکتوس',
+  pageSubtitle: 'دستاوردها و افتخارات کسب شده توسط تیم کاکتوس',
+  categories: {
+    all: 'همه',
+    international: 'بین المللی',
+    national: 'ملی',
+    regional: 'منطقه‌ای',
+  },
+  details: {
+    close: 'بستن',
+    category: 'دسته‌بندی',
+    issuedDate: 'تاریخ صدور',
+    organization: 'سازمان',
+    location: 'محل',
+    rank: 'رتبه',
+    description: 'توضیحات',
+  },
 };
 
 export const requirements = {
   title: 'نرم‌افزارهای مورد نیاز',
   description: 'نرم‌افزارها و ابزارهای مورد نیاز برای دوره‌ها',
   download: 'دانلود',
-  platform: 'پلتفرم',
+  platform: 'سیستم عامل',
   version: 'نسخه',
+  pageTitle: 'نرم‌افزارهای',
+  pageTitleHighlight: 'مورد نیاز',
+  pageSubtitle: 'نرم‌افزارها و ابزارهای مورد نیاز برای شرکت در دوره‌های آموزشی',
+  searchPlaceholder: 'جستجو در نرم‌افزارها...',
+  categories: {
+    all: 'همه',
+    programming: 'برنامه‌نویسی',
+    design: 'طراحی',
+    simulation: 'شبیه‌سازی',
+  },
+  filters: {
+    title: 'فیلترها',
+    category: 'دسته‌بندی',
+    platform: 'سیستم عامل',
+  },
 };
 
 export const footer = {

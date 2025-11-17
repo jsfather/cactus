@@ -11,8 +11,10 @@ import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { t, dir } = useLocale();
   const resolvedParams = use(params);
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,11 +41,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   if (!blog) {
     return (
-      <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+      <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
         <div className="container mx-auto px-4 py-12 text-center">
-          <h1 className="text-2xl font-bold">مقاله یافت نشد</h1>
+          <h1 className="text-2xl font-bold">{t.blog.notFound}</h1>
           <Link href="/blog" className="text-primary-600 mt-4 inline-block">
-            بازگشت به لیست مقالات
+            {t.blog.backToList}
           </Link>
         </div>
       </div>
@@ -55,7 +57,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     .filter(Boolean);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <article className="container mx-auto max-w-4xl px-4 py-12">
         <div>
           {/* Back Link */}
@@ -63,7 +65,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             href="/blog"
             className="hover:text-primary-600 mb-6 inline-flex items-center text-sm text-gray-600 dark:text-gray-400"
           >
-            ← بازگشت به لیست مقالات
+            ← {t.blog.backToList}
           </Link>
 
           {/* Title */}

@@ -12,6 +12,7 @@ import {
   Clock,
   Users,
 } from 'lucide-react';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface Course {
   title: string;
@@ -22,58 +23,59 @@ interface Course {
   price: string;
 }
 
-const courses: Course[] = [
-  {
-    title: 'مبانی رباتیک',
-    description:
-      'آشنایی با اصول اولیه رباتیک، شامل مکانیک، الکترونیک و برنامه‌نویسی.',
-    duration: '۸ هفته',
-    level: 'مبتدی',
-    image: '/course-robotics-intro.png',
-    price: '۲,۹۹۰,۰۰۰',
-  },
-  {
-    title: 'برنامه‌نویسی پیشرفته ربات',
-    description:
-      'تسلط بر مفاهیم پیچیده برنامه‌نویسی و الگوریتم‌ها برای ربات‌های خودکار.',
-    duration: '۱۲ هفته',
-    level: 'پیشرفته',
-    image: '/course-robot-programming.png',
-    price: '۴,۹۹۰,۰۰۰',
-  },
-  {
-    title: 'سیستم‌های بینایی ربات',
-    description:
-      'بررسی تکنیک‌های بینایی کامپیوتر و پیاده‌سازی پردازش تصویر در ربات‌ها.',
-    duration: '۱۰ هفته',
-    level: 'متوسط',
-    image: '/course-robot-vision.png',
-    price: '۳,۹۹۰,۰۰۰',
-  },
-];
-
-const stats = [
-  {
-    icon: <BookOpen className="h-6 w-6" />,
-    value: '+۵۰',
-    label: 'دوره آموزشی',
-  },
-  {
-    icon: <Clock className="h-6 w-6" />,
-    value: '+۱۰۰۰',
-    label: 'ساعت آموزش',
-  },
-  {
-    icon: <Users className="h-6 w-6" />,
-    value: '+۲۰۰۰',
-    label: 'دانشجو',
-  },
-];
-
 export default function Page() {
+  const { t, dir } = useLocale();
+
+  const getCourses = (): Course[] => [
+    {
+      title: t.home.courses.items.roboticsBasics.title,
+      description: t.home.courses.items.roboticsBasics.description,
+      duration: dir === 'rtl' ? '۸ هفته' : '8 Weeks',
+      level: t.home.courses.beginner,
+      image: '/course-robotics-intro.png',
+      price: dir === 'rtl' ? '۲,۹۹۰,۰۰۰' : '2,990,000',
+    },
+    {
+      title: t.home.courses.items.advancedRobotProgramming.title,
+      description: t.home.courses.items.advancedRobotProgramming.description,
+      duration: dir === 'rtl' ? '۱۲ هفته' : '12 Weeks',
+      level: t.home.courses.advanced,
+      image: '/course-robot-programming.png',
+      price: dir === 'rtl' ? '۴,۹۹۰,۰۰۰' : '4,990,000',
+    },
+    {
+      title: t.home.courses.items.robotVisionSystems.title,
+      description: t.home.courses.items.robotVisionSystems.description,
+      duration: dir === 'rtl' ? '۱۰ هفته' : '10 Weeks',
+      level: t.home.courses.intermediate,
+      image: '/course-robot-vision.png',
+      price: dir === 'rtl' ? '۳,۹۹۰,۰۰۰' : '3,990,000',
+    },
+  ];
+
+  const getStats = () => [
+    {
+      icon: <BookOpen className="h-6 w-6" />,
+      value: t.courses.stats.coursesValue,
+      label: t.courses.stats.courses,
+    },
+    {
+      icon: <Clock className="h-6 w-6" />,
+      value: t.courses.stats.hoursValue,
+      label: t.courses.stats.hours,
+    },
+    {
+      icon: <Users className="h-6 w-6" />,
+      value: t.courses.stats.studentsValue,
+      label: t.courses.stats.students,
+    },
+  ];
+
+  const courses = getCourses();
+  const stats = getStats();
   return (
     <div
-      dir="rtl"
+      dir={dir}
       className="min-h-screen bg-white pt-20 text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
       {/* Breadcrumb */}
@@ -84,11 +86,11 @@ export default function Page() {
               href="/"
               className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
             >
-              خانه
+              {t.common.home}
             </Link>
             <ChevronLeft className="mx-2 h-4 w-4 text-gray-500" />
             <span className="text-primary-600 dark:text-primary-400">
-              دوره‌های آموزشی
+              {t.courses.pageTitle}
             </span>
           </nav>
         </div>
@@ -103,10 +105,10 @@ export default function Page() {
               animate={{ opacity: 1, y: 0 }}
               className="mb-6 text-4xl font-bold"
             >
-              دوره‌های آموزشی
+              {t.courses.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                رباتیک
+                {t.courses.pageTitleHighlight}
               </span>
             </motion.h1>
             <motion.p
@@ -115,7 +117,7 @@ export default function Page() {
               transition={{ delay: 0.1 }}
               className="mb-8 text-xl text-gray-600 dark:text-gray-300"
             >
-              با بهترین اساتید، جدیدترین تکنولوژی‌ها را در حوزه رباتیک بیاموزید
+              {t.courses.pageSubtitle}
             </motion.p>
 
             {/* Search and Filter */}
@@ -123,14 +125,14 @@ export default function Page() {
               <div className="relative max-w-md flex-1">
                 <input
                   type="text"
-                  placeholder="جستجو در دوره‌ها..."
+                  placeholder={t.courses.searchPlaceholder}
                   className="focus:ring-primary-500 w-full rounded-xl border border-gray-200 px-4 py-3 pr-12 focus:border-transparent focus:ring-2 dark:border-gray-700 dark:bg-gray-800"
                 />
                 <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
               </div>
               <button className="flex items-center justify-center gap-2 rounded-xl bg-gray-100 px-6 py-3 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                 <Filter className="h-5 w-5" />
-                فیلتر دوره‌ها
+                {t.courses.filterCourses}
               </button>
             </div>
 
@@ -208,14 +210,14 @@ export default function Page() {
                       {course.duration}
                     </span>
                     <span className="text-primary-600 dark:text-primary-400 font-bold">
-                      {course.price} تومان
+                      {course.price} {t.common.toman}
                     </span>
                   </div>
                 </div>
                 <div className="px-6 pb-6">
                   <Link href={`/courses/1`}>
-                    <button className="text-primary-600 dark:text-primary-400 w-full cursor-pointer rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                      اطلاعات بیشتر
+                    <button className="text-primary-600 dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+                      {t.home.courses.moreInfo}
                     </button>
                   </Link>
                 </div>
@@ -229,14 +231,12 @@ export default function Page() {
       <section className="bg-gradient-to-r from-gray-100 to-gray-200 py-20 dark:from-gray-700 dark:to-gray-800">
         <div className="container mx-auto px-4">
           <div className="text-center text-gray-900 dark:text-white">
-            <h2 className="mb-4 text-3xl font-bold">
-              آماده شروع یادگیری هستید؟
-            </h2>
+            <h2 className="mb-4 text-3xl font-bold">{t.courses.cta.title}</h2>
             <p className="mb-8 text-lg text-gray-600 dark:text-gray-300">
-              با ما تماس بگیرید و مشاوره رایگان دریافت کنید
+              {t.courses.cta.subtitle}
             </p>
             <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-              دریافت مشاوره رایگان
+              {t.courses.cta.button}
             </Button>
           </div>
         </div>

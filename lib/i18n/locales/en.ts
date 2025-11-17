@@ -21,6 +21,10 @@ export const common = {
   yes: 'Yes',
   no: 'No',
   more: 'More',
+  home: 'Home',
+  hour: 'hour',
+  hours: 'hours',
+  toman: 'Toman',
 };
 
 export const nav = {
@@ -224,9 +228,76 @@ export const home = {
 export const about = {
   title: 'About Us',
   description: 'Learn more about Cactus Academy',
+  pageTitle: 'Specialized Academy',
+  pageTitleHighlight: 'Cactus',
+  pageSubtitle:
+    'With over 10 years of experience in specialized training and quality content production',
+  stats: {
+    students: 'Students',
+    studentsValue: '5000+',
+    studentsDesc: 'Have enrolled in our courses so far',
+    instructors: 'Instructors',
+    instructorsValue: '50+',
+    instructorsDesc: 'Expert and experienced',
+    courses: 'Courses',
+    coursesValue: '150+',
+    coursesDesc: 'Specialized training',
+    awards: 'Awards',
+    awardsValue: '10+',
+    awardsDesc: 'In educational festivals',
+  },
+  ourStory: 'Our Story',
   mission: 'Our Mission',
   vision: 'Our Vision',
-  team: 'Our Team',
+  values: 'Our Values',
+  missionTitle: 'Empowering the next generation',
+  missionDesc:
+    'Our mission is to provide quality education in robotics and technology, empowering students with practical skills needed in the modern world.',
+  visionTitle: 'Leading robotics education',
+  visionDesc:
+    'We envision becoming a leading institution in robotics education, known for innovative teaching methods and successful graduates.',
+  valuesTitle: 'Excellence, Innovation, Integrity',
+  valuesDesc:
+    'We believe in maintaining the highest standards of education, fostering innovation, and operating with complete integrity.',
+  features: {
+    title: 'Why Choose',
+    titleHighlight: 'Cactus',
+    feature1: {
+      title: 'Expert Instructors',
+      desc: 'Learn from industry professionals',
+    },
+    feature2: {
+      title: 'Hands-on Learning',
+      desc: 'Practical projects and real robots',
+    },
+    feature3: {
+      title: 'Modern Equipment',
+      desc: 'Latest technology and tools',
+    },
+    feature4: {
+      title: 'Career Support',
+      desc: 'Job placement assistance',
+    },
+    feature5: {
+      title: 'Flexible Schedule',
+      desc: 'Choose times that work for you',
+    },
+    feature6: {
+      title: 'Valid Certificates',
+      desc: 'Recognized industry certifications',
+    },
+  },
+  location: 'Our Location',
+  faq: {
+    title: 'Frequently Asked',
+    titleHighlight: 'Questions',
+    q1: 'How can I register for courses?',
+    a1: 'You can register by visiting the courses page, selecting your desired course, and completing payment through our online gateway.',
+    q2: 'Do courses have valid certificates?',
+    a2: 'Yes, all our courses come with valid certificates from Cactus Academy.',
+    q3: 'Is installment payment available?',
+    a3: 'Yes, installment payment options are available for long-term courses.',
+  },
 };
 
 export const courses = {
@@ -239,6 +310,41 @@ export const courses = {
   instructor: 'Instructor',
   enroll: 'Enroll Now',
   viewDetails: 'View Details',
+  pageTitle: 'Training Courses',
+  pageTitleHighlight: 'Robotics',
+  pageSubtitle:
+    'Learn the latest technologies in robotics with the best instructors',
+  searchPlaceholder: 'Search courses...',
+  filterCourses: 'Filter Courses',
+  specialCourses: 'Special Courses',
+  sortBy: 'Sort by',
+  newest: 'Newest',
+  popular: 'Most Popular',
+  stats: {
+    courses: 'Training Courses',
+    coursesValue: '+50',
+    hours: 'Training Hours',
+    hoursValue: '+1000',
+    students: 'Students',
+    studentsValue: '+2000',
+  },
+  cta: {
+    title: 'Ready to Start Learning?',
+    subtitle: 'Contact us and get free consultation',
+    button: 'Get Free Consultation',
+  },
+  detail: {
+    price: 'Course Price',
+    schedule: 'Course Schedule',
+    day: 'Day',
+    time: 'Time',
+    description: 'Course Description',
+    prerequisites: 'Prerequisites',
+    whatYouLearn: 'What You Will Learn',
+    courseInstructor: 'Course Instructor',
+    enroll: 'Enroll in Course',
+    guarantee: '7-day money-back guarantee',
+  },
 };
 
 export const blog = {
@@ -252,6 +358,8 @@ export const blog = {
   categories: 'Categories',
   tags: 'Tags',
   searchPlaceholder: 'Search articles...',
+  backToList: 'Back to articles list',
+  articleNotFound: 'Article not found',
 };
 
 export const shop = {
@@ -269,6 +377,55 @@ export const shop = {
   cartEmpty: 'Your cart is empty',
   total: 'Total',
   quantity: 'Quantity',
+  pageTitle: 'Shop',
+  pageTitleHighlight: 'Cactus',
+  pageSubtitle: 'Online purchase of robotics educational equipment and kits',
+  searchPlaceholder: 'Search products...',
+  categories: {
+    all: 'All Products',
+    educationalKits: 'Educational Kits',
+    electronics: 'Electronic Parts',
+    robots: 'Complete Robots',
+    sensors: 'Sensors',
+  },
+  filters: {
+    title: 'Filters',
+    category: 'Category',
+    availability: 'Availability',
+    all: 'All',
+    inStockOnly: 'In Stock Only',
+  },
+  productDetail: {
+    notFound: 'Product not found',
+    backToShop: 'Back to Shop',
+    description: 'Description',
+    features: 'Features',
+    specifications: 'Specifications',
+    relatedProducts: 'Related Products',
+    stock: 'Stock',
+    available: 'Available',
+    unavailable: 'Unavailable',
+    reviews: 'Reviews',
+  },
+  checkoutPage: {
+    title: 'Checkout',
+    shippingInfo: 'Shipping Information',
+    orderSummary: 'Order Summary',
+    fullName: 'Full Name',
+    email: 'Email',
+    phone: 'Phone',
+    address: 'Address',
+    city: 'City',
+    postalCode: 'Postal Code',
+    subtotal: 'Subtotal',
+    shipping: 'Shipping',
+    freeShipping: 'Free',
+    completeOrder: 'Complete Order',
+    emptyCart: 'Your cart is empty',
+    emptyCartDesc: 'Return to shop to make a purchase',
+    backToShop: 'Back to Shop',
+    remove: 'Remove',
+  },
 };
 
 export const teachers = {
@@ -279,12 +436,39 @@ export const teachers = {
   expertise: 'Expertise',
   experience: 'Experience',
   viewProfile: 'View Profile',
+  pageTitle: 'Instructors',
+  pageTitleHighlight: 'Cactus',
+  pageSubtitle:
+    'Meet the best instructors and experts in various technology fields',
+  noInstructors: 'No instructor found',
+  skills: 'Skills',
+  city: 'City',
+  memberSince: 'Member Since',
+  achievements: 'Achievements',
 };
 
 export const certifications = {
   title: 'Certifications & Honors',
   description: 'Our achievements and certifications',
   viewCertificate: 'View Certificate',
+  pageTitle: 'Certificates',
+  pageTitleHighlight: 'Cactus',
+  pageSubtitle: 'Achievements and honors earned by the Cactus team',
+  categories: {
+    all: 'All',
+    international: 'International',
+    national: 'National',
+    regional: 'Regional',
+  },
+  details: {
+    close: 'Close',
+    category: 'Category',
+    issuedDate: 'Issued Date',
+    organization: 'Organization',
+    location: 'Location',
+    rank: 'Rank',
+    description: 'Description',
+  },
 };
 
 export const requirements = {
@@ -293,6 +477,21 @@ export const requirements = {
   download: 'Download',
   platform: 'Platform',
   version: 'Version',
+  pageTitle: 'Required',
+  pageTitleHighlight: 'Software',
+  pageSubtitle: 'Software and tools needed to participate in training courses',
+  searchPlaceholder: 'Search software...',
+  categories: {
+    all: 'All',
+    programming: 'Programming',
+    design: 'Design',
+    simulation: 'Simulation',
+  },
+  filters: {
+    title: 'Filters',
+    category: 'Category',
+    platform: 'Platform',
+  },
 };
 
 export const footer = {

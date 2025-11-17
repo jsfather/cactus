@@ -16,6 +16,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface SoftwareRequirement {
   id: string;
@@ -419,24 +420,36 @@ const priceColors = {
 };
 
 export default function RequirementsPage() {
+  const { t, dir } = useLocale();
   const [selectedSoftware, setSelectedSoftware] =
     useState<SoftwareRequirement | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('همه');
-  const [selectedPlatform, setSelectedPlatform] = useState('همه');
+  const [selectedCategory, setSelectedCategory] = useState(
+    t.requirements.allCategories
+  );
+  const [selectedPlatform, setSelectedPlatform] = useState(
+    t.requirements.allPlatforms
+  );
 
   const filteredSoftware = softwareRequirements.filter((software) => {
     const categoryMatch =
-      selectedCategory === 'همه' || software.category === selectedCategory;
+      selectedCategory === t.requirements.allCategories ||
+      software.category === selectedCategory;
     const platformMatch =
-      selectedPlatform === 'همه' ||
+      selectedPlatform === t.requirements.allPlatforms ||
       software.platform.includes(selectedPlatform);
     return categoryMatch && platformMatch;
   });
 
-  const platforms = ['همه', 'Windows', 'macOS', 'Linux', 'Web'];
+  const platforms = [
+    t.requirements.allPlatforms,
+    'Windows',
+    'macOS',
+    'Linux',
+    'Web',
+  ];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -445,15 +458,14 @@ export default function RequirementsPage() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              نرم‌افزارها
+              {t.requirements.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                کاکتوس
+                {t.requirements.pageTitleHighlight}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              فهرست کامل نرم‌افزارهای ضروری برای یادگیری و توسعه پروژه‌های
-              رباتیک
+              {t.requirements.pageSubtitle}
             </p>
           </motion.div>
         </div>
@@ -466,7 +478,7 @@ export default function RequirementsPage() {
             {/* Category Filter */}
             <div>
               <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                دسته‌بندی:
+                {t.requirements.category}:
               </h3>
               <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
@@ -488,7 +500,7 @@ export default function RequirementsPage() {
             {/* Platform Filter */}
             <div>
               <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                پلتفرم:
+                {t.requirements.platform}:
               </h3>
               <div className="flex flex-wrap gap-2">
                 {platforms.map((platform) => (

@@ -8,6 +8,7 @@ import { Search, Filter, Star } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
 import { PublicProduct } from '@/app/lib/services/public-product.service';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface DisplayProduct {
   id: string | number;
@@ -57,6 +58,7 @@ const convertApiProductToDisplayFormat = (
 };
 
 export default function Page() {
+  const { t, dir } = useLocale();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -94,7 +96,7 @@ export default function Page() {
   });
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -103,14 +105,14 @@ export default function Page() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              فروشگاه
+              {t.shop.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                کاکتوس
+                {t.shop.pageTitleHighlight}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              خرید آنلاین تجهیزات و کیت‌های آموزشی رباتیک
+              {t.shop.pageSubtitle}
             </p>
           </motion.div>
         </div>
@@ -136,10 +138,10 @@ export default function Page() {
               {/* Filter Toggle Button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
                 <Filter className="h-5 w-5" />
-                فیلترها
+                {t.shop.filters}
               </button>
             </div>
 
@@ -154,7 +156,7 @@ export default function Page() {
                 {/* Categories */}
                 <div className="mb-4">
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    دسته‌بندی‌ها
+                    {t.shop.categories}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {categories.map((category) => (
@@ -176,7 +178,7 @@ export default function Page() {
                 {/* Availability Filter */}
                 <div className="mb-4">
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    وضعیت موجودی
+                    {t.shop.availabilityStatus}
                   </h3>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
@@ -187,7 +189,7 @@ export default function Page() {
                         onChange={() => setAvailability('all')}
                         className="text-primary-600"
                       />
-                      <span>همه</span>
+                      <span>{t.shop.allProducts}</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -197,7 +199,7 @@ export default function Page() {
                         onChange={() => setAvailability('in-stock')}
                         className="text-primary-600"
                       />
-                      <span>فقط کالاهای موجود</span>
+                      <span>{t.shop.onlyInStock}</span>
                     </label>
                   </div>
                 </div>

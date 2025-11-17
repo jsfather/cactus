@@ -17,42 +17,39 @@ import { useSettings } from '@/app/lib/hooks/use-settings';
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface FAQ {
   question: string;
   answer: string;
 }
 
-const faqs: FAQ[] = [
-  {
-    question: 'چگونه می‌توانم در دوره‌ها ثبت‌نام کنم؟',
-    answer:
-      'شما می‌توانید با مراجعه به صفحه دوره‌ها و انتخاب دوره مورد نظر خود، از طریق درگاه پرداخت آنلاین ثبت‌نام کنید.',
-  },
-  {
-    question: 'آیا دوره‌ها گواهینامه معتبر دارند؟',
-    answer:
-      'بله، تمامی دوره‌های ما دارای گواهینامه معتبر از آکادمی کاکتوس هستند.',
-  },
-  {
-    question: 'آیا امکان پرداخت اقساطی وجود دارد؟',
-    answer: 'بله، برای دوره‌های بلندمدت امکان پرداخت اقساطی فراهم شده است.',
-  },
-];
-
-const stats = [
-  {
-    number: '۵۰۰۰+',
-    label: 'دانشجو',
-    description: 'تاکنون در دوره‌های ما ثبت‌نام کرده‌اند',
-  },
-  { number: '۵۰+', label: 'مربی', description: 'متخصص و با تجربه' },
-  { number: '۱۵۰+', label: 'دوره', description: 'آموزشی تخصصی' },
-  { number: '۱۰+', label: 'جایزه', description: 'در جشنواره‌های آموزشی' },
-];
-
 export default function Page() {
+  const { t, dir } = useLocale();
   const [activeTab, setActiveTab] = useState(0);
+
+  const getStats = () => [
+    {
+      number: dir === 'rtl' ? '۵۰۰۰+' : '5000+',
+      label: t.about.stats.students,
+      description: t.about.stats.studentsDesc,
+    },
+    {
+      number: dir === 'rtl' ? '۵۰+' : '50+',
+      label: t.about.stats.instructors,
+      description: t.about.stats.instructorsDesc,
+    },
+    {
+      number: dir === 'rtl' ? '۱۵۰+' : '150+',
+      label: t.about.stats.courses,
+      description: t.about.stats.coursesDesc,
+    },
+    {
+      number: dir === 'rtl' ? '۱۰+' : '10+',
+      label: t.about.stats.awards,
+      description: t.about.stats.awardsDesc,
+    },
+  ];
 
   const { settings, loading, fetchSettings } = useSettings();
 
@@ -61,7 +58,7 @@ export default function Page() {
   }, [fetchSettings]);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -70,14 +67,14 @@ export default function Page() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              آکادمی تخصصی
+              {t.about.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                آموزش‌های آنلاین
+                {t.about.pageTitleHighlight}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              با بیش از ۱۰ سال تجربه در زمینه آموزش تخصصی و تولید محتوای باکیفیت
+              {t.about.pageSubtitle}
             </p>
           </motion.div>
         </div>
@@ -86,7 +83,7 @@ export default function Page() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat, index) => (
+            {getStats().map((stat, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -117,7 +114,7 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               className="mb-12 text-center"
             >
-              <h2 className="mb-4 text-3xl font-bold">درباره آکادمی کاکتوس</h2>
+              <h2 className="mb-4 text-3xl font-bold">{t.about.ourStory}</h2>
               <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 
@@ -158,7 +155,7 @@ export default function Page() {
                     : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
-                ماموریت ما
+                {t.about.mission}
               </button>
               <button
                 onClick={() => setActiveTab(1)}
@@ -168,7 +165,7 @@ export default function Page() {
                     : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
-                چشم‌انداز
+                {t.about.vision}
               </button>
             </div>
 
@@ -181,7 +178,7 @@ export default function Page() {
               {activeTab === 0 ? (
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold dark:text-white">
-                    ماموریت ما
+                    {t.about.mission}
                   </h3>
                   {loading ? (
                     <div className="h-20 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
@@ -197,7 +194,7 @@ export default function Page() {
               ) : (
                 <div className="space-y-4">
                   <h3 className="text-2xl font-bold dark:text-white">
-                    چشم‌انداز
+                    {t.about.vision}
                   </h3>
                   <div className="prose dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white max-w-none text-gray-600 dark:text-gray-300">
                     <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
@@ -219,7 +216,7 @@ export default function Page() {
               whileInView={{ opacity: 1, y: 0 }}
               className="mb-12 text-center"
             >
-              <h2 className="mb-4 text-3xl font-bold">تماس با ما</h2>
+              <h2 className="mb-4 text-3xl font-bold">{t.about.location}</h2>
               <div className="bg-primary-600 mx-auto h-1 w-20 rounded-full" />
             </motion.div>
 

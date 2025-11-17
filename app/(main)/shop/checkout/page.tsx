@@ -8,8 +8,10 @@ import { ChevronLeft, Minus, Plus, Trash2 } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { useStudentOrder } from '@/app/lib/hooks/use-student-order';
 import toast from 'react-hot-toast';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 export default function CheckoutPage() {
+  const { t, dir } = useLocale();
   const router = useRouter();
   const { state, removeItem, updateQuantity, clearCart } = useCart();
   const { buyOrder, loading } = useStudentOrder();
@@ -64,15 +66,17 @@ export default function CheckoutPage() {
     return (
       <div className="container mx-auto min-h-screen px-4 pt-24">
         <div className="flex flex-col items-center justify-center py-16">
-          <h1 className="mb-4 text-2xl font-bold">سبد خرید شما خالی است</h1>
+          <h1 className="mb-4 text-2xl font-bold">
+            {t.shop.checkoutPage.emptyCart}
+          </h1>
           <p className="mb-8 text-gray-600 dark:text-gray-400">
-            برای خرید به فروشگاه بازگردید
+            {t.shop.checkoutPage.emptyCartDescription}
           </p>
           <Link
             href="/shop"
             className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 rounded-lg px-6 py-2 text-white transition-colors"
           >
-            بازگشت به فروشگاه
+            {t.shop.backToShop}
           </Link>
         </div>
       </div>
@@ -89,25 +93,29 @@ export default function CheckoutPage() {
               href="/shop"
               className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
             >
-              فروشگاه
+              {t.shop.backToShop}
             </Link>
           </li>
           <ChevronLeft className="h-4 w-4 text-gray-400" />
-          <li className="text-gray-900 dark:text-white">تکمیل خرید</li>
+          <li className="text-gray-900 dark:text-white">
+            {t.shop.checkoutPage.title}
+          </li>
         </ol>
       </nav>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Checkout Form */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">اطلاعات ارسال</h2>
+          <h2 className="text-2xl font-bold">
+            {t.shop.checkoutPage.shippingInfo}
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="fullName"
                 className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                نام و نام خانوادگی
+                {t.shop.checkoutPage.fullName}
               </label>
               <input
                 type="text"
@@ -125,7 +133,7 @@ export default function CheckoutPage() {
                 htmlFor="email"
                 className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                ایمیل
+                {t.shop.checkoutPage.email}
               </label>
               <input
                 type="email"
@@ -143,7 +151,7 @@ export default function CheckoutPage() {
                 htmlFor="phone"
                 className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                شماره تماس
+                {t.shop.checkoutPage.phone}
               </label>
               <input
                 type="tel"
@@ -161,7 +169,7 @@ export default function CheckoutPage() {
                 htmlFor="address"
                 className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                آدرس
+                {t.shop.checkoutPage.address}
               </label>
               <textarea
                 id="address"
@@ -180,7 +188,7 @@ export default function CheckoutPage() {
                   htmlFor="city"
                   className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  شهر
+                  {t.shop.checkoutPage.city}
                 </label>
                 <input
                   type="text"
@@ -198,7 +206,7 @@ export default function CheckoutPage() {
                   htmlFor="postalCode"
                   className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
                 >
-                  کد پستی
+                  {t.shop.checkoutPage.postalCode}
                 </label>
                 <input
                   type="text"
@@ -217,14 +225,18 @@ export default function CheckoutPage() {
               disabled={loading}
               className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 w-full rounded-lg px-6 py-3 text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-400"
             >
-              {loading ? 'در حال پردازش...' : 'ثبت سفارش و پرداخت'}
+              {loading
+                ? t.shop.checkoutPage.processing
+                : t.shop.checkoutPage.completeOrder}
             </button>
           </form>
         </div>
 
         {/* Order Summary */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">خلاصه سفارش</h2>
+          <h2 className="text-2xl font-bold">
+            {t.shop.checkoutPage.orderSummary}
+          </h2>
           <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
             <div className="mb-6 space-y-4">
               {state.items.map((item) => (
@@ -265,7 +277,7 @@ export default function CheckoutPage() {
                               (item.price || '0').replace(/[^0-9]/g, '')
                             ) * item.quantity
                           ).toLocaleString()}{' '}
-                          تومان
+                          {t.common.toman}
                         </span>
                         <button
                           onClick={() => removeItem(item.id)}
@@ -282,20 +294,22 @@ export default function CheckoutPage() {
             <div className="space-y-2 border-t border-gray-200 pt-4 dark:border-gray-700">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
-                  جمع سبد خرید
+                  {t.shop.checkoutPage.subtotal}
                 </span>
-                <span>{(state.totalPrice || 0).toLocaleString()} تومان</span>
+                <span>
+                  {(state.totalPrice || 0).toLocaleString()} {t.common.toman}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600 dark:text-gray-400">
-                  هزینه ارسال
+                  {t.shop.checkoutPage.shipping}
                 </span>
-                <span>رایگان</span>
+                <span>{t.shop.checkoutPage.freeShipping}</span>
               </div>
               <div className="flex justify-between border-t border-gray-200 pt-2 text-lg font-bold dark:border-gray-700">
-                <span>مجموع</span>
+                <span>{t.shop.checkoutPage.total}</span>
                 <span className="text-primary-600 dark:text-primary-400">
-                  {(state.totalPrice || 0).toLocaleString()} تومان
+                  {(state.totalPrice || 0).toLocaleString()} {t.common.toman}
                 </span>
               </div>
             </div>

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Calendar, Tag, X, Share2, Download } from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface Certificate {
   id: string;
@@ -53,20 +54,28 @@ const certifications: Certificate[] = [
   // ... Add the rest of the certificates with proper data structure
 ];
 
-const categories = ['همه', 'بین المللی', 'ملی', 'منطقه‌ای'];
-
 export default function Page() {
+  const { t, dir } = useLocale();
   const [selectedCertificate, setSelectedCertificate] =
     useState<Certificate | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('همه');
+  const [selectedCategory, setSelectedCategory] = useState(
+    t.certifications.categories.all
+  );
+
+  const categories = [
+    t.certifications.categories.all,
+    t.certifications.categories.international,
+    t.certifications.categories.national,
+    t.certifications.categories.regional,
+  ];
 
   const filteredCertifications =
-    selectedCategory === 'همه'
+    selectedCategory === t.certifications.categories.all
       ? certifications
       : certifications.filter((cert) => cert.category === selectedCategory);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -75,14 +84,14 @@ export default function Page() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              گواهینامه‌ها
+              {t.certifications.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                کاکتوس
+                {t.certifications.pageTitleHighlight}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              دستاوردها و افتخارات کسب شده توسط تیم کاکتوس
+              {t.certifications.pageSubtitle}
             </p>
           </motion.div>
         </div>
@@ -183,7 +192,7 @@ export default function Page() {
               >
                 <div className="mb-6 flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    جزئیات گواهینامه
+                    {t.certifications.details.title}
                   </h2>
                   <button
                     onClick={() => setSelectedCertificate(null)}
@@ -215,7 +224,7 @@ export default function Page() {
                   <div className="grid grid-cols-2 gap-6">
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        دسته‌بندی
+                        {t.certifications.details.category}
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {selectedCertificate.category}
@@ -223,7 +232,7 @@ export default function Page() {
                     </div>
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        تاریخ صدور
+                        {t.certifications.details.issuedDate}
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {selectedCertificate.issuedDate}
@@ -232,7 +241,7 @@ export default function Page() {
                     {selectedCertificate.organization && (
                       <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                         <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          سازمان صادرکننده
+                          {t.certifications.details.organization}
                         </div>
                         <div className="font-medium text-gray-900 dark:text-white">
                           {selectedCertificate.organization}
@@ -242,7 +251,7 @@ export default function Page() {
                     {selectedCertificate.location && (
                       <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                         <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          محل برگزاری
+                          {t.certifications.details.location}
                         </div>
                         <div className="font-medium text-gray-900 dark:text-white">
                           {selectedCertificate.location}
@@ -252,7 +261,7 @@ export default function Page() {
                     {selectedCertificate.rank && (
                       <div className="bg-primary-50 dark:bg-primary-900/20 col-span-2 rounded-xl p-4">
                         <div className="text-primary-600 dark:text-primary-400 mb-2 text-sm">
-                          رتبه کسب شده
+                          {t.certifications.details.rank}
                         </div>
                         <div className="text-primary-700 dark:text-primary-300 font-medium">
                           {selectedCertificate.rank}
@@ -270,7 +279,7 @@ export default function Page() {
                       }}
                     >
                       <Share2 className="ml-2 h-4 w-4" />
-                      اشتراک‌گذاری
+                      {t.certifications.details.share}
                     </Button>
                     <Button
                       variant="secondary"
@@ -280,7 +289,7 @@ export default function Page() {
                       }}
                     >
                       <Download className="ml-2 h-4 w-4" />
-                      دانلود تصویر
+                      {t.certifications.details.download}
                     </Button>
                   </div>
                 </div>
