@@ -16,6 +16,7 @@ import {
 import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
 import { PublicProduct } from '@/app/lib/services/public-product.service';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface ProductPageProps {
   params: Promise<{
@@ -264,12 +265,7 @@ const convertApiProductToDisplayFormat = (
     ? Object.values(apiProduct.attributes).filter(
         (value) => value && value.length > 0
       )
-    : [
-        'محصول با کیفیت',
-        'گارانتی معتبر',
-        'پشتیبانی فنی',
-        'ارسال سریع',
-      ];
+    : ['محصول با کیفیت', 'گارانتی معتبر', 'پشتیبانی فنی', 'ارسال سریع'];
 
   // Extract specifications from attributes or use defaults
   const specifications = apiProduct.attributes
@@ -305,6 +301,7 @@ const convertApiProductToDisplayFormat = (
 };
 
 export default function Page({ params }: ProductPageProps) {
+  const { t, dir } = useLocale();
   const resolvedParams = use(params);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -324,7 +321,7 @@ export default function Page({ params }: ProductPageProps) {
   useEffect(() => {
     // Clear error and fetch all products if not already loaded
     clearError();
-    
+
     if (allProducts.length === 0 && !allProductsLoading) {
       fetchAllProducts();
     }
@@ -335,26 +332,29 @@ export default function Page({ params }: ProductPageProps) {
     if (allProducts.length > 0) {
       const productId = parseInt(resolvedParams.id);
       const foundProduct = findProductById(productId);
-      
+
       if (foundProduct) {
         // Use API data
         const displayProduct = convertApiProductToDisplayFormat(foundProduct);
-        
+
         // Add related products from the same category
         const relatedProducts = allProducts
-          .filter(p => 
-            p.id !== foundProduct.id && 
-            p.category?.name === foundProduct.category?.name
+          .filter(
+            (p) =>
+              p.id !== foundProduct.id &&
+              p.category?.name === foundProduct.category?.name
           )
           .slice(0, 3)
-          .map(p => ({
+          .map((p) => ({
             id: p.id.toString(),
             title: p.title,
-            price: new Intl.NumberFormat('fa-IR').format(p.discount_price || p.price),
+            price: new Intl.NumberFormat('fa-IR').format(
+              p.discount_price || p.price
+            ),
             image: p.image || '/product-1.jpg',
             category: p.category?.name || 'عمومی',
           }));
-        
+
         displayProduct.relatedProducts = relatedProducts;
         setProduct(displayProduct);
       } else {
@@ -398,7 +398,7 @@ export default function Page({ params }: ProductPageProps) {
   if (allProductsLoading || !product) {
     return (
       <div
-        dir="rtl"
+        dir={dir}
         className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900"
       >
         <div className="container mx-auto px-4">
@@ -464,7 +464,7 @@ export default function Page({ params }: ProductPageProps) {
 
   return (
     <div
-      dir="rtl"
+      dir={dir}
       className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900"
     >
       <div className="container mx-auto px-4">
@@ -490,7 +490,7 @@ export default function Page({ params }: ProductPageProps) {
                 }}
                 className="rounded-lg bg-red-100 px-3 py-1 text-sm font-medium text-red-800 transition-colors hover:bg-red-200 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700"
               >
-                تلاش مجدد
+                {t.common.retry}
               </button>
             </div>
           </div>
@@ -504,7 +504,7 @@ export default function Page({ params }: ProductPageProps) {
                 href="/shop"
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
               >
-                فروشگاه
+                {t.shop.backToShop}
               </Link>
             </li>
             <ChevronLeft className="h-4 w-4 text-gray-400" />
@@ -531,7 +531,7 @@ export default function Page({ params }: ProductPageProps) {
               />
               {product.discount && (
                 <div className="absolute top-4 right-4 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
-                  تخفیف
+                  {t.shop.discount}
                 </div>
               )}
             </div>
@@ -589,7 +589,7 @@ export default function Page({ params }: ProductPageProps) {
                     />
                   ))}
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    ({product.reviews} نظر)
+                    ({product.reviews} {t.shop.reviews})
                   </span>
                 </div>
                 <span className="text-primary-600 dark:text-primary-400 text-sm">
@@ -605,27 +605,27 @@ export default function Page({ params }: ProductPageProps) {
                     <>
                       <p className="text-primary-600 dark:text-primary-400 text-3xl font-bold">
                         {product.discount}
-                        <span className="mr-1 text-base">تومان</span>
+                        <span className="mr-1 text-base">{t.common.toman}</span>
                       </p>
                       <p className="text-gray-500 line-through dark:text-gray-400">
-                        {product.price} تومان
+                        {product.price} {t.common.toman}
                       </p>
                     </>
                   ) : (
                     <p className="text-primary-600 dark:text-primary-400 text-3xl font-bold">
                       {product.price}
-                      <span className="mr-1 text-base">تومان</span>
+                      <span className="mr-1 text-base">{t.common.toman}</span>
                     </p>
                   )}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   {product.inStock ? (
                     <span className="text-green-600 dark:text-green-400">
-                      موجود در انبار ({product.stockCount} عدد)
+                      {t.shop.inStock} ({product.stockCount} {t.shop.items})
                     </span>
                   ) : (
                     <span className="text-red-600 dark:text-red-400">
-                      ناموجود
+                      {t.shop.outOfStock}
                     </span>
                   )}
                 </div>
@@ -656,7 +656,7 @@ export default function Page({ params }: ProductPageProps) {
                   disabled={!product.inStock}
                   className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 flex-1 rounded-lg px-6 py-3 text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  افزودن به سبد خرید
+                  {t.shop.addToCart}
                 </button>
               </div>
             </div>
@@ -666,27 +666,27 @@ export default function Page({ params }: ProductPageProps) {
               <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
                 <Truck className="text-primary-600 dark:text-primary-400 h-8 w-8" />
                 <div>
-                  <p className="font-medium">ارسال سریع</p>
+                  <p className="font-medium">{t.shop.fastShipping}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    ارسال به سراسر کشور
+                    {t.shop.shippingDescription}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
                 <Shield className="text-primary-600 dark:text-primary-400 h-8 w-8" />
                 <div>
-                  <p className="font-medium">گارانتی اصالت</p>
+                  <p className="font-medium">{t.shop.authenticityGuarantee}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    تضمین کیفیت محصول
+                    {t.shop.qualityAssurance}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
                 <RefreshCw className="text-primary-600 dark:text-primary-400 h-8 w-8" />
                 <div>
-                  <p className="font-medium">۷ روز ضمانت</p>
+                  <p className="font-medium">{t.shop.returnGuarantee}</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    بازگشت بدون شرط
+                    {t.shop.returnDescription}
                   </p>
                 </div>
               </div>
@@ -694,9 +694,9 @@ export default function Page({ params }: ProductPageProps) {
 
             {/* Description */}
             <div className="prose prose-lg dark:prose-invert max-w-none">
-              <h2>توضیحات محصول</h2>
+              <h2>{t.shop.description}</h2>
               <p>{product.description}</p>
-              <h3>ویژگی‌ها</h3>
+              <h3>{t.shop.features}</h3>
               <ul>
                 {product.features.map((feature, index) => (
                   <li key={index}>{feature}</li>
@@ -706,7 +706,9 @@ export default function Page({ params }: ProductPageProps) {
 
             {/* Specifications */}
             <div className="rounded-2xl bg-white p-6 dark:bg-gray-800">
-              <h2 className="mb-4 text-xl font-bold">مشخصات فنی</h2>
+              <h2 className="mb-4 text-xl font-bold">
+                {t.shop.specifications}
+              </h2>
               <div className="space-y-4">
                 {product.specifications.map((spec, index) => (
                   <div
@@ -726,7 +728,7 @@ export default function Page({ params }: ProductPageProps) {
 
         {/* Related Products */}
         <section className="mt-16">
-          <h2 className="mb-8 text-2xl font-bold">محصولات مرتبط</h2>
+          <h2 className="mb-8 text-2xl font-bold">{t.shop.relatedProducts}</h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {product.relatedProducts.map((relatedProduct, index) => (
               <motion.div
@@ -753,7 +755,7 @@ export default function Page({ params }: ProductPageProps) {
                       {relatedProduct.title}
                     </h3>
                     <p className="text-primary-600 dark:text-primary-400 font-bold">
-                      {relatedProduct.price} تومان
+                      {relatedProduct.price} {t.common.toman}
                     </p>
                   </div>
                 </Link>

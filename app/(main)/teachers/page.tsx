@@ -6,15 +6,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Star, MapPin, Calendar, Award, User } from 'lucide-react';
 import { usePublicTeacher } from '@/app/lib/hooks/use-public-teacher';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 export default function Page() {
+  const { t, dir } = useLocale();
   const { teachers, loading, error, fetchHomeTeachers } = usePublicTeacher();
 
   useEffect(() => {
     fetchHomeTeachers();
   }, [fetchHomeTeachers]);
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -23,14 +25,14 @@ export default function Page() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              مربیان
+              {t.teachers.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                کاکتوس
+                {t.teachers.pageTitleHighlight}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              با بهترین اساتید و متخصصان در حوزه‌های مختلف فناوری آشنا شوید
+              {t.teachers.pageSubtitle}
             </p>
           </motion.div>
         </div>
@@ -66,7 +68,7 @@ export default function Page() {
 
           {!loading && !error && teachers.length === 0 && (
             <div className="rounded-lg bg-gray-50 p-8 text-center text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-              هیچ مدرسی یافت نشد
+              {t.teachers.noInstructors}
             </div>
           )}
 
@@ -149,7 +151,10 @@ export default function Page() {
                             {teacher.member_since && (
                               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <Calendar className="h-4 w-4" />
-                                <span>عضو از {teacher.member_since}</span>
+                                <span>
+                                  {t.teachers.memberSince}{' '}
+                                  {teacher.member_since}
+                                </span>
                               </div>
                             )}
                             {teacher.achievements && (

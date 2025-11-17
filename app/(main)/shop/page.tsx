@@ -8,6 +8,7 @@ import { Search, Filter, Star } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
 import { PublicProduct } from '@/app/lib/services/public-product.service';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface DisplayProduct {
   id: string | number;
@@ -57,6 +58,7 @@ const convertApiProductToDisplayFormat = (
 };
 
 export default function Page() {
+  const { t, dir } = useLocale();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -94,7 +96,7 @@ export default function Page() {
   });
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -103,14 +105,14 @@ export default function Page() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              فروشگاه
+              {t.shop.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                کاکتوس
+                {t.shop.pageTitleHighlight}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              خرید آنلاین تجهیزات و کیت‌های آموزشی رباتیک
+              {t.shop.pageSubtitle}
             </p>
           </motion.div>
         </div>
@@ -125,7 +127,7 @@ export default function Page() {
               <div className="relative flex-1 md:max-w-md">
                 <input
                   type="search"
-                  placeholder="جستجو در محصولات..."
+                  placeholder={t.shop.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 dark:border-gray-700 dark:bg-gray-800"
@@ -136,10 +138,10 @@ export default function Page() {
               {/* Filter Toggle Button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
                 <Filter className="h-5 w-5" />
-                فیلترها
+                {t.shop.filters.title}
               </button>
             </div>
 
@@ -154,7 +156,7 @@ export default function Page() {
                 {/* Categories */}
                 <div className="mb-4">
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    دسته‌بندی‌ها
+                    {t.shop.filters.category}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {categories.map((category) => (
@@ -176,7 +178,7 @@ export default function Page() {
                 {/* Availability Filter */}
                 <div className="mb-4">
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    وضعیت موجودی
+                    {t.shop.filters.availability}
                   </h3>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
@@ -187,7 +189,7 @@ export default function Page() {
                         onChange={() => setAvailability('all')}
                         className="text-primary-600"
                       />
-                      <span>همه</span>
+                      <span>{t.shop.filters.all}</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -197,7 +199,7 @@ export default function Page() {
                         onChange={() => setAvailability('in-stock')}
                         className="text-primary-600"
                       />
-                      <span>فقط کالاهای موجود</span>
+                      <span>{t.shop.filters.inStockOnly}</span>
                     </label>
                   </div>
                 </div>
@@ -247,13 +249,13 @@ export default function Page() {
                         />
                         {product.discount && (
                           <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
-                            تخفیف
+                            {dir === 'rtl' ? 'تخفیف' : 'Discount'}
                           </div>
                         )}
                         {!product.inStock && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                             <span className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white">
-                              ناموجود
+                              {dir === 'rtl' ? 'ناموجود' : 'Out of Stock'}
                             </span>
                           </div>
                         )}
@@ -335,7 +337,7 @@ export default function Page() {
                               </span>
                             )}
                             <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
-                              تومان
+                              {t.common.toman}
                             </span>
                           </div>
                           <button
@@ -365,7 +367,13 @@ export default function Page() {
                             }`}
                             disabled={!product.inStock}
                           >
-                            {product.inStock ? 'افزودن به سبد' : 'ناموجود'}
+                            {product.inStock
+                              ? dir === 'rtl'
+                                ? 'افزودن به سبد'
+                                : 'Add to Cart'
+                              : dir === 'rtl'
+                                ? 'ناموجود'
+                                : 'Out of Stock'}
                           </button>
                         </div>
                       </div>
@@ -380,13 +388,15 @@ export default function Page() {
           {error && (
             <div className="py-8 text-center">
               <p className="mb-4 text-lg text-red-600 dark:text-red-400">
-                خطا در بارگذاری محصولات: {error}
+                {dir === 'rtl'
+                  ? `خطا در بارگذاری محصولات: ${error}`
+                  : `Error loading products: ${error}`}
               </p>
               <button
                 onClick={fetchHomeProducts}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
               >
-                تلاش مجدد
+                {dir === 'rtl' ? 'تلاش مجدد' : 'Try Again'}
               </button>
             </div>
           )}
@@ -395,7 +405,9 @@ export default function Page() {
           {!loading && !error && filteredProducts.length === 0 && (
             <div className="mt-8 text-center">
               <p className="text-lg text-gray-600 dark:text-gray-300">
-                متأسفانه هیچ محصولی با معیارهای جستجوی شما یافت نشد.
+                {dir === 'rtl'
+                  ? 'متأسفانه هیچ محصولی با معیارهای جستجوی شما یافت نشد.'
+                  : 'Sorry, no products found matching your search criteria.'}
               </p>
             </div>
           )}

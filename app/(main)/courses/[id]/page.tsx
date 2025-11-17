@@ -9,6 +9,7 @@ import {
   GraduationCap,
   BarChart,
 } from 'lucide-react';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 const courseData = {
   title: 'دوره جامع برنامه‌نویسی پایتون',
@@ -43,8 +44,9 @@ const courseData = {
 };
 
 export default function Page() {
+  const { t, dir } = useLocale();
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <article className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
           {/* Main Content */}
@@ -71,7 +73,7 @@ export default function Page() {
                 <BarChart className="text-primary-600 h-6 w-6" />
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    سطح دوره
+                    {t.courses.detail.level}
                   </p>
                   <p className="font-bold">{courseData.level}</p>
                 </div>
@@ -80,7 +82,7 @@ export default function Page() {
                 <Clock className="text-primary-600 h-6 w-6" />
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    مدت دوره
+                    {t.courses.detail.duration}
                   </p>
                   <p className="font-bold">{courseData.duration}</p>
                 </div>
@@ -89,23 +91,31 @@ export default function Page() {
                 <Users className="text-primary-600 h-6 w-6" />
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    تعداد دانشجو
+                    {t.courses.detail.students}
                   </p>
-                  <p className="font-bold">{courseData.students} نفر</p>
+                  <p className="font-bold">
+                    {courseData.students} {t.courses.detail.people}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Course Schedule */}
             <div className="mb-8 rounded-2xl bg-gray-50 p-6 dark:bg-gray-800">
-              <h2 className="mb-4 text-xl font-bold">زمان‌بندی دوره</h2>
+              <h2 className="mb-4 text-xl font-bold">
+                {t.courses.detail.schedule}
+              </h2>
               <div className="space-y-4">
                 {courseData.schedule.map((session, index) => (
                   <div key={index} className="flex items-center gap-4">
                     <Calendar className="text-primary-600 h-5 w-5" />
-                    <span className="font-bold">{session.day}ها</span>
+                    <span className="font-bold">
+                      {session.day}
+                      {t.courses.detail.days}
+                    </span>
                     <span className="text-gray-600 dark:text-gray-400">
-                      ساعت {session.time} به مدت {session.duration}
+                      {t.courses.detail.time} {session.time}{' '}
+                      {t.courses.detail.forDuration} {session.duration}
                     </span>
                   </div>
                 ))}
@@ -114,21 +124,21 @@ export default function Page() {
 
             {/* Course Description */}
             <div className="prose prose-lg dark:prose-invert mb-8 max-w-none">
-              <h2>توضیحات دوره</h2>
+              <h2>{t.courses.detail.description}</h2>
               <p>
                 در این دوره جامع، شما با مفاهیم پایه و پیشرفته برنامه‌نویسی
                 پایتون آشنا خواهید شد. از صفر تا صد پایتون را به همراه کاربردهای
                 عملی آن خواهید آموخت.
               </p>
 
-              <h3>پیش‌نیازهای دوره</h3>
+              <h3>{t.courses.detail.prerequisites}</h3>
               <ul>
                 {courseData.prerequisites.map((item, index) => (
                   <li key={index}>{item}</li>
                 ))}
               </ul>
 
-              <h3>چه چیزهایی یاد خواهید گرفت</h3>
+              <h3>{t.courses.detail.whatYouWillLearn}</h3>
               <ul>
                 {courseData.whatYouWillLearn.map((item, index) => (
                   <li key={index}>{item}</li>
@@ -138,7 +148,9 @@ export default function Page() {
 
             {/* Instructor Info */}
             <div className="mb-12 rounded-2xl bg-gray-50 p-6 dark:bg-gray-800">
-              <h2 className="mb-6 text-xl font-bold">مدرس دوره</h2>
+              <h2 className="mb-6 text-xl font-bold">
+                {t.courses.detail.instructor}
+              </h2>
               <div className="flex items-start gap-4">
                 <Image
                   src={courseData.instructor.avatar}
@@ -167,7 +179,7 @@ export default function Page() {
             <div className="rounded-2xl bg-gray-50 p-6 dark:bg-gray-800">
               <div className="mb-6 text-center">
                 <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                  قیمت دوره
+                  {t.courses.detail.price}
                 </p>
                 <p className="text-primary-600 text-3xl font-bold">
                   {courseData.price}
@@ -177,24 +189,24 @@ export default function Page() {
               <div className="mb-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <BookOpen className="text-primary-600 h-5 w-5" />
-                  <span>دسترسی به تمام جلسات</span>
+                  <span>{t.courses.detail.accessToAllSessions}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <GraduationCap className="text-primary-600 h-5 w-5" />
-                  <span>گواهینامه معتبر</span>
+                  <span>{t.courses.detail.certificate}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Users className="text-primary-600 h-5 w-5" />
-                  <span>پشتیبانی آنلاین</span>
+                  <span>{t.courses.detail.onlineSupport}</span>
                 </div>
               </div>
 
               <button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 w-full rounded-lg px-6 py-3 text-center text-white transition-colors">
-                ثبت‌نام در دوره
+                {t.courses.detail.enroll}
               </button>
 
               <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-                ۷ روز ضمانت بازگشت وجه
+                {t.courses.detail.guarantee}
               </p>
             </div>
           </aside>

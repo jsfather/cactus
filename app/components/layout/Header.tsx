@@ -12,24 +12,27 @@ import { Menu, X, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '@/app/hooks/useUser';
 import { CartMenu } from '@/app/components/layout/CartMenu';
-
-const menuItems = [
-  { title: 'دوره‌ها', href: '/courses' },
-  { title: 'مربیان', href: '/teachers' },
-  { title: 'درباره ما', href: '/about' },
-  { title: 'وبلاگ', href: '/blog' },
-  { title: 'فروشگاه', href: '/shop' },
-  { title: 'گواهینامه ها و افتخارات', href: '/certifications' },
-  { title: 'نرم‌افزارهای مورد نیاز', href: '/requirements' },
-];
+import LanguageSwitcher from '@/app/components/ui/LanguageSwitcher';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 export default function Header() {
   const { user, loading, error } = useUser();
+  const { t } = useLocale();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const menuItems = [
+    { title: t.nav.courses, href: '/courses' },
+    { title: t.nav.teachers, href: '/teachers' },
+    { title: t.nav.about, href: '/about' },
+    { title: t.nav.blog, href: '/blog' },
+    { title: t.nav.shop, href: '/shop' },
+    { title: t.nav.certifications, href: '/certifications' },
+    { title: t.nav.requirements, href: '/requirements' },
+  ];
 
   useEffect(() => {
     if (error?.message.includes('401')) {
@@ -82,7 +85,7 @@ export default function Header() {
                   className="transition-all duration-300 dark:brightness-0 dark:invert"
                 />
                 <span className="from-primary-600 to-primary-800 mx-2 hidden bg-gradient-to-l bg-clip-text text-2xl font-black text-transparent lg:block">
-                  کاکتوس
+                  {t.common.siteName}
                 </span>
               </Link>
 
@@ -105,7 +108,7 @@ export default function Header() {
                 {menuItems.length > 5 && (
                   <div className="group relative">
                     <button className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm font-medium text-gray-900 transition-colors duration-200 xl:text-base dark:text-gray-100">
-                      بیشتر
+                      {t.common.more}
                       <svg
                         className="h-4 w-4"
                         fill="none"
@@ -157,14 +160,15 @@ export default function Header() {
               <div className="relative hidden lg:block">
                 <input
                   type="text"
-                  placeholder="جستجو ..."
-                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                  placeholder={t.common.search}
+                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                 />
-                <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
+                <span className="absolute end-3 top-2.5 text-gray-500 dark:text-gray-400">
                   <Search className="h-5 w-5" />
                 </span>
               </div>
 
+              <LanguageSwitcher />
               <DarkModeToggle />
               <CartMenu />
 
@@ -177,7 +181,7 @@ export default function Header() {
                 ) : !loading ? (
                   <Link href="/send-otp">
                     <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
-                      ورود / ثبت نام
+                      {t.nav.login}
                     </Button>
                   </Link>
                 ) : null}
@@ -199,10 +203,10 @@ export default function Header() {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="جستجو ..."
-                    className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                    placeholder={t.common.search}
+                    className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                   />
-                  <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
+                  <span className="absolute end-3 top-2.5 text-gray-500 dark:text-gray-400">
                     <Search className="h-5 w-5" />
                   </span>
                 </div>
@@ -243,7 +247,7 @@ export default function Header() {
                     className="rounded-xl"
                   />
                   <span className="from-primary-600 to-primary-800 bg-gradient-to-l bg-clip-text text-xl font-black text-transparent">
-                    کاکتوس
+                    {t.common.siteName}
                   </span>
                 </Link>
                 <button
@@ -274,7 +278,7 @@ export default function Header() {
                 {!user && (
                   <Link href="/send-otp" className="block">
                     <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 w-full transform rounded-full px-6 py-2.5 text-white transition-all duration-200 hover:scale-105">
-                      ورود / ثبت نام
+                      {t.nav.login}
                     </Button>
                   </Link>
                 )}

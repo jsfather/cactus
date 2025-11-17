@@ -16,6 +16,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface SoftwareRequirement {
   id: string;
@@ -393,17 +394,6 @@ const softwareRequirements: SoftwareRequirement[] = [
   },
 ];
 
-const categories = [
-  'همه',
-  'برنامه‌نویسی',
-  'برنامه‌نویسی بصری',
-  'زبان برنامه‌نویسی',
-  'سیستم عامل رباتیک',
-  'شبیه‌سازی',
-  'بینایی کامپیوتر',
-  'محاسبات علمی',
-];
-
 const difficultyColors = {
   مبتدی: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
   متوسط:
@@ -419,24 +409,47 @@ const priceColors = {
 };
 
 export default function RequirementsPage() {
+  const { t, dir } = useLocale();
   const [selectedSoftware, setSelectedSoftware] =
     useState<SoftwareRequirement | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState('همه');
-  const [selectedPlatform, setSelectedPlatform] = useState('همه');
+  const [selectedCategory, setSelectedCategory] = useState(
+    t.requirements.allCategories
+  );
+  const [selectedPlatform, setSelectedPlatform] = useState(
+    t.requirements.allPlatforms
+  );
+
+  const categories = [
+    t.requirements.allCategories,
+    dir === 'rtl' ? 'برنامه‌نویسی' : 'Programming',
+    dir === 'rtl' ? 'برنامه‌نویسی بصری' : 'Visual Programming',
+    dir === 'rtl' ? 'زبان برنامه‌نویسی' : 'Programming Language',
+    dir === 'rtl' ? 'سیستم عامل رباتیک' : 'Robot Operating System',
+    dir === 'rtl' ? 'شبیه‌سازی' : 'Simulation',
+    dir === 'rtl' ? 'بینایی کامپیوتر' : 'Computer Vision',
+    dir === 'rtl' ? 'محاسبات علمی' : 'Scientific Computing',
+  ];
+
+  const platforms = [
+    t.requirements.allPlatforms,
+    'Windows',
+    'macOS',
+    'Linux',
+    'Web',
+  ];
 
   const filteredSoftware = softwareRequirements.filter((software) => {
     const categoryMatch =
-      selectedCategory === 'همه' || software.category === selectedCategory;
+      selectedCategory === t.requirements.allCategories ||
+      software.category === selectedCategory;
     const platformMatch =
-      selectedPlatform === 'همه' ||
+      selectedPlatform === t.requirements.allPlatforms ||
       software.platform.includes(selectedPlatform);
     return categoryMatch && platformMatch;
   });
 
-  const platforms = ['همه', 'Windows', 'macOS', 'Linux', 'Web'];
-
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -445,15 +458,14 @@ export default function RequirementsPage() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              نرم‌افزارها
+              {t.requirements.pageTitle}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                کاکتوس
+                {t.requirements.pageTitleHighlight}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              فهرست کامل نرم‌افزارهای ضروری برای یادگیری و توسعه پروژه‌های
-              رباتیک
+              {t.requirements.pageSubtitle}
             </p>
           </motion.div>
         </div>
@@ -466,7 +478,7 @@ export default function RequirementsPage() {
             {/* Category Filter */}
             <div>
               <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                دسته‌بندی:
+                {t.requirements.category}:
               </h3>
               <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
@@ -488,7 +500,7 @@ export default function RequirementsPage() {
             {/* Platform Filter */}
             <div>
               <h3 className="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                پلتفرم:
+                {t.requirements.platform}:
               </h3>
               <div className="flex flex-wrap gap-2">
                 {platforms.map((platform) => (
@@ -556,9 +568,9 @@ export default function RequirementsPage() {
                 {/* Software Details */}
                 <div className="border-t border-gray-100 p-6 pt-4 dark:border-gray-700">
                   <div className="mb-4 flex flex-wrap gap-2">
-                    {software.platform.slice(0, 3).map((platform) => (
+                    {software.platform.slice(0, 3).map((platform, index) => (
                       <span
-                        key={platform}
+                        key={`${software.id}-platform-${index}`}
                         className="flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                       >
                         <Monitor className="h-3 w-3" />
@@ -575,7 +587,9 @@ export default function RequirementsPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <HardDrive className="h-4 w-4" />
-                      <span>حجم: {software.size}</span>
+                      <span>
+                        {dir === 'rtl' ? 'حجم' : 'Size'}: {software.size}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                       <Cpu className="h-4 w-4" />
@@ -593,7 +607,7 @@ export default function RequirementsPage() {
                       }}
                     >
                       <Download className="ml-1 h-4 w-4" />
-                      دانلود
+                      {dir === 'rtl' ? 'دانلود' : 'Download'}
                     </Button>
                     <Button
                       onClick={(e) => {
@@ -601,7 +615,7 @@ export default function RequirementsPage() {
                         setSelectedSoftware(software);
                       }}
                     >
-                      جزئیات
+                      {dir === 'rtl' ? 'جزئیات' : 'Details'}
                     </Button>
                   </div>
                 </div>
@@ -641,7 +655,9 @@ export default function RequirementsPage() {
                         {selectedSoftware.name}
                       </h2>
                       <p className="text-gray-600 dark:text-gray-400">
-                        نسخه {selectedSoftware.version} • آخرین بروزرسانی:{' '}
+                        {dir === 'rtl' ? 'نسخه' : 'Version'}{' '}
+                        {selectedSoftware.version} •{' '}
+                        {dir === 'rtl' ? 'آخرین بروزرسانی' : 'Last Update'}:{' '}
                         {selectedSoftware.lastUpdate}
                       </p>
                     </div>
@@ -658,7 +674,7 @@ export default function RequirementsPage() {
                   {/* Description */}
                   <div>
                     <h3 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white">
-                      توضیحات
+                      {dir === 'rtl' ? 'توضیحات' : 'Description'}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400">
                       {selectedSoftware.description}
@@ -669,7 +685,7 @@ export default function RequirementsPage() {
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        دسته‌بندی
+                        {dir === 'rtl' ? 'دسته‌بندی' : 'Category'}
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {selectedSoftware.category}
@@ -677,7 +693,7 @@ export default function RequirementsPage() {
                     </div>
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        سطح دشواری
+                        {dir === 'rtl' ? 'سطح دشواری' : 'Difficulty'}
                       </div>
                       <span
                         className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${difficultyColors[selectedSoftware.difficulty]}`}
@@ -687,7 +703,7 @@ export default function RequirementsPage() {
                     </div>
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        قیمت
+                        {dir === 'rtl' ? 'قیمت' : 'Price'}
                       </div>
                       <span
                         className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${priceColors[selectedSoftware.price]}`}
@@ -697,7 +713,7 @@ export default function RequirementsPage() {
                     </div>
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        حجم
+                        {dir === 'rtl' ? 'حجم' : 'Size'}
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white">
                         {selectedSoftware.size}
@@ -708,14 +724,16 @@ export default function RequirementsPage() {
                   {/* System Requirements */}
                   <div>
                     <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-                      حداقل سیستم مورد نیاز
+                      {dir === 'rtl'
+                        ? 'حداقل سیستم مورد نیاز'
+                        : 'Minimum System Requirements'}
                     </h3>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div className="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
                         <div className="mb-3 flex items-center gap-2">
                           <Monitor className="text-primary-600 dark:text-primary-400 h-5 w-5" />
                           <span className="font-medium text-gray-900 dark:text-white">
-                            سیستم عامل
+                            {dir === 'rtl' ? 'سیستم عامل' : 'Operating System'}
                           </span>
                         </div>
                         <div className="space-y-1">
@@ -733,24 +751,26 @@ export default function RequirementsPage() {
                         <div className="mb-3 flex items-center gap-2">
                           <Cpu className="text-primary-600 dark:text-primary-400 h-5 w-5" />
                           <span className="font-medium text-gray-900 dark:text-white">
-                            سخت‌افزار
+                            {dir === 'rtl' ? 'سخت‌افزار' : 'Hardware'}
                           </span>
                         </div>
                         <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
                           <div>
-                            • پردازنده:{' '}
+                            • {dir === 'rtl' ? 'پردازنده' : 'Processor'}:{' '}
                             {selectedSoftware.requirements.processor}
                           </div>
                           <div>
-                            • حافظه RAM: {selectedSoftware.requirements.ram}
+                            • {dir === 'rtl' ? 'حافظه RAM' : 'RAM'}:{' '}
+                            {selectedSoftware.requirements.ram}
                           </div>
                           <div>
-                            • فضای ذخیره:{' '}
+                            • {dir === 'rtl' ? 'فضای ذخیره' : 'Storage'}:{' '}
                             {selectedSoftware.requirements.storage}
                           </div>
                           {selectedSoftware.requirements.graphics && (
                             <div>
-                              • کارت گرافیک:{' '}
+                              •{' '}
+                              {dir === 'rtl' ? 'کارت گرافیک' : 'Graphics Card'}:{' '}
                               {selectedSoftware.requirements.graphics}
                             </div>
                           )}
@@ -762,7 +782,7 @@ export default function RequirementsPage() {
                   {/* Features */}
                   <div>
                     <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-                      ویژگی‌های کلیدی
+                      {dir === 'rtl' ? 'ویژگی‌های کلیدی' : 'Key Features'}
                     </h3>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       {selectedSoftware.features.map((feature, index) => (
@@ -779,7 +799,9 @@ export default function RequirementsPage() {
                   {/* Supported Platforms */}
                   <div>
                     <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-                      پلتفرم‌های پشتیبانی شده
+                      {dir === 'rtl'
+                        ? 'پلتفرم‌های پشتیبانی شده'
+                        : 'Supported Platforms'}
                     </h3>
                     <div className="flex flex-wrap gap-3">
                       {selectedSoftware.platform.map((platform) => (
@@ -797,7 +819,7 @@ export default function RequirementsPage() {
                   {/* Installation Guide */}
                   <div>
                     <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-                      راهنمای نصب
+                      {dir === 'rtl' ? 'راهنمای نصب' : 'Installation Guide'}
                     </h3>
                     <div className="space-y-6">
                       {Object.entries(selectedSoftware.installation).map(
@@ -835,7 +857,9 @@ export default function RequirementsPage() {
                   {/* Tutorials */}
                   <div>
                     <h3 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-                      آموزش‌های پیشنهادی
+                      {dir === 'rtl'
+                        ? 'آموزش‌های پیشنهادی'
+                        : 'Recommended Tutorials'}
                     </h3>
                     <div className="space-y-3">
                       {selectedSoftware.tutorials.map((tutorial, index) => (
@@ -864,7 +888,9 @@ export default function RequirementsPage() {
                       }
                     >
                       <Download className="ml-2 h-5 w-5" />
-                      دانلود از سایت رسمی
+                      {dir === 'rtl'
+                        ? 'دانلود از سایت رسمی'
+                        : 'Download from Official Site'}
                     </Button>
                     <Button
                       variant="secondary"
@@ -874,7 +900,7 @@ export default function RequirementsPage() {
                       }
                     >
                       <BookOpen className="ml-2 h-5 w-5" />
-                      مستندات
+                      {dir === 'rtl' ? 'مستندات' : 'Documentation'}
                     </Button>
                     {selectedSoftware.downloadLinks.alternative && (
                       <Button
@@ -888,7 +914,7 @@ export default function RequirementsPage() {
                         }
                       >
                         <ExternalLink className="ml-2 h-5 w-5" />
-                        لینک جایگزین
+                        {dir === 'rtl' ? 'لینک جایگزین' : 'Alternative Link'}
                       </Button>
                     )}
                   </div>
@@ -897,7 +923,10 @@ export default function RequirementsPage() {
                   <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                     <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <Settings className="h-4 w-4" />
-                      <span>مجوز: {selectedSoftware.license}</span>
+                      <span>
+                        {dir === 'rtl' ? 'مجوز' : 'License'}:{' '}
+                        {selectedSoftware.license}
+                      </span>
                     </div>
                   </div>
                 </div>

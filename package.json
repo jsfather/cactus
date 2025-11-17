@@ -29,6 +29,8 @@
     "react-masonry-css": "^1.0.16",
     "react-multi-date-picker": "^4.5.2",
     "react-toastify": "^11.0.5",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "use-debounce": "^10.0.4",
     "zod": "^3.25.42",
     "zustand": "^5.0.7"
