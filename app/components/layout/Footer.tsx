@@ -1,9 +1,11 @@
 import Image from 'next/image';
 import { useSettings } from '@/app/lib/hooks/use-settings';
 import { useEffect } from 'react';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 export default function Footer() {
   const { settings, fetchSettings } = useSettings();
+  const { t } = useLocale();
 
   useEffect(() => {
     fetchSettings();
@@ -22,11 +24,10 @@ export default function Footer() {
                 height={40}
                 className="rounded-lg transition-all duration-300 dark:brightness-0 dark:invert"
               />
-              <span className="text-xl font-bold text-white">کاکتوس</span>
+              <span className="text-xl font-bold text-white">{t.common.siteName}</span>
             </div>
             <p className="mb-6 text-gray-400">
-              توانمندسازی نسل آینده مهندسان رباتیک از طریق آموزش پیشرفته و تجربه
-              عملی با تجهیزات مدرن.
+              {t.footer.description}
             </p>
             <div className="mb-6 flex gap-4">
               {[
@@ -71,14 +72,14 @@ export default function Footer() {
 
           <div>
             <h3 className="mb-4 text-lg font-semibold text-white">
-              دسترسی سریع
+              {t.footer.quickLinks}
             </h3>
             <ul className="space-y-3">
               {[
-                { title: 'دوره‌ها', href: 'courses' },
-                { title: 'مربیان', href: 'teachers' },
-                { title: 'درباره ما', href: 'about' },
-                { title: 'وبلاگ', href: 'blog' },
+                { title: t.nav.courses, href: 'courses' },
+                { title: t.nav.teachers, href: 'teachers' },
+                { title: t.nav.about, href: 'about' },
+                { title: t.nav.blog, href: 'blog' },
               ].map((link) => (
                 <li key={link.href}>
                   <a
@@ -94,7 +95,7 @@ export default function Footer() {
 
           <div>
             <h3 className="mb-4 text-lg font-semibold text-white">
-              اطلاعات تماس
+              {t.footer.contactUs}
             </h3>
             <ul className="space-y-3">
               <li className="flex items-center gap-2">
@@ -167,18 +168,18 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-lg font-semibold text-white">خبرنامه</h3>
+            <h3 className="mb-4 text-lg font-semibold text-white">{t.footer.newsletter}</h3>
             <p className="mb-4 text-gray-400">
-              برای دریافت آخرین اخبار و تخفیف‌های ویژه در خبرنامه ما عضو شوید.
+              {t.footer.newsletterDescription}
             </p>
             <form className="space-y-3">
               <input
                 type="email"
-                placeholder="ایمیل خود را وارد کنید"
+                placeholder={t.footer.emailPlaceholder}
                 className="focus:ring-primary-500 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-right focus:border-transparent focus:ring-2 focus:outline-none"
               />
               <button className="bg-primary-600 hover:bg-primary-700 w-full rounded-lg py-2 font-medium text-white transition duration-200">
-                عضویت در خبرنامه
+                {t.footer.subscribe}
               </button>
             </form>
           </div>

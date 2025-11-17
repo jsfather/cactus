@@ -8,8 +8,10 @@ import { Search, Filter, User } from 'lucide-react';
 import { publicBlogService } from '@/app/lib/services/public-blog.service';
 import { Blog } from '@/app/lib/types';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { useLocale } from '@/app/contexts/LocaleContext';
 
 export default function Page() {
+  const { t, dir } = useLocale();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -68,7 +70,7 @@ export default function Page() {
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-white pt-20 dark:bg-gray-900">
+    <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-4">
           <motion.div
@@ -77,14 +79,14 @@ export default function Page() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              وبلاگ
+              {t.blog.title}
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                کاکتوس
+                {t.common.siteName}
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              آخرین مقالات، آموزش‌ها و اخبار دنیای رباتیک
+              {t.blog.description}
             </p>
           </motion.div>
         </div>
@@ -99,7 +101,7 @@ export default function Page() {
               <div className="relative flex-1 md:max-w-md">
                 <input
                   type="search"
-                  placeholder="جستجو در مقالات..."
+                  placeholder={t.blog.searchPlaceholder || t.common.search}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 dark:border-gray-700 dark:bg-gray-800"
@@ -113,7 +115,7 @@ export default function Page() {
                 className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
               >
                 <Filter className="h-5 w-5" />
-                فیلترها
+                {t.common.filter}
               </button>
             </div>
 
@@ -128,7 +130,7 @@ export default function Page() {
                 {/* Tags */}
                 <div>
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    برچسب‌ها
+                    {t.blog.tags}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {allTags.map((tag) => (
@@ -241,7 +243,7 @@ export default function Page() {
           {filteredPosts.length === 0 && (
             <div className="mt-8 text-center">
               <p className="text-lg text-gray-600 dark:text-gray-300">
-                متأسفانه هیچ مقاله‌ای با معیارهای جستجوی شما یافت نشد.
+                {t.blog.noPosts}
               </p>
             </div>
           )}
