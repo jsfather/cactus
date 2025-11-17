@@ -19,41 +19,6 @@ interface Certificate {
   rank?: string;
 }
 
-const certifications: Certificate[] = [
-  {
-    id: 'oxford-inventors',
-    title: 'مخترعین آکسفورد',
-    image: '/certifications/مخترعین-آکسفورد.jpg',
-    category: 'بین المللی',
-    issuedDate: '2024',
-    description: 'گواهینامه شرکت در رویداد مخترعین آکسفورد',
-    organization: 'دانشگاه آکسفورد',
-    location: 'انگلستان',
-  },
-  {
-    id: 'iran-open-2024',
-    title: 'مقام اول لایت فوتبالیست سکندری',
-    image: '/certifications/مقام اول لایت فوتبالیست سکندری- ایران اپن 2024.jpg',
-    category: 'ملی',
-    issuedDate: '2024',
-    description: 'کسب مقام اول در مسابقات ایران اپن 2024',
-    organization: 'ایران اپن',
-    location: 'ایران',
-    rank: 'مقام اول',
-  },
-  {
-    id: 'gitex-2023',
-    title: 'جیتکس امارات',
-    image: '/certifications/جیتکس امارات 2023.JPG',
-    category: 'بین المللی',
-    issuedDate: '2023',
-    description: 'حضور در نمایشگاه جیتکس امارات',
-    organization: 'GITEX',
-    location: 'امارات متحده عربی',
-  },
-  // ... Add the rest of the certificates with proper data structure
-];
-
 export default function Page() {
   const { t, dir } = useLocale();
   const [selectedCertificate, setSelectedCertificate] =
@@ -61,6 +26,54 @@ export default function Page() {
   const [selectedCategory, setSelectedCategory] = useState(
     t.certifications.categories.all
   );
+
+  const certifications: Certificate[] = [
+    {
+      id: 'oxford-inventors',
+      title: dir === 'rtl' ? 'مخترعین آکسفورد' : 'Oxford Inventors',
+      image: '/certifications/مخترعین-آکسفورد.jpg',
+      category: dir === 'rtl' ? 'بین المللی' : 'International',
+      issuedDate: '2024',
+      description:
+        dir === 'rtl'
+          ? 'گواهینامه شرکت در رویداد مخترعین آکسفورد'
+          : 'Certificate of participation in Oxford Inventors event',
+      organization: dir === 'rtl' ? 'دانشگاه آکسفورد' : 'University of Oxford',
+      location: dir === 'rtl' ? 'انگلستان' : 'England',
+    },
+    {
+      id: 'iran-open-2024',
+      title:
+        dir === 'rtl'
+          ? 'مقام اول لایت فوتبالیست سکندری'
+          : 'First Place Light Football Robocup',
+      image:
+        '/certifications/مقام اول لایت فوتبالیست سکندری- ایران اپن 2024.jpg',
+      category: dir === 'rtl' ? 'ملی' : 'National',
+      issuedDate: '2024',
+      description:
+        dir === 'rtl'
+          ? 'کسب مقام اول در مسابقات ایران اپن 2024'
+          : 'First place in Iran Open 2024 competition',
+      organization: dir === 'rtl' ? 'ایران اپن' : 'Iran Open',
+      location: dir === 'rtl' ? 'ایران' : 'Iran',
+      rank: dir === 'rtl' ? 'مقام اول' : 'First Place',
+    },
+    {
+      id: 'gitex-2023',
+      title: dir === 'rtl' ? 'جیتکس امارات' : 'GITEX UAE',
+      image: '/certifications/جیتکس امارات 2023.JPG',
+      category: dir === 'rtl' ? 'بین المللی' : 'International',
+      issuedDate: '2023',
+      description:
+        dir === 'rtl'
+          ? 'حضور در نمایشگاه جیتکس امارات'
+          : 'Participation in GITEX UAE exhibition',
+      organization: 'GITEX',
+      location: dir === 'rtl' ? 'امارات متحده عربی' : 'United Arab Emirates',
+    },
+    // ... Add the rest of the certificates with proper data structure
+  ];
 
   const categories = [
     t.certifications.categories.all,
@@ -72,7 +85,23 @@ export default function Page() {
   const filteredCertifications =
     selectedCategory === t.certifications.categories.all
       ? certifications
-      : certifications.filter((cert) => cert.category === selectedCategory);
+      : certifications.filter((cert) => {
+          // Convert the cert.category to match the selected category
+          if (selectedCategory === t.certifications.categories.international) {
+            return (
+              cert.category === (dir === 'rtl' ? 'بین المللی' : 'International')
+            );
+          } else if (
+            selectedCategory === t.certifications.categories.national
+          ) {
+            return cert.category === (dir === 'rtl' ? 'ملی' : 'National');
+          } else if (
+            selectedCategory === t.certifications.categories.regional
+          ) {
+            return cert.category === (dir === 'rtl' ? 'منطقه‌ای' : 'Regional');
+          }
+          return false;
+        });
 
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">

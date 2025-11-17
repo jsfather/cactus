@@ -127,7 +127,7 @@ export default function Page() {
               <div className="relative flex-1 md:max-w-md">
                 <input
                   type="search"
-                  placeholder="جستجو در محصولات..."
+                  placeholder={t.shop.searchPlaceholder}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 dark:border-gray-700 dark:bg-gray-800"
@@ -249,13 +249,13 @@ export default function Page() {
                         />
                         {product.discount && (
                           <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
-                            تخفیف
+                            {dir === 'rtl' ? 'تخفیف' : 'Discount'}
                           </div>
                         )}
                         {!product.inStock && (
                           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                             <span className="rounded-full bg-red-500 px-4 py-2 text-sm font-medium text-white">
-                              ناموجود
+                              {dir === 'rtl' ? 'ناموجود' : 'Out of Stock'}
                             </span>
                           </div>
                         )}
@@ -337,7 +337,7 @@ export default function Page() {
                               </span>
                             )}
                             <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
-                              تومان
+                              {t.common.toman}
                             </span>
                           </div>
                           <button
@@ -367,7 +367,13 @@ export default function Page() {
                             }`}
                             disabled={!product.inStock}
                           >
-                            {product.inStock ? 'افزودن به سبد' : 'ناموجود'}
+                            {product.inStock
+                              ? dir === 'rtl'
+                                ? 'افزودن به سبد'
+                                : 'Add to Cart'
+                              : dir === 'rtl'
+                                ? 'ناموجود'
+                                : 'Out of Stock'}
                           </button>
                         </div>
                       </div>
@@ -382,13 +388,15 @@ export default function Page() {
           {error && (
             <div className="py-8 text-center">
               <p className="mb-4 text-lg text-red-600 dark:text-red-400">
-                خطا در بارگذاری محصولات: {error}
+                {dir === 'rtl'
+                  ? `خطا در بارگذاری محصولات: ${error}`
+                  : `Error loading products: ${error}`}
               </p>
               <button
                 onClick={fetchHomeProducts}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
               >
-                تلاش مجدد
+                {dir === 'rtl' ? 'تلاش مجدد' : 'Try Again'}
               </button>
             </div>
           )}
@@ -397,7 +405,9 @@ export default function Page() {
           {!loading && !error && filteredProducts.length === 0 && (
             <div className="mt-8 text-center">
               <p className="text-lg text-gray-600 dark:text-gray-300">
-                متأسفانه هیچ محصولی با معیارهای جستجوی شما یافت نشد.
+                {dir === 'rtl'
+                  ? 'متأسفانه هیچ محصولی با معیارهای جستجوی شما یافت نشد.'
+                  : 'Sorry, no products found matching your search criteria.'}
               </p>
             </div>
           )}
