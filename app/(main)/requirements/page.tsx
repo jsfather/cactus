@@ -568,9 +568,9 @@ export default function RequirementsPage() {
                 {/* Software Details */}
                 <div className="border-t border-gray-100 p-6 pt-4 dark:border-gray-700">
                   <div className="mb-4 flex flex-wrap gap-2">
-                    {software.platform.slice(0, 3).map((platform) => (
+                    {software.platform.slice(0, 3).map((platform, index) => (
                       <span
-                        key={platform}
+                        key={`${software.id}-platform-${index}`}
                         className="flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                       >
                         <Monitor className="h-3 w-3" />
