@@ -57,6 +57,22 @@ export default function Page() {
     fetchSettings();
   }, [fetchSettings]);
 
+  // Define FAQs array - you can populate from settings or use static data
+  const faqs: FAQ[] = [
+    {
+      question: 'چگونه می‌توانم در دوره‌ها ثبت نام کنم؟',
+      answer: 'برای ثبت نام در دوره‌ها، کافیست وارد صفحه دوره‌ها شوید و دوره مورد نظر خود را انتخاب کنید. سپس روی دکمه ثبت نام کلیک کنید و مراحل ثبت نام را تکمیل نمایید.',
+    },
+    {
+      question: 'آیا دوره‌ها گواهینامه دارند؟',
+      answer: 'بله، تمامی دوره‌های ما دارای گواهینامه معتبر می‌باشند که پس از اتمام موفقیت‌آمیز دوره برای شما صادر خواهد شد.',
+    },
+    {
+      question: 'آیا امکان پرداخت اقساطی وجود دارد؟',
+      answer: 'بله، برای دوره‌های خاص امکان پرداخت اقساطی فراهم شده است. برای اطلاعات بیشتر با بخش پشتیبانی تماس بگیرید.',
+    },
+  ];
+
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white py-20 dark:from-gray-800 dark:to-gray-900">

@@ -141,7 +141,7 @@ export default function Page() {
                 className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
                 <Filter className="h-5 w-5" />
-                {t.shop.filters}
+                {t.shop.filters.title}
               </button>
             </div>
 
@@ -156,7 +156,7 @@ export default function Page() {
                 {/* Categories */}
                 <div className="mb-4">
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    {t.shop.categories}
+                    {t.shop.filters.category}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {categories.map((category) => (
@@ -178,7 +178,7 @@ export default function Page() {
                 {/* Availability Filter */}
                 <div className="mb-4">
                   <h3 className="mb-2 font-medium text-gray-900 dark:text-white">
-                    {t.shop.availabilityStatus}
+                    {t.shop.filters.availability}
                   </h3>
                   <div className="flex gap-4">
                     <label className="flex items-center gap-2">
@@ -189,7 +189,7 @@ export default function Page() {
                         onChange={() => setAvailability('all')}
                         className="text-primary-600"
                       />
-                      <span>{t.shop.allProducts}</span>
+                      <span>{t.shop.filters.all}</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -199,7 +199,7 @@ export default function Page() {
                         onChange={() => setAvailability('in-stock')}
                         className="text-primary-600"
                       />
-                      <span>{t.shop.onlyInStock}</span>
+                      <span>{t.shop.filters.inStockOnly}</span>
                     </label>
                   </div>
                 </div>
