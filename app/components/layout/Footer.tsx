@@ -24,11 +24,11 @@ export default function Footer() {
                 height={40}
                 className="rounded-lg transition-all duration-300 dark:brightness-0 dark:invert"
               />
-              <span className="text-xl font-bold text-white">{t.common.siteName}</span>
+              <span className="text-xl font-bold text-white">
+                {t.common.siteName}
+              </span>
             </div>
-            <p className="mb-6 text-gray-400">
-              {t.footer.description}
-            </p>
+            <p className="mb-6 text-gray-400">{t.footer.description}</p>
             <div className="mb-6 flex gap-4">
               {[
                 { name: 'توییتر', link: 'twitter' },
@@ -115,7 +115,7 @@ export default function Footer() {
                 {settings?.phone ? (
                   <span>{settings.phone}</span>
                 ) : (
-                  <span className="w-24 h-4 rounded bg-gray-700 animate-pulse inline-block" />
+                  <span className="inline-block h-4 w-24 animate-pulse rounded bg-gray-700" />
                 )}
               </li>
               <li className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export default function Footer() {
                 {settings?.email ? (
                   <span>{settings.email}</span>
                 ) : (
-                  <span className="w-32 h-4 rounded bg-gray-700 animate-pulse inline-block" />
+                  <span className="inline-block h-4 w-32 animate-pulse rounded bg-gray-700" />
                 )}
               </li>
               <li className="flex items-center gap-2">
@@ -161,14 +161,16 @@ export default function Footer() {
                 {settings?.address ? (
                   <span>{settings.address}</span>
                 ) : (
-                  <span className="w-40 h-4 rounded bg-gray-700 animate-pulse inline-block" />
+                  <span className="inline-block h-4 w-40 animate-pulse rounded bg-gray-700" />
                 )}
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="mb-4 text-lg font-semibold text-white">{t.footer.newsletter}</h3>
+            <h3 className="mb-4 text-lg font-semibold text-white">
+              {t.footer.newsletter}
+            </h3>
             <p className="mb-4 text-gray-400">
               {t.footer.newsletterDescription}
             </p>
@@ -176,7 +178,7 @@ export default function Footer() {
               <input
                 type="email"
                 placeholder={t.footer.emailPlaceholder}
-                className="focus:ring-primary-500 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-right focus:border-transparent focus:ring-2 focus:outline-none"
+                className="focus:ring-primary-500 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-right focus:border-transparent focus:outline-none focus:ring-2"
               />
               <button className="bg-primary-600 hover:bg-primary-700 w-full rounded-lg py-2 font-medium text-white transition duration-200">
                 {t.footer.subscribe}
@@ -189,7 +191,7 @@ export default function Footer() {
           {settings?.footer_text ? (
             <p>{settings.footer_text}</p>
           ) : (
-            <div className="w-64 h-4 rounded bg-gray-700 animate-pulse mx-auto" />
+            <div className="mx-auto h-4 w-64 animate-pulse rounded bg-gray-700" />
           )}
         </div>
       </div>

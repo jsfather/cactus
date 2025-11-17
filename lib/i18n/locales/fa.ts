@@ -138,7 +138,8 @@ export const requirements = {
 };
 
 export const footer = {
-  description: 'توانمندسازی نسل آینده مهندسان رباتیک از طریق آموزش پیشرفته و تجربه عملی با تجهیزات مدرن.',
+  description:
+    'توانمندسازی نسل آینده مهندسان رباتیک از طریق آموزش پیشرفته و تجربه عملی با تجهیزات مدرن.',
   quickLinks: 'دسترسی سریع',
   contactUs: 'اطلاعات تماس',
   followUs: 'ما را دنبال کنید',
@@ -147,7 +148,8 @@ export const footer = {
   email: 'ایمیل',
   address: 'آدرس',
   newsletter: 'خبرنامه',
-  newsletterDescription: 'برای دریافت آخرین اخبار و تخفیف‌های ویژه در خبرنامه ما عضو شوید.',
+  newsletterDescription:
+    'برای دریافت آخرین اخبار و تخفیف‌های ویژه در خبرنامه ما عضو شوید.',
   emailPlaceholder: 'ایمیل خود را وارد کنید',
   subscribe: 'عضویت در خبرنامه',
 };

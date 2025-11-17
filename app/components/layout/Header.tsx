@@ -125,7 +125,7 @@ export default function Header() {
                     </button>
 
                     {/* Dropdown menu */}
-                    <div className="invisible absolute top-full right-0 z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
+                    <div className="invisible absolute right-0 top-full z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
                       <div className="py-2">
                         {menuItems.slice(5).map((item) => (
                           <Link
@@ -161,9 +161,9 @@ export default function Header() {
                 <input
                   type="text"
                   placeholder={t.common.search}
-                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                 />
-                <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
+                <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">
                   <Search className="h-5 w-5" />
                 </span>
               </div>
@@ -204,9 +204,9 @@ export default function Header() {
                   <input
                     type="text"
                     placeholder={t.common.search}
-                    className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                    className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                   />
-                  <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
+                  <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">
                     <Search className="h-5 w-5" />
                   </span>
                 </div>
@@ -235,7 +235,7 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-80 overflow-y-auto bg-white p-6 shadow-xl dark:bg-gray-900"
+              className="fixed bottom-0 right-0 top-0 z-50 w-80 overflow-y-auto bg-white p-6 shadow-xl dark:bg-gray-900"
             >
               <div className="flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2">

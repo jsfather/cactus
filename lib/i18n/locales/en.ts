@@ -43,7 +43,8 @@ export const nav = {
 export const home = {
   hero: {
     title: 'Learn Robotics with Cactus',
-    subtitle: 'Start your journey in the world of robotics and artificial intelligence',
+    subtitle:
+      'Start your journey in the world of robotics and artificial intelligence',
     cta: 'View Courses',
   },
   features: {
@@ -138,7 +139,8 @@ export const requirements = {
 };
 
 export const footer = {
-  description: 'Empowering the next generation of robotics engineers through advanced training and hands-on experience with modern equipment.',
+  description:
+    'Empowering the next generation of robotics engineers through advanced training and hands-on experience with modern equipment.',
   quickLinks: 'Quick Links',
   contactUs: 'Contact Information',
   followUs: 'Follow Us',
@@ -147,7 +149,8 @@ export const footer = {
   email: 'Email',
   address: 'Address',
   newsletter: 'Newsletter',
-  newsletterDescription: 'Subscribe to our newsletter to receive the latest news and special offers.',
+  newsletterDescription:
+    'Subscribe to our newsletter to receive the latest news and special offers.',
   emailPlaceholder: 'Enter your email',
   subscribe: 'Subscribe to Newsletter',
 };
