@@ -1,107 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Calendar, Tag, X, Share2, Download } from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
 import { useLocale } from '@/app/contexts/LocaleContext';
-
-interface Certificate {
-  id: string;
-  title: string;
-  image: string;
-  category: string;
-  issuedDate: string;
-  description: string;
-  organization?: string;
-  location?: string;
-  rank?: string;
-}
+import { publicCertificateService } from '@/app/lib/services/public-certificate.service';
+import { Certificate } from '@/lib/types/certificate';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { toast } from 'react-hot-toast';
 
 export default function Page() {
   const { t, dir } = useLocale();
   const [selectedCertificate, setSelectedCertificate] =
     useState<Certificate | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState(
-    t.certifications.categories.all
-  );
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const certifications: Certificate[] = [
-    {
-      id: 'oxford-inventors',
-      title: dir === 'rtl' ? 'مخترعین آکسفورد' : 'Oxford Inventors',
-      image: '/certifications/مخترعین-آکسفورد.jpg',
-      category: dir === 'rtl' ? 'بین المللی' : 'International',
-      issuedDate: '2024',
-      description:
-        dir === 'rtl'
-          ? 'گواهینامه شرکت در رویداد مخترعین آکسفورد'
-          : 'Certificate of participation in Oxford Inventors event',
-      organization: dir === 'rtl' ? 'دانشگاه آکسفورد' : 'University of Oxford',
-      location: dir === 'rtl' ? 'انگلستان' : 'England',
-    },
-    {
-      id: 'iran-open-2024',
-      title:
-        dir === 'rtl'
-          ? 'مقام اول لایت فوتبالیست سکندری'
-          : 'First Place Light Football Robocup',
-      image:
-        '/certifications/مقام اول لایت فوتبالیست سکندری- ایران اپن 2024.jpg',
-      category: dir === 'rtl' ? 'ملی' : 'National',
-      issuedDate: '2024',
-      description:
-        dir === 'rtl'
-          ? 'کسب مقام اول در مسابقات ایران اپن 2024'
-          : 'First place in Iran Open 2024 competition',
-      organization: dir === 'rtl' ? 'ایران اپن' : 'Iran Open',
-      location: dir === 'rtl' ? 'ایران' : 'Iran',
-      rank: dir === 'rtl' ? 'مقام اول' : 'First Place',
-    },
-    {
-      id: 'gitex-2023',
-      title: dir === 'rtl' ? 'جیتکس امارات' : 'GITEX UAE',
-      image: '/certifications/جیتکس امارات 2023.JPG',
-      category: dir === 'rtl' ? 'بین المللی' : 'International',
-      issuedDate: '2023',
-      description:
-        dir === 'rtl'
-          ? 'حضور در نمایشگاه جیتکس امارات'
-          : 'Participation in GITEX UAE exhibition',
-      organization: 'GITEX',
-      location: dir === 'rtl' ? 'امارات متحده عربی' : 'United Arab Emirates',
-    },
-    // ... Add the rest of the certificates with proper data structure
-  ];
-
+  // Get unique categories from certificates
   const categories = [
-    t.certifications.categories.all,
-    t.certifications.categories.international,
-    t.certifications.categories.national,
-    t.certifications.categories.regional,
+    'all',
+    ...new Set(certificates.flatMap((cert) => cert.categories)),
   ];
 
-  const filteredCertifications =
-    selectedCategory === t.certifications.categories.all
-      ? certifications
-      : certifications.filter((cert) => {
-          // Convert the cert.category to match the selected category
-          if (selectedCategory === t.certifications.categories.international) {
-            return (
-              cert.category === (dir === 'rtl' ? 'بین المللی' : 'International')
-            );
-          } else if (
-            selectedCategory === t.certifications.categories.national
-          ) {
-            return cert.category === (dir === 'rtl' ? 'ملی' : 'National');
-          } else if (
-            selectedCategory === t.certifications.categories.regional
-          ) {
-            return cert.category === (dir === 'rtl' ? 'منطقه‌ای' : 'Regional');
-          }
-          return false;
-        });
+  // Fetch certificates
+  useEffect(() => {
+    const fetchCertificates = async () => {
+      try {
+        setLoading(true);
+        const response = await publicCertificateService.getList(
+          selectedCategory === 'all' ? undefined : selectedCategory
+        );
+        setCertificates(response.data);
+      } catch (error) {
+        console.error('Error fetching certificates:', error);
+        toast.error('خطا در بارگذاری گواهینامه‌ها');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCertificates();
+  }, [selectedCategory]);
+
+  const filteredCertifications = certificates;
+
+  // Clean string from API (remove extra quotes)
+  const cleanString = (str: string) => {
+    return str.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
@@ -113,14 +66,14 @@ export default function Page() {
             className="mx-auto max-w-4xl text-center"
           >
             <h1 className="mb-6 text-4xl font-bold">
-              {t.certifications.pageTitle}
+              افتخارات و
               <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
                 {' '}
-                {t.certifications.pageTitleHighlight}
+                گواهینامه‌ها
               </span>
             </h1>
             <p className="mb-12 text-xl text-gray-600 dark:text-gray-300">
-              {t.certifications.pageSubtitle}
+              مجموعه‌ای از افتخارات و گواهینامه‌های کسب شده
             </p>
           </motion.div>
         </div>
@@ -140,7 +93,7 @@ export default function Page() {
                     : 'bg-white text-gray-600 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
                 }`}
               >
-                {category}
+                {category === 'all' ? 'همه' : category}
               </button>
             ))}
           </div>
@@ -160,9 +113,10 @@ export default function Page() {
                 <div className="relative h-3/5 overflow-hidden">
                   <Image
                     src={cert.image}
-                    alt={cert.title}
+                    alt={cleanString(cert.title)}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    unoptimized
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/50" />
                 </div>
@@ -171,24 +125,24 @@ export default function Page() {
                 <div className="relative h-2/5 p-6">
                   <div className="mb-2 flex items-center justify-between">
                     <h3 className="line-clamp-1 text-xl font-bold text-gray-900 dark:text-white">
-                      {cert.title}
+                      {cleanString(cert.title)}
                     </h3>
                     <Trophy className="h-5 w-5 text-amber-500" />
                   </div>
                   <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                    {cert.description}
+                    {cleanString(cert.description)}
                   </p>
                   <div className="absolute right-6 bottom-6 left-6 flex flex-wrap items-center gap-4 text-sm">
                     <div className="flex items-center gap-1.5">
                       <Tag className="text-primary-500 h-4 w-4" />
                       <span className="text-gray-600 dark:text-gray-400">
-                        {cert.category}
+                        {cert.categories[0]}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <Calendar className="text-primary-500 h-4 w-4" />
                       <span className="text-gray-600 dark:text-gray-400">
-                        {cert.issuedDate}
+                        {new Date(cert.issued_at).toLocaleDateString('fa-IR')}
                       </span>
                     </div>
                   </div>
@@ -221,7 +175,7 @@ export default function Page() {
               >
                 <div className="mb-6 flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {t.certifications.details.title}
+                    جزئیات گواهینامه
                   </h2>
                   <button
                     onClick={() => setSelectedCertificate(null)}
@@ -234,66 +188,59 @@ export default function Page() {
                 <div className="relative mb-8 aspect-video overflow-hidden rounded-2xl">
                   <Image
                     src={selectedCertificate.image}
-                    alt={selectedCertificate.title}
+                    alt={cleanString(selectedCertificate.title)}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
 
                 <div className="space-y-6">
                   <div>
                     <h3 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-                      {selectedCertificate.title}
+                      {cleanString(selectedCertificate.title)}
                     </h3>
                     <p className="text-lg text-gray-600 dark:text-gray-400">
-                      {selectedCertificate.description}
+                      {cleanString(selectedCertificate.description)}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6">
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        {t.certifications.details.category}
+                        دسته‌بندی
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white">
-                        {selectedCertificate.category}
+                        {selectedCertificate.categories.join(', ')}
                       </div>
                     </div>
                     <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                       <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                        {t.certifications.details.issuedDate}
+                        تاریخ صدور
                       </div>
                       <div className="font-medium text-gray-900 dark:text-white">
-                        {selectedCertificate.issuedDate}
+                        {new Date(
+                          selectedCertificate.issued_at
+                        ).toLocaleDateString('fa-IR')}
                       </div>
                     </div>
                     {selectedCertificate.organization && (
                       <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                         <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          {t.certifications.details.organization}
+                          سازمان
                         </div>
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {selectedCertificate.organization}
+                          {cleanString(selectedCertificate.organization)}
                         </div>
                       </div>
                     )}
                     {selectedCertificate.location && (
                       <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-700/50">
                         <div className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                          {t.certifications.details.location}
+                          مکان
                         </div>
                         <div className="font-medium text-gray-900 dark:text-white">
-                          {selectedCertificate.location}
-                        </div>
-                      </div>
-                    )}
-                    {selectedCertificate.rank && (
-                      <div className="bg-primary-50 dark:bg-primary-900/20 col-span-2 rounded-xl p-4">
-                        <div className="text-primary-600 dark:text-primary-400 mb-2 text-sm">
-                          {t.certifications.details.rank}
-                        </div>
-                        <div className="text-primary-700 dark:text-primary-300 font-medium">
-                          {selectedCertificate.rank}
+                          {cleanString(selectedCertificate.location)}
                         </div>
                       </div>
                     )}
@@ -304,21 +251,27 @@ export default function Page() {
                       variant="secondary"
                       className="flex-1"
                       onClick={() => {
-                        // Handle share
+                        if (navigator.share) {
+                          navigator.share({
+                            title: cleanString(selectedCertificate.title),
+                            text: cleanString(selectedCertificate.description),
+                            url: window.location.href,
+                          });
+                        }
                       }}
                     >
                       <Share2 className="ml-2 h-4 w-4" />
-                      {t.certifications.details.share}
+                      اشتراک‌گذاری
                     </Button>
                     <Button
                       variant="secondary"
                       className="flex-1"
                       onClick={() => {
-                        // Handle download
+                        window.open(selectedCertificate.image, '_blank');
                       }}
                     >
                       <Download className="ml-2 h-4 w-4" />
-                      {t.certifications.details.download}
+                      دانلود
                     </Button>
                   </div>
                 </div>

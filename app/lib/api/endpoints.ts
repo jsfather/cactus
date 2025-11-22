@@ -15,6 +15,9 @@ export const API_ENDPOINTS = {
     GET: '/home/settings',
     UPDATE: '/admin/settings',
   },
+  HOME: {
+    CERTIFICATES: '/home/certificates',
+  },
   PANEL: {
     ADMIN: {
       DASHBOARD: '/admin/dashboard',
