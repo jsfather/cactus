@@ -1,6 +1,9 @@
 import { useCallback } from 'react';
 import { useCertificateStore } from '@/app/lib/stores/certificate.store';
-import { CertificateCreateRequest, CertificateUpdateRequest } from '@/lib/types/certificate';
+import {
+  CertificateCreateRequest,
+  CertificateUpdateRequest,
+} from '@/lib/types/certificate';
 
 export const useCertificate = () => {
   const store = useCertificateStore();
@@ -16,7 +19,8 @@ export const useCertificate = () => {
   );
 
   const updateCertificate = useCallback(
-    (id: string, payload: CertificateUpdateRequest) => store.updateCertificate(id, payload),
+    (id: string, payload: CertificateUpdateRequest) =>
+      store.updateCertificate(id, payload),
     [store.updateCertificate]
   );
 

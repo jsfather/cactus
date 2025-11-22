@@ -9,7 +9,14 @@ import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useCertificate } from '@/app/lib/hooks/use-certificate';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import { Award, Plus, Calendar, MapPin, Building2, TrendingUp } from 'lucide-react';
+import {
+  Award,
+  Plus,
+  Calendar,
+  MapPin,
+  Building2,
+  TrendingUp,
+} from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import Image from 'next/image';
 
@@ -18,7 +25,8 @@ export default function CertificatesPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Certificate | null>(null);
-  const { certificateList, loading, fetchCertificateList, deleteCertificate } = useCertificate();
+  const { certificateList, loading, fetchCertificateList, deleteCertificate } =
+    useCertificate();
 
   useEffect(() => {
     fetchCertificateList();
@@ -31,7 +39,9 @@ export default function CertificatesPage() {
     const thisYear = new Date();
     return certDate.getFullYear() === thisYear.getFullYear();
   }).length;
-  const uniqueOrganizations = new Set(certificateList.map((cert) => cert.organization)).size;
+  const uniqueOrganizations = new Set(
+    certificateList.map((cert) => cert.organization)
+  ).size;
   const thisMonthCertificates = certificateList.filter((cert) => {
     const certDate = new Date(cert.created_at);
     const thisMonth = new Date();
@@ -156,7 +166,11 @@ export default function CertificatesPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
-          { label: 'افتخارات و گواهینامه‌ها', href: '/admin/certificates', active: true },
+          {
+            label: 'افتخارات و گواهینامه‌ها',
+            href: '/admin/certificates',
+            active: true,
+          },
         ]}
       />
 
@@ -267,7 +281,9 @@ export default function CertificatesPage() {
             columns={columns}
             loading={loading}
             emptyMessage="هیچ گواهینامه‌ای یافت نشد"
-            onEdit={(certificate) => router.push(`/admin/certificates/${certificate.id}`)}
+            onEdit={(certificate) =>
+              router.push(`/admin/certificates/${certificate.id}`)
+            }
             onDelete={handleDeleteClick}
           />
         </div>

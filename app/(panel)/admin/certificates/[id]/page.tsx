@@ -14,7 +14,10 @@ import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCertificate } from '@/app/lib/hooks/use-certificate';
-import { CertificateCreateRequest, CertificateUpdateRequest } from '@/lib/types/certificate';
+import {
+  CertificateCreateRequest,
+  CertificateUpdateRequest,
+} from '@/lib/types/certificate';
 import { ArrowRight, Save } from 'lucide-react';
 
 const schema = z.object({
@@ -81,11 +84,19 @@ export default function CertificateFormPage({
     if (currentCertificate && !isNew) {
       reset({
         image: currentCertificate.image,
-        title: currentCertificate.title.replace(/^"|"$/g, '').replace(/\\"/g, '"'),
-        description: currentCertificate.description.replace(/^"|"$/g, '').replace(/\\"/g, '"'),
+        title: currentCertificate.title
+          .replace(/^"|"$/g, '')
+          .replace(/\\"/g, '"'),
+        description: currentCertificate.description
+          .replace(/^"|"$/g, '')
+          .replace(/\\"/g, '"'),
         issued_at: currentCertificate.issued_at,
-        organization: currentCertificate.organization.replace(/^"|"$/g, '').replace(/\\"/g, '"'),
-        location: currentCertificate.location.replace(/^"|"$/g, '').replace(/\\"/g, '"'),
+        organization: currentCertificate.organization
+          .replace(/^"|"$/g, '')
+          .replace(/\\"/g, '"'),
+        location: currentCertificate.location
+          .replace(/^"|"$/g, '')
+          .replace(/\\"/g, '"'),
         categories: currentCertificate.categories.join(', '),
       });
     }
@@ -114,7 +125,10 @@ export default function CertificateFormPage({
         await createCertificate(payload as CertificateCreateRequest);
         toast.success('گواهینامه با موفقیت ایجاد شد');
       } else {
-        await updateCertificate(resolvedParams.id, payload as CertificateUpdateRequest);
+        await updateCertificate(
+          resolvedParams.id,
+          payload as CertificateUpdateRequest
+        );
         toast.success('گواهینامه با موفقیت به‌روزرسانی شد');
       }
 
@@ -283,8 +297,8 @@ export default function CertificateFormPage({
                 {isSubmitting
                   ? 'در حال ذخیره...'
                   : isNew
-                  ? 'ایجاد گواهینامه'
-                  : 'به‌روزرسانی گواهینامه'}
+                    ? 'ایجاد گواهینامه'
+                    : 'به‌روزرسانی گواهینامه'}
               </Button>
             </div>
           </form>

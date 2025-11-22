@@ -20,9 +20,11 @@ export class CertificateService {
     );
   }
 
-  async create(payload: CertificateCreateRequest): Promise<CertificateResponse> {
+  async create(
+    payload: CertificateCreateRequest
+  ): Promise<CertificateResponse> {
     const formData = new FormData();
-    
+
     if (payload.image instanceof File) {
       formData.append('image', payload.image);
     }
@@ -31,7 +33,7 @@ export class CertificateService {
     formData.append('issued_at', payload.issued_at);
     formData.append('organization', payload.organization);
     formData.append('location', payload.location);
-    
+
     payload.categories.forEach((category, index) => {
       formData.append(`categories[${index}]`, category);
     });
@@ -47,9 +49,12 @@ export class CertificateService {
     );
   }
 
-  async update(id: string, payload: CertificateUpdateRequest): Promise<CertificateResponse> {
+  async update(
+    id: string,
+    payload: CertificateUpdateRequest
+  ): Promise<CertificateResponse> {
     const formData = new FormData();
-    
+
     if (payload.image instanceof File) {
       formData.append('image', payload.image);
     }
@@ -58,11 +63,11 @@ export class CertificateService {
     formData.append('issued_at', payload.issued_at);
     formData.append('organization', payload.organization);
     formData.append('location', payload.location);
-    
+
     payload.categories.forEach((category, index) => {
       formData.append(`categories[${index}]`, category);
     });
-    
+
     formData.append('_method', 'PUT');
 
     return apiClient.post<CertificateResponse>(

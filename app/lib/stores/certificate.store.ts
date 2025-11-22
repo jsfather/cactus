@@ -22,8 +22,13 @@ interface CertificateState {
   clearError: () => void;
 
   fetchCertificateList: () => Promise<void>;
-  createCertificate: (payload: CertificateCreateRequest) => Promise<CertificateResponse>;
-  updateCertificate: (id: string, payload: CertificateUpdateRequest) => Promise<CertificateResponse>;
+  createCertificate: (
+    payload: CertificateCreateRequest
+  ) => Promise<CertificateResponse>;
+  updateCertificate: (
+    id: string,
+    payload: CertificateUpdateRequest
+  ) => Promise<CertificateResponse>;
   deleteCertificate: (id: string) => Promise<void>;
   fetchCertificateById: (id: string) => Promise<void>;
 }
@@ -80,7 +85,9 @@ export const useCertificateStore = create<CertificateState>()(
         const updatedCertificate = await certificateService.update(id, payload);
         set((state) => ({
           certificateList: state.certificateList.map((cert) =>
-            cert.id === updatedCertificate.data.id ? updatedCertificate.data : cert
+            cert.id === updatedCertificate.data.id
+              ? updatedCertificate.data
+              : cert
           ),
           currentCertificate: updatedCertificate.data,
           loading: false,
@@ -98,7 +105,9 @@ export const useCertificateStore = create<CertificateState>()(
         set({ loading: true, error: null });
         await certificateService.delete(id);
         set((state) => ({
-          certificateList: state.certificateList.filter((cert) => cert.id !== parseInt(id)),
+          certificateList: state.certificateList.filter(
+            (cert) => cert.id !== parseInt(id)
+          ),
           loading: false,
         }));
       } catch (error) {
