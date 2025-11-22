@@ -89,6 +89,14 @@ export const API_ENDPOINTS = {
         GET_ALL: '/admin/levels',
       },
 
+      OFFLINE_SESSIONS: {
+        GET_ALL: '/admin/offline_sessions',
+        GET_BY_ID: (id: string) => `/admin/offline_sessions/${id}`,
+        CREATE: '/admin/offline_sessions',
+        UPDATE: (id: string) => `/admin/offline_sessions/${id}`,
+        DELETE: (id: string) => `/admin/offline_sessions/${id}`,
+      },
+
       TERM_STUDENTS: {
         GET_ALL: '/admin/term-students',
         GET_BY_ID: (id: string) => `/admin/term-students/${id}`,

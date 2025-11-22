@@ -52,6 +52,10 @@ const menuItems = [
         href: '/admin/term-students',
       },
       {
+        title: 'جلسات آفلاین',
+        href: '/admin/offline-sessions',
+      },
+      {
         title: 'آزمون ها',
         href: '/admin/exams',
       },
