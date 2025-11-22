@@ -155,6 +155,14 @@ export const API_ENDPOINTS = {
         UPDATE: (id: string) => `/admin/panel-guides/${id}`,
         DELETE: (id: string) => `/admin/panel-guides/${id}`,
       },
+
+      CERTIFICATES: {
+        GET_ALL: '/admin/certificates',
+        GET_BY_ID: (id: string) => `/admin/certificates/${id}`,
+        CREATE: '/admin/certificates',
+        UPDATE: (id: string) => `/admin/certificates/${id}`,
+        DELETE: (id: string) => `/admin/certificates/${id}`,
+      },
     },
 
     STUDENT: {

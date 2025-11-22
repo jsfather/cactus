@@ -74,6 +74,10 @@ const menuItems = [
         href: '/admin/orders',
       },
       {
+        title: 'افتخارات و گواهینامه‌ها',
+        href: '/admin/certificates',
+      },
+      {
         title: 'سوالات متداول',
         href: '/admin/faqs',
       },
