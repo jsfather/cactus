@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, use } from 'react';
+import { useEffect, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
@@ -14,6 +14,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useAdminOfflineSession } from '@/app/lib/hooks/use-admin-offline-session';
 import { useTerm } from '@/app/lib/hooks/use-term';
+import { useTermTeacher } from '@/app/lib/hooks/use-term-teacher';
+import { useTeacher } from '@/app/lib/hooks/use-teacher';
 import {
   OfflineSessionCreateRequest,
   OfflineSessionUpdateRequest,
@@ -72,11 +74,47 @@ export default function OfflineSessionFormPage({
   } = useAdminOfflineSession();
 
   const { termList, fetchTermList } = useTerm();
+  const { termTeacherList, fetchTermTeacherList } = useTermTeacher();
+  const { teacherList, fetchTeacherList } = useTeacher();
   const selectedTermId = watch('term_id');
+
+  // Get term teacher IDs for the selected term
+  const termTeachersForSelectedTerm = useMemo(() => {
+    if (!selectedTermId) return [];
+    return termTeacherList.filter(
+      (tt) => tt.term?.id?.toString() === selectedTermId
+    );
+  }, [termTeacherList, selectedTermId]);
+
+  // Filter teachers that are assigned to the selected term
+  const availableTeachers = useMemo(() => {
+    if (!selectedTermId || termTeachersForSelectedTerm.length === 0) return [];
+
+    // Get user IDs from term teachers
+    const userIdsInTerm = new Set(
+      termTeachersForSelectedTerm
+        .map((tt) => tt.user?.id)
+        .filter((id): id is number => id !== undefined)
+    );
+
+    // Find teachers with matching user IDs and map to term teacher IDs
+    return termTeachersForSelectedTerm
+      .map((tt) => {
+        const teacher = teacherList.find((t) => t.user?.id === tt.user?.id);
+        return {
+          termTeacherId: tt.id,
+          teacher,
+          user: tt.user,
+        };
+      })
+      .filter((item) => item.teacher || item.user);
+  }, [teacherList, termTeachersForSelectedTerm, selectedTermId]);
 
   useEffect(() => {
     fetchTermList();
-  }, [fetchTermList]);
+    fetchTermTeacherList();
+    fetchTeacherList();
+  }, [fetchTermList, fetchTermTeacherList, fetchTeacherList]);
 
   useEffect(() => {
     if (!isNew && resolvedParams.id) {
@@ -249,8 +287,16 @@ export default function OfflineSessionFormPage({
                       {...field}
                       options={[
                         { label: 'مدرس را انتخاب کنید', value: '' },
-                        // Note: You'll need to fetch term teachers based on selected term
-                        // For now, this is a placeholder. You may need to add term teacher fetching logic
+                        ...availableTeachers.map((item) => {
+                          const user = item.teacher?.user || item.user;
+                          const firstName = user?.first_name || '';
+                          const lastName = user?.last_name || '';
+                          const fullName = `${firstName} ${lastName}`.trim();
+                          return {
+                            label: fullName || `مدرس ${item.termTeacherId}`,
+                            value: item.termTeacherId.toString(),
+                          };
+                        }),
                       ]}
                       error={errors.term_teacher_id?.message}
                       required
@@ -261,6 +307,11 @@ export default function OfflineSessionFormPage({
                 {!selectedTermId && (
                   <p className="mt-1 text-xs text-gray-500">
                     ابتدا ترم را انتخاب کنید
+                  </p>
+                )}
+                {selectedTermId && availableTeachers.length === 0 && (
+                  <p className="mt-1 text-xs text-yellow-600 dark:text-yellow-400">
+                    هیچ مدرسی برای این ترم یافت نشد
                   </p>
                 )}
               </div>
