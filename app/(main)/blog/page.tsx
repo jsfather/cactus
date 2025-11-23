@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Filter, User } from 'lucide-react';
+import { Search, Filter, User, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { publicBlogService } from '@/app/lib/services/public-blog.service';
 import { Blog } from '@/app/lib/types';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
@@ -106,7 +106,7 @@ export default function Page() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 dark:border-gray-700 dark:bg-gray-800"
                 />
-                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                <Search className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
               </div>
 
               {/* Filter Toggle Button */}
@@ -209,7 +209,7 @@ export default function Page() {
                       <p className="mb-4 line-clamp-3 text-gray-600 dark:text-gray-300">
                         {post.little_description}
                       </p>
-                      <div className="flex items-center justify-between">
+                      <div className="mb-3 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
                         {post.user && (
                           <div className="flex items-center gap-2">
                             {post.user.profile_picture ? (
@@ -231,6 +231,16 @@ export default function Page() {
                         <time className="text-sm text-gray-500 dark:text-gray-400">
                           {post.created_at}
                         </time>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                          <ThumbsUp className="h-4 w-4" />
+                          <span>{post.likes_count || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
+                          <ThumbsDown className="h-4 w-4" />
+                          <span>{post.dislikes_count || 0}</span>
+                        </div>
                       </div>
                     </div>
                   </Link>
