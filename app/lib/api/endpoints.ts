@@ -103,6 +103,7 @@ export const API_ENDPOINTS = {
         CREATE: '/admin/term-students',
         UPDATE: (id: string) => `/admin/term-students/${id}`,
         DELETE: (id: string) => `/admin/term-students/${id}`,
+        DELETE_STUDENT: '/admin/term-students-delete',
       },
 
       TERM_TEACHERS: {
