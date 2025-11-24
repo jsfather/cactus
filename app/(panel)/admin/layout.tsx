@@ -56,6 +56,10 @@ const menuItems = [
         href: '/admin/offline-sessions',
       },
       {
+        title: 'گزارشات',
+        href: '/admin/reports',
+      },
+      {
         title: 'آزمون ها',
         href: '/admin/exams',
       },

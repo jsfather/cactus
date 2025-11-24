@@ -174,6 +174,10 @@ export const API_ENDPOINTS = {
         UPDATE: (id: string) => `/admin/certificates/${id}`,
         DELETE: (id: string) => `/admin/certificates/${id}`,
       },
+
+      REPORTS: {
+        GET_ALL: '/admin/reports',
+      },
     },
 
     STUDENT: {
