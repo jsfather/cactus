@@ -18,16 +18,33 @@ export class PublicBlogService {
     this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
   }
 
-  async getList(): Promise<GetBlogListResponse> {
-    const response = await axios.get<GetBlogListResponse>(
-      `${this.baseURL}${API_ENDPOINTS.PUBLIC.BLOG.GET_ALL}`
-    );
+  async getList(params?: {
+    search?: string;
+    tags?: string;
+    page?: number;
+  }): Promise<GetBlogListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.tags) queryParams.append('tags', params.tags);
+    if (params?.page) queryParams.append('page', params.page.toString());
+
+    const queryString = queryParams.toString();
+    const url = `${this.baseURL}${API_ENDPOINTS.PUBLIC.BLOG.GET_ALL}${queryString ? `?${queryString}` : ''}`;
+
+    const response = await axios.get<GetBlogListResponse>(url);
     return response.data;
   }
 
   async getById(id: string): Promise<GetBlogResponse> {
     const response = await axios.get<GetBlogResponse>(
       `${this.baseURL}${API_ENDPOINTS.PUBLIC.BLOG.GET_BY_ID(id)}`
+    );
+    return response.data;
+  }
+
+  async getTags(): Promise<{ data: string[] }> {
+    const response = await axios.get<{ data: string[] }>(
+      `${this.baseURL}${API_ENDPOINTS.PUBLIC.BLOG.GET_TAGS}`
     );
     return response.data;
   }

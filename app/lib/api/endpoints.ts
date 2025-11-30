@@ -275,6 +275,7 @@ export const API_ENDPOINTS = {
     BLOG: {
       GET_ALL: '/home/blogs',
       GET_BY_ID: (id: string) => `/home/blog/${id}`,
+      GET_TAGS: '/home/blog-tags',
     },
 
     COURSES: {

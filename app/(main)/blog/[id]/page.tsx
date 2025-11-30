@@ -199,7 +199,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             {postTags.map((tag) => (
               <Link
                 key={tag}
-                href={`/blog/tag/${tag}`}
+                href={`/blog?tags=${encodeURIComponent(tag)}`}
                 className="rounded-full bg-gray-100 px-4 py-1 text-sm hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
                 <Tag className="mr-1 inline-block h-3 w-3" />
