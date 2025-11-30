@@ -78,6 +78,10 @@ const menuItems = [
         href: '/admin/products',
       },
       {
+        title: 'نظرات محصولات',
+        href: '/admin/product-comments',
+      },
+      {
         title: 'سفارشات',
         href: '/admin/orders',
       },

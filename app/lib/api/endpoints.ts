@@ -54,6 +54,13 @@ export const API_ENDPOINTS = {
         DELETE: (id: string) => `/admin/product-categories/${id}`,
       },
 
+      PRODUCT_COMMENTS: {
+        GET_ALL: '/admin/product_comments',
+        APPROVE: (id: string) => `/admin/product_comments/${id}/approve`,
+        REJECT: (id: string) => `/admin/product_comments/${id}/reject`,
+        DELETE: (id: string) => `/admin/product_comments/${id}`,
+      },
+
       ORDERS: {
         GET_ALL: '/admin/orders',
         GET_BY_ID: (id: string) => `/admin/orders/${id}`,
@@ -287,6 +294,7 @@ export const API_ENDPOINTS = {
       PRODUCTS: '/products',
       HOME_PRODUCTS: '/home/products',
       PRODUCT_BY_ID: (id: string) => `/products/${id}`,
+      PRODUCT_COMMENTS: (id: string) => `/products/${id}/comments`,
       CATEGORIES: '/product-categories',
     },
 

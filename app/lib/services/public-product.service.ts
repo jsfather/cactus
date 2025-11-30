@@ -1,5 +1,10 @@
-﻿import { publicApiClient } from "@/app/lib/api/client";
-import { API_ENDPOINTS } from "@/app/lib/api/endpoints";
+﻿import { publicApiClient, apiClient } from '@/app/lib/api/client';
+import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
+import {
+  ProductComment,
+  ProductCommentRequest,
+  ProductCommentResponse,
+} from '@/app/lib/types/product';
 
 export interface PublicProduct {
   id: number;
@@ -17,6 +22,11 @@ export interface PublicProduct {
   discount_price?: number | null;
   rating?: number;
   reviews_count?: number;
+  comments?: ProductComment[];
+}
+
+export interface GetPublicProductResponse {
+  data: PublicProduct;
 }
 
 export interface GetPublicProductsResponse {
@@ -53,6 +63,23 @@ export class PublicProductService {
   async getProducts(): Promise<GetPublicProductsResponse> {
     return publicApiClient.get<GetPublicProductsResponse>(
       API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS
+    );
+  }
+
+  async getById(id: string): Promise<GetPublicProductResponse> {
+    return publicApiClient.get<GetPublicProductResponse>(
+      API_ENDPOINTS.PUBLIC.SHOP.PRODUCT_BY_ID(id)
+    );
+  }
+
+  // Comment methods (require authentication)
+  async addComment(
+    productId: string,
+    payload: ProductCommentRequest
+  ): Promise<ProductCommentResponse> {
+    return apiClient.post<ProductCommentResponse>(
+      API_ENDPOINTS.PUBLIC.SHOP.PRODUCT_COMMENTS(productId),
+      payload
     );
   }
 }
