@@ -53,7 +53,7 @@ export const usePublicProductStore = create<PublicProductState>()(
 
     findProductById: (id: number) => {
       const { allProducts } = get();
-      return allProducts.find(product => product.id === id) || null;
+      return allProducts.find((product) => product.id === id) || null;
     },
 
     fetchHomeProducts: async (params?: ProductSearchParams) => {

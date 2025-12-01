@@ -63,10 +63,10 @@ function ShopContent() {
   const { t, dir } = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // Initialize from URL params
   const initialSearch = searchParams.get('search') || '';
-  
+
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -91,16 +91,16 @@ function ShopContent() {
     const timer = setTimeout(() => {
       const params = new URLSearchParams();
       if (searchQuery) params.set('search', searchQuery);
-      
+
       const queryString = params.toString();
       const newPath = `/shop${queryString ? `?${queryString}` : ''}`;
-      
+
       // Only update if path is different
       if (window.location.pathname + window.location.search !== newPath) {
         router.replace(newPath, { scroll: false });
       }
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [searchQuery, router]);
 

@@ -68,16 +68,16 @@ function BlogContent() {
       const params = new URLSearchParams();
       if (searchQuery) params.set('search', searchQuery);
       if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
-      
+
       const queryString = params.toString();
       const newPath = `/blog${queryString ? `?${queryString}` : ''}`;
-      
+
       // Only update if path is different
       if (window.location.pathname + window.location.search !== newPath) {
         router.replace(newPath, { scroll: false });
       }
     }, 500);
-    
+
     return () => clearTimeout(timer);
   }, [searchQuery, selectedTags, router]);
 

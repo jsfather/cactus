@@ -173,7 +173,10 @@ export default function Header() {
               </button>
 
               {/* Desktop Search */}
-              <form onSubmit={handleSearch} className="relative hidden lg:block">
+              <form
+                onSubmit={handleSearch}
+                className="relative hidden lg:block"
+              >
                 <input
                   type="text"
                   placeholder={t.common.search}
@@ -182,7 +185,7 @@ export default function Header() {
                   onKeyDown={handleSearchKeyDown}
                   className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                 />
-                <button 
+                <button
                   type="submit"
                   className="absolute end-3 top-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
@@ -231,7 +234,7 @@ export default function Header() {
                     onKeyDown={handleSearchKeyDown}
                     className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                   />
-                  <button 
+                  <button
                     type="submit"
                     className="absolute end-3 top-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                   >

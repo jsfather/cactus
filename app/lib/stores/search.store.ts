@@ -69,7 +69,7 @@ export const useSearchStore = create<SearchState>()(
 
     searchAll: async (query) => {
       set({ query });
-      
+
       // Run both searches in parallel
       await Promise.all([
         get().searchBlogs({ search: query }),

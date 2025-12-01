@@ -5,7 +5,15 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, User, ThumbsUp, ThumbsDown, Star, ShoppingBag, FileText } from 'lucide-react';
+import {
+  Search,
+  User,
+  ThumbsUp,
+  ThumbsDown,
+  Star,
+  ShoppingBag,
+  FileText,
+} from 'lucide-react';
 import { useSearch } from '@/app/lib/hooks/use-search';
 import { useCart } from '@/app/contexts/CartContext';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
@@ -15,16 +23,16 @@ function SearchContent() {
   const { t, dir } = useLocale();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
-  
+
   const [searchInput, setSearchInput] = useState(initialQuery);
-  const { 
+  const {
     query,
-    blogs, 
-    products, 
-    blogsLoading, 
-    productsLoading, 
-    searchAll, 
-    setQuery 
+    blogs,
+    products,
+    blogsLoading,
+    productsLoading,
+    searchAll,
+    setQuery,
   } = useSearch();
   const { addItem } = useCart();
 
@@ -106,8 +114,10 @@ function SearchContent() {
               <div className="mb-8">
                 <p className="text-lg text-gray-600 dark:text-gray-300">
                   نتایج جستجو برای:{' '}
-                  <span className="font-bold text-gray-900 dark:text-white">"{query}"</span>
-                  {' '}({blogs.length + products.length} نتیجه)
+                  <span className="font-bold text-gray-900 dark:text-white">
+                    "{query}"
+                  </span>{' '}
+                  ({blogs.length + products.length} نتیجه)
                 </p>
               </div>
 
@@ -195,7 +205,8 @@ function SearchContent() {
                                   <div className="flex items-center gap-2">
                                     <User className="h-4 w-4 text-gray-400" />
                                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                                      {post.user.first_name} {post.user.last_name}
+                                      {post.user.first_name}{' '}
+                                      {post.user.last_name}
                                     </span>
                                   </div>
                                 )}
@@ -275,8 +286,12 @@ function SearchContent() {
                                       addItem({
                                         id: product.id,
                                         title: product.title,
-                                        price: formatPrice(product.discount_price || product.price),
-                                        image: product.image || '/product-1.jpg',
+                                        price: formatPrice(
+                                          product.discount_price ||
+                                            product.price
+                                        ),
+                                        image:
+                                          product.image || '/product-1.jpg',
                                       });
                                     }
                                   }}

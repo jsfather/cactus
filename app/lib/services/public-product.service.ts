@@ -59,18 +59,22 @@ export interface ProductSearchParams {
 }
 
 export class PublicProductService {
-  async getHomeProducts(params?: ProductSearchParams): Promise<GetPublicProductsResponse> {
+  async getHomeProducts(
+    params?: ProductSearchParams
+  ): Promise<GetPublicProductsResponse> {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
-    
+
     const queryString = queryParams.toString();
     const url = `${API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS}${queryString ? `?${queryString}` : ''}`;
-    
+
     return publicApiClient.get<GetPublicProductsResponse>(url);
   }
 
-  async getProducts(params?: ProductSearchParams): Promise<GetPublicProductsResponse> {
+  async getProducts(
+    params?: ProductSearchParams
+  ): Promise<GetPublicProductsResponse> {
     return this.getHomeProducts(params);
   }
 
