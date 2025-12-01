@@ -3,6 +3,7 @@ import { devtools } from 'zustand/middleware';
 import {
   publicProductService,
   PublicProduct,
+  ProductSearchParams,
 } from '@/app/lib/services/public-product.service';
 import type { ApiError } from '@/app/lib/api/client';
 
@@ -20,8 +21,8 @@ interface PublicProductState {
   setAllProductsLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
-  fetchHomeProducts: () => Promise<void>;
-  fetchAllProducts: () => Promise<void>;
+  fetchHomeProducts: (params?: ProductSearchParams) => Promise<void>;
+  fetchAllProducts: (params?: ProductSearchParams) => Promise<void>;
   findProductById: (id: number) => PublicProduct | null;
   setCurrentProduct: (product: PublicProduct | null) => void;
   clearCurrentProduct: () => void;
@@ -55,10 +56,10 @@ export const usePublicProductStore = create<PublicProductState>()(
       return allProducts.find(product => product.id === id) || null;
     },
 
-    fetchHomeProducts: async () => {
+    fetchHomeProducts: async (params?: ProductSearchParams) => {
       try {
         set({ loading: true, error: null });
-        const response = await publicProductService.getHomeProducts();
+        const response = await publicProductService.getHomeProducts(params);
         set({
           products: response.data,
           loading: false,
@@ -70,10 +71,10 @@ export const usePublicProductStore = create<PublicProductState>()(
       }
     },
 
-    fetchAllProducts: async () => {
+    fetchAllProducts: async (params?: ProductSearchParams) => {
       try {
         set({ allProductsLoading: true, error: null });
-        const response = await publicProductService.getProducts();
+        const response = await publicProductService.getProducts(params);
         set({
           allProducts: response.data,
           allProductsLoading: false,

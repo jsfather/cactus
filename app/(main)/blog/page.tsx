@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -11,7 +11,7 @@ import { Blog } from '@/app/lib/types';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { useLocale } from '@/app/contexts/LocaleContext';
 
-export default function Page() {
+function BlogContent() {
   const { t, dir } = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -61,6 +61,25 @@ export default function Page() {
 
     fetchBlogs();
   }, [searchQuery, selectedTags]);
+
+  // Update URL when search query changes (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('search', searchQuery);
+      if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
+      
+      const queryString = params.toString();
+      const newPath = `/blog${queryString ? `?${queryString}` : ''}`;
+      
+      // Only update if path is different
+      if (window.location.pathname + window.location.search !== newPath) {
+        router.replace(newPath, { scroll: false });
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedTags, router]);
 
   const toggleTag = (tag: string) => {
     const newTags = selectedTags.includes(tag)
@@ -329,5 +348,13 @@ export default function Page() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <BlogContent />
+    </Suspense>
   );
 }

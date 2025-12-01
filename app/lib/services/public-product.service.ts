@@ -53,17 +53,25 @@ export interface GetPublicProductsResponse {
   };
 }
 
+export interface ProductSearchParams {
+  search?: string;
+  page?: number;
+}
+
 export class PublicProductService {
-  async getHomeProducts(): Promise<GetPublicProductsResponse> {
-    return publicApiClient.get<GetPublicProductsResponse>(
-      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS
-    );
+  async getHomeProducts(params?: ProductSearchParams): Promise<GetPublicProductsResponse> {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.page) queryParams.append('page', params.page.toString());
+    
+    const queryString = queryParams.toString();
+    const url = `${API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS}${queryString ? `?${queryString}` : ''}`;
+    
+    return publicApiClient.get<GetPublicProductsResponse>(url);
   }
 
-  async getProducts(): Promise<GetPublicProductsResponse> {
-    return publicApiClient.get<GetPublicProductsResponse>(
-      API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS
-    );
+  async getProducts(params?: ProductSearchParams): Promise<GetPublicProductsResponse> {
+    return this.getHomeProducts(params);
   }
 
   async getById(id: string): Promise<GetPublicProductResponse> {

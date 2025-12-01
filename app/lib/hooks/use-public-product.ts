@@ -1,16 +1,17 @@
 import { useCallback } from 'react';
 import { usePublicProductStore } from '@/app/lib/stores/public-product.store';
+import { ProductSearchParams } from '@/app/lib/services/public-product.service';
 
 export const usePublicProduct = () => {
   const store = usePublicProductStore();
 
   const fetchHomeProducts = useCallback(
-    () => store.fetchHomeProducts(),
+    (params?: ProductSearchParams) => store.fetchHomeProducts(params),
     [store.fetchHomeProducts]
   );
 
   const fetchAllProducts = useCallback(
-    () => store.fetchAllProducts(),
+    (params?: ProductSearchParams) => store.fetchAllProducts(params),
     [store.fetchAllProducts]
   );
 

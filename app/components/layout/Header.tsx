@@ -20,9 +20,25 @@ export default function Header() {
   const { t } = useLocale();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const router = useRouter();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setShowMobileSearch(false);
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch(e as unknown as React.FormEvent);
+    }
+  };
 
   const menuItems = [
     { title: t.nav.courses, href: '/courses' },
@@ -157,16 +173,22 @@ export default function Header() {
               </button>
 
               {/* Desktop Search */}
-              <div className="relative hidden lg:block">
+              <form onSubmit={handleSearch} className="relative hidden lg:block">
                 <input
                   type="text"
                   placeholder={t.common.search}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
                   className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                 />
-                <span className="absolute end-3 top-2.5 text-gray-500 dark:text-gray-400">
+                <button 
+                  type="submit"
+                  className="absolute end-3 top-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
                   <Search className="h-5 w-5" />
-                </span>
-              </div>
+                </button>
+              </form>
 
               <LanguageSwitcher />
               <DarkModeToggle />
@@ -200,16 +222,22 @@ export default function Header() {
               className="border-t border-gray-200 bg-white lg:hidden dark:border-gray-700 dark:bg-gray-900"
             >
               <div className="container mx-auto p-4">
-                <div className="relative">
+                <form onSubmit={handleSearch} className="relative">
                   <input
                     type="text"
                     placeholder={t.common.search}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearchKeyDown}
                     className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                   />
-                  <span className="absolute end-3 top-2.5 text-gray-500 dark:text-gray-400">
+                  <button 
+                    type="submit"
+                    className="absolute end-3 top-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                  >
                     <Search className="h-5 w-5" />
-                  </span>
-                </div>
+                  </button>
+                </form>
               </div>
             </motion.div>
           )}
