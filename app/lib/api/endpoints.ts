@@ -15,6 +15,9 @@ export const API_ENDPOINTS = {
     GET: '/home/settings',
     UPDATE: '/admin/settings',
   },
+  HOME: {
+    CERTIFICATES: '/home/certificates',
+  },
   PANEL: {
     ADMIN: {
       DASHBOARD: '/admin/dashboard',
@@ -49,6 +52,13 @@ export const API_ENDPOINTS = {
         CREATE: '/admin/product-categories',
         UPDATE: (id: string) => `/admin/product-categories/${id}`,
         DELETE: (id: string) => `/admin/product-categories/${id}`,
+      },
+
+      PRODUCT_COMMENTS: {
+        GET_ALL: '/admin/product_comments',
+        APPROVE: (id: string) => `/admin/product_comments/${id}/approve`,
+        REJECT: (id: string) => `/admin/product_comments/${id}/reject`,
+        DELETE: (id: string) => `/admin/product_comments/${id}`,
       },
 
       ORDERS: {
@@ -86,12 +96,21 @@ export const API_ENDPOINTS = {
         GET_ALL: '/admin/levels',
       },
 
+      OFFLINE_SESSIONS: {
+        GET_ALL: '/admin/offline_sessions',
+        GET_BY_ID: (id: string) => `/admin/offline_sessions/${id}`,
+        CREATE: '/admin/offline_sessions',
+        UPDATE: (id: string) => `/admin/offline_sessions/${id}`,
+        DELETE: (id: string) => `/admin/offline_sessions/${id}`,
+      },
+
       TERM_STUDENTS: {
         GET_ALL: '/admin/term-students',
         GET_BY_ID: (id: string) => `/admin/term-students/${id}`,
         CREATE: '/admin/term-students',
         UPDATE: (id: string) => `/admin/term-students/${id}`,
         DELETE: (id: string) => `/admin/term-students/${id}`,
+        DELETE_STUDENT: '/admin/term-students-delete',
       },
 
       TERM_TEACHERS: {
@@ -154,6 +173,18 @@ export const API_ENDPOINTS = {
         CREATE: '/admin/panel-guides',
         UPDATE: (id: string) => `/admin/panel-guides/${id}`,
         DELETE: (id: string) => `/admin/panel-guides/${id}`,
+      },
+
+      CERTIFICATES: {
+        GET_ALL: '/admin/certificates',
+        GET_BY_ID: (id: string) => `/admin/certificates/${id}`,
+        CREATE: '/admin/certificates',
+        UPDATE: (id: string) => `/admin/certificates/${id}`,
+        DELETE: (id: string) => `/admin/certificates/${id}`,
+      },
+
+      REPORTS: {
+        GET_ALL: '/admin/reports',
       },
     },
 
@@ -251,6 +282,7 @@ export const API_ENDPOINTS = {
     BLOG: {
       GET_ALL: '/home/blogs',
       GET_BY_ID: (id: string) => `/home/blog/${id}`,
+      GET_TAGS: '/home/blog-tags',
     },
 
     COURSES: {
@@ -262,6 +294,7 @@ export const API_ENDPOINTS = {
       PRODUCTS: '/products',
       HOME_PRODUCTS: '/home/products',
       PRODUCT_BY_ID: (id: string) => `/products/${id}`,
+      PRODUCT_COMMENTS: (id: string) => `/products/${id}/comments`,
       CATEGORIES: '/product-categories',
     },
 

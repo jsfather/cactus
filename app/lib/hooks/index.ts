@@ -12,3 +12,4 @@ export { useTicket } from './useTicket';
 export { useFAQ } from './useFAQ';
 export { useStudentOrder } from './use-student-order';
 export { usePublicProduct } from './use-public-product';
+export { useSearch } from './use-search';

@@ -52,6 +52,14 @@ const menuItems = [
         href: '/admin/term-students',
       },
       {
+        title: 'جلسات آفلاین',
+        href: '/admin/offline-sessions',
+      },
+      {
+        title: 'گزارشات',
+        href: '/admin/reports',
+      },
+      {
         title: 'آزمون ها',
         href: '/admin/exams',
       },
@@ -70,8 +78,16 @@ const menuItems = [
         href: '/admin/products',
       },
       {
+        title: 'نظرات محصولات',
+        href: '/admin/product-comments',
+      },
+      {
         title: 'سفارشات',
         href: '/admin/orders',
+      },
+      {
+        title: 'افتخارات و گواهینامه‌ها',
+        href: '/admin/certificates',
       },
       {
         title: 'سوالات متداول',

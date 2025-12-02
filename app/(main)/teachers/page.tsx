@@ -93,82 +93,84 @@ export default function Page() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                   >
-                    <div className="overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-gray-800">
-                      <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
-                        {profilePicture ? (
-                          <Image
-                            src={profilePicture}
-                            alt={fullName}
-                            fill
-                            className="object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center">
-                            <User className="h-32 w-32 text-gray-400 dark:text-gray-600" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-6">
-                        <h2 className="mb-2 text-xl font-bold">{fullName}</h2>
-                        {teacher.bio && (
-                          <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                            {teacher.bio}
-                          </p>
-                        )}
+                    <Link href={`/teachers/${teacher.user_id}`}>
+                      <div className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-800">
+                        <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+                          {profilePicture ? (
+                            <Image
+                              src={profilePicture}
+                              alt={fullName}
+                              fill
+                              className="object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <User className="h-32 w-32 text-gray-400 dark:text-gray-600" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-6">
+                          <h2 className="mb-2 text-xl font-bold">{fullName}</h2>
+                          {teacher.bio && (
+                            <p className="mb-4 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                              {teacher.bio}
+                            </p>
+                          )}
 
-                        {/* Skills */}
-                        {topSkills.length > 0 && (
-                          <div className="mb-4 flex flex-wrap gap-2">
-                            {topSkills.map((skill, idx) => (
-                              <span
-                                key={idx}
-                                className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 rounded-full px-3 py-1 text-sm"
-                              >
-                                {skill.name}
-                              </span>
-                            ))}
-                            {skills.length > 3 && (
-                              <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                                +{skills.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        )}
+                          {/* Skills */}
+                          {topSkills.length > 0 && (
+                            <div className="mb-4 flex flex-wrap gap-2">
+                              {topSkills.map((skill, idx) => (
+                                <span
+                                  key={idx}
+                                  className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 rounded-full px-3 py-1 text-sm"
+                                >
+                                  {skill.name}
+                                </span>
+                              ))}
+                              {skills.length > 3 && (
+                                <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                                  +{skills.length - 3}
+                                </span>
+                              )}
+                            </div>
+                          )}
 
-                        {/* Additional Info */}
-                        {hasAdditionalInfo && (
-                          <div className="space-y-2 border-t border-gray-100 pt-4 dark:border-gray-700">
-                            {teacher.city && (
-                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <MapPin className="h-4 w-4" />
-                                <span>{teacher.city}</span>
-                              </div>
-                            )}
-                            {teacher.member_since && (
-                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <Calendar className="h-4 w-4" />
-                                <span>
-                                  {t.teachers.memberSince}{' '}
-                                  {teacher.member_since}
-                                </span>
-                              </div>
-                            )}
-                            {teacher.achievements && (
-                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <Award className="h-4 w-4" />
-                                <span className="line-clamp-1">
-                                  {teacher.achievements}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        )}
+                          {/* Additional Info */}
+                          {hasAdditionalInfo && (
+                            <div className="space-y-2 border-t border-gray-100 pt-4 dark:border-gray-700">
+                              {teacher.city && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                  <MapPin className="h-4 w-4" />
+                                  <span>{teacher.city}</span>
+                                </div>
+                              )}
+                              {teacher.member_since && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                  <Calendar className="h-4 w-4" />
+                                  <span>
+                                    {t.teachers.memberSince}{' '}
+                                    {teacher.member_since}
+                                  </span>
+                                </div>
+                              )}
+                              {teacher.achievements && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                  <Award className="h-4 w-4" />
+                                  <span className="line-clamp-1">
+                                    {teacher.achievements}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    </Link>
                   </motion.div>
                 );
               })}

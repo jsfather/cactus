@@ -113,3 +113,56 @@ export interface UpdateProductCategoryRequest {
   description?: string;
   is_active?: boolean;
 }
+
+// Product Comment types
+export interface ProductCommentUser {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  phone: string;
+  email: string | null;
+  profile_picture: string;
+}
+
+export interface ProductComment {
+  id: number;
+  product_id?: string | number;
+  content: string;
+  user?: ProductCommentUser;
+  approved?: boolean;
+  created_at: string;
+}
+
+export interface ProductCommentRequest {
+  content: string;
+}
+
+export interface ProductCommentResponse {
+  data: ProductComment;
+}
+
+export interface GetProductCommentsResponse {
+  data: ProductComment[];
+}
+
+// Admin Product Comment types
+export interface AdminProductComment {
+  id: number;
+  product_id: number;
+  user_id: number;
+  content: string;
+  approved: boolean;
+  created_at: string;
+  updated_at: string;
+  user?: ProductCommentUser;
+  product?: {
+    id: number;
+    title: string;
+  };
+}
+
+export interface GetAdminProductCommentsResponse {
+  data: AdminProductComment[];
+}

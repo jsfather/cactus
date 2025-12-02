@@ -1,28 +1,56 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Filter, User } from 'lucide-react';
+import { Search, Filter, User, ThumbsUp, ThumbsDown, X } from 'lucide-react';
 import { publicBlogService } from '@/app/lib/services/public-blog.service';
 import { Blog } from '@/app/lib/types';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { useLocale } from '@/app/contexts/LocaleContext';
 
-export default function Page() {
+function BlogContent() {
   const { t, dir } = useLocale();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize from URL params
+  const initialTag = searchParams.get('tags') || '';
+  const initialSearch = searchParams.get('search') || '';
+
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    initialTag ? [initialTag] : []
+  );
+  const [showFilters, setShowFilters] = useState(!!initialTag);
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [allTags, setAllTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Fetch all available tags
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const response = await publicBlogService.getTags();
+        setAllTags(response.data);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+      }
+    };
+
+    fetchTags();
+  }, []);
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await publicBlogService.getList();
+        const response = await publicBlogService.getList({
+          search: searchQuery || undefined,
+          tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
+        });
         setBlogs(response.data);
       } catch (error) {
         console.error('Error fetching blogs:', error);
@@ -32,37 +60,49 @@ export default function Page() {
     };
 
     fetchBlogs();
-  }, []);
+  }, [searchQuery, selectedTags]);
 
-  // Extract all unique tags from blogs
-  const allTags = Array.from(
-    new Set(
-      blogs.flatMap((blog) =>
-        blog.tags.flatMap((tagString) =>
-          tagString.split(',').map((t) => t.trim())
-        )
-      )
-    )
-  );
+  // Update URL when search query changes (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('search', searchQuery);
+      if (selectedTags.length > 0) params.set('tags', selectedTags.join(','));
 
-  const filteredPosts = blogs.filter((post) => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.little_description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTags =
-      selectedTags.length === 0 ||
-      selectedTags.some((tag) =>
-        post.tags.some((postTag) =>
-          postTag.split(',').some((t) => t.trim() === tag)
-        )
-      );
-    return matchesSearch && matchesTags;
-  });
+      const queryString = params.toString();
+      const newPath = `/blog${queryString ? `?${queryString}` : ''}`;
+
+      // Only update if path is different
+      if (window.location.pathname + window.location.search !== newPath) {
+        router.replace(newPath, { scroll: false });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, selectedTags, router]);
 
   const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
+    const newTags = selectedTags.includes(tag)
+      ? selectedTags.filter((t) => t !== tag)
+      : [...selectedTags, tag];
+
+    setSelectedTags(newTags);
+
+    // Update URL
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    if (newTags.length > 0) params.set('tags', newTags.join(','));
+
+    const queryString = params.toString();
+    router.push(`/blog${queryString ? `?${queryString}` : ''}`, {
+      scroll: false,
+    });
+  };
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setSelectedTags([]);
+    router.push('/blog', { scroll: false });
   };
 
   if (loading) {
@@ -106,18 +146,57 @@ export default function Page() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 dark:border-gray-700 dark:bg-gray-800"
                 />
-                <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                <Search className="absolute top-2.5 left-3 h-5 w-5 text-gray-400" />
               </div>
 
               {/* Filter Toggle Button */}
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                  selectedTags.length > 0
+                    ? 'border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-400 dark:bg-primary-900/20 dark:text-primary-300'
+                    : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
+                }`}
               >
                 <Filter className="h-5 w-5" />
                 {t.common.filter}
+                {selectedTags.length > 0 && (
+                  <span className="bg-primary-600 flex h-5 w-5 items-center justify-center rounded-full text-xs text-white">
+                    {selectedTags.length}
+                  </span>
+                )}
               </button>
             </div>
+
+            {/* Selected Tags Display */}
+            {selectedTags.length > 0 && (
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  فیلتر برچسب:
+                </span>
+                {selectedTags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800 dark:bg-blue-900/50 dark:text-blue-300"
+                  >
+                    {tag}
+                    <button
+                      onClick={() => toggleTag(tag)}
+                      className="rounded-full p-0.5 transition-colors hover:bg-blue-200 dark:hover:bg-blue-800"
+                      aria-label={`حذف فیلتر ${tag}`}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </span>
+                ))}
+                <button
+                  onClick={clearFilters}
+                  className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                  پاک کردن همه
+                </button>
+              </div>
+            )}
 
             {/* Filters Panel */}
             {showFilters && allTags.length > 0 && (
@@ -154,7 +233,7 @@ export default function Page() {
 
           {/* Blog Posts Grid */}
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {filteredPosts.map((post, index) => {
+            {blogs.map((post, index) => {
               const postTags = post.tags
                 .flatMap((tagString) =>
                   tagString.split(',').map((t) => t.trim())
@@ -209,7 +288,7 @@ export default function Page() {
                       <p className="mb-4 line-clamp-3 text-gray-600 dark:text-gray-300">
                         {post.little_description}
                       </p>
-                      <div className="flex items-center justify-between">
+                      <div className="mb-3 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-700">
                         {post.user && (
                           <div className="flex items-center gap-2">
                             {post.user.profile_picture ? (
@@ -232,6 +311,16 @@ export default function Page() {
                           {post.created_at}
                         </time>
                       </div>
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1 text-green-600 dark:text-green-400">
+                          <ThumbsUp className="h-4 w-4" />
+                          <span>{post.likes_count || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-red-600 dark:text-red-400">
+                          <ThumbsDown className="h-4 w-4" />
+                          <span>{post.dislikes_count || 0}</span>
+                        </div>
+                      </div>
                     </div>
                   </Link>
                 </motion.article>
@@ -240,15 +329,32 @@ export default function Page() {
           </div>
 
           {/* No Results Message */}
-          {filteredPosts.length === 0 && (
+          {blogs.length === 0 && !loading && (
             <div className="mt-8 text-center">
               <p className="text-lg text-gray-600 dark:text-gray-300">
                 {t.blog.noPosts}
               </p>
+              {(selectedTags.length > 0 || searchQuery) && (
+                <button
+                  onClick={clearFilters}
+                  className="text-primary-600 hover:text-primary-700 mt-4 inline-flex items-center gap-1 text-sm font-medium"
+                >
+                  <X className="h-4 w-4" />
+                  پاک کردن فیلترها
+                </button>
+              )}
             </div>
           )}
         </div>
       </section>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <BlogContent />
+    </Suspense>
   );
 }

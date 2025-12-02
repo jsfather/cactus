@@ -40,6 +40,24 @@ export class TermStudentService {
       throw error;
     }
   }
+
+  async deleteStudentFromTerm(data: {
+    term_id: number;
+    user_id: number;
+  }): Promise<{ message: string }> {
+    try {
+      const { apiClient } = await import('@/app/lib/api/client');
+      const { API_ENDPOINTS } = await import('@/app/lib/api/endpoints');
+      const response = await apiClient.post<{ message: string }>(
+        API_ENDPOINTS.PANEL.ADMIN.TERM_STUDENTS.DELETE_STUDENT,
+        data
+      );
+      return response;
+    } catch (error) {
+      console.error('Error deleting student from term:', error);
+      throw error;
+    }
+  }
 }
 
 export const termStudentService = new TermStudentService();

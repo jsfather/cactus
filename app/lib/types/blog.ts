@@ -15,8 +15,10 @@ export interface BlogUser {
 
 export interface BlogComment {
   id: number;
+  blog_id?: string | number;
   content: string;
-  user: BlogUser;
+  user?: BlogUser;
+  approved?: boolean;
   created_at: string;
 }
 
@@ -34,7 +36,29 @@ export interface Blog {
   publish_at: string;
   created_at: string;
   updated_at?: string;
+  likes_count?: number;
+  dislikes_count?: number;
+  user_reaction?: 'like' | 'dislike' | null;
   comments?: BlogComment[];
+}
+
+export interface BlogReactionRequest {
+  type: 'like' | 'dislike';
+}
+
+export interface BlogReactionResponse {
+  status: 'added' | 'removed' | 'updated';
+  likes_count: number;
+  dislikes_count: number;
+  user_reaction: 'like' | 'dislike' | null;
+}
+
+export interface BlogCommentRequest {
+  content: string;
+}
+
+export interface BlogCommentResponse {
+  data: BlogComment;
 }
 
 export interface GetBlogListResponse {

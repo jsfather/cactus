@@ -8,6 +8,7 @@ import Input from '@/app/components/ui/Input';
 import Textarea from '@/app/components/ui/Textarea';
 import DatePicker from '@/app/components/ui/DatePicker';
 import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
+import TagInput from '@/app/components/ui/TagInput';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { z } from 'zod';
@@ -33,7 +34,7 @@ const schema = z
         /^[a-z0-9-]+$/,
         'اسلاگ باید شامل حروف انگلیسی کوچک، اعداد و خط تیره باشد'
       ),
-    tags: z.string(),
+    tags: z.array(z.string()).default([]),
     status: z.enum(['draft', 'published'], {
       required_error: 'وضعیت انتشار الزامی است',
     }),
@@ -81,7 +82,7 @@ export default function BlogFormPage({
       meta_title: '',
       meta_description: '',
       slug: '',
-      tags: '',
+      tags: [],
       status: 'draft',
       publish_at: '',
     },
@@ -146,9 +147,7 @@ export default function BlogFormPage({
         meta_title: currentBlog.meta_title,
         meta_description: currentBlog.meta_description,
         slug: currentBlog.slug,
-        tags: Array.isArray(currentBlog.tags)
-          ? currentBlog.tags.join(', ')
-          : '',
+        tags: Array.isArray(currentBlog.tags) ? currentBlog.tags : [],
         status: isDraft ? 'draft' : 'published',
         publish_at: currentBlog.publish_at
           ? currentBlog.publish_at.split('T')[0]
@@ -173,10 +172,7 @@ export default function BlogFormPage({
         meta_title: data.meta_title,
         meta_description: data.meta_description,
         slug: data.slug,
-        tags: data.tags
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter(Boolean),
+        tags: data.tags,
         user_id: user.id, // استفاده از آیدی کاربر لاگین شده
         publish_at: data.publish_at || new Date().toISOString().split('T')[0],
       };
@@ -363,15 +359,21 @@ export default function BlogFormPage({
               )}
 
               <div className="lg:col-span-2">
-                <Input
-                  label="برچسب‌ها"
-                  {...register('tags')}
-                  error={errors.tags?.message}
-                  placeholder="Laravel, PHP, Backend"
+                <Controller
+                  name="tags"
+                  control={control}
+                  render={({ field }) => (
+                    <TagInput
+                      id="tags"
+                      label="برچسب‌ها"
+                      placeholder="برچسب جدید..."
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      error={errors.tags?.message}
+                    />
+                  )}
                 />
-                <p className="mt-1 text-xs text-gray-500">
-                  برچسب‌ها را با کاما جدا کنید
-                </p>
               </div>
 
               <div>

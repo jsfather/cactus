@@ -21,3 +21,4 @@ export * from './product';
 export * from './order';
 export * from './level';
 export * from './available-term';
+export * from './search';

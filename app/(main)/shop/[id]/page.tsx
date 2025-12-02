@@ -12,11 +12,21 @@ import {
   Shield,
   RefreshCw,
   ChevronLeft,
+  MessageSquare,
+  User,
 } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
-import { PublicProduct } from '@/app/lib/services/public-product.service';
+import {
+  PublicProduct,
+  publicProductService,
+} from '@/app/lib/services/public-product.service';
+import { ProductComment } from '@/app/lib/types/product';
 import { useLocale } from '@/app/contexts/LocaleContext';
+import { useUser } from '@/app/hooks/useUser';
+import { toast } from 'react-toastify';
+import { Button } from '@/app/components/ui/Button';
+import Textarea from '@/app/components/ui/Textarea';
 
 interface ProductPageProps {
   params: Promise<{
@@ -49,6 +59,7 @@ interface DisplayProductDetail {
   isFromApi: boolean;
   originalId?: number;
   actualPrice?: number;
+  comments?: ProductComment[];
 }
 
 // Static fallback data
@@ -302,10 +313,14 @@ const convertApiProductToDisplayFormat = (
 
 export default function Page({ params }: ProductPageProps) {
   const { t, dir } = useLocale();
+  const { user } = useUser();
   const resolvedParams = use(params);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState<DisplayProductDetail | null>(null);
+  const [comments, setComments] = useState<ProductComment[]>([]);
+  const [commentContent, setCommentContent] = useState('');
+  const [commentLoading, setCommentLoading] = useState(false);
   const { addItem } = useCart();
 
   // Fetch API products
@@ -326,6 +341,22 @@ export default function Page({ params }: ProductPageProps) {
       fetchAllProducts();
     }
   }, [allProducts.length, allProductsLoading, fetchAllProducts, clearError]);
+
+  // Fetch product with comments
+  useEffect(() => {
+    const fetchProductWithComments = async () => {
+      try {
+        const response = await publicProductService.getById(resolvedParams.id);
+        if (response.data.comments) {
+          setComments(response.data.comments);
+        }
+      } catch (error) {
+        console.error('Error fetching product comments:', error);
+      }
+    };
+
+    fetchProductWithComments();
+  }, [resolvedParams.id]);
 
   useEffect(() => {
     // Find product by ID once products are loaded
@@ -459,6 +490,42 @@ export default function Page({ params }: ProductPageProps) {
           image: product.images[0],
         });
       }
+    }
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user) {
+      toast.error('برای ارسال نظر باید وارد شوید');
+      return;
+    }
+
+    if (!commentContent.trim()) {
+      toast.error('لطفا محتوای نظر را وارد کنید');
+      return;
+    }
+
+    try {
+      setCommentLoading(true);
+      await publicProductService.addComment(resolvedParams.id, {
+        content: commentContent,
+      });
+
+      toast.success(
+        'نظر شما با موفقیت ثبت شد و پس از تایید نمایش داده خواهد شد'
+      );
+      setCommentContent('');
+
+      // Refresh product to get updated comments
+      const response = await publicProductService.getById(resolvedParams.id);
+      if (response.data.comments) {
+        setComments(response.data.comments);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'خطا در ارسال نظر');
+    } finally {
+      setCommentLoading(false);
     }
   };
 
@@ -761,6 +828,98 @@ export default function Page({ params }: ProductPageProps) {
                 </Link>
               </motion.div>
             ))}
+          </div>
+        </section>
+
+        {/* Comments Section */}
+        <section className="mt-16">
+          <div className="rounded-2xl bg-white p-6 shadow-lg dark:bg-gray-800">
+            <h3 className="mb-6 flex items-center gap-2 text-xl font-semibold">
+              <MessageSquare className="h-6 w-6" />
+              نظرات کاربران ({comments.filter((c) => c.approved).length})
+            </h3>
+
+            {/* Comment Form */}
+            {user ? (
+              <form onSubmit={handleCommentSubmit} className="mb-8">
+                <Textarea
+                  id="comment"
+                  label="نظر خود را بنویسید"
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                  rows={4}
+                  placeholder="نظر خود را درباره این محصول بنویسید..."
+                  required
+                />
+                <Button
+                  type="submit"
+                  disabled={commentLoading}
+                  className="mt-4"
+                >
+                  {commentLoading ? 'در حال ارسال...' : 'ارسال نظر'}
+                </Button>
+              </form>
+            ) : (
+              <div className="mb-8 rounded-lg bg-gray-50 p-6 text-center dark:bg-gray-700">
+                <p className="text-gray-600 dark:text-gray-400">
+                  برای ارسال نظر ابتدا{' '}
+                  <Link
+                    href="/send-otp"
+                    className="text-primary-600 font-semibold underline"
+                  >
+                    وارد شوید
+                  </Link>
+                </p>
+              </div>
+            )}
+
+            {/* Comments List */}
+            <div className="space-y-6">
+              {comments.filter((c) => c.approved).length > 0 ? (
+                comments
+                  .filter((comment) => comment.approved)
+                  .map((comment) => (
+                    <div
+                      key={comment.id}
+                      className="rounded-lg bg-gray-50 p-6 dark:bg-gray-700"
+                    >
+                      <div className="mb-3 flex items-start justify-between">
+                        <div className="flex items-center gap-3">
+                          {comment.user?.profile_picture ? (
+                            <Image
+                              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${comment.user.profile_picture}`}
+                              alt={`${comment.user.first_name} ${comment.user.last_name}`}
+                              width={40}
+                              height={40}
+                              className="rounded-full"
+                            />
+                          ) : (
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 dark:bg-gray-600">
+                              <User className="h-5 w-5 text-gray-500" />
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-semibold">
+                              {comment.user?.first_name}{' '}
+                              {comment.user?.last_name}
+                            </p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              {comment.created_at}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="whitespace-pre-wrap text-gray-700 dark:text-gray-300">
+                        {comment.content}
+                      </p>
+                    </div>
+                  ))
+              ) : (
+                <p className="py-8 text-center text-gray-500 dark:text-gray-400">
+                  هنوز نظری ثبت نشده است. اولین نفر باشید!
+                </p>
+              )}
+            </div>
           </div>
         </section>
       </div>

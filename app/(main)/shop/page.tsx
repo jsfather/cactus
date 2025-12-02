@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,6 +10,7 @@ import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
 import { PublicProduct } from '@/app/lib/services/public-product.service';
 import { useLocale } from '@/app/contexts/LocaleContext';
+import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 interface DisplayProduct {
   id: string | number;
@@ -57,9 +59,15 @@ const convertApiProductToDisplayFormat = (
   };
 };
 
-export default function Page() {
+function ShopContent() {
   const { t, dir } = useLocale();
-  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Initialize from URL params
+  const initialSearch = searchParams.get('search') || '';
+
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const [availability, setAvailability] = useState<'all' | 'in-stock'>('all');
@@ -73,17 +81,33 @@ export default function Page() {
     fetchHomeProducts,
   } = usePublicProduct();
 
+  // Fetch products when search query changes
   useEffect(() => {
-    fetchHomeProducts();
-  }, [fetchHomeProducts]);
+    fetchHomeProducts({ search: searchQuery || undefined });
+  }, [searchQuery, fetchHomeProducts]);
+
+  // Update URL when search query changes (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      if (searchQuery) params.set('search', searchQuery);
+
+      const queryString = params.toString();
+      const newPath = `/shop${queryString ? `?${queryString}` : ''}`;
+
+      // Only update if path is different
+      if (window.location.pathname + window.location.search !== newPath) {
+        router.replace(newPath, { scroll: false });
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, router]);
 
   // Convert API products to display format
   const allProducts = apiProducts.map(convertApiProductToDisplayFormat);
 
   const filteredProducts = allProducts.filter((product) => {
-    const matchesSearch = product.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
     const matchesCategory =
       selectedCategory === 'all' ||
       product.category ===
@@ -92,7 +116,7 @@ export default function Page() {
       availability === 'all' ||
       (availability === 'in-stock' && product.inStock);
 
-    return matchesSearch && matchesCategory && matchesAvailability;
+    return matchesCategory && matchesAvailability;
   });
 
   return (
@@ -414,5 +438,13 @@ export default function Page() {
         </div>
       </section>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <ShopContent />
+    </Suspense>
   );
 }

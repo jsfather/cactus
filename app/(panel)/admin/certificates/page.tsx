@@ -3,117 +3,133 @@
 import { useState, useEffect } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
-import { OfflineSession } from '@/app/lib/types/offline-session';
+import { Certificate } from '@/lib/types/certificate';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
-import { useOfflineSession } from '@/app/lib/hooks/use-offline-session';
+import { useCertificate } from '@/app/lib/hooks/use-certificate';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import {
-  Video,
+  Award,
   Plus,
   Calendar,
-  BookOpen,
+  MapPin,
+  Building2,
   TrendingUp,
-  PlayCircle,
 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import Image from 'next/image';
 
-export default function OfflineSessionsPage() {
+export default function CertificatesPage() {
   const router = useRouter();
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<OfflineSession | null>(null);
-  const {
-    offlineSessionList,
-    loading,
-    fetchOfflineSessionList,
-    deleteOfflineSession,
-  } = useOfflineSession();
+  const [itemToDelete, setItemToDelete] = useState<Certificate | null>(null);
+  const { certificateList, loading, fetchCertificateList, deleteCertificate } =
+    useCertificate();
 
   useEffect(() => {
-    fetchOfflineSessionList();
-  }, [fetchOfflineSessionList]);
+    fetchCertificateList();
+  }, [fetchCertificateList]);
 
   // Calculate summary stats
-  const totalSessions = offlineSessionList.length;
-  const sessionsWithHomeworks = offlineSessionList.filter(
-    (session) => session.homeworks && session.homeworks.length > 0
-  ).length;
-  const totalHomeworks = offlineSessionList.reduce(
-    (total, session) =>
-      total + (session.homeworks ? session.homeworks.length : 0),
-    0
-  );
-  const thisMonthSessions = offlineSessionList.filter((session) => {
-    const sessionDate = new Date(session.created_at);
+  const totalCertificates = certificateList.length;
+  const thisYearCertificates = certificateList.filter((cert) => {
+    const certDate = new Date(cert.issued_at);
+    const thisYear = new Date();
+    return certDate.getFullYear() === thisYear.getFullYear();
+  }).length;
+  const uniqueOrganizations = new Set(
+    certificateList.map((cert) => cert.organization)
+  ).size;
+  const thisMonthCertificates = certificateList.filter((cert) => {
+    const certDate = new Date(cert.created_at);
     const thisMonth = new Date();
     return (
-      sessionDate.getMonth() === thisMonth.getMonth() &&
-      sessionDate.getFullYear() === thisMonth.getFullYear()
+      certDate.getMonth() === thisMonth.getMonth() &&
+      certDate.getFullYear() === thisMonth.getFullYear()
     );
   }).length;
 
-  const columns: Column<OfflineSession>[] = [
+  const columns: Column<Certificate>[] = [
     {
-      header: 'عنوان',
-      accessor: 'title',
-    },
-    {
-      header: 'توضیحات',
-      accessor: 'description',
-      render: (value): string => {
-        return String(value).length > 50
-          ? String(value).substring(0, 50) + '...'
-          : String(value);
-      },
-    },
-    {
-      header: 'ویدیو',
-      accessor: 'video_url',
+      header: 'تصویر',
+      accessor: 'image',
       render: (value): any => {
-        const videoUrl = value as string;
-        if (!videoUrl) return '-';
         return (
-          <a
-            href={videoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-          >
-            <PlayCircle className="ml-1 h-4 w-4" />
-            مشاهده ویدیو
-          </a>
+          <div className="relative h-12 w-16 overflow-hidden rounded">
+            <Image
+              src={String(value)}
+              alt="گواهینامه"
+              fill
+              className="object-cover"
+            />
+          </div>
         );
       },
     },
     {
-      header: 'شناسه ترم',
-      accessor: 'term_id',
+      header: 'عنوان',
+      accessor: 'title',
       render: (value): string => {
-        return String(value);
+        const title = String(value);
+        return title.replace(/^"|"$/g, '').replace(/\\"/g, '"');
       },
     },
     {
-      header: 'تعداد تمرینات',
-      accessor: 'homeworks',
+      header: 'سازمان',
+      accessor: 'organization',
       render: (value): string => {
-        const homeworks = value as any[];
-        return homeworks ? homeworks.length.toString() : '0';
+        const org = String(value);
+        return org.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+      },
+    },
+    {
+      header: 'مکان',
+      accessor: 'location',
+      render: (value): string => {
+        const loc = String(value);
+        return loc.replace(/^"|"$/g, '').replace(/\\"/g, '"');
+      },
+    },
+    {
+      header: 'تاریخ صدور',
+      accessor: 'issued_at',
+      render: (value): string => {
+        if (!value || typeof value !== 'string') return '-';
+        return new Date(value).toLocaleDateString('fa-IR');
+      },
+    },
+    {
+      header: 'دسته‌بندی‌ها',
+      accessor: 'categories',
+      render: (value): any => {
+        const categories = value as string[];
+        return (
+          <div className="flex flex-wrap gap-1">
+            {categories.map((cat, idx) => (
+              <span
+                key={idx}
+                className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+              >
+                {cat}
+              </span>
+            ))}
+          </div>
+        );
       },
     },
     {
       header: 'تاریخ ایجاد',
       accessor: 'created_at',
-      render: (value): string => {
-        if (!value || typeof value !== 'string') return '';
-        return new Date(value).toLocaleDateString('fa-IR');
+      render: (value): any => {
+        return <span className="dir-ltr inline-block">{String(value)}</span>;
       },
     },
   ];
 
-  const handleDeleteClick = (session: OfflineSession) => {
-    setItemToDelete(session);
+  const handleDeleteClick = (certificate: Certificate) => {
+    setItemToDelete(certificate);
     setShowDeleteModal(true);
   };
 
@@ -122,13 +138,13 @@ export default function OfflineSessionsPage() {
 
     try {
       setDeleteLoading(true);
-      await deleteOfflineSession(itemToDelete.id.toString());
-      toast.success('جلسه آفلاین با موفقیت حذف شد');
+      await deleteCertificate(itemToDelete.id.toString());
+      toast.success('گواهینامه با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchOfflineSessionList();
+      await fetchCertificateList();
     } catch (error) {
-      toast.error('خطا در حذف جلسه آفلاین');
+      toast.error('خطا در حذف گواهینامه');
     } finally {
       setDeleteLoading(false);
     }
@@ -149,10 +165,10 @@ export default function OfflineSessionsPage() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'پنل مدیریت', href: '/teacher' },
+          { label: 'پنل مدیریت', href: '/admin' },
           {
-            label: 'جلسات آفلاین',
-            href: '/teacher/offline_sessions',
+            label: 'افتخارات و گواهینامه‌ها',
+            href: '/admin/certificates',
             active: true,
           },
         ]}
@@ -163,15 +179,15 @@ export default function OfflineSessionsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              مدیریت جلسات آفلاین
+              افتخارات و گواهینامه‌ها
             </h1>
             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-              ایجاد، ویرایش و مدیریت جلسات آفلاین
+              مدیریت گواهینامه‌ها و افتخارات آموزشگاه
             </p>
           </div>
-          <Button onClick={() => router.push('/teacher/offline_sessions/new')}>
+          <Button onClick={() => router.push('/admin/certificates/new')}>
             <Plus className="ml-2 h-4 w-4" />
-            افزودن جلسه جدید
+            افزودن گواهینامه جدید
           </Button>
         </div>
 
@@ -181,15 +197,15 @@ export default function OfflineSessionsPage() {
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Video className="h-6 w-6 text-blue-600" />
+                  <Award className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                      کل جلسات
+                      کل گواهینامه‌ها
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {totalSessions.toLocaleString('fa-IR')}
+                      {totalCertificates.toLocaleString('fa-IR')}
                     </dd>
                   </dl>
                 </div>
@@ -201,15 +217,15 @@ export default function OfflineSessionsPage() {
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <BookOpen className="h-6 w-6 text-green-600" />
+                  <Calendar className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                      جلسات با تمرین
+                      امسال
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {sessionsWithHomeworks.toLocaleString('fa-IR')}
+                      {thisYearCertificates.toLocaleString('fa-IR')}
                     </dd>
                   </dl>
                 </div>
@@ -221,15 +237,15 @@ export default function OfflineSessionsPage() {
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Calendar className="h-6 w-6 text-yellow-600" />
+                  <Building2 className="h-6 w-6 text-yellow-600" />
                 </div>
                 <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                      کل تمرینات
+                      سازمان‌ها
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {totalHomeworks.toLocaleString('fa-IR')}
+                      {uniqueOrganizations.toLocaleString('fa-IR')}
                     </dd>
                   </dl>
                 </div>
@@ -249,7 +265,7 @@ export default function OfflineSessionsPage() {
                       این ماه
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {thisMonthSessions.toLocaleString('fa-IR')}
+                      {thisMonthCertificates.toLocaleString('fa-IR')}
                     </dd>
                   </dl>
                 </div>
@@ -258,15 +274,15 @@ export default function OfflineSessionsPage() {
           </div>
         </div>
 
-        {/* Offline Sessions Table */}
+        {/* Certificates Table */}
         <div className="mt-6">
           <Table
-            data={offlineSessionList}
+            data={certificateList}
             columns={columns}
             loading={loading}
-            emptyMessage="هیچ جلسه آفلاینی یافت نشد"
-            onEdit={(session) =>
-              router.push(`/teacher/offline_sessions/${session.id}`)
+            emptyMessage="هیچ گواهینامه‌ای یافت نشد"
+            onEdit={(certificate) =>
+              router.push(`/admin/certificates/${certificate.id}`)
             }
             onDelete={handleDeleteClick}
           />
@@ -277,8 +293,8 @@ export default function OfflineSessionsPage() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف جلسه آفلاین"
-        description={`آیا از حذف جلسه آفلاین "${itemToDelete?.title}" مطمئن هستید؟`}
+        title="حذف گواهینامه"
+        description={`آیا از حذف گواهینامه "${itemToDelete?.title.replace(/^"|"$/g, '').replace(/\\"/g, '"')}" مطمئن هستید؟`}
         confirmText="حذف"
         cancelText="انصراف"
         loading={deleteLoading}
