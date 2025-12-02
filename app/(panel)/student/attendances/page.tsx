@@ -125,7 +125,7 @@ export default function StudentAttendancesPage() {
               {term.title}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              سطح: {term.level.label} ({term.level.name})
+              سطح: {term.level.name} ({term.level.label})
             </div>
           </div>
         );

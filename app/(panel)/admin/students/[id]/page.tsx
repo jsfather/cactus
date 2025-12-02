@@ -398,7 +398,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
                     onChange={field.onChange}
                     options={levelList.map((level) => ({
                       value: level.id.toString(),
-                      label: `${level.label} - ${level.name}`,
+                      label: `${level.name} - ${level.label}`,
                     }))}
                     error={errors.level_id?.message}
                     required

@@ -329,7 +329,7 @@ const TermFormPage: React.FC<PageProps> = ({ params }) => {
                     required
                     options={levelList.map((level) => ({
                       value: level.id.toString(),
-                      label: `${level.label} - ${level.name}`,
+                      label: `${level.name} - ${level.label}`,
                     }))}
                   />
                 )}

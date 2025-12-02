@@ -179,7 +179,7 @@ export default function TeacherTermDetailPage() {
                     سطح ترم
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {currentTerm.level.label} - {currentTerm.level.name}
+                    {currentTerm.level.name} - {currentTerm.level.label}
                   </dd>
                 </dl>
               </div>
