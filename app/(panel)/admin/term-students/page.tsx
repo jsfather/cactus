@@ -273,7 +273,7 @@ export default function TermStudentsPage() {
                           {getTermTypeLabel(term.type)}
                         </span>
                         <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                          {term.level.label} - {term.level.name}
+                          {term.level.name} - {term.level.label}
                         </span>
                       </div>
                     </div>

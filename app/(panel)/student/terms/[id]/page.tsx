@@ -29,17 +29,17 @@ export default function StudentTermDetailPage({
 }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  const { 
-    currentTerm, 
-    loading, 
-    error, 
-    skyRoomLoading, 
-    skyRoomError, 
-    getTermById, 
-    clearTerm, 
+  const {
+    currentTerm,
+    loading,
+    error,
+    skyRoomLoading,
+    skyRoomError,
+    getTermById,
+    clearTerm,
     resetError,
     getSkyRoomUrl,
-    resetSkyRoomError 
+    resetSkyRoomError,
   } = useStudentTerm();
 
   useEffect(() => {
@@ -94,16 +94,16 @@ export default function StudentTermDetailPage({
     const sessionDate = new Date(schedule.session_date);
     const [startHour, startMinute] = schedule.start_time.split(':').map(Number);
     const [endHour, endMinute] = schedule.end_time.split(':').map(Number);
-    
+
     const sessionStart = new Date(sessionDate);
     sessionStart.setHours(startHour, startMinute, 0, 0);
-    
+
     const sessionEnd = new Date(sessionDate);
     sessionEnd.setHours(endHour, endMinute, 0, 0);
-    
+
     // Allow joining 15 minutes before session starts and until session ends
     const joinableStart = new Date(sessionStart.getTime() - 15 * 60 * 1000);
-    
+
     return now >= joinableStart && now <= sessionEnd;
   };
 
@@ -118,7 +118,7 @@ export default function StudentTermDetailPage({
   const getAttendanceStatus = (schedule: any) => {
     const now = new Date();
     const sessionDate = new Date(schedule.session_date);
-    
+
     // If myAttendance exists, use it
     if (schedule.myAttendance !== null && schedule.myAttendance !== undefined) {
       return {
@@ -127,7 +127,7 @@ export default function StudentTermDetailPage({
         icon: CheckCircle,
       };
     }
-    
+
     // If session is in the past and myAttendance is null, student was absent
     if (sessionDate < now) {
       return {
@@ -136,7 +136,7 @@ export default function StudentTermDetailPage({
         icon: XCircle,
       };
     }
-    
+
     // If session is in the future
     return {
       label: 'آینده',
@@ -151,7 +151,7 @@ export default function StudentTermDetailPage({
     // Use schedules to determine status since start_date and end_date are in Jalali format
     const now = new Date();
     const schedules = currentTerm.schedules || [];
-    
+
     if (schedules.length === 0) {
       return {
         label: 'بدون جلسه',
@@ -160,9 +160,13 @@ export default function StudentTermDetailPage({
       };
     }
 
-    const sessionDates = schedules.map(s => new Date(s.session_date));
-    const firstSession = new Date(Math.min(...sessionDates.map(d => d.getTime())));
-    const lastSession = new Date(Math.max(...sessionDates.map(d => d.getTime())));
+    const sessionDates = schedules.map((s) => new Date(s.session_date));
+    const firstSession = new Date(
+      Math.min(...sessionDates.map((d) => d.getTime()))
+    );
+    const lastSession = new Date(
+      Math.max(...sessionDates.map((d) => d.getTime()))
+    );
 
     if (firstSession > now) {
       return {
@@ -239,8 +243,8 @@ export default function StudentTermDetailPage({
                 {status.label}
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                سطح: {currentTerm.term.level.label} (
-                {currentTerm.term.level.name})
+                سطح: {currentTerm.term.level.name} (
+                {currentTerm.term.level.label})
               </span>
             </div>
           </div>
@@ -444,37 +448,40 @@ export default function StudentTermDetailPage({
                     )
                     .map((schedule) => (
                       <tr key={schedule.id}>
-                        <td className="px-6 py-4 text-sm text-right whitespace-nowrap text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 text-right text-sm whitespace-nowrap text-gray-900 dark:text-white">
                           {new Date(schedule.session_date).toLocaleDateString(
                             'fa-IR'
                           )}
                         </td>
-                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 text-center text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                           {formatTime(schedule.start_time)}
                         </td>
-                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap text-gray-500 dark:text-gray-400">
+                        <td className="px-6 py-4 text-center text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                           {formatTime(schedule.end_time)}
                         </td>
-                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap">
+                        <td className="px-6 py-4 text-center text-sm whitespace-nowrap">
                           {(() => {
-                            const attendanceStatus = getAttendanceStatus(schedule);
+                            const attendanceStatus =
+                              getAttendanceStatus(schedule);
                             const StatusIcon = attendanceStatus.icon;
                             return (
-                              <span className={`inline-flex items-center gap-1 ${attendanceStatus.color}`}>
+                              <span
+                                className={`inline-flex items-center gap-1 ${attendanceStatus.color}`}
+                              >
                                 <StatusIcon className="h-4 w-4" />
                                 {attendanceStatus.label}
                               </span>
                             );
                           })()}
                         </td>
-                        <td className="px-6 py-4 text-sm text-center whitespace-nowrap">
+                        <td className="px-6 py-4 text-center text-sm whitespace-nowrap">
                           {canJoinSession(schedule) ? (
                             <Button
                               type="button"
                               variant="primary"
                               onClick={() => handleJoinSession(schedule.id)}
                               disabled={skyRoomLoading}
-                              className="inline-flex items-center gap-1 text-sm px-3 py-1.5"
+                              className="inline-flex items-center gap-1 px-3 py-1.5 text-sm"
                             >
                               {skyRoomLoading ? (
                                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
@@ -485,7 +492,7 @@ export default function StudentTermDetailPage({
                               <ExternalLink className="h-3 w-3" />
                             </Button>
                           ) : (
-                            <span className="text-gray-400 dark:text-gray-500 text-xs">
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
                               غیرفعال
                             </span>
                           )}

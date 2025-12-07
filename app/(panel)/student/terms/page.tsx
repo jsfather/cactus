@@ -31,23 +31,20 @@ export default function StudentTermsPage() {
   const router = useRouter();
   const { termList, stats, loading, error, getTermList, resetError } =
     useStudentTerm();
-  const { 
-    availableTerms, 
-    stats: availableStats, 
-    loading: availableLoading, 
-    error: availableError, 
-    getAvailableTerms, 
-    resetError: resetAvailableError 
+  const {
+    availableTerms,
+    stats: availableStats,
+    loading: availableLoading,
+    error: availableError,
+    getAvailableTerms,
+    resetError: resetAvailableError,
   } = useAvailableTerm();
   const { addItem } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await Promise.all([
-          getTermList(),
-          getAvailableTerms()
-        ]);
+        await Promise.all([getTermList(), getAvailableTerms()]);
       } catch (error) {
         toast.error('خطا در دریافت اطلاعات ترم‌ها');
       }
@@ -87,7 +84,7 @@ export default function StudentTermsPage() {
     // Use schedules to determine status since start_date and end_date are in Jalali format
     const now = new Date();
     const schedules = term.schedules || [];
-    
+
     if (schedules.length === 0) {
       return {
         label: 'بدون جلسه',
@@ -95,9 +92,13 @@ export default function StudentTermsPage() {
       };
     }
 
-    const sessionDates = schedules.map(s => new Date(s.session_date));
-    const firstSession = new Date(Math.min(...sessionDates.map(d => d.getTime())));
-    const lastSession = new Date(Math.max(...sessionDates.map(d => d.getTime())));
+    const sessionDates = schedules.map((s) => new Date(s.session_date));
+    const firstSession = new Date(
+      Math.min(...sessionDates.map((d) => d.getTime()))
+    );
+    const lastSession = new Date(
+      Math.max(...sessionDates.map((d) => d.getTime()))
+    );
 
     if (firstSession > now) {
       return {
@@ -121,17 +122,24 @@ export default function StudentTermsPage() {
 
   const getAttendanceInfo = (schedules: StudentTerm['schedules']) => {
     const now = new Date();
-    const pastSessions = schedules.filter(s => new Date(s.session_date) < now);
-    const upcomingSessions = schedules.filter(s => new Date(s.session_date) >= now);
-    
+    const pastSessions = schedules.filter(
+      (s) => new Date(s.session_date) < now
+    );
+    const upcomingSessions = schedules.filter(
+      (s) => new Date(s.session_date) >= now
+    );
+
     // Sort upcoming sessions by date to get the next one
-    upcomingSessions.sort((a, b) => new Date(a.session_date).getTime() - new Date(b.session_date).getTime());
-    
+    upcomingSessions.sort(
+      (a, b) =>
+        new Date(a.session_date).getTime() - new Date(b.session_date).getTime()
+    );
+
     return {
       totalSessions: schedules.length,
       pastSessions: pastSessions.length,
       upcomingSessions: upcomingSessions.length,
-      nextSession: upcomingSessions.length > 0 ? upcomingSessions[0] : null
+      nextSession: upcomingSessions.length > 0 ? upcomingSessions[0] : null,
     };
   };
 
@@ -147,7 +155,7 @@ export default function StudentTermsPage() {
               {term.title}
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400">
-              سطح: {term.level.label} ({term.level.name})
+              سطح: {term.level.name} ({term.level.label})
             </div>
           </div>
         );
@@ -277,8 +285,8 @@ export default function StudentTermsPage() {
 
   const handleRegisterTerm = (termId: number) => {
     // Find the selected term from available terms
-    const selectedTerm = availableTerms.find(term => term.id === termId);
-    
+    const selectedTerm = availableTerms.find((term) => term.id === termId);
+
     if (!selectedTerm) {
       toast.error('ترم مورد نظر یافت نشد');
       return;
@@ -292,9 +300,9 @@ export default function StudentTermsPage() {
         price: selectedTerm.price.toString(),
         image: '/course-robotics-intro.png', // Default course image
       });
-      
+
       toast.success('ترم به سبد خرید اضافه شد');
-      
+
       // Navigate to checkout page
       router.push('/shop/checkout');
     } catch (error) {
@@ -425,7 +433,7 @@ export default function StudentTermsPage() {
           {/* Available Terms Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <h2 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
                 <PlusCircle className="h-6 w-6 text-blue-600" />
                 ترم‌های قابل ثبت‌نام
               </h2>

@@ -183,7 +183,7 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
                       {getTermTypeLabel(term.type)}
                     </span>
                     <span className="rounded-full bg-indigo-100 px-2 py-1 text-xs text-indigo-800 dark:bg-indigo-900 dark:text-indigo-100">
-                      {term.level.label} - {term.level.name}
+                      {term.level.name} - {term.level.label}
                     </span>
                   </div>
                 </div>

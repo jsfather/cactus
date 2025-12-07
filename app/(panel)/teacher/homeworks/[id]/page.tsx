@@ -34,7 +34,17 @@ export default function TeacherHomeworkDetailPage() {
   const router = useRouter();
   const homeworkId = params.id as string;
 
-  const { currentHomework, loading, fetchHomeworkById, clearCurrentHomework, conversations, conversationLoading, sendingMessage, fetchConversation, sendConversationMessage } = useTeacherHomework();
+  const {
+    currentHomework,
+    loading,
+    fetchHomeworkById,
+    clearCurrentHomework,
+    conversations,
+    conversationLoading,
+    sendingMessage,
+    fetchConversation,
+    sendConversationMessage,
+  } = useTeacherHomework();
 
   useEffect(() => {
     if (homeworkId) {
@@ -81,7 +91,10 @@ export default function TeacherHomeworkDetailPage() {
           breadcrumbs={[
             { label: 'داشبورد مدرس', href: '/teacher' },
             { label: 'تکالیف', href: '/teacher/homeworks' },
-            { label: 'جزئیات تکلیف', href: `/teacher/homeworks/${currentHomework.id}` },
+            {
+              label: 'جزئیات تکلیف',
+              href: `/teacher/homeworks/${currentHomework.id}`,
+            },
           ]}
         />
 
@@ -185,13 +198,13 @@ export default function TeacherHomeworkDetailPage() {
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Homework Information */}
           <Card className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
               اطلاعات تکلیف
             </h2>
-            
+
             <div className="space-y-4">
-              <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+              <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                <dt className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                   شرح تکلیف:
                 </dt>
                 <dd className="text-sm text-gray-900 dark:text-white">
@@ -200,13 +213,15 @@ export default function TeacherHomeworkDetailPage() {
               </div>
 
               {currentHomework.file_url && (
-                <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                  <dt className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                     فایل ضمیمه:
                   </dt>
                   <dd>
                     <Button
-                      onClick={() => window.open(currentHomework.file_url!, '_blank')}
+                      onClick={() =>
+                        window.open(currentHomework.file_url!, '_blank')
+                      }
                       variant="secondary"
                       className="flex items-center gap-2"
                     >
@@ -218,19 +233,23 @@ export default function TeacherHomeworkDetailPage() {
               )}
 
               {currentHomework.schedule && (
-                <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                  <dt className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                     اطلاعات جلسه:
                   </dt>
                   <dd className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
                       <CalendarDays className="h-4 w-4 text-blue-600" />
-                      <span>تاریخ: {currentHomework.schedule.session_date}</span>
+                      <span>
+                        تاریخ: {currentHomework.schedule.session_date}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-900 dark:text-white">
                       <Timer className="h-4 w-4 text-green-600" />
                       <span>
-                        زمان: {currentHomework.schedule.start_time.substring(0, 5)} - {currentHomework.schedule.end_time.substring(0, 5)}
+                        زمان:{' '}
+                        {currentHomework.schedule.start_time.substring(0, 5)} -{' '}
+                        {currentHomework.schedule.end_time.substring(0, 5)}
                       </span>
                     </div>
                   </dd>
@@ -239,7 +258,7 @@ export default function TeacherHomeworkDetailPage() {
 
               {currentHomework.teacher && (
                 <div className="py-3">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+                  <dt className="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">
                     مدرس:
                   </dt>
                   <dd className="flex items-center gap-3">
@@ -251,14 +270,15 @@ export default function TeacherHomeworkDetailPage() {
                           className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 dark:bg-gray-600">
                           <User className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                         </div>
                       )}
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {currentHomework.teacher.first_name} {currentHomework.teacher.last_name}
+                        {currentHomework.teacher.first_name}{' '}
+                        {currentHomework.teacher.last_name}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
                         {currentHomework.teacher.phone}
@@ -273,13 +293,13 @@ export default function TeacherHomeworkDetailPage() {
           {/* Term Information */}
           {currentHomework.term && (
             <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+              <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
                 اطلاعات ترم
               </h2>
-              
+
               <div className="space-y-4">
-                <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                  <dt className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                     عنوان ترم:
                   </dt>
                   <dd className="text-sm font-medium text-gray-900 dark:text-white">
@@ -287,35 +307,45 @@ export default function TeacherHomeworkDetailPage() {
                   </dd>
                 </div>
 
-                <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                  <dt className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                     نوع ترم:
                   </dt>
                   <dd>
-                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                      currentHomework.term.type === 'normal' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' :
-                      currentHomework.term.type === 'capacity_completion' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
-                      currentHomework.term.type === 'project_based' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' :
-                      currentHomework.term.type === 'specialized' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
-                      currentHomework.term.type === 'ai' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
-                    }`}>
-                      {getTeacherHomeworkTermTypeLabel(currentHomework.term.type)}
+                    <span
+                      className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                        currentHomework.term.type === 'normal'
+                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
+                          : currentHomework.term.type === 'capacity_completion'
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
+                            : currentHomework.term.type === 'project_based'
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300'
+                              : currentHomework.term.type === 'specialized'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                                : currentHomework.term.type === 'ai'
+                                  ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300'
+                                  : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300'
+                      }`}
+                    >
+                      {getTeacherHomeworkTermTypeLabel(
+                        currentHomework.term.type
+                      )}
                     </span>
                   </dd>
                 </div>
 
-                <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                  <dt className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                     سطح:
                   </dt>
                   <dd className="text-sm text-gray-900 dark:text-white">
-                    {currentHomework.term.level.label} - {currentHomework.term.level.name}
+                    {currentHomework.term.level.name} -{' '}
+                    {currentHomework.term.level.label}
                   </dd>
                 </div>
 
-                <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                  <dt className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                     مدت زمان:
                   </dt>
                   <dd className="text-sm text-gray-900 dark:text-white">
@@ -323,8 +353,8 @@ export default function TeacherHomeworkDetailPage() {
                   </dd>
                 </div>
 
-                <div className="py-3 border-b border-gray-200 dark:border-gray-700">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                <div className="border-b border-gray-200 py-3 dark:border-gray-700">
+                  <dt className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                     تعداد جلسات:
                   </dt>
                   <dd className="text-sm text-gray-900 dark:text-white">
@@ -333,11 +363,12 @@ export default function TeacherHomeworkDetailPage() {
                 </div>
 
                 <div className="py-3">
-                  <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  <dt className="mb-1 text-sm font-medium text-gray-500 dark:text-gray-400">
                     دوره ترم:
                   </dt>
                   <dd className="text-sm text-gray-900 dark:text-white">
-                    {currentHomework.term.start_date} تا {currentHomework.term.end_date}
+                    {currentHomework.term.start_date} تا{' '}
+                    {currentHomework.term.end_date}
                   </dd>
                 </div>
               </div>
@@ -348,29 +379,29 @@ export default function TeacherHomeworkDetailPage() {
         {/* Answers Section */}
         {answersCount > 0 ? (
           <Card className="mt-8 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
               پاسخ‌های دانش‌آموزان ({answersCount} پاسخ)
             </h2>
-            
-            <div className="text-center py-8">
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-4" />
+
+            <div className="py-8 text-center">
+              <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-600" />
               <p className="text-gray-600 dark:text-gray-400">
                 پاسخ‌ها در این بخش نمایش داده خواهد شد.
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-500">
                 (جزئیات پاسخ‌ها بر اساس API پیاده‌سازی خواهد شد)
               </p>
             </div>
           </Card>
         ) : (
           <Card className="mt-8 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
               پاسخ‌های دانش‌آموزان
             </h2>
-            
-            <div className="text-center py-8">
-              <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+
+            <div className="py-8 text-center">
+              <AlertCircle className="mx-auto mb-4 h-12 w-12 text-yellow-500" />
+              <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
                 هنوز پاسخی دریافت نشده
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
@@ -381,7 +412,8 @@ export default function TeacherHomeworkDetailPage() {
         )}
 
         {/* Conversations Section */}
-        {currentHomework.conversations && currentHomework.conversations.length > 0 ? (
+        {currentHomework.conversations &&
+        currentHomework.conversations.length > 0 ? (
           <div className="mt-8 space-y-6">
             {currentHomework.conversations.map((conversation) => (
               <ConversationComponent
@@ -397,13 +429,13 @@ export default function TeacherHomeworkDetailPage() {
           </div>
         ) : (
           <Card className="mt-8 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
               گفتگوها
             </h2>
-            
-            <div className="text-center py-8">
-              <MessageCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+
+            <div className="py-8 text-center">
+              <MessageCircle className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+              <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
                 هیچ گفتگویی وجود ندارد
               </h3>
               <p className="text-gray-600 dark:text-gray-400">

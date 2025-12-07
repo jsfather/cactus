@@ -231,8 +231,8 @@ export default function TermAttendancesPage() {
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-gray-400" />
                   <span className="font-medium text-gray-900 dark:text-white">
-                    {currentTerm.term.level.label} (
-                    {currentTerm.term.level.name})
+                    {currentTerm.term.level.name} (
+                    {currentTerm.term.level.label})
                   </span>
                 </div>
               </div>
