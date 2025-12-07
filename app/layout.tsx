@@ -7,7 +7,7 @@ import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
-  description: 'آموزش‌های حضوری و آنلاین رباتیک',
+  description: 'آموزش‌های حضوری و آنلاین روباتیک',
 };
 
 export default function RootLayout({
@@ -54,11 +54,7 @@ export default function RootLayout({
       >
         <CartProvider>
           {children}
-          <ToastContainer
-            rtl={true}
-            draggable
-            pauseOnHover
-          />
+          <ToastContainer rtl={true} draggable pauseOnHover />
         </CartProvider>
       </body>
       <Script
