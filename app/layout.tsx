@@ -7,7 +7,7 @@ import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: 'کاکتوس',
-  description: 'آموزش‌های حضوری و آنلاین روباتیک',
+  description: 'آموزش‌های حضوری و آنلاین رباتیک',
 };
 
 export default function RootLayout({
