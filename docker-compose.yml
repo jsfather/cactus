@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nextjs-app
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      # Add your environment variables here
+      # - DATABASE_URL=${DATABASE_URL}
+      # - API_KEY=${API_KEY}
+    networks:
+      - app-network
+    # Uncomment if you need volume mounts
+    # volumes:
+    #   - ./data:/app/data
+    env_file:
+      - .env.production
+
+networks:
+  app-network:
+    driver: bridge
