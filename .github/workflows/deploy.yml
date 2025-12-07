@@ -1,58 +1,29 @@
 name: Deploy Cactus to VPS
+
 on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Ubuntu Server
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          node-version: '18' # adjust to your version
-          cache: 'npm'
-      
-      - name: Install dependencies
-        run: npm ci
-      
-      - name: Build project
-        run: npm run build
-      
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 9011
           script: |
-            cd /var/www/cactus
-            git fetch --all
-            git reset --hard origin/main
-      
-      - name: Copy built files to VPS
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 9011
-          source: ".next,public,package.json,package-lock.json,next.config.js" # adjust based on your framework
-          target: "/var/www/cactus"
-          overwrite: true
-      
-      - name: Install production dependencies and restart
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: 9011
-          script: |
-            cd /var/www/cactus
-            npm ci --production
-            pm2 restart cactus || pm2 start npm --name "cactus" -- run start
+            cd /path/to/your/app
+            git pull origin main
+            docker-compose down
+            docker-compose build --no-cache
+            docker-compose up -d
+            docker image prune -f
