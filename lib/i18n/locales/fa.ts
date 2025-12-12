@@ -403,6 +403,12 @@ export const shop = {
     available: 'موجود',
     unavailable: 'ناموجود',
     reviews: 'نظرات',
+    fastShipping: 'ارسال سریع',
+    shippingDescription: 'ارسال به سراسر کشور',
+    authenticityGuarantee: 'ضمانت اصالت',
+    qualityAssurance: 'تضمین کیفیت محصول',
+    returnGuarantee: 'گارانتی بازگشت',
+    returnDescription: 'ضمانت ۷ روزه بازگشت کالا',
   },
   checkoutPage: {
     title: 'تکمیل خرید',

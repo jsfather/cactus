@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   MessageSquare,
   User,
+  Package,
 } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
@@ -27,6 +28,9 @@ import { useUser } from '@/app/hooks/useUser';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/Button';
 import Textarea from '@/app/components/ui/Textarea';
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 
 interface ProductPageProps {
   params: Promise<{
@@ -321,6 +325,7 @@ export default function Page({ params }: ProductPageProps) {
   const [comments, setComments] = useState<ProductComment[]>([]);
   const [commentContent, setCommentContent] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
+  const [imageError, setImageError] = useState<Record<number, boolean>>({});
   const { addItem } = useCart();
 
   // Fetch API products
@@ -588,14 +593,27 @@ export default function Page({ params }: ProductPageProps) {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Product Images */}
           <div className="space-y-4">
-            <div className="relative aspect-square overflow-hidden rounded-2xl">
-              <Image
-                src={product.images[selectedImage]}
-                alt={product.title}
-                fill
-                className="object-cover"
-                priority
-              />
+            <div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
+              {imageError[selectedImage] ? (
+                <div className="flex h-full w-full flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                  <Package className="mb-4 h-24 w-24" />
+                  <span className="text-sm">تصویر موجود نیست</span>
+                </div>
+              ) : (
+                <Image
+                  src={product.images[selectedImage]}
+                  alt={product.title}
+                  fill
+                  className="object-cover"
+                  priority
+                  onError={() =>
+                    setImageError((prev) => ({
+                      ...prev,
+                      [selectedImage]: true,
+                    }))
+                  }
+                />
+              )}
               {product.discount && (
                 <div className="absolute top-4 right-4 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
                   {t.shop.discount}
@@ -607,18 +625,27 @@ export default function Page({ params }: ProductPageProps) {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`relative aspect-square overflow-hidden rounded-lg border-2 transition-colors ${
+                  className={`relative aspect-square overflow-hidden rounded-lg border-2 bg-gray-100 transition-colors dark:bg-gray-800 ${
                     selectedImage === index
                       ? 'border-primary-600 dark:border-primary-500'
                       : 'border-transparent'
                   }`}
                 >
-                  <Image
-                    src={image}
-                    alt={`${product.title} - تصویر ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
+                  {imageError[index] ? (
+                    <div className="flex h-full w-full items-center justify-center text-gray-400 dark:text-gray-500">
+                      <Package className="h-8 w-8" />
+                    </div>
+                  ) : (
+                    <Image
+                      src={image}
+                      alt={`${product.title} - تصویر ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      onError={() =>
+                        setImageError((prev) => ({ ...prev, [index]: true }))
+                      }
+                    />
+                  )}
                 </button>
               ))}
             </div>
@@ -731,29 +758,35 @@ export default function Page({ params }: ProductPageProps) {
             {/* Features */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
-                <Truck className="text-primary-600 dark:text-primary-400 h-8 w-8" />
+                <RefreshCw className="text-primary-600 dark:text-primary-400 h-8 w-8 shrink-0" />
                 <div>
-                  <p className="font-medium">{t.shop.fastShipping}</p>
+                  <p className="font-medium">
+                    {t.shop.productDetail.fastShipping}
+                  </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t.shop.shippingDescription}
+                    {t.shop.productDetail.shippingDescription}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
-                <Shield className="text-primary-600 dark:text-primary-400 h-8 w-8" />
+                <Shield className="text-primary-600 dark:text-primary-400 h-8 w-8 shrink-0" />
                 <div>
-                  <p className="font-medium">{t.shop.authenticityGuarantee}</p>
+                  <p className="font-medium">
+                    {t.shop.productDetail.authenticityGuarantee}
+                  </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t.shop.qualityAssurance}
+                    {t.shop.productDetail.qualityAssurance}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
-                <RefreshCw className="text-primary-600 dark:text-primary-400 h-8 w-8" />
+                <Truck className="text-primary-600 dark:text-primary-400 h-8 w-8 shrink-0" />
                 <div>
-                  <p className="font-medium">{t.shop.returnGuarantee}</p>
+                  <p className="font-medium">
+                    {t.shop.productDetail.returnGuarantee}
+                  </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t.shop.returnDescription}
+                    {t.shop.productDetail.returnDescription}
                   </p>
                 </div>
               </div>
@@ -761,14 +794,20 @@ export default function Page({ params }: ProductPageProps) {
 
             {/* Description */}
             <div className="prose prose-lg dark:prose-invert max-w-none">
-              <h2>{t.shop.description}</h2>
-              <p>{product.description}</p>
-              <h3>{t.shop.features}</h3>
-              <ul>
-                {product.features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
-                ))}
-              </ul>
+              <h2>{t.shop.productDetail.description}</h2>
+              <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+                {product.description}
+              </ReactMarkdown>
+              {product.features.length > 0 && (
+                <>
+                  <h3>{t.shop.productDetail.features}</h3>
+                  <ul>
+                    {product.features.map((feature, index) => (
+                      <li key={index}>{feature}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
 
             {/* Specifications */}
