@@ -26,10 +26,9 @@ export class ProductService {
     formData.append('price', data.price.toString());
     formData.append('stock', data.stock.toString());
 
-    // Handle image - can be File or string (for updates)
+    // Handle image - only send if it's a new File upload
+    // Don't send string URLs as Laravel expects an actual image file
     if (data.image instanceof File) {
-      formData.append('image', data.image);
-    } else if (typeof data.image === 'string' && data.image) {
       formData.append('image', data.image);
     }
 
@@ -75,7 +74,9 @@ export class ProductService {
     payload: UpdateProductFormData
   ): Promise<GetProductResponse> {
     const formData = this.createFormData(payload);
-    return apiClient.put<GetProductResponse>(
+    // Use POST with _method=PUT for Laravel compatibility with FormData
+    formData.append('_method', 'PUT');
+    return apiClient.post<GetProductResponse>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.UPDATE(id),
       formData,
       {
