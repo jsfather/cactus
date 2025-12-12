@@ -16,7 +16,7 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
-import Textarea from '@/app/components/ui/Textarea';
+import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
 import FileUpload from '@/app/components/ui/FileUpload';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Package, Plus, X, Save } from 'lucide-react';
@@ -162,14 +162,20 @@ export default function NewProductPage() {
                 />
               </div>
 
-              <Textarea
-                id="description"
-                label="توضیحات محصول"
-                required
-                placeholder="توضیحات محصول را وارد کنید..."
-                error={errors.description?.message}
-                {...register('description')}
-                rows={4}
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <MarkdownEditor
+                    id="description"
+                    label="توضیحات محصول"
+                    required
+                    placeholder="توضیحات محصول را وارد کنید..."
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.description?.message}
+                  />
+                )}
               />
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
