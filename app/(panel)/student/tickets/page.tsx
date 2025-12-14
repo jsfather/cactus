@@ -101,7 +101,7 @@ export default function TicketsPage() {
   ];
 
   const breadcrumbItems = [
-    { label: 'پنل دانش‌آموز', href: '/student' },
+    { label: 'پنل دانش‌پژوه', href: '/student' },
     { label: 'تیکت‌ها', href: '/student/tickets' },
   ];
 

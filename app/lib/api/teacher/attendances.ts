@@ -7,7 +7,7 @@ export const getStudent = async (id: string) => {
   );
 
   if (!response) {
-    throw new Error('خطایی در دریافت اطلاعات دانش آموز رخ داده است');
+    throw new Error('خطایی در دریافت اطلاعات دانش‌پژوه رخ داده است');
   }
 
   return response;

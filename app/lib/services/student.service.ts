@@ -8,9 +8,9 @@ import {
 } from '@/app/lib/types';
 
 export class StudentService {
-  async getList(): Promise<GetStudentListResponse> {
+  async getList(page: number = 1): Promise<GetStudentListResponse> {
     return apiClient.get<GetStudentListResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.STUDENTS.GET_ALL
+      `${API_ENDPOINTS.PANEL.ADMIN.STUDENTS.GET_ALL}?page=${page}`
     );
   }
 
@@ -64,15 +64,19 @@ export class StudentService {
     if (payload.username) jsonPayload.username = payload.username;
     if (payload.phone) jsonPayload.phone = payload.phone;
     if (payload.email) jsonPayload.email = payload.email;
-    if (payload.national_code) jsonPayload.national_code = payload.national_code;
+    if (payload.national_code)
+      jsonPayload.national_code = payload.national_code;
     if (payload.level_id) jsonPayload.level_id = payload.level_id;
     if (payload.father_name) jsonPayload.father_name = payload.father_name;
     if (payload.mother_name) jsonPayload.mother_name = payload.mother_name;
     if (payload.father_job) jsonPayload.father_job = payload.father_job;
     if (payload.mother_job) jsonPayload.mother_job = payload.mother_job;
-    if (payload.has_allergy !== undefined) jsonPayload.has_allergy = payload.has_allergy;
-    if (payload.allergy_details) jsonPayload.allergy_details = payload.allergy_details;
-    if (payload.interest_level) jsonPayload.interest_level = payload.interest_level;
+    if (payload.has_allergy !== undefined)
+      jsonPayload.has_allergy = payload.has_allergy;
+    if (payload.allergy_details)
+      jsonPayload.allergy_details = payload.allergy_details;
+    if (payload.interest_level)
+      jsonPayload.interest_level = payload.interest_level;
     if (payload.focus_level) jsonPayload.focus_level = payload.focus_level;
     if (payload.birth_date) jsonPayload.birth_date = payload.birth_date;
 

@@ -77,7 +77,7 @@ export default function TermStudentsPage() {
         term_id: studentToDelete.termId,
         user_id: studentToDelete.userId,
       });
-      toast.success('دانش آموز با موفقیت از ترم حذف شد');
+      toast.success('دانش‌پژوه با موفقیت از ترم حذف شد');
       setShowDeleteModal(false);
       setStudentToDelete(null);
       // Refresh the list
@@ -85,7 +85,7 @@ export default function TermStudentsPage() {
     } catch (error: any) {
       console.error('Error deleting student:', error);
       toast.error(
-        error.response?.data?.message || 'خطا در حذف دانش آموز از ترم'
+        error.response?.data?.message || 'خطا در حذف دانش‌پژوه از ترم'
       );
     } finally {
       setDeleteLoading(false);
@@ -94,7 +94,7 @@ export default function TermStudentsPage() {
 
   const breadcrumbItems = [
     { title: 'پنل مدیریت', href: '/admin' },
-    { title: 'دانش آموزان ترم', href: '/admin/term-students' },
+    { title: 'دانش‌پژوهان ترم', href: '/admin/term-students' },
   ];
 
   if (loading) {
@@ -129,16 +129,16 @@ export default function TermStudentsPage() {
             }))}
           />
           <h1 className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
-            دانش آموزان ترم
+            دانش‌پژوهان ترم
           </h1>
           <p className="mt-1 text-gray-600 dark:text-gray-400">
-            مدیریت دانش آموزان تخصیص یافته به ترم‌ها
+            مدیریت دانش‌پژوهان تخصیص یافته به ترم‌ها
           </p>
         </div>
         <Link href="/admin/term-students/new">
           <Button className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            اضافه کردن دانش آموز به ترم
+            اضافه کردن دانش‌پژوه به ترم
           </Button>
         </Link>
       </div>
@@ -168,7 +168,7 @@ export default function TermStudentsPage() {
             </div>
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                کل دانش آموزان
+                کل دانش‌پژوهان
               </p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">
                 {termsWithStudents.reduce(
@@ -231,7 +231,7 @@ export default function TermStudentsPage() {
       {/* Terms List */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-          لیست ترم‌های دارای دانش آموز ({termsWithStudents.length} ترم)
+          لیست ترم‌های دارای دانش‌پژوه ({termsWithStudents.length} ترم)
         </h2>
 
         {termsWithStudents.length === 0 ? (
@@ -240,15 +240,15 @@ export default function TermStudentsPage() {
               <Users className="h-16 w-16 text-gray-400" />
               <div>
                 <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-                  هیچ ترمی با دانش آموز یافت نشد
+                  هیچ ترمی با دانش‌پژوه یافت نشد
                 </h3>
                 <p className="mb-4 text-gray-600 dark:text-gray-400">
-                  ترم‌هایی که دانش آموز دارند اینجا نمایش داده می‌شوند
+                  ترم‌هایی که دانش‌پژوه دارند اینجا نمایش داده می‌شوند
                 </p>
                 <Link href="/admin/term-students/new">
                   <Button>
                     <Plus className="ml-2 h-4 w-4" />
-                    اضافه کردن دانش آموز به ترم
+                    اضافه کردن دانش‌پژوه به ترم
                   </Button>
                 </Link>
               </div>
@@ -328,7 +328,7 @@ export default function TermStudentsPage() {
                     <div className="mb-3 flex items-center justify-between">
                       <h4 className="flex items-center gap-2 font-medium text-gray-900 dark:text-white">
                         <Users className="h-4 w-4" />
-                        دانش آموزان ({term.students?.length || 0} از{' '}
+                        دانش‌پژوهان ({term.students?.length || 0} از{' '}
                         {term.capacity})
                       </h4>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -386,7 +386,7 @@ export default function TermStudentsPage() {
                                 );
                               }}
                               className="flex-shrink-0 rounded p-1.5 text-red-600 transition-colors hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
-                              title="حذف دانش آموز"
+                              title="حذف دانش‌پژوه"
                               type="button"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -429,7 +429,7 @@ export default function TermStudentsPage() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف دانش آموز از ترم"
+        title="حذف دانش‌پژوه از ترم"
         message={
           studentToDelete ? (
             <div className="space-y-2">
@@ -445,7 +445,7 @@ export default function TermStudentsPage() {
                 اطمینان دارید؟
               </p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                این عملیات قابل بازگشت نیست و دانش آموز از لیست این ترم حذف
+                این عملیات قابل بازگشت نیست و دانش‌پژوه از لیست این ترم حذف
                 خواهد شد.
               </p>
             </div>

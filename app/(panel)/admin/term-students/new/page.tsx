@@ -20,7 +20,7 @@ import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 const termStudentSchema = z.object({
-  user_id: z.string().min(1, 'دانش آموز الزامی است'),
+  user_id: z.string().min(1, 'دانش‌پژوه الزامی است'),
   term_id: z.string().optional(),
   term_teacher_id: z.string().min(1, 'مدرس ترم الزامی است'),
 });
@@ -150,7 +150,7 @@ export default function CreateTermStudentPage() {
   const studentOptions = studentList.map((student) => ({
     label:
       `${student.user?.first_name || ''} ${student.user?.last_name || ''}`.trim() ||
-      `دانش آموز ${student.user_id}`,
+      `دانش‌پژوه ${student.user_id}`,
     value: student.user?.id?.toString() || student.user_id.toString(),
   }));
 
@@ -172,8 +172,8 @@ export default function CreateTermStudentPage() {
     <main>
       <Breadcrumbs
         breadcrumbs={[
-          { label: 'دانش آموزان ترم', href: '/admin/term-students' },
-          { label: 'اضافه کردن دانش آموز به ترم', href: '/admin/term-students/new', active: true },
+          { label: 'دانش‌پژوهان ترم', href: '/admin/term-students' },
+          { label: 'اضافه کردن دانش‌پژوه به ترم', href: '/admin/term-students/new', active: true },
         ]}
       />
 
@@ -203,8 +203,8 @@ export default function CreateTermStudentPage() {
             render={({ field }) => (
               <Select
                 id="user_id"
-                label="دانش آموز *"
-                placeholder="دانش آموز را انتخاب کنید"
+                label="دانش‌پژوه *"
+                placeholder="دانش‌پژوه را انتخاب کنید"
                 options={studentOptions}
                 error={errors.user_id?.message}
                 value={field.value}
@@ -244,7 +244,7 @@ export default function CreateTermStudentPage() {
             انصراف
           </Button>
           <Button type="submit" loading={isSubmitting || submitting}>
-            اضافه کردن دانش آموز به ترم
+            اضافه کردن دانش‌پژوه به ترم
           </Button>
         </div>
       </form>

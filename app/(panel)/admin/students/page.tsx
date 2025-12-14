@@ -10,7 +10,18 @@ import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Student } from '@/app/lib/types';
 import { useStudent } from '@/app/lib/hooks/use-student';
-import { Plus, Users, UserCheck, Phone, GraduationCap, Eye } from 'lucide-react';
+import {
+  Plus,
+  Users,
+  UserCheck,
+  Phone,
+  GraduationCap,
+  Eye,
+  ChevronRight,
+  ChevronLeft,
+  ChevronsRight,
+  ChevronsLeft,
+} from 'lucide-react';
 
 export default function StudentsPage() {
   const router = useRouter();
@@ -18,15 +29,21 @@ export default function StudentsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Student | null>(null);
 
-  const { studentList, loading, fetchStudentList, deleteStudent, clearError } =
-    useStudent();
+  const {
+    studentList,
+    loading,
+    pagination,
+    fetchStudentList,
+    deleteStudent,
+    clearError,
+  } = useStudent();
 
   useEffect(() => {
     fetchStudentList();
   }, [fetchStudentList]);
 
-  // Calculate summary statistics
-  const totalStudents = studentList.length;
+  // Calculate summary statistics from current page
+  const totalStudents = pagination?.total ?? studentList.length;
   const studentsWithInfo = studentList.filter(
     (student) =>
       student.father_name && student.mother_name && student.birth_date
@@ -129,12 +146,13 @@ export default function StudentsPage() {
     try {
       setDeleteLoading(true);
       await deleteStudent(itemToDelete.user_id.toString());
-      toast.success('دانش‌آموز با موفقیت حذف شد');
+      toast.success('دانش‌پژوه با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchStudentList();
+      // Stay on current page after deletion
+      await fetchStudentList(pagination?.current_page ?? 1);
     } catch (error) {
-      toast.error('خطا در حذف دانش‌آموز');
+      toast.error('خطا در حذف دانش‌پژوه');
     } finally {
       setDeleteLoading(false);
     }
@@ -161,21 +179,21 @@ export default function StudentsPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
-          { label: 'دانش‌آموزان', href: '/admin/students' },
+          { label: 'دانش‌پژوهان', href: '/admin/students' },
         ]}
       />
 
       {/* Header */}
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          مدیریت دانش‌آموزان
+          مدیریت دانش‌پژوهان
         </h1>
         <Button
           onClick={() => router.push('/admin/students/new')}
           className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          افزودن دانش‌آموز
+          افزودن دانش‌پژوه
         </Button>
       </div>
 
@@ -189,7 +207,7 @@ export default function StudentsPage() {
             <div className="mr-5 w-0 flex-1">
               <dl>
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  کل دانش‌آموزان
+                  کل دانش‌پژوهان
                 </dt>
                 <dd className="text-lg font-medium text-gray-900 dark:text-white">
                   {totalStudents.toLocaleString('fa-IR')}
@@ -260,7 +278,7 @@ export default function StudentsPage() {
           data={studentList}
           columns={columns}
           loading={loading}
-          emptyMessage="هیچ دانش‌آموزی یافت نشد"
+          emptyMessage="هیچ دانش‌پژوهی یافت نشد"
           onView={(student) =>
             router.push(`/admin/students/${student.user_id}/view`)
           }
@@ -270,6 +288,91 @@ export default function StudentsPage() {
           onDelete={handleDeleteClick}
           getRowId={(student) => String(student.user_id)}
         />
+
+        {/* Pagination */}
+        {pagination && pagination.last_page > 1 && (
+          <div className="flex flex-col items-center justify-center border-t border-gray-200 bg-white px-4 py-4 sm:px-6 dark:border-gray-700 dark:bg-gray-800">
+            <div className="flex items-center gap-2">
+              <button
+                disabled={pagination.current_page === 1}
+                onClick={() => fetchStudentList(1)}
+                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
+                title="اولین صفحه"
+              >
+                <ChevronsRight className="h-5 w-5" />
+              </button>
+              <button
+                disabled={pagination.current_page === 1}
+                onClick={() => fetchStudentList(pagination.current_page - 1)}
+                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
+                title="صفحه قبل"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+
+              {/* Page Numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: pagination.last_page }, (_, i) => i + 1)
+                  .filter((page) => {
+                    const current = pagination.current_page;
+                    return (
+                      page === 1 ||
+                      page === pagination.last_page ||
+                      (page >= current - 1 && page <= current + 1)
+                    );
+                  })
+                  .map((page, index, array) => (
+                    <span key={page} className="flex items-center">
+                      {index > 0 && array[index - 1] !== page - 1 && (
+                        <span className="px-2 text-gray-400">...</span>
+                      )}
+                      <button
+                        onClick={() => fetchStudentList(page)}
+                        className={`min-w-[2.5rem] rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                          pagination.current_page === page
+                            ? 'bg-primary-600 dark:bg-primary-500 text-white'
+                            : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                        }`}
+                      >
+                        {page.toLocaleString('fa-IR')}
+                      </button>
+                    </span>
+                  ))}
+              </div>
+
+              <button
+                disabled={pagination.current_page === pagination.last_page}
+                onClick={() => fetchStudentList(pagination.current_page + 1)}
+                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
+                title="صفحه بعد"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                disabled={pagination.current_page === pagination.last_page}
+                onClick={() => fetchStudentList(pagination.last_page)}
+                className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
+                title="آخرین صفحه"
+              >
+                <ChevronsLeft className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              نمایش{' '}
+              {(
+                (pagination.current_page - 1) * pagination.per_page +
+                1
+              ).toLocaleString('fa-IR')}{' '}
+              تا{' '}
+              {Math.min(
+                pagination.current_page * pagination.per_page,
+                pagination.total
+              ).toLocaleString('fa-IR')}{' '}
+              از {pagination.total.toLocaleString('fa-IR')} دانش‌پژوه
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Delete Confirmation Modal */}
@@ -277,8 +380,8 @@ export default function StudentsPage() {
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف دانش‌آموز"
-        description={`آیا از حذف دانش‌آموز "${itemToDelete?.user?.first_name} ${itemToDelete?.user?.last_name}" اطمینان دارید؟`}
+        title="حذف دانش‌پژوه"
+        description={`آیا از حذف دانش‌پژوه "${itemToDelete?.user?.first_name} ${itemToDelete?.user?.last_name}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

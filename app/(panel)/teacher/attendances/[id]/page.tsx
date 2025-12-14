@@ -180,7 +180,7 @@ export default function AttendanceDetailPage({
               {/* Student Info */}
               <Card className="p-6">
                 <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-white">
-                  اطلاعات دانش‌آموز
+                  اطلاعات دانش‌پژوه
                 </h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -353,7 +353,7 @@ export default function AttendanceDetailPage({
                       rows={3}
                       {...register('absence_reason')}
                       error={errors.absence_reason?.message}
-                      placeholder="دلیل غیبت دانش‌آموز را وارد کنید..."
+                      placeholder="دلیل غیبت دانش‌پژوه را وارد کنید..."
                     />
                   </div>
                 )}

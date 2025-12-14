@@ -14,12 +14,7 @@ export default function Page() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<User | null>(null);
-  const {
-    userList,
-    loading,
-    fetchUserList,
-    deleteUser,
-  } = useUser();
+  const { userList, loading, fetchUserList, deleteUser } = useUser();
 
   useEffect(() => {
     fetchUserList();
@@ -53,7 +48,7 @@ export default function Page() {
         const roleMap = {
           admin: 'مدیر',
           teacher: 'مربی',
-          student: 'دانش‌آموز',
+          student: 'دانش‌پژوه',
         };
         return roleMap[value as keyof typeof roleMap] || (value as string);
       },

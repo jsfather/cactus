@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { handleApiError as showApiError } from '@/app/lib/utils/error';
 
 export interface ApiError {
   message: string;
@@ -106,6 +107,11 @@ class ApiClient {
           errors: error.response?.data?.errors,
         };
 
+        // Show toast error automatically (except for 401 which redirects)
+        if (error.response?.status !== 401) {
+          showApiError(apiError);
+        }
+
         if (error.response?.status === 401) {
           if (typeof window !== 'undefined') {
             // Clear both zustand store and localStorage
@@ -197,6 +203,10 @@ class PublicApiClient {
           code: error.response?.data?.code,
           errors: error.response?.data?.errors,
         };
+
+        // Show toast error automatically
+        showApiError(apiError);
+
         return Promise.reject(apiError);
       }
     );

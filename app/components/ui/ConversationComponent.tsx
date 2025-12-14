@@ -113,7 +113,7 @@ export default function ConversationComponent({
                 </span>
               ) : (
                 <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                  {isTeacher ? 'مدرس' : 'دانش‌آموز'}
+                  {isTeacher ? 'مدرس' : 'دانش‌پژوه'}
                 </span>
               )}
               <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-xs font-medium ${
@@ -121,7 +121,7 @@ export default function ConversationComponent({
                   ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
                   : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
               }`}>
-                {isTeacher ? 'مدرس' : 'دانش‌آموز'}
+                {isTeacher ? 'مدرس' : 'دانش‌پژوه'}
               </span>
             </div>
 

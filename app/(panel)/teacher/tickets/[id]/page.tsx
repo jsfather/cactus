@@ -175,7 +175,7 @@ export default function TeacherTicketDetailPage() {
             <User className="h-5 w-5 text-gray-400" />
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                دانش‌آموز
+                دانش‌پژوه
               </p>
               <p className="font-medium text-gray-900 dark:text-gray-100">
                 {currentTicket.student || 'نامشخص'}

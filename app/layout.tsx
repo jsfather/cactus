@@ -54,7 +54,19 @@ export default function RootLayout({
       >
         <CartProvider>
           {children}
-          <ToastContainer rtl={true} draggable pauseOnHover />
+          <ToastContainer
+            rtl={true}
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+            limit={5}
+          />
         </CartProvider>
       </body>
       <Script

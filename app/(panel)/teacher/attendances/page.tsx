@@ -100,7 +100,7 @@ export default function TeacherAttendancesPage() {
 
   const columns: Column<Attendance>[] = [
     {
-      header: 'دانش‌آموز',
+      header: 'دانش‌پژوه',
       accessor: 'student',
       render: (value, item): string => {
         if (!item.student) return 'نامشخص';
@@ -212,7 +212,7 @@ export default function TeacherAttendancesPage() {
               مدیریت حضور و غیاب
             </h1>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              مدیریت و ثبت حضور و غیاب دانش‌آموزان
+              مدیریت و ثبت حضور و غیاب دانش‌پژوهان
             </p>
           </div>
 
@@ -318,10 +318,10 @@ export default function TeacherAttendancesPage() {
               <UserX className="ml-2 h-5 w-5 text-red-600 dark:text-red-400" />
               <div className="flex-1">
                 <h3 className="text-sm font-medium text-red-800 dark:text-red-300">
-                  دانش‌آموزان غایب امروز
+                  دانش‌پژوهان غایب امروز
                 </h3>
                 <p className="mt-1 text-sm text-red-700 dark:text-red-400">
-                  {totalAbsents} دانش‌آموز در جلسات امروز غایب هستند
+                  {totalAbsents} دانش‌پژوه در جلسات امروز غایب هستند
                 </p>
               </div>
               <Button
@@ -355,7 +355,7 @@ export default function TeacherAttendancesPage() {
                 انتخاب ترم
               </h3>
               <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                برای مشاهده حضور و غیاب دانش‌آموزان، ابتدا یک ترم انتخاب کنید
+                برای مشاهده حضور و غیاب دانش‌پژوهان، ابتدا یک ترم انتخاب کنید
               </p>
             </Card>
           )}

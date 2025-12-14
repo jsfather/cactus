@@ -137,7 +137,7 @@ export default function TicketConversation({
                       {message.sender}
                     </span>
                     <span className="text-xs opacity-75">
-                      {message.is_student ? '(دانش‌آموز)' : '(مدرس)'}
+                      {message.is_student ? '(دانش‌پژوه)' : '(مدرس)'}
                     </span>
                   </div>
                   <p className="text-sm whitespace-pre-wrap">

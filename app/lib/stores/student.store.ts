@@ -9,19 +9,30 @@ import {
   GetStudentResponse,
 } from '@/app/lib/types';
 
+interface PaginationMeta {
+  current_page: number;
+  from: number;
+  last_page: number;
+  path: string;
+  per_page: number;
+  to: number;
+  total: number;
+}
+
 interface StudentState {
   // State
   studentList: Student[];
   currentStudent: Student | null;
   loading: boolean;
   error: string | null;
+  pagination: PaginationMeta | null;
 
   // Actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
 
-  fetchStudentList: () => Promise<void>;
+  fetchStudentList: (page?: number) => Promise<void>;
   createStudent: (payload: CreateStudentRequest) => Promise<GetStudentResponse>;
   updateStudent: (
     id: string,
@@ -39,6 +50,7 @@ export const useStudentStore = create<StudentState>()(
     currentStudent: null,
     loading: false,
     error: null,
+    pagination: null,
 
     // Actions
     setLoading: (loading) => set({ loading }),
@@ -46,12 +58,13 @@ export const useStudentStore = create<StudentState>()(
     clearError: () => set({ error: null }),
     clearCurrentStudent: () => set({ currentStudent: null }),
 
-    fetchStudentList: async () => {
+    fetchStudentList: async (page = 1) => {
       try {
         set({ loading: true, error: null });
-        const response = await studentService.getList();
+        const response = await studentService.getList(page);
         set({
           studentList: response.data,
+          pagination: response.meta,
           loading: false,
         });
       } catch (error) {

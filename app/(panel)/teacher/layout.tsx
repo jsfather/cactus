@@ -48,7 +48,7 @@ const menuItems = [
     isGroupTitle: true,
     subItems: [
       {
-        title: 'دانش آموزان',
+        title: 'دانش‌پژوهان',
         href: '/teacher/students',
       },
     ],

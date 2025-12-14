@@ -6,7 +6,7 @@ export const useStudent = () => {
   const store = useStudentStore();
 
   const fetchStudentList = useCallback(
-    () => store.fetchStudentList(),
+    (page?: number) => store.fetchStudentList(page),
     [store.fetchStudentList]
   );
 
@@ -42,6 +42,7 @@ export const useStudent = () => {
     currentStudent: store.currentStudent,
     loading: store.loading,
     error: store.error,
+    pagination: store.pagination,
 
     // Actions
     fetchStudentList,
