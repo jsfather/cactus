@@ -48,11 +48,11 @@ export default function NewHomeworkPage() {
   useEffect(() => {
     if (terms.length > 0) {
       const schedules: any[] = [];
-      terms.forEach(term => {
+      terms.forEach((term) => {
         if (term.teachers) {
-          term.teachers.forEach(teacher => {
+          term.teachers.forEach((teacher) => {
             if (teacher.schedules) {
-              teacher.schedules.forEach(schedule => {
+              teacher.schedules.forEach((schedule) => {
                 schedules.push({
                   ...schedule,
                   termTitle: term.title,
@@ -138,7 +138,7 @@ export default function NewHomeworkPage() {
                     control={control}
                     render={({ field }) => (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                           شرح تکلیف *
                         </label>
                         <textarea
@@ -146,7 +146,7 @@ export default function NewHomeworkPage() {
                           id="description"
                           rows={4}
                           placeholder="شرح کاملی از تکلیف مورد نظر بنویسید..."
-                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                         />
                         {errors.description && (
                           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -165,12 +165,12 @@ export default function NewHomeworkPage() {
                     control={control}
                     render={({ field }) => (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                           انتخاب ترم *
                         </label>
                         <select
                           {...field}
-                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                         >
                           <option value="">انتخاب کنید...</option>
                           {terms.map((term) => (
@@ -196,17 +196,22 @@ export default function NewHomeworkPage() {
                     control={control}
                     render={({ field }) => (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                           انتخاب جلسه *
                         </label>
                         <select
                           {...field}
-                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                         >
                           <option value="">انتخاب کنید...</option>
                           {availableSchedules.map((schedule) => (
-                            <option key={schedule.id} value={schedule.id.toString()}>
-                              {schedule.termTitle} - {schedule.session_date} ({schedule.start_time.substring(0, 5)} - {schedule.end_time.substring(0, 5)})
+                            <option
+                              key={schedule.id}
+                              value={schedule.id.toString()}
+                            >
+                              {schedule.termTitle} - {schedule.session_date} (
+                              {schedule.start_time.substring(0, 5)} -{' '}
+                              {schedule.end_time.substring(0, 5)})
                             </option>
                           ))}
                         </select>
@@ -227,14 +232,14 @@ export default function NewHomeworkPage() {
                     control={control}
                     render={({ field }) => (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                           شناسه جلسه آفلاین (اختیاری)
                         </label>
                         <input
                           {...field}
                           type="number"
                           placeholder="شناسه جلسه آفلاین..."
-                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
                         />
                         {errors.offline_session_id && (
                           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
@@ -260,7 +265,7 @@ export default function NewHomeworkPage() {
               </div>
 
               {/* Form Actions */}
-              <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-end gap-4 border-t border-gray-200 pt-6 dark:border-gray-700">
                 <Button
                   type="button"
                   variant="secondary"
@@ -300,7 +305,8 @@ export default function NewHomeworkPage() {
                     هیچ جلسه‌ای موجود نیست
                   </h3>
                   <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-                    برای ایجاد تکلیف، ابتدا باید ترم‌ها و جلسات برنامه‌ریزی شوند.
+                    برای ایجاد تکلیف، ابتدا باید ترم‌ها و جلسات برنامه‌ریزی
+                    شوند.
                   </p>
                 </div>
               </div>

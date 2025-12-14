@@ -10,7 +10,16 @@ import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Student } from '@/app/lib/types';
 import { useStudent } from '@/app/lib/hooks/use-student';
-import { Plus, Users, UserCheck, Phone, GraduationCap, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
+import {
+  Plus,
+  Users,
+  UserCheck,
+  Phone,
+  GraduationCap,
+  Eye,
+  ChevronRight,
+  ChevronLeft,
+} from 'lucide-react';
 
 export default function StudentsPage() {
   const router = useRouter();
@@ -18,8 +27,14 @@ export default function StudentsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Student | null>(null);
 
-  const { studentList, loading, pagination, fetchStudentList, deleteStudent, clearError } =
-    useStudent();
+  const {
+    studentList,
+    loading,
+    pagination,
+    fetchStudentList,
+    deleteStudent,
+    clearError,
+  } = useStudent();
 
   useEffect(() => {
     fetchStudentList();

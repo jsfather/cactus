@@ -4,7 +4,13 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import LogoutButton from '@/app/components/layout/LogoutButton';
-import { LayoutDashboard, GraduationCap, User, User2, Settings } from 'lucide-react';
+import {
+  LayoutDashboard,
+  GraduationCap,
+  User,
+  User2,
+  Settings,
+} from 'lucide-react';
 import Link from 'next/link';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { useUser } from '@/app/hooks/useUser';

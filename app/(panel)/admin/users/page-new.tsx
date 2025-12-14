@@ -14,12 +14,7 @@ export default function Page() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<User | null>(null);
-  const {
-    userList,
-    loading,
-    fetchUserList,
-    deleteUser,
-  } = useUser();
+  const { userList, loading, fetchUserList, deleteUser } = useUser();
 
   useEffect(() => {
     fetchUserList();
