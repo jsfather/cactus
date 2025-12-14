@@ -8,9 +8,9 @@ import {
 } from '@/app/lib/types';
 
 export class StudentService {
-  async getList(): Promise<GetStudentListResponse> {
+  async getList(page: number = 1): Promise<GetStudentListResponse> {
     return apiClient.get<GetStudentListResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.STUDENTS.GET_ALL
+      `${API_ENDPOINTS.PANEL.ADMIN.STUDENTS.GET_ALL}?page=${page}`
     );
   }
 

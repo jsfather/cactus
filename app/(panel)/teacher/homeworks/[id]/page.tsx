@@ -105,7 +105,7 @@ export default function TeacherHomeworkDetailPage() {
               جزئیات تکلیف
             </h1>
             <p className="mt-2 text-gray-600 dark:text-gray-400">
-              مشاهده کامل اطلاعات تکلیف و پاسخ‌های دانش‌آموزان
+              مشاهده کامل اطلاعات تکلیف و پاسخ‌های دانش‌پژوهان
             </p>
           </div>
           <div className="flex gap-4">
@@ -380,7 +380,7 @@ export default function TeacherHomeworkDetailPage() {
         {answersCount > 0 ? (
           <Card className="mt-8 p-6">
             <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
-              پاسخ‌های دانش‌آموزان ({answersCount} پاسخ)
+              پاسخ‌های دانش‌پژوهان ({answersCount} پاسخ)
             </h2>
 
             <div className="py-8 text-center">
@@ -396,7 +396,7 @@ export default function TeacherHomeworkDetailPage() {
         ) : (
           <Card className="mt-8 p-6">
             <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">
-              پاسخ‌های دانش‌آموزان
+              پاسخ‌های دانش‌پژوهان
             </h2>
 
             <div className="py-8 text-center">
@@ -405,7 +405,7 @@ export default function TeacherHomeworkDetailPage() {
                 هنوز پاسخی دریافت نشده
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                دانش‌آموزان هنوز به این تکلیف پاسخ نداده‌اند.
+                دانش‌پژوهان هنوز به این تکلیف پاسخ نداده‌اند.
               </p>
             </div>
           </Card>

@@ -207,9 +207,9 @@ export default function TermStudentsPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدرس', href: '/teacher' },
-          { label: 'دانش‌آموزان من', href: '/teacher/students' },
+          { label: 'دانش‌پژوهان من', href: '/teacher/students' },
           {
-            label: `دانش‌آموزان ترم ${termId}`,
+            label: `دانش‌پژوهان ترم ${termId}`,
             href: `/teacher/students/term/${termId}`,
             active: true,
           },
@@ -229,10 +229,10 @@ export default function TermStudentsPage() {
             </Button>
             <div>
               <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                دانش‌آموزان ترم {termId}
+                دانش‌پژوهان ترم {termId}
               </h1>
               <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                مشاهده دانش‌آموزان این ترم
+                مشاهده دانش‌پژوهان این ترم
               </p>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function TermStudentsPage() {
                 <div className="mr-5 w-0 flex-1">
                   <dl>
                     <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                      کل دانش‌آموزان
+                      کل دانش‌پژوهان
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
                       {totalStudents.toLocaleString('fa-IR')}
@@ -329,7 +329,7 @@ export default function TermStudentsPage() {
             data={termStudents}
             columns={columns}
             loading={loading}
-            emptyMessage="هیچ دانش‌آموزی در این ترم یافت نشد"
+            emptyMessage="هیچ دانش‌پژوهی در این ترم یافت نشد"
             onView={handleViewStudent}
             getRowId={(student) => String(student.user_id)}
           />

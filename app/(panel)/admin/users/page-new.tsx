@@ -53,7 +53,7 @@ export default function Page() {
         const roleMap = {
           admin: 'مدیر',
           teacher: 'مربی',
-          student: 'دانش‌آموز',
+          student: 'دانش‌پژوه',
         };
         return roleMap[value as keyof typeof roleMap] || (value as string);
       },

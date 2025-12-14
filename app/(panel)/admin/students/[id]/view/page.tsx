@@ -45,7 +45,7 @@ export default function StudentViewPage({ params }: PageProps) {
 
   const breadcrumbItems = [
     { label: 'پنل مدیریت', href: '/admin' },
-    { label: 'دانش‌آموزان', href: '/admin/students' },
+    { label: 'دانش‌پژوهان', href: '/admin/students' },
     {
       label: 'مشاهده جزئیات',
       href: `/admin/students/${resolvedParams.id}/view`,
@@ -89,13 +89,13 @@ export default function StudentViewPage({ params }: PageProps) {
           <div className="text-center">
             <AlertCircle className="mx-auto mb-4 h-16 w-16 text-yellow-500" />
             <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-              دانش‌آموز یافت نشد
+              دانش‌پژوه یافت نشد
             </h3>
             <p className="mb-6 text-gray-600 dark:text-gray-400">
-              دانش‌آموز مورد نظر یافت نشد یا حذف شده است.
+              دانش‌پژوه مورد نظر یافت نشد یا حذف شده است.
             </p>
             <Button onClick={() => router.push('/admin/students')}>
-              بازگشت به لیست دانش‌آموزان
+              بازگشت به لیست دانش‌پژوهان
             </Button>
           </div>
         </Card>
@@ -223,7 +223,7 @@ export default function StudentViewPage({ params }: PageProps) {
       <Card className="p-6">
         <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
           <Users className="h-5 w-5" />
-          اطلاعات دانش‌آموز
+          اطلاعات دانش‌پژوه
         </h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <div className="flex items-center gap-2">
@@ -484,7 +484,7 @@ export default function StudentViewPage({ params }: PageProps) {
               هیچ ترمی یافت نشد
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              این دانش‌آموز هنوز در هیچ ترمی ثبت‌نام نکرده است.
+              این دانش‌پژوه هنوز در هیچ ترمی ثبت‌نام نکرده است.
             </p>
           </div>
         </Card>

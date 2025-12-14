@@ -148,7 +148,7 @@ export function UserMenu({ userName }: UserMenuProps) {
                   className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
                   strokeWidth={1.7}
                 />
-                <span>داشبورد دانش آموز</span>
+                <span>داشبورد دانش‌پژوه</span>
               </button>
             )}
             <div className="px-3">

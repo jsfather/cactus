@@ -47,16 +47,16 @@ export default function StudentDetailPage() {
       <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            دانش‌آموز یافت نشد
+            دانش‌پژوه یافت نشد
           </h2>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            ممکن است این دانش‌آموز حذف شده باشد یا شناسه اشتباه باشد.
+            ممکن است این دانش‌پژوه حذف شده باشد یا شناسه اشتباه باشد.
           </p>
           <Button
             className="mt-4"
             onClick={() => router.push('/teacher/students')}
           >
-            بازگشت به لیست دانش‌آموزان
+            بازگشت به لیست دانش‌پژوهان
           </Button>
         </div>
       </div>
@@ -70,11 +70,11 @@ export default function StudentDetailPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدرس', href: '/teacher' },
-          { label: 'دانش‌آموزان من', href: '/teacher/students' },
+          { label: 'دانش‌پژوهان من', href: '/teacher/students' },
           {
             label: user
               ? `${user.first_name} ${user.last_name}`
-              : `دانش‌آموز ${currentStudent.user_id}`,
+              : `دانش‌پژوه ${currentStudent.user_id}`,
             href: `/teacher/students/${currentStudent.user_id}`,
             active: true,
           },
@@ -96,10 +96,10 @@ export default function StudentDetailPage() {
               <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                 {user
                   ? `${user.first_name} ${user.last_name}`
-                  : `دانش‌آموز ${currentStudent.user_id}`}
+                  : `دانش‌پژوه ${currentStudent.user_id}`}
               </h1>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                مشاهده جزئیات دانش‌آموز
+                مشاهده جزئیات دانش‌پژوه
               </p>
             </div>
           </div>

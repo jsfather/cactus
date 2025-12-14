@@ -121,7 +121,7 @@ export default function NewHomeworkPage() {
               ایجاد تکلیف جدید
             </h1>
             <p className="mt-2 text-gray-600 dark:text-gray-400">
-              تکلیف جدید برای دانش‌آموزان ایجاد کنید
+              تکلیف جدید برای دانش‌پژوهان ایجاد کنید
             </p>
           </div>
         </div>

@@ -19,7 +19,7 @@ import { CreateAttendanceRequest } from '@/app/lib/types/attendance';
 import { ArrowRight, Save, UserCheck } from 'lucide-react';
 
 const attendanceSchema = z.object({
-  student_id: z.string().min(1, 'انتخاب دانش‌آموز الزامی است'),
+  student_id: z.string().min(1, 'انتخاب دانش‌پژوه الزامی است'),
   term_id: z.string().min(1, 'انتخاب ترم الزامی است'),
   term_teacher_schedule_id: z.string().min(1, 'انتخاب جلسه الزامی است'),
   status: z.enum(['present', 'absent'], {
@@ -167,7 +167,7 @@ function NewAttendanceForm() {
               {/* Student Selection */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  دانش‌آموز *
+                  دانش‌پژوه *
                 </label>
                 <Controller
                   name="student_id"
@@ -178,7 +178,7 @@ function NewAttendanceForm() {
                       value={field.value}
                       onChange={field.onChange}
                       options={[
-                        { value: '', label: 'انتخاب دانش‌آموز' },
+                        { value: '', label: 'انتخاب دانش‌پژوه' },
                         ...studentOptions,
                       ]}
                       error={errors.student_id?.message}
@@ -258,7 +258,7 @@ function NewAttendanceForm() {
                   rows={3}
                   {...register('absence_reason')}
                   error={errors.absence_reason?.message}
-                  placeholder="دلیل غیبت دانش‌آموز را وارد کنید..."
+                  placeholder="دلیل غیبت دانش‌پژوه را وارد کنید..."
                 />
               </div>
             )}

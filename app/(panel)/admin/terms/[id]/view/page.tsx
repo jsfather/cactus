@@ -123,7 +123,7 @@ const TermViewPage: React.FC<PageProps> = ({ params }) => {
             {currentTerm.title}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            جزئیات ترم و دانش‌آموزان ثبت‌نام شده
+            جزئیات ترم و دانش‌پژوهان ثبت‌نام شده
           </p>
         </div>
         <div className="flex gap-3">
@@ -301,7 +301,7 @@ const TermViewPage: React.FC<PageProps> = ({ params }) => {
       <Card className="p-6">
         <div className="mb-6 flex items-center justify-between">
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            دانش‌آموزان ثبت‌نام شده ({currentTerm.students?.length || 0})
+            دانش‌پژوهان ثبت‌نام شده ({currentTerm.students?.length || 0})
           </h3>
         </div>
 
@@ -363,10 +363,10 @@ const TermViewPage: React.FC<PageProps> = ({ params }) => {
           <div className="py-8 text-center">
             <Users className="mx-auto mb-4 h-16 w-16 text-gray-400" />
             <p className="mb-2 text-lg text-gray-600 dark:text-gray-400">
-              هنوز هیچ دانش‌آموزی ثبت‌نام نکرده
+              هنوز هیچ دانش‌پژوهی ثبت‌نام نکرده
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-500">
-              زمانی که دانش‌آموزان ثبت‌نام کنند، اینجا نمایش داده خواهند شد
+              زمانی که دانش‌پژوهان ثبت‌نام کنند، اینجا نمایش داده خواهند شد
             </p>
           </div>
         )}

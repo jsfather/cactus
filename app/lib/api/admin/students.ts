@@ -5,7 +5,7 @@ export const getStudents = async () => {
   const response = await ApiService.get<{ data: Student[] }>('admin/students');
 
   if (!response) {
-    throw new Error('خطایی در دریافت لیست دانش‌آموزان رخ داده است');
+    throw new Error('خطایی در دریافت لیست دانش‌پژوهان رخ داده است');
   }
 
   return response;
@@ -17,7 +17,7 @@ export const getStudent = async (id: number | string) => {
   );
 
   if (!response) {
-    throw new Error('خطایی در دریافت دانش‌آموز رخ داده است');
+    throw new Error('خطایی در دریافت دانش‌پژوه رخ داده است');
   }
 
   return response;
@@ -30,7 +30,7 @@ export const createStudent = async (data: FormData) => {
   );
 
   if (!response) {
-    throw new Error('خطایی در ایجاد دانش‌آموز رخ داده است');
+    throw new Error('خطایی در ایجاد دانش‌پژوه رخ داده است');
   }
 
   return response;
@@ -43,7 +43,7 @@ export const updateStudent = async (id: number | string, data: FormData) => {
   );
 
   if (!response) {
-    throw new Error('خطایی در بروزرسانی دانش‌آموز رخ داده است');
+    throw new Error('خطایی در بروزرسانی دانش‌پژوه رخ داده است');
   }
 
   return response;
@@ -62,7 +62,7 @@ export const getStudentExamPlacement = async (id: number | string) => {
   );
 
   if (!response) {
-    throw new Error('خطایی در دریافت دانش‌آموز رخ داده است');
+    throw new Error('خطایی در دریافت دانش‌پژوه رخ داده است');
   }
 
   return response;

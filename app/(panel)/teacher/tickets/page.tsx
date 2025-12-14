@@ -76,7 +76,7 @@ export default function TeacherTicketsPage() {
       ),
     },
     {
-      header: 'دانش‌آموز',
+      header: 'دانش‌پژوه',
       accessor: 'student',
       render: (value, ticket: Ticket) => (
         <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -132,7 +132,7 @@ export default function TeacherTicketsPage() {
             تیکت‌های پشتیبانی
           </h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            مدیریت تیکت‌های پشتیبانی دریافتی از دانش‌آموزان
+            مدیریت تیکت‌های پشتیبانی دریافتی از دانش‌پژوهان
           </p>
         </div>
       </div>

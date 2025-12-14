@@ -157,7 +157,7 @@ export default function TeacherTermDetailPage() {
               <div className="mr-4 w-0 flex-1">
                 <dl>
                   <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                    دانش‌آموزان
+                    دانش‌پژوهان
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {enrolledStudents.length.toLocaleString('fa-IR')} /{' '}

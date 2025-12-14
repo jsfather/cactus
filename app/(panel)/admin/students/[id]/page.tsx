@@ -132,7 +132,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
       try {
         await fetchStudentById(resolvedParamsData.id);
       } catch (error) {
-        toast.error('خطا در بارگذاری اطلاعات دانش‌آموز');
+        toast.error('خطا در بارگذاری اطلاعات دانش‌پژوه');
         router.push('/admin/students');
       } finally {
         setLoading(false);
@@ -193,7 +193,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
         };
 
         await createStudent(formData);
-        toast.success('دانش‌آموز با موفقیت ایجاد شد');
+        toast.success('دانش‌پژوه با موفقیت ایجاد شد');
       } else {
         const formData: UpdateStudentRequest = {
           first_name: data.first_name.trim(),
@@ -219,7 +219,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
         };
 
         await updateStudent(resolvedParams!.id, formData);
-        toast.success('دانش‌آموز با موفقیت ویرایش شد');
+        toast.success('دانش‌پژوه با موفقیت ویرایش شد');
       }
 
       router.push('/admin/students');
@@ -254,15 +254,15 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
-          { label: 'دانش‌آموزان', href: '/admin/students' },
-          { label: isNew ? 'افزودن دانش‌آموز' : 'ویرایش دانش‌آموز', href: '#' },
+          { label: 'دانش‌پژوهان', href: '/admin/students' },
+          { label: isNew ? 'افزودن دانش‌پژوه' : 'ویرایش دانش‌پژوه', href: '#' },
         ]}
       />
 
       {/* Header */}
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {isNew ? 'افزودن دانش‌آموز جدید' : 'ویرایش دانش‌آموز'}
+          {isNew ? 'افزودن دانش‌پژوه جدید' : 'ویرایش دانش‌پژوه'}
         </h1>
       </div>
 
@@ -611,7 +611,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
               disabled={isSubmitting}
               loading={isSubmitting}
             >
-              {isNew ? 'ایجاد دانش‌آموز' : 'ویرایش دانش‌آموز'}
+              {isNew ? 'ایجاد دانش‌پژوه' : 'ویرایش دانش‌پژوه'}
             </Button>
           </div>
         </form>

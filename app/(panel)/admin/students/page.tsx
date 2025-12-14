@@ -10,7 +10,7 @@ import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Student } from '@/app/lib/types';
 import { useStudent } from '@/app/lib/hooks/use-student';
-import { Plus, Users, UserCheck, Phone, GraduationCap, Eye } from 'lucide-react';
+import { Plus, Users, UserCheck, Phone, GraduationCap, Eye, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export default function StudentsPage() {
   const router = useRouter();
@@ -18,15 +18,15 @@ export default function StudentsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Student | null>(null);
 
-  const { studentList, loading, fetchStudentList, deleteStudent, clearError } =
+  const { studentList, loading, pagination, fetchStudentList, deleteStudent, clearError } =
     useStudent();
 
   useEffect(() => {
     fetchStudentList();
   }, [fetchStudentList]);
 
-  // Calculate summary statistics
-  const totalStudents = studentList.length;
+  // Calculate summary statistics from current page
+  const totalStudents = pagination?.total ?? studentList.length;
   const studentsWithInfo = studentList.filter(
     (student) =>
       student.father_name && student.mother_name && student.birth_date
@@ -129,12 +129,13 @@ export default function StudentsPage() {
     try {
       setDeleteLoading(true);
       await deleteStudent(itemToDelete.user_id.toString());
-      toast.success('دانش‌آموز با موفقیت حذف شد');
+      toast.success('دانش‌پژوه با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchStudentList();
+      // Stay on current page after deletion
+      await fetchStudentList(pagination?.current_page ?? 1);
     } catch (error) {
-      toast.error('خطا در حذف دانش‌آموز');
+      toast.error('خطا در حذف دانش‌پژوه');
     } finally {
       setDeleteLoading(false);
     }
@@ -161,21 +162,21 @@ export default function StudentsPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
-          { label: 'دانش‌آموزان', href: '/admin/students' },
+          { label: 'دانش‌پژوهان', href: '/admin/students' },
         ]}
       />
 
       {/* Header */}
       <div className="flex w-full items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          مدیریت دانش‌آموزان
+          مدیریت دانش‌پژوهان
         </h1>
         <Button
           onClick={() => router.push('/admin/students/new')}
           className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          افزودن دانش‌آموز
+          افزودن دانش‌پژوه
         </Button>
       </div>
 
@@ -189,7 +190,7 @@ export default function StudentsPage() {
             <div className="mr-5 w-0 flex-1">
               <dl>
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                  کل دانش‌آموزان
+                  کل دانش‌پژوهان
                 </dt>
                 <dd className="text-lg font-medium text-gray-900 dark:text-white">
                   {totalStudents.toLocaleString('fa-IR')}
@@ -260,7 +261,7 @@ export default function StudentsPage() {
           data={studentList}
           columns={columns}
           loading={loading}
-          emptyMessage="هیچ دانش‌آموزی یافت نشد"
+          emptyMessage="هیچ دانش‌پژوهی یافت نشد"
           onView={(student) =>
             router.push(`/admin/students/${student.user_id}/view`)
           }
@@ -272,13 +273,48 @@ export default function StudentsPage() {
         />
       </div>
 
+      {/* Pagination */}
+      {pagination && pagination.last_page > 1 && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2 space-x-reverse">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              صفحه {pagination.current_page.toLocaleString('fa-IR')} از{' '}
+              {pagination.last_page.toLocaleString('fa-IR')}
+            </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              (کل: {pagination.total.toLocaleString('fa-IR')})
+            </span>
+          </div>
+          <div className="flex items-center space-x-2 space-x-reverse">
+            <Button
+              variant="secondary"
+              disabled={pagination.current_page === 1}
+              onClick={() => fetchStudentList(pagination.current_page - 1)}
+              className="flex items-center gap-1"
+            >
+              <ChevronRight className="h-4 w-4" />
+              قبلی
+            </Button>
+            <Button
+              variant="secondary"
+              disabled={pagination.current_page === pagination.last_page}
+              onClick={() => fetchStudentList(pagination.current_page + 1)}
+              className="flex items-center gap-1"
+            >
+              بعدی
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       <ConfirmModal
         isOpen={showDeleteModal}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="حذف دانش‌آموز"
-        description={`آیا از حذف دانش‌آموز "${itemToDelete?.user?.first_name} ${itemToDelete?.user?.last_name}" اطمینان دارید؟`}
+        title="حذف دانش‌پژوه"
+        description={`آیا از حذف دانش‌پژوه "${itemToDelete?.user?.first_name} ${itemToDelete?.user?.last_name}" اطمینان دارید؟`}
         confirmText="حذف"
         loading={deleteLoading}
         variant="danger"

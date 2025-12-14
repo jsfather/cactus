@@ -306,7 +306,7 @@ export default function TicketDetailPage({
                         {message.sender}
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {message.is_student ? '(دانش‌آموز)' : '(مدیر)'}
+                        {message.is_student ? '(دانش‌پژوه)' : '(مدیر)'}
                       </span>
                     </div>
                     <span className="text-sm text-gray-500 dark:text-gray-400">

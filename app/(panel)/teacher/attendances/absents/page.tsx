@@ -39,7 +39,7 @@ export default function AbsentStudentsPage() {
 
   const columns: Column<Attendance>[] = [
     {
-      header: 'دانش‌آموز',
+      header: 'دانش‌پژوه',
       accessor: 'student',
       render: (value, item): string => {
         if (!item.student) return 'نامشخص';
@@ -125,7 +125,7 @@ export default function AbsentStudentsPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'حضور و غیاب', href: '/teacher/attendances' },
-          { label: 'دانش‌آموزان غایب', href: '/teacher/attendances/absents' },
+          { label: 'دانش‌پژوهان غایب', href: '/teacher/attendances/absents' },
         ]}
       />
 
@@ -134,10 +134,10 @@ export default function AbsentStudentsPage() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-              دانش‌آموزان غایب
+              دانش‌پژوهان غایب
             </h1>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              لیست دانش‌آموزان غایب در جلسات مختلف
+              لیست دانش‌پژوهان غایب در جلسات مختلف
             </p>
           </div>
           <Button
@@ -213,7 +213,7 @@ export default function AbsentStudentsPage() {
                   توجه: غیبت‌های امروز
                 </h3>
                 <p className="mt-1 text-sm text-orange-700 dark:text-orange-400">
-                  {todayAbsents.length} دانش‌آموز در جلسات امروز غایب هستند.
+                  {todayAbsents.length} دانش‌پژوه در جلسات امروز غایب هستند.
                   توصیه می‌شود با آنها تماس گیری شود.
                 </p>
               </div>
@@ -229,7 +229,7 @@ export default function AbsentStudentsPage() {
               هیچ غیبتی ثبت نشده
             </h3>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              در حال حاضر هیچ دانش‌آموز غایبی ثبت نشده است
+              در حال حاضر هیچ دانش‌پژوه غایبی ثبت نشده است
             </p>
             <Button
               className="mt-4"
@@ -245,7 +245,7 @@ export default function AbsentStudentsPage() {
               data={absentStudents}
               columns={columns}
               loading={loading}
-              emptyMessage="هیچ دانش‌آموز غایبی یافت نشد"
+              emptyMessage="هیچ دانش‌پژوه غایبی یافت نشد"
               onView={(attendance) =>
                 router.push(`/teacher/attendances/${attendance.id}`)
               }

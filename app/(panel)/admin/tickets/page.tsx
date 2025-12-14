@@ -168,7 +168,7 @@ export default function TicketsPage() {
           ) : (
             <>
               <User className="h-4 w-4" />
-              دانش‌آموز
+              دانش‌پژوه
             </>
           )}
         </div>
@@ -231,7 +231,7 @@ export default function TicketsPage() {
             مدیریت تیکت‌ها
           </h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            مدیریت و پاسخگویی به تیکت‌های دانش‌آموزان و مدرسین
+            مدیریت و پاسخگویی به تیکت‌های دانش‌پژوهان و مدرسین
           </p>
         </div>
         <Link href="/admin/tickets/departments">
@@ -288,7 +288,7 @@ export default function TicketsPage() {
             <div className="mr-5 w-0 flex-1">
               <dl>
                 <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                  تیکت‌های دانش‌آموزان
+                  تیکت‌های دانش‌پژوهان
                 </dt>
                 <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
                   {tickets.filter((t) => t.type === 'student').length}
@@ -333,7 +333,7 @@ export default function TicketsPage() {
             className="flex items-center gap-2 text-sm"
           >
             <User className="h-4 w-4" />
-            دانش‌آموزان
+            دانش‌پژوهان
           </Button>
           <Button
             variant={ticketType === 'teachers' ? 'primary' : 'white'}
