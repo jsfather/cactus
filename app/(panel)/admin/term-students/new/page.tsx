@@ -16,6 +16,7 @@ import { useTermTeacher } from '@/app/lib/hooks/use-term-teacher';
 // Components
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import Select from '@/app/components/ui/Select';
+import InfiniteSelect from '@/app/components/ui/InfiniteSelect';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
@@ -41,7 +42,10 @@ export default function CreateTermStudentPage() {
   const {
     studentList,
     loading: studentsLoading,
+    loadingMore: studentsLoadingMore,
+    pagination: studentPagination,
     fetchStudentList,
+    fetchMoreStudents,
   } = useStudent();
   const {
     termTeacherList,
@@ -70,9 +74,14 @@ export default function CreateTermStudentPage() {
   // Load dropdown data on mount
   useEffect(() => {
     fetchTermList();
-    fetchStudentList();
+    fetchStudentList(1, 50); // Load first 50 students
     fetchTermTeacherList();
   }, [fetchTermList, fetchStudentList, fetchTermTeacherList]);
+
+  // Handle loading more students
+  const handleLoadMoreStudents = () => {
+    fetchMoreStudents(50);
+  };
 
   // Handle errors from store
   useEffect(() => {
@@ -88,27 +97,27 @@ export default function CreateTermStudentPage() {
       if (!data.term_id) {
         return;
       }
-      
+
       const submitData = {
         user_id: data.user_id,
         term_id: data.term_id,
         term_teacher_id: data.term_teacher_id,
       };
-      
+
       const response = await createTermStudent(submitData);
       console.log('Success response:', response);
-      
+
       // Check if there's a message in the response (even on success)
       if (response && 'message' in response) {
         toast.info((response as any).message);
       }
-      
+
       router.push('/admin/term-students');
     } catch (error: any) {
       console.log('Full error object:', error);
       console.log('Error response:', error?.response);
       console.log('Error response data:', error?.response?.data);
-      
+
       // Show error message from backend
       if (error?.response?.data?.message) {
         toast.info(error.response.data.message);
@@ -121,15 +130,18 @@ export default function CreateTermStudentPage() {
   };
 
   // Handle term teacher selection to auto-select term
-  const handleTermTeacherChange = (event: React.ChangeEvent<HTMLSelectElement>, onChange: (value: string) => void) => {
+  const handleTermTeacherChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+    onChange: (value: string) => void
+  ) => {
     const termTeacherId = event.target.value;
     onChange(termTeacherId);
-    
+
     // Find the selected term teacher and auto-select its term
     const selectedTermTeacher = termTeacherList.find(
       (tt) => tt.id.toString() === termTeacherId
     );
-    
+
     if (selectedTermTeacher && selectedTermTeacher.term) {
       // Auto-select the term using setValue
       setValue('term_id', selectedTermTeacher.term.id.toString());
@@ -173,7 +185,11 @@ export default function CreateTermStudentPage() {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'دانش‌پژوهان ترم', href: '/admin/term-students' },
-          { label: 'اضافه کردن دانش‌پژوه به ترم', href: '/admin/term-students/new', active: true },
+          {
+            label: 'اضافه کردن دانش‌پژوه به ترم',
+            href: '/admin/term-students/new',
+            active: true,
+          },
         ]}
       />
 
@@ -190,7 +206,9 @@ export default function CreateTermStudentPage() {
                 options={termTeacherOptions}
                 error={errors.term_teacher_id?.message}
                 value={field.value}
-                onChange={(event) => handleTermTeacherChange(event, field.onChange)}
+                onChange={(event) =>
+                  handleTermTeacherChange(event, field.onChange)
+                }
                 onBlur={field.onBlur}
                 name={field.name}
               />
@@ -201,7 +219,7 @@ export default function CreateTermStudentPage() {
             name="user_id"
             control={control}
             render={({ field }) => (
-              <Select
+              <InfiniteSelect
                 id="user_id"
                 label="دانش‌پژوه *"
                 placeholder="دانش‌پژوه را انتخاب کنید"
@@ -211,6 +229,10 @@ export default function CreateTermStudentPage() {
                 onChange={field.onChange}
                 onBlur={field.onBlur}
                 name={field.name}
+                onLoadMore={handleLoadMoreStudents}
+                loading={studentsLoading}
+                loadingMore={studentsLoadingMore}
+                pagination={studentPagination}
               />
             )}
           />
@@ -222,7 +244,11 @@ export default function CreateTermStudentPage() {
               <Select
                 id="term_id"
                 label="ترم"
-                placeholder={field.value ? "ترم انتخاب شده" : "ابتدا مدرس ترم را انتخاب کنید"}
+                placeholder={
+                  field.value
+                    ? 'ترم انتخاب شده'
+                    : 'ابتدا مدرس ترم را انتخاب کنید'
+                }
                 options={termOptions}
                 error={errors.term_id?.message}
                 value={field.value}

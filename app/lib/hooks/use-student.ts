@@ -6,8 +6,13 @@ export const useStudent = () => {
   const store = useStudentStore();
 
   const fetchStudentList = useCallback(
-    (page?: number) => store.fetchStudentList(page),
+    (page?: number, perPage?: number) => store.fetchStudentList(page, perPage),
     [store.fetchStudentList]
+  );
+
+  const fetchMoreStudents = useCallback(
+    (perPage?: number) => store.fetchMoreStudents(perPage),
+    [store.fetchMoreStudents]
   );
 
   const createStudent = useCallback(
@@ -36,21 +41,29 @@ export const useStudent = () => {
     [store.clearCurrentStudent]
   );
 
+  const resetStudentList = useCallback(
+    () => store.resetStudentList(),
+    [store.resetStudentList]
+  );
+
   return {
     // State
     studentList: store.studentList,
     currentStudent: store.currentStudent,
     loading: store.loading,
+    loadingMore: store.loadingMore,
     error: store.error,
     pagination: store.pagination,
 
     // Actions
     fetchStudentList,
+    fetchMoreStudents,
     createStudent,
     updateStudent,
     deleteStudent,
     fetchStudentById,
     clearCurrentStudent,
+    resetStudentList,
     clearError: store.clearError,
   };
 };
