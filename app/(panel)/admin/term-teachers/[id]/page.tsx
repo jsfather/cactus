@@ -46,7 +46,7 @@ const daysOfWeek = [
   { value: 'شنبه', label: 'شنبه' },
   { value: 'یکشنبه', label: 'یکشنبه' },
   { value: 'دوشنبه', label: 'دوشنبه' },
-  { value: 'سه‌شنبه', label: 'سه‌شنبه' },
+  { value: 'سه شنبه', label: 'سه شنبه' },
   { value: 'چهارشنبه', label: 'چهارشنبه' },
   { value: 'پنجشنبه', label: 'پنجشنبه' },
   { value: 'جمعه', label: 'جمعه' },
