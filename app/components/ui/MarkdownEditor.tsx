@@ -1,11 +1,11 @@
 'use client';
 
 import { forwardRef, useRef, useEffect } from 'react';
-import { 
-  MDXEditor, 
-  headingsPlugin, 
-  listsPlugin, 
-  quotePlugin, 
+import {
+  MDXEditor,
+  headingsPlugin,
+  listsPlugin,
+  quotePlugin,
   thematicBreakPlugin,
   markdownShortcutPlugin,
   linkPlugin,
@@ -14,6 +14,7 @@ import {
   tablePlugin,
   codeBlockPlugin,
   codeMirrorPlugin,
+  diffSourcePlugin,
   toolbarPlugin,
   UndoRedo,
   BoldItalicUnderlineToggles,
@@ -24,7 +25,8 @@ import {
   InsertThematicBreak,
   BlockTypeSelect,
   CodeToggle,
-  type MDXEditorMethods
+  DiffSourceToggleWrapper,
+  type MDXEditorMethods,
 } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import clsx from 'clsx';
@@ -58,21 +60,37 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
   ) => {
     const editorRef = useRef<MDXEditorMethods>(null);
 
+    // Track if the value was set programmatically to avoid feedback loops
+    const isInternalUpdate = useRef(false);
+
     useEffect(() => {
       if (ref && typeof ref === 'object') {
         (ref as any).current = editorRef.current;
       }
     }, [ref]);
 
-    // Update editor content when value prop changes
+    // Update editor content when value prop changes from external source
     useEffect(() => {
-      if (editorRef.current && value !== undefined) {
+      if (
+        editorRef.current &&
+        value !== undefined &&
+        !isInternalUpdate.current
+      ) {
         const currentMarkdown = editorRef.current.getMarkdown();
-        if (currentMarkdown !== value) {
+        // Normalize for comparison (trim trailing whitespace from each line)
+        const normalizedCurrent = currentMarkdown.trim();
+        const normalizedValue = value.trim();
+        if (normalizedCurrent !== normalizedValue) {
           editorRef.current.setMarkdown(value);
         }
       }
+      isInternalUpdate.current = false;
     }, [value]);
+
+    const handleChange = (newValue: string) => {
+      isInternalUpdate.current = true;
+      onChange?.(newValue);
+    };
 
     return (
       <div className={clsx('w-full', className)} dir="rtl">
@@ -85,27 +103,30 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
             {required && <span className="mr-1 text-red-500">*</span>}
           </label>
         )}
-        
+
         <div
           className={clsx(
-            'markdown-editor-wrapper rounded-lg border transition-all overflow-hidden',
+            'markdown-editor-wrapper overflow-hidden rounded-lg border transition-all',
             'bg-white dark:bg-gray-900',
             error
               ? 'border-red-500 focus-within:border-red-500 focus-within:ring-2 focus-within:ring-red-200 dark:border-red-500 dark:focus-within:border-red-500 dark:focus-within:ring-red-200/20'
-              : 'border-gray-300 focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-200 dark:border-gray-700 dark:focus-within:border-primary-500 dark:focus-within:ring-primary-200/20'
+              : 'focus-within:border-primary-500 focus-within:ring-primary-200 dark:focus-within:border-primary-500 dark:focus-within:ring-primary-200/20 border-gray-300 focus-within:ring-2 dark:border-gray-700'
           )}
         >
           <div style={{ direction: 'rtl', position: 'relative' }}>
             {/* Custom Placeholder */}
             {!value && (
-              <div className="absolute top-4 right-4 text-gray-400 dark:text-gray-500 pointer-events-none text-sm" style={{ direction: 'rtl' }}>
+              <div
+                className="pointer-events-none absolute top-4 right-4 text-sm text-gray-400 dark:text-gray-500"
+                style={{ direction: 'rtl' }}
+              >
                 {placeholder}
               </div>
             )}
             <MDXEditor
               ref={editorRef}
               markdown={value}
-              onChange={(newValue) => onChange?.(newValue)}
+              onChange={handleChange}
               readOnly={readOnly}
               autoFocus={false}
               plugins={[
@@ -119,55 +140,65 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
                 imagePlugin(),
                 tablePlugin(),
                 codeBlockPlugin({ defaultCodeBlockLanguage: 'javascript' }),
-                codeMirrorPlugin({ 
-                  codeBlockLanguages: { 
-                    js: 'JavaScript', 
-                    css: 'CSS', 
+                codeMirrorPlugin({
+                  codeBlockLanguages: {
+                    js: 'JavaScript',
+                    css: 'CSS',
                     html: 'HTML',
                     tsx: 'TypeScript',
                     python: 'Python',
                     json: 'JSON',
-                    txt: 'Plain Text'
-                  } 
+                    txt: 'Plain Text',
+                  },
                 }),
+                diffSourcePlugin({ viewMode: 'rich-text' }),
                 toolbarPlugin({
                   toolbarContents: () => (
-                    <div className="flex flex-wrap flex-row-reverse items-center gap-1 p-2 w-full" style={{ direction: 'rtl' }}>
-                      <UndoRedo />
-                      <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-                      <BlockTypeSelect />
-                      <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-                      <BoldItalicUnderlineToggles />
-                      <CodeToggle />
-                      <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-                      <CreateLink />
-                      <InsertImage />
-                      <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-                      <ListsToggle />
-                      <InsertTable />
-                      <InsertThematicBreak />
-                    </div>
-                  )
-                })
+                    <DiffSourceToggleWrapper>
+                      <div
+                        className="flex w-full flex-row-reverse flex-wrap items-center gap-1 p-2"
+                        style={{ direction: 'rtl' }}
+                      >
+                        <UndoRedo />
+                        <div className="mx-1 h-6 w-px bg-gray-300 dark:bg-gray-600" />
+                        <BlockTypeSelect />
+                        <div className="mx-1 h-6 w-px bg-gray-300 dark:bg-gray-600" />
+                        <BoldItalicUnderlineToggles />
+                        <CodeToggle />
+                        <div className="mx-1 h-6 w-px bg-gray-300 dark:bg-gray-600" />
+                        <CreateLink />
+                        <InsertImage />
+                        <div className="mx-1 h-6 w-px bg-gray-300 dark:bg-gray-600" />
+                        <ListsToggle />
+                        <InsertTable />
+                        <InsertThematicBreak />
+                      </div>
+                    </DiffSourceToggleWrapper>
+                  ),
+                }),
               ]}
               contentEditableClassName="prose prose-slate dark:prose-invert max-w-none p-4 min-h-[200px] focus:outline-none"
             />
           </div>
         </div>
-        
+
         {error && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-            {error}
-          </p>
+          <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>
         )}
-        
-        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-right">
-          💡 ویرایشگر پیشرفته با پشتیبانی کامل از Markdown و MDX.
+
+        <div className="mt-2 text-right text-xs text-gray-500 dark:text-gray-400">
+          💡 برای خط جدید از دکمه «Source» در تولبار استفاده کنید تا بتوانید
+          مستقیماً markdown بنویسید.
           <span className="mx-1">|</span>
           <button
             type="button"
             className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
-            onClick={() => window.open('https://www.markdownguide.org/cheat-sheet/', '_blank')}
+            onClick={() =>
+              window.open(
+                'https://www.markdownguide.org/cheat-sheet/',
+                '_blank'
+              )
+            }
           >
             راهنمای Markdown
           </button>
@@ -177,7 +208,9 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
         <style jsx global>{`
           .markdown-editor-wrapper {
             direction: rtl !important;
-            font-family: var(--font-dana-fanum), var(--font-dana), 'Dana', 'Tahoma', sans-serif !important;
+            font-family:
+              var(--font-dana-fanum), var(--font-dana), 'Dana', 'Tahoma',
+              sans-serif !important;
           }
 
           /* Force RTL on editor container */
@@ -231,7 +264,9 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
             color: #111827 !important;
           }
 
-          .markdown-editor-wrapper .mdxeditor-toolbar button[aria-pressed="true"] {
+          .markdown-editor-wrapper
+            .mdxeditor-toolbar
+            button[aria-pressed='true'] {
             background-color: #dbeafe !important;
             color: #1d4ed8 !important;
           }
@@ -245,7 +280,10 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
             color: #ffffff !important;
           }
 
-          .dark .markdown-editor-wrapper .mdxeditor-toolbar button[aria-pressed="true"] {
+          .dark
+            .markdown-editor-wrapper
+            .mdxeditor-toolbar
+            button[aria-pressed='true'] {
             background-color: #2563eb !important;
             color: #ffffff !important;
           }
@@ -269,7 +307,7 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
 
           /* Content Editable Area - Force RTL */
           .markdown-editor-wrapper .mdxeditor-root-contenteditable,
-          .markdown-editor-wrapper [contenteditable="true"] {
+          .markdown-editor-wrapper [contenteditable='true'] {
             background-color: #ffffff !important;
             color: #111827 !important;
             direction: rtl !important;
@@ -287,37 +325,38 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
 
           /* Remove any default placeholder */
           .markdown-editor-wrapper .mdxeditor-root-contenteditable::placeholder,
-          .markdown-editor-wrapper [contenteditable="true"]::placeholder {
+          .markdown-editor-wrapper [contenteditable='true']::placeholder {
             opacity: 0 !important;
             display: none !important;
           }
 
-          .markdown-editor-wrapper .mdxeditor-root-contenteditable:empty::before,
-          .markdown-editor-wrapper [contenteditable="true"]:empty::before {
+          .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable:empty::before,
+          .markdown-editor-wrapper [contenteditable='true']:empty::before {
             display: none !important;
             content: none !important;
           }
 
           .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable,
-          .dark .markdown-editor-wrapper [contenteditable="true"] {
+          .dark .markdown-editor-wrapper [contenteditable='true'] {
             background-color: #111827 !important;
             color: #f3f4f6 !important;
           }
 
           /* Cursor positioning fix */
           .markdown-editor-wrapper .mdxeditor-root-contenteditable:focus,
-          .markdown-editor-wrapper [contenteditable="true"]:focus {
+          .markdown-editor-wrapper [contenteditable='true']:focus {
             caret-color: #111827 !important;
           }
 
           .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable:focus,
-          .dark .markdown-editor-wrapper [contenteditable="true"]:focus {
+          .dark .markdown-editor-wrapper [contenteditable='true']:focus {
             caret-color: #f3f4f6 !important;
           }
 
           /* Force RTL on all text content */
           .markdown-editor-wrapper .mdxeditor-root-contenteditable *,
-          .markdown-editor-wrapper [contenteditable="true"] * {
+          .markdown-editor-wrapper [contenteditable='true'] * {
             direction: rtl !important;
             text-align: right !important;
             unicode-bidi: embed !important;
@@ -479,25 +518,27 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
 
           /* Focus styles */
           .markdown-editor-wrapper .mdxeditor-root-contenteditable:focus,
-          .markdown-editor-wrapper [contenteditable="true"]:focus {
+          .markdown-editor-wrapper [contenteditable='true']:focus {
             outline: none !important;
           }
 
           /* Selection styling */
           .markdown-editor-wrapper .mdxeditor-root-contenteditable::selection,
-          .markdown-editor-wrapper [contenteditable="true"]::selection {
+          .markdown-editor-wrapper [contenteditable='true']::selection {
             background-color: #dbeafe !important;
             color: #1e40af !important;
           }
 
-          .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable::selection,
-          .dark .markdown-editor-wrapper [contenteditable="true"]::selection {
+          .dark
+            .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::selection,
+          .dark .markdown-editor-wrapper [contenteditable='true']::selection {
             background-color: #1e40af !important;
             color: #dbeafe !important;
           }
 
           /* Force text cursor on right side */
-          .markdown-editor-wrapper [contenteditable="true"] {
+          .markdown-editor-wrapper [contenteditable='true'] {
             text-align: right !important;
             unicode-bidi: plaintext !important;
           }
@@ -510,42 +551,93 @@ const MarkdownEditor = forwardRef<MDXEditorMethods, MarkdownEditorProps>(
           }
 
           /* Scrollbar styling */
-          .markdown-editor-wrapper .mdxeditor-root-contenteditable::-webkit-scrollbar,
-          .markdown-editor-wrapper [contenteditable="true"]::-webkit-scrollbar {
+          .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::-webkit-scrollbar,
+          .markdown-editor-wrapper [contenteditable='true']::-webkit-scrollbar {
             width: 8px;
             height: 8px;
           }
 
-          .markdown-editor-wrapper .mdxeditor-root-contenteditable::-webkit-scrollbar-track,
-          .markdown-editor-wrapper [contenteditable="true"]::-webkit-scrollbar-track {
+          .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::-webkit-scrollbar-track,
+          .markdown-editor-wrapper
+            [contenteditable='true']::-webkit-scrollbar-track {
             background: #f1f5f9;
             border-radius: 4px;
           }
 
-          .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable::-webkit-scrollbar-track,
-          .dark .markdown-editor-wrapper [contenteditable="true"]::-webkit-scrollbar-track {
+          .dark
+            .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::-webkit-scrollbar-track,
+          .dark
+            .markdown-editor-wrapper
+            [contenteditable='true']::-webkit-scrollbar-track {
             background: #1e293b;
           }
 
-          .markdown-editor-wrapper .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb,
-          .markdown-editor-wrapper [contenteditable="true"]::-webkit-scrollbar-thumb {
+          .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb,
+          .markdown-editor-wrapper
+            [contenteditable='true']::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
           }
 
-          .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb,
-          .dark .markdown-editor-wrapper [contenteditable="true"]::-webkit-scrollbar-thumb {
+          .dark
+            .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb,
+          .dark
+            .markdown-editor-wrapper
+            [contenteditable='true']::-webkit-scrollbar-thumb {
             background: #475569;
           }
 
-          .markdown-editor-wrapper .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb:hover,
-          .markdown-editor-wrapper [contenteditable="true"]::-webkit-scrollbar-thumb:hover {
+          .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb:hover,
+          .markdown-editor-wrapper
+            [contenteditable='true']::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
           }
 
-          .dark .markdown-editor-wrapper .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb:hover,
-          .dark .markdown-editor-wrapper [contenteditable="true"]::-webkit-scrollbar-thumb:hover {
+          .dark
+            .markdown-editor-wrapper
+            .mdxeditor-root-contenteditable::-webkit-scrollbar-thumb:hover,
+          .dark
+            .markdown-editor-wrapper
+            [contenteditable='true']::-webkit-scrollbar-thumb:hover {
             background: #64748b;
+          }
+
+          /* Source/Diff Mode Toggle Styles */
+          .markdown-editor-wrapper .mdxeditor-diff-source-wrapper {
+            direction: rtl !important;
+          }
+
+          .markdown-editor-wrapper .mdxeditor-source-editor {
+            direction: ltr !important;
+            text-align: left !important;
+            font-family:
+              'Monaco', 'Consolas', 'Courier New', monospace !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            background-color: #f8fafc !important;
+            color: #1e293b !important;
+            padding: 16px !important;
+            min-height: 200px !important;
+          }
+
+          .dark .markdown-editor-wrapper .mdxeditor-source-editor {
+            background-color: #0f172a !important;
+            color: #e2e8f0 !important;
+          }
+
+          /* Source mode toggle button styling */
+          .markdown-editor-wrapper [data-state='source'],
+          .markdown-editor-wrapper [data-state='rich-text'] {
+            padding: 4px 12px !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
           }
         `}</style>
       </div>

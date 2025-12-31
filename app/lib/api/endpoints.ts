@@ -117,7 +117,7 @@ export const API_ENDPOINTS = {
         GET_ALL: '/admin/term-teachers',
         GET_BY_ID: (id: string) => `/admin/term-teachers/${id}`,
         CREATE: '/admin/term-teachers',
-        UPDATE: (id: string) => `/admin/term-teachers/${id}`,
+        UPDATE: '/admin/term-teachers-update',
         DELETE: (id: string) => `/admin/term-teachers/${id}`,
       },
 

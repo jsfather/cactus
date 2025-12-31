@@ -4,13 +4,24 @@ import {
   CreateTeacherRequest,
   UpdateTeacherRequest,
 } from '@/app/lib/types/teacher';
+import { TeacherSearchFilters } from '@/app/lib/services/teacher.service';
 
 export const useTeacher = () => {
   const store = useTeacherStore();
 
   const fetchTeacherList = useCallback(
-    () => store.fetchTeacherList(),
+    (filters?: TeacherSearchFilters) => store.fetchTeacherList(filters),
     [store.fetchTeacherList]
+  );
+
+  const setSearchFilters = useCallback(
+    (filters: TeacherSearchFilters) => store.setSearchFilters(filters),
+    [store.setSearchFilters]
+  );
+
+  const clearSearchFilters = useCallback(
+    () => store.clearSearchFilters(),
+    [store.clearSearchFilters]
   );
 
   const createTeacher = useCallback(
@@ -41,9 +52,12 @@ export const useTeacher = () => {
     loading: store.loading,
     error: store.error,
     totalTeachers: store.totalTeachers,
+    searchFilters: store.searchFilters,
 
     // Actions
     fetchTeacherList,
+    setSearchFilters,
+    clearSearchFilters,
     createTeacher,
     updateTeacher,
     deleteTeacher,

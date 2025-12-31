@@ -16,7 +16,7 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Select from '@/app/components/ui/Select';
-import MarkdownEditor from '@/app/components/ui/MarkdownEditor';
+import SimpleMarkdownEditor from '@/app/components/ui/SimpleMarkdownEditor';
 import FileUpload from '@/app/components/ui/FileUpload';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Plus, X, Save, ArrowRight } from 'lucide-react';
@@ -234,13 +234,14 @@ export default function ProductFormPage({ params }: Props) {
                 name="description"
                 control={control}
                 render={({ field }) => (
-                  <MarkdownEditor
+                  <SimpleMarkdownEditor
                     id="description"
                     label="توضیحات محصول"
                     required
                     placeholder="توضیحات محصول را وارد کنید..."
                     value={field.value}
                     onChange={field.onChange}
+                    onBlur={field.onBlur}
                     error={errors.description?.message}
                   />
                 )}

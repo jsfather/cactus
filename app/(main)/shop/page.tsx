@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, Filter, Star } from 'lucide-react';
+import { Search, Filter, Star, Loader2 } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
 import { PublicProduct } from '@/app/lib/services/public-product.service';
@@ -77,14 +77,55 @@ function ShopContent() {
   const {
     products: apiProducts,
     loading,
+    loadingMore,
     error,
+    pagination,
     fetchHomeProducts,
+    fetchMoreProducts,
+    hasMoreProducts,
+    resetProducts,
   } = usePublicProduct();
+
+  // Ref for infinite scroll trigger
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // Fetch products when search query changes
   useEffect(() => {
     fetchHomeProducts({ search: searchQuery || undefined });
   }, [searchQuery, fetchHomeProducts]);
+
+  // Infinite scroll with Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (
+          entry.isIntersecting &&
+          hasMoreProducts() &&
+          !loadingMore &&
+          !loading
+        ) {
+          fetchMoreProducts();
+        }
+      },
+      {
+        root: null,
+        rootMargin: '100px',
+        threshold: 0.1,
+      }
+    );
+
+    const currentRef = loadMoreRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasMoreProducts, loadingMore, loading, fetchMoreProducts]);
 
   // Update URL when search query changes (debounced)
   useEffect(() => {
@@ -433,6 +474,31 @@ function ShopContent() {
                   ? 'متأسفانه هیچ محصولی با معیارهای جستجوی شما یافت نشد.'
                   : 'Sorry, no products found matching your search criteria.'}
               </p>
+            </div>
+          )}
+
+          {/* Infinite Scroll Trigger & Loading More Indicator */}
+          {!loading && filteredProducts.length > 0 && (
+            <div ref={loadMoreRef} className="mt-8 flex justify-center py-4">
+              {loadingMore ? (
+                <div className="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <span>
+                    {dir === 'rtl' ? 'در حال بارگذاری...' : 'Loading more...'}
+                  </span>
+                </div>
+              ) : hasMoreProducts() ? (
+                <div className="h-4 w-full" />
+              ) : (
+                pagination &&
+                pagination.total > 0 && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {dir === 'rtl'
+                      ? `نمایش ${pagination.total} محصول`
+                      : `Showing all ${pagination.total} products`}
+                  </p>
+                )
+              )}
             </div>
           )}
         </div>

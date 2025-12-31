@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Table, { Column } from '@/app/components/ui/Table';
@@ -8,8 +8,10 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import SearchFilters, { SearchFilter } from '@/app/components/ui/SearchFilters';
 import { Student } from '@/app/lib/types';
 import { useStudent } from '@/app/lib/hooks/use-student';
+import { StudentSearchFilters } from '@/app/lib/services/student.service';
 import {
   Plus,
   Users,
@@ -23,6 +25,42 @@ import {
   ChevronsLeft,
 } from 'lucide-react';
 
+// Search filter configuration
+const searchFiltersConfig: SearchFilter[] = [
+  {
+    key: 'first_name',
+    label: 'نام',
+    placeholder: 'جستجو بر اساس نام...',
+    type: 'text',
+  },
+  {
+    key: 'last_name',
+    label: 'نام خانوادگی',
+    placeholder: 'جستجو بر اساس نام خانوادگی...',
+    type: 'text',
+  },
+  {
+    key: 'username',
+    label: 'نام کاربری',
+    placeholder: 'جستجو بر اساس نام کاربری...',
+    type: 'text',
+  },
+  {
+    key: 'phone',
+    label: 'شماره موبایل',
+    placeholder: 'جستجو بر اساس شماره موبایل...',
+    type: 'tel',
+    convertNumbers: true,
+  },
+  {
+    key: 'national_code',
+    label: 'کد ملی',
+    placeholder: 'جستجو بر اساس کد ملی...',
+    type: 'text',
+    convertNumbers: true,
+  },
+];
+
 export default function StudentsPage() {
   const router = useRouter();
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -33,6 +71,7 @@ export default function StudentsPage() {
     studentList,
     loading,
     pagination,
+    searchFilters,
     fetchStudentList,
     deleteStudent,
     clearError,
@@ -41,6 +80,29 @@ export default function StudentsPage() {
   useEffect(() => {
     fetchStudentList();
   }, [fetchStudentList]);
+
+  // Handle search with filters
+  const handleSearch = useCallback(
+    (filters: Record<string, string>) => {
+      const searchFilters: StudentSearchFilters = {
+        first_name: filters.first_name,
+        last_name: filters.last_name,
+        username: filters.username,
+        phone: filters.phone,
+        national_code: filters.national_code,
+      };
+      fetchStudentList(1, 15, searchFilters);
+    },
+    [fetchStudentList]
+  );
+
+  // Handle pagination with current filters
+  const handlePageChange = useCallback(
+    (page: number) => {
+      fetchStudentList(page, 15, searchFilters);
+    },
+    [fetchStudentList, searchFilters]
+  );
 
   // Calculate summary statistics from current page
   const totalStudents = pagination?.total ?? studentList.length;
@@ -149,8 +211,8 @@ export default function StudentsPage() {
       toast.success('دانش‌پژوه با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      // Stay on current page after deletion
-      await fetchStudentList(pagination?.current_page ?? 1);
+      // Stay on current page after deletion with current filters
+      await fetchStudentList(pagination?.current_page ?? 1, 15, searchFilters);
     } catch (error) {
       toast.error('خطا در حذف دانش‌پژوه');
     } finally {
@@ -196,6 +258,14 @@ export default function StudentsPage() {
           افزودن دانش‌پژوه
         </Button>
       </div>
+
+      {/* Search Filters */}
+      <SearchFilters
+        filters={searchFiltersConfig}
+        onSearch={handleSearch}
+        loading={loading}
+        initialValues={searchFilters as Record<string, string>}
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -295,7 +365,7 @@ export default function StudentsPage() {
             <div className="flex items-center gap-2">
               <button
                 disabled={pagination.current_page === 1}
-                onClick={() => fetchStudentList(1)}
+                onClick={() => handlePageChange(1)}
                 className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
                 title="اولین صفحه"
               >
@@ -303,7 +373,7 @@ export default function StudentsPage() {
               </button>
               <button
                 disabled={pagination.current_page === 1}
-                onClick={() => fetchStudentList(pagination.current_page - 1)}
+                onClick={() => handlePageChange(pagination.current_page - 1)}
                 className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
                 title="صفحه قبل"
               >
@@ -327,7 +397,7 @@ export default function StudentsPage() {
                         <span className="px-2 text-gray-400">...</span>
                       )}
                       <button
-                        onClick={() => fetchStudentList(page)}
+                        onClick={() => handlePageChange(page)}
                         className={`min-w-[2.5rem] rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                           pagination.current_page === page
                             ? 'bg-primary-600 dark:bg-primary-500 text-white'
@@ -342,7 +412,7 @@ export default function StudentsPage() {
 
               <button
                 disabled={pagination.current_page === pagination.last_page}
-                onClick={() => fetchStudentList(pagination.current_page + 1)}
+                onClick={() => handlePageChange(pagination.current_page + 1)}
                 className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
                 title="صفحه بعد"
               >
@@ -350,7 +420,7 @@ export default function StudentsPage() {
               </button>
               <button
                 disabled={pagination.current_page === pagination.last_page}
-                onClick={() => fetchStudentList(pagination.last_page)}
+                onClick={() => handlePageChange(pagination.last_page)}
                 className="rounded-md p-2 text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
                 title="آخرین صفحه"
               >
