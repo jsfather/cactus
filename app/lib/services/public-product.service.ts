@@ -56,6 +56,7 @@ export interface GetPublicProductsResponse {
 export interface ProductSearchParams {
   search?: string;
   page?: number;
+  per_page?: number;
 }
 
 export class PublicProductService {
@@ -65,6 +66,8 @@ export class PublicProductService {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
     if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.per_page)
+      queryParams.append('per_page', params.per_page.toString());
 
     const queryString = queryParams.toString();
     const url = `${API_ENDPOINTS.PUBLIC.SHOP.HOME_PRODUCTS}${queryString ? `?${queryString}` : ''}`;
