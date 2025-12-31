@@ -31,6 +31,7 @@ import Textarea from '@/app/components/ui/Textarea';
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 
 interface ProductPageProps {
   params: Promise<{
@@ -793,9 +794,76 @@ export default function Page({ params }: ProductPageProps) {
             </div>
 
             {/* Description */}
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              <h2>{t.shop.productDetail.description}</h2>
-              <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+            <div
+              className="text-right text-gray-700 dark:text-gray-300"
+              dir="rtl"
+            >
+              <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
+                {t.shop.productDetail.description}
+              </h2>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                components={{
+                  p: ({ children }) => (
+                    <p
+                      className="mb-4 leading-relaxed"
+                      style={{ whiteSpace: 'pre-wrap' }}
+                    >
+                      {children}
+                    </p>
+                  ),
+                  h1: ({ children }) => (
+                    <h1 className="mt-6 mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+                      {children}
+                    </h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="mt-5 mb-3 text-xl font-bold text-gray-900 dark:text-white">
+                      {children}
+                    </h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="mt-4 mb-2 text-lg font-bold text-gray-900 dark:text-white">
+                      {children}
+                    </h3>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className="mr-4 mb-4 list-inside list-disc space-y-1">
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="mr-4 mb-4 list-inside list-decimal space-y-1">
+                      {children}
+                    </ol>
+                  ),
+                  li: ({ children }) => <li className="mb-1">{children}</li>,
+                  strong: ({ children }) => (
+                    <strong className="font-bold text-gray-900 dark:text-white">
+                      {children}
+                    </strong>
+                  ),
+                  em: ({ children }) => <em className="italic">{children}</em>,
+                  blockquote: ({ children }) => (
+                    <blockquote className="my-4 border-r-4 border-gray-300 pr-4 text-gray-600 italic dark:border-gray-600 dark:text-gray-400">
+                      {children}
+                    </blockquote>
+                  ),
+                  code: ({ children }) => (
+                    <code className="rounded bg-gray-100 px-1 py-0.5 font-mono text-sm dark:bg-gray-800">
+                      {children}
+                    </code>
+                  ),
+                  a: ({ children, href }) => (
+                    <a
+                      href={href}
+                      className="text-primary-600 dark:text-primary-400 underline"
+                    >
+                      {children}
+                    </a>
+                  ),
+                }}
+              >
                 {product.description}
               </ReactMarkdown>
               {product.features.length > 0 && (
