@@ -52,6 +52,13 @@ const searchFiltersConfig: SearchFilter[] = [
     type: 'tel',
     convertNumbers: true,
   },
+  {
+    key: 'national_code',
+    label: 'کد ملی',
+    placeholder: 'جستجو بر اساس کد ملی...',
+    type: 'text',
+    convertNumbers: true,
+  },
 ];
 
 export default function StudentsPage() {
@@ -82,6 +89,7 @@ export default function StudentsPage() {
         last_name: filters.last_name,
         username: filters.username,
         phone: filters.phone,
+        national_code: filters.national_code,
       };
       fetchStudentList(1, 15, searchFilters);
     },

@@ -12,6 +12,7 @@ export interface StudentSearchFilters {
   last_name?: string;
   username?: string;
   phone?: string;
+  national_code?: string;
 }
 
 export class StudentService {
@@ -30,6 +31,8 @@ export class StudentService {
       if (filters.last_name) params.set('last_name', filters.last_name);
       if (filters.username) params.set('username', filters.username);
       if (filters.phone) params.set('phone', filters.phone);
+      if (filters.national_code)
+        params.set('national_code', filters.national_code);
     }
 
     return apiClient.get<GetStudentListResponse>(

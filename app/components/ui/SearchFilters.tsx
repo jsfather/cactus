@@ -41,7 +41,7 @@ export default function SearchFilters({
     if (Object.keys(initialValues).length > 0) {
       setValues(initialValues);
       // Auto-expand if there are initial values
-      const hasValues = Object.values(initialValues).some((v) => v.trim());
+      const hasValues = Object.values(initialValues).some((v) => v && v.trim());
       setIsExpanded(hasValues);
     }
   }, [initialValues]);
@@ -51,7 +51,7 @@ export default function SearchFilters({
     (searchValues: Record<string, string>) => {
       const cleanedValues: Record<string, string> = {};
       Object.entries(searchValues).forEach(([key, value]) => {
-        if (value.trim()) {
+        if (value && value.trim()) {
           cleanedValues[key] = value.trim();
         }
       });
@@ -76,7 +76,7 @@ export default function SearchFilters({
   const handleSearch = useCallback(() => {
     const cleanedValues: Record<string, string> = {};
     Object.entries(values).forEach(([key, value]) => {
-      if (value.trim()) {
+      if (value && value.trim()) {
         cleanedValues[key] = value.trim();
       }
     });
@@ -98,7 +98,7 @@ export default function SearchFilters({
     [showSearchButton, handleSearch]
   );
 
-  const hasActiveFilters = Object.values(values).some((v) => v.trim());
+  const hasActiveFilters = Object.values(values).some((v) => v && v.trim());
 
   return (
     <div className={`w-full ${className}`}>
@@ -113,7 +113,7 @@ export default function SearchFilters({
           فیلتر جستجو
           {hasActiveFilters && (
             <span className="bg-primary-600 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white">
-              {Object.values(values).filter((v) => v.trim()).length}
+              {Object.values(values).filter((v) => v && v.trim()).length}
             </span>
           )}
         </button>
