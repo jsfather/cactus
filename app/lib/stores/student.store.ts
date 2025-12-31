@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { studentService } from '@/app/lib/services/student.service';
+import {
+  studentService,
+  StudentSearchFilters,
+} from '@/app/lib/services/student.service';
 import type { ApiError } from '@/app/lib/api/client';
 import {
   Student,
@@ -27,14 +30,21 @@ interface StudentState {
   loadingMore: boolean;
   error: string | null;
   pagination: PaginationMeta | null;
+  searchFilters: StudentSearchFilters;
 
   // Actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
 
-  fetchStudentList: (page?: number, perPage?: number) => Promise<void>;
+  fetchStudentList: (
+    page?: number,
+    perPage?: number,
+    filters?: StudentSearchFilters
+  ) => Promise<void>;
   fetchMoreStudents: (perPage?: number) => Promise<void>;
+  setSearchFilters: (filters: StudentSearchFilters) => void;
+  clearSearchFilters: () => void;
   createStudent: (payload: CreateStudentRequest) => Promise<GetStudentResponse>;
   updateStudent: (
     id: string,
@@ -55,6 +65,7 @@ export const useStudentStore = create<StudentState>()(
     loadingMore: false,
     error: null,
     pagination: null,
+    searchFilters: {},
 
     // Actions
     setLoading: (loading) => set({ loading }),
@@ -62,11 +73,23 @@ export const useStudentStore = create<StudentState>()(
     clearError: () => set({ error: null }),
     clearCurrentStudent: () => set({ currentStudent: null }),
     resetStudentList: () => set({ studentList: [], pagination: null }),
+    setSearchFilters: (filters) => set({ searchFilters: filters }),
+    clearSearchFilters: () => set({ searchFilters: {} }),
 
-    fetchStudentList: async (page = 1, perPage = 15) => {
+    fetchStudentList: async (page = 1, perPage = 15, filters?) => {
       try {
         set({ loading: true, error: null });
-        const response = await studentService.getList(page, perPage);
+        // Use provided filters or fallback to stored filters
+        const searchFilters =
+          filters !== undefined ? filters : get().searchFilters;
+        if (filters !== undefined) {
+          set({ searchFilters: filters });
+        }
+        const response = await studentService.getList(
+          page,
+          perPage,
+          searchFilters
+        );
         set({
           studentList: response.data,
           pagination: response.meta,
@@ -80,7 +103,7 @@ export const useStudentStore = create<StudentState>()(
     },
 
     fetchMoreStudents: async (perPage = 50) => {
-      const { pagination, loadingMore, studentList } = get();
+      const { pagination, loadingMore, studentList, searchFilters } = get();
 
       // Don't fetch if already loading or no more pages
       if (
@@ -94,7 +117,11 @@ export const useStudentStore = create<StudentState>()(
       try {
         set({ loadingMore: true, error: null });
         const nextPage = pagination.current_page + 1;
-        const response = await studentService.getList(nextPage, perPage);
+        const response = await studentService.getList(
+          nextPage,
+          perPage,
+          searchFilters
+        );
         set({
           studentList: [...studentList, ...response.data],
           pagination: response.meta,

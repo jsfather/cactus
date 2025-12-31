@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { Teacher } from '@/app/lib/types/teacher';
@@ -9,8 +9,39 @@ import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useTeacher } from '@/app/lib/hooks/use-teacher';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import SearchFilters, { SearchFilter } from '@/app/components/ui/SearchFilters';
+import { TeacherSearchFilters } from '@/app/lib/services/teacher.service';
 import { Users, Plus, UserCheck, Clock, Award, TrendingUp } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+
+// Search filter configuration
+const searchFiltersConfig: SearchFilter[] = [
+  {
+    key: 'first_name',
+    label: 'نام',
+    placeholder: 'جستجو بر اساس نام...',
+    type: 'text',
+  },
+  {
+    key: 'last_name',
+    label: 'نام خانوادگی',
+    placeholder: 'جستجو بر اساس نام خانوادگی...',
+    type: 'text',
+  },
+  {
+    key: 'username',
+    label: 'نام کاربری',
+    placeholder: 'جستجو بر اساس نام کاربری...',
+    type: 'text',
+  },
+  {
+    key: 'phone',
+    label: 'شماره موبایل',
+    placeholder: 'جستجو بر اساس شماره موبایل...',
+    type: 'tel',
+    convertNumbers: true,
+  },
+];
 
 export default function TeachersPage() {
   const router = useRouter();
@@ -21,6 +52,7 @@ export default function TeachersPage() {
     teacherList,
     loading,
     totalTeachers,
+    searchFilters,
     fetchTeacherList,
     deleteTeacher,
   } = useTeacher();
@@ -28,6 +60,20 @@ export default function TeachersPage() {
   useEffect(() => {
     fetchTeacherList();
   }, [fetchTeacherList]);
+
+  // Handle search with filters
+  const handleSearch = useCallback(
+    (filters: Record<string, string>) => {
+      const teacherFilters: TeacherSearchFilters = {
+        first_name: filters.first_name,
+        last_name: filters.last_name,
+        username: filters.username,
+        phone: filters.phone,
+      };
+      fetchTeacherList(teacherFilters);
+    },
+    [fetchTeacherList]
+  );
 
   // Calculate summary stats
   const activeTeachers = teacherList.filter(
@@ -139,7 +185,7 @@ export default function TeachersPage() {
       toast.success('مربی با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchTeacherList();
+      await fetchTeacherList(searchFilters);
     } catch (error) {
       toast.error('خطا در حذف مربی');
     } finally {
@@ -182,6 +228,16 @@ export default function TeachersPage() {
             <Plus className="ml-2 h-4 w-4" />
             افزودن مربی جدید
           </Button>
+        </div>
+
+        {/* Search Filters */}
+        <div className="mt-6">
+          <SearchFilters
+            filters={searchFiltersConfig}
+            onSearch={handleSearch}
+            loading={loading}
+            initialValues={searchFilters as Record<string, string>}
+          />
         </div>
 
         {/* Summary Stats */}

@@ -7,13 +7,33 @@ import {
   UpdateStudentRequest,
 } from '@/app/lib/types';
 
+export interface StudentSearchFilters {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  phone?: string;
+}
+
 export class StudentService {
   async getList(
     page: number = 1,
-    perPage: number = 15
+    perPage: number = 15,
+    filters?: StudentSearchFilters
   ): Promise<GetStudentListResponse> {
+    const params = new URLSearchParams();
+    params.set('page', page.toString());
+    params.set('per_page', perPage.toString());
+
+    // Add search filters if provided
+    if (filters) {
+      if (filters.first_name) params.set('first_name', filters.first_name);
+      if (filters.last_name) params.set('last_name', filters.last_name);
+      if (filters.username) params.set('username', filters.username);
+      if (filters.phone) params.set('phone', filters.phone);
+    }
+
     return apiClient.get<GetStudentListResponse>(
-      `${API_ENDPOINTS.PANEL.ADMIN.STUDENTS.GET_ALL}?page=${page}&per_page=${perPage}`
+      `${API_ENDPOINTS.PANEL.ADMIN.STUDENTS.GET_ALL}?${params.toString()}`
     );
   }
 

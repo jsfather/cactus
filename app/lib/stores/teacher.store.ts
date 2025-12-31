@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import { teacherService } from '@/app/lib/services/teacher.service';
+import {
+  teacherService,
+  TeacherSearchFilters,
+} from '@/app/lib/services/teacher.service';
 import type { ApiError } from '@/app/lib/api/client';
 import {
   Teacher,
@@ -16,13 +19,16 @@ interface TeacherState {
   loading: boolean;
   error: string | null;
   totalTeachers: number;
+  searchFilters: TeacherSearchFilters;
 
   // Actions
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
 
-  fetchTeacherList: () => Promise<void>;
+  fetchTeacherList: (filters?: TeacherSearchFilters) => Promise<void>;
+  setSearchFilters: (filters: TeacherSearchFilters) => void;
+  clearSearchFilters: () => void;
   createTeacher: (payload: CreateTeacherRequest) => Promise<GetTeacherResponse>;
   updateTeacher: (
     id: string,
@@ -40,16 +46,25 @@ export const useTeacherStore = create<TeacherState>()(
     loading: false,
     error: null,
     totalTeachers: 0,
+    searchFilters: {},
 
     // Actions
     setLoading: (loading) => set({ loading }),
     setError: (error) => set({ error }),
     clearError: () => set({ error: null }),
+    setSearchFilters: (filters) => set({ searchFilters: filters }),
+    clearSearchFilters: () => set({ searchFilters: {} }),
 
-    fetchTeacherList: async () => {
+    fetchTeacherList: async (filters?) => {
       try {
         set({ loading: true, error: null });
-        const response = await teacherService.getList();
+        // Use provided filters or fallback to stored filters
+        const searchFilters =
+          filters !== undefined ? filters : get().searchFilters;
+        if (filters !== undefined) {
+          set({ searchFilters: filters });
+        }
+        const response = await teacherService.getList(searchFilters);
         set({
           teacherList: response.data,
           totalTeachers: response.meta?.total || response.data.length,
