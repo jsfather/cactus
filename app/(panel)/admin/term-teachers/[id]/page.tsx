@@ -19,7 +19,10 @@ import { useTermTeacher } from '@/app/lib/hooks/use-term-teacher';
 import { useTeacher } from '@/app/lib/hooks/use-teacher';
 import { useTerm } from '@/app/lib/hooks/use-term';
 import { useFormWithBackendErrors } from '@/app/hooks/useFormWithBackendErrors';
-import { CreateTermTeacherRequest, UpdateTermTeacherRequest } from '@/app/lib/types/term_teacher';
+import {
+  CreateTermTeacherRequest,
+  UpdateTermTeacherRequest,
+} from '@/app/lib/types/term_teacher';
 import { ApiError } from '@/app/lib/api/client';
 
 // Form Validation Schema
@@ -60,6 +63,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     loading: termTeacherLoading,
     fetchTermTeacherById,
     createTermTeacher,
+    updateTermTeacher,
+    clearCurrentTermTeacher,
   } = useTermTeacher();
 
   const {
@@ -68,11 +73,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     fetchTeacherList,
   } = useTeacher();
 
-  const {
-    termList,
-    loading: termLoading,
-    fetchTermList,
-  } = useTerm();
+  const { termList, loading: termLoading, fetchTermList } = useTerm();
 
   // Form setup
   const {
@@ -121,10 +122,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const loadData = async () => {
       try {
         // Load terms and teachers for dropdowns
-        await Promise.all([
-          fetchTermList(),
-          fetchTeacherList(),
-        ]);
+        await Promise.all([fetchTermList(), fetchTeacherList()]);
+
+        // If editing, also fetch the term-teacher data
+        if (!isNew) {
+          await fetchTermTeacherById(resolvedParams.id);
+        }
       } catch (error) {
         console.error('Error loading data:', error);
         toast.error('خطا در بارگذاری اطلاعات');
@@ -133,11 +136,17 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isNew, resolvedParams.id]);
 
   // Initialize form with default values for new term-teacher
   useEffect(() => {
-    if (!loading && termOptions.length > 0 && teacherOptions.length > 0 && !initializedRef.current) {
+    if (
+      !loading &&
+      termOptions.length > 0 &&
+      teacherOptions.length > 0 &&
+      !initializedRef.current &&
+      isNew
+    ) {
       // Set default values for new term-teachers
       reset({
         term_id: parseInt(termOptions[0].value),
@@ -153,24 +162,86 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       initializedRef.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, termOptions.length, teacherOptions.length]);
+  }, [loading, termOptions.length, teacherOptions.length, isNew]);
+
+  // Initialize form with fetched data when editing
+  useEffect(() => {
+    if (
+      !isNew &&
+      currentTermTeacher &&
+      termOptions.length > 0 &&
+      teacherOptions.length > 0 &&
+      !initializedRef.current
+    ) {
+      // Format times by removing seconds if present (HH:MM:SS -> HH:MM)
+      const formatTime = (time: string) => {
+        if (!time) return '';
+        const parts = time.split(':');
+        return parts.length >= 2 ? `${parts[0]}:${parts[1]}` : time;
+      };
+
+      // Map the fetched days to the form format
+      const formDays = currentTermTeacher.days.map((day) => ({
+        day_of_week: day.day_of_week,
+        start_time: formatTime(day.start_time),
+        end_time: formatTime(day.end_time),
+      }));
+
+      reset({
+        term_id: currentTermTeacher.term_id,
+        teacher_id: currentTermTeacher.teacher_id,
+        days:
+          formDays.length > 0
+            ? formDays
+            : [
+                {
+                  day_of_week: 'شنبه',
+                  start_time: '09:00',
+                  end_time: '10:00',
+                },
+              ],
+      });
+      initializedRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNew, currentTermTeacher, termOptions.length, teacherOptions.length]);
+
+  // Clear current term teacher when leaving the page
+  useEffect(() => {
+    return () => {
+      clearCurrentTermTeacher();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit = async (data: TermTeacherFormData) => {
     try {
-      await createTermTeacher(data);
-      toast.success('ترم مدرس با موفقیت ایجاد شد');
+      console.log('Submitting form data:', JSON.stringify(data, null, 2));
+      if (isNew) {
+        await createTermTeacher(data);
+        toast.success('ترم مدرس با موفقیت ایجاد شد');
+      } else {
+        await updateTermTeacher(resolvedParams.id, data);
+        toast.success('ترم مدرس با موفقیت بروزرسانی شد');
+      }
       router.push('/admin/term-teachers');
-    } catch (error) {
+    } catch (error: any) {
       // Error is already handled by the hook and store
       console.error('Form submission error:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        status: error?.status,
+        errors: error?.errors,
+        raw: JSON.stringify(error, null, 2),
+      });
     }
   };
 
   const handleError = (error: ApiError) => {
     console.error('Term teacher form submission error:', error);
     toast.error(
-      error?.message || 
-      (isNew ? 'خطا در ایجاد ترم مدرس' : 'خطا در بروزرسانی ترم مدرس')
+      error?.message ||
+        (isNew ? 'خطا در ایجاد ترم مدرس' : 'خطا در بروزرسانی ترم مدرس')
     );
   };
 
@@ -198,8 +269,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         breadcrumbs={[
           { label: 'ترم مدرسین', href: '/admin/term-teachers' },
           {
-            label: 'ایجاد ترم مدرس',
-            href: '/admin/term-teachers/new',
+            label: isNew ? 'ایجاد ترم مدرس' : 'ویرایش ترم مدرس',
+            href: `/admin/term-teachers/${resolvedParams.id}`,
             active: true,
           },
         ]}
@@ -207,7 +278,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       <div className="mt-8 rounded-lg bg-white p-6 shadow dark:bg-gray-800">
         <form
-          onSubmit={handleSubmit(submitWithErrorHandling(onSubmit, handleError))}
+          onSubmit={handleSubmit(
+            submitWithErrorHandling(onSubmit, handleError)
+          )}
           className="space-y-6"
         >
           {globalError && (
@@ -273,7 +346,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             </div>
 
             {errors.days?.message && (
-              <p className="text-sm text-red-600 dark:text-red-400">{errors.days.message}</p>
+              <p className="text-sm text-red-600 dark:text-red-400">
+                {errors.days.message}
+              </p>
             )}
 
             <div className="space-y-4">
