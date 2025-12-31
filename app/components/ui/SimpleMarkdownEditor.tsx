@@ -17,6 +17,7 @@ import {
   Code,
   Eye,
   Edit3,
+  CornerDownLeft,
 } from 'lucide-react';
 
 interface SimpleMarkdownEditorProps {
@@ -113,6 +114,11 @@ const SimpleMarkdownEditor = forwardRef<
         icon: Link2,
         action: () => insertMarkdown('[', '](url)'),
         title: 'لینک',
+      },
+      {
+        icon: CornerDownLeft,
+        action: () => insertMarkdown('\\\n', ''),
+        title: 'خط جدید',
       },
     ];
 
