@@ -13,6 +13,7 @@ export interface StudentSearchFilters {
   username?: string;
   phone?: string;
   national_code?: string;
+  search?: string; // General search term - will search by last_name
 }
 
 export class StudentService {
@@ -27,6 +28,8 @@ export class StudentService {
 
     // Add search filters if provided
     if (filters) {
+      // If general search is provided, use it as last_name filter
+      if (filters.search) params.set('last_name', filters.search);
       if (filters.first_name) params.set('first_name', filters.first_name);
       if (filters.last_name) params.set('last_name', filters.last_name);
       if (filters.username) params.set('username', filters.username);

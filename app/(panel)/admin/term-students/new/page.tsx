@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,6 +46,7 @@ export default function CreateTermStudentPage() {
     pagination: studentPagination,
     fetchStudentList,
     fetchMoreStudents,
+    resetStudentList,
   } = useStudent();
   const {
     termTeacherList,
@@ -71,17 +72,44 @@ export default function CreateTermStudentPage() {
     },
   });
 
+  // Track if initial data has been loaded
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+
   // Load dropdown data on mount
   useEffect(() => {
-    fetchTermList();
-    fetchStudentList(1, 50); // Load first 50 students
-    fetchTermTeacherList();
+    const loadInitialData = async () => {
+      await Promise.all([
+        fetchTermList(),
+        fetchStudentList(1, 50),
+        fetchTermTeacherList(),
+      ]);
+      setInitialLoadComplete(true);
+    };
+    loadInitialData();
   }, [fetchTermList, fetchStudentList, fetchTermTeacherList]);
 
   // Handle loading more students
   const handleLoadMoreStudents = () => {
     fetchMoreStudents(50);
   };
+
+  // Handle server-side search for students
+  const handleSearchStudents = useCallback(
+    (searchTerm: string) => {
+      // Reset list and search with the term
+      resetStudentList();
+      if (searchTerm.trim()) {
+        // Search by last_name
+        fetchStudentList(1, 50, {
+          last_name: searchTerm.trim(),
+        });
+      } else {
+        // Empty search - load all students (pass empty object to clear filters)
+        fetchStudentList(1, 50, {});
+      }
+    },
+    [fetchStudentList, resetStudentList]
+  );
 
   // Handle errors from store
   useEffect(() => {
@@ -174,9 +202,12 @@ export default function CreateTermStudentPage() {
     value: termTeacher.id.toString(),
   }));
 
-  const loading = termsLoading || studentsLoading || termTeachersLoading;
+  // Only show full-page loading spinner during initial load, not during search
+  const initialLoading =
+    !initialLoadComplete &&
+    (termsLoading || studentsLoading || termTeachersLoading);
 
-  if (loading) {
+  if (initialLoading) {
     return <LoadingSpinner />;
   }
 
@@ -233,6 +264,9 @@ export default function CreateTermStudentPage() {
                 loading={studentsLoading}
                 loadingMore={studentsLoadingMore}
                 pagination={studentPagination}
+                searchable
+                onSearch={handleSearchStudents}
+                searchPlaceholder="جستجو با نام خانوادگی..."
               />
             )}
           />
