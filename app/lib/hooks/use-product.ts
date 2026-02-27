@@ -9,7 +9,7 @@ export const useProduct = () => {
   const store = useProductStore();
 
   const fetchProductList = useCallback(
-    () => store.fetchProductList(),
+    (page?: number) => store.fetchProductList(page),
     [store.fetchProductList]
   );
   const fetchCategoryList = useCallback(
@@ -45,6 +45,7 @@ export const useProduct = () => {
     currentProduct: store.currentProduct,
     loading: store.loading,
     error: store.error,
+    paginationMeta: store.paginationMeta,
 
     // Actions
     fetchProductList,
