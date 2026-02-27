@@ -8,8 +8,14 @@ import {
 } from '@/lib/types/offline-session';
 
 export class AdminOfflineSessionService {
-  async getList(termId?: string | number): Promise<OfflineSessionListResponse> {
-    const params = termId ? { term_id: termId } : {};
+  async getList(
+    termId?: string | number,
+    page: number = 1
+  ): Promise<OfflineSessionListResponse> {
+    const params: Record<string, any> = { page };
+    if (termId) {
+      params.term_id = termId;
+    }
     return apiClient.get<OfflineSessionListResponse>(
       API_ENDPOINTS.PANEL.ADMIN.OFFLINE_SESSIONS.GET_ALL,
       { params }

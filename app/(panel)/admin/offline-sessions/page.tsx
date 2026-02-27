@@ -6,9 +6,10 @@ import { toast } from 'react-hot-toast';
 import { OfflineSession } from '@/lib/types/offline-session';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAdminOfflineSession } from '@/app/lib/hooks/use-admin-offline-session';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import Pagination from '@/app/components/ui/Pagination';
 import {
   Video,
   Plus,
@@ -23,6 +24,8 @@ import { useTerm } from '@/app/lib/hooks/use-term';
 
 export default function OfflineSessionsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get('page')) || 1;
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<OfflineSession | null>(null);
@@ -33,6 +36,7 @@ export default function OfflineSessionsPage() {
     deleteOfflineSession,
     currentTermId,
     setCurrentTermId,
+    paginationMeta,
   } = useAdminOfflineSession();
   const { termList, fetchTermList } = useTerm();
 
@@ -42,12 +46,12 @@ export default function OfflineSessionsPage() {
 
   useEffect(() => {
     if (currentTermId) {
-      fetchOfflineSessionList(currentTermId);
+      fetchOfflineSessionList(currentTermId, currentPage);
     }
-  }, [currentTermId, fetchOfflineSessionList]);
+  }, [currentTermId, currentPage, fetchOfflineSessionList]);
 
   // Calculate summary stats
-  const totalSessions = offlineSessionList.length;
+  const totalSessions = paginationMeta?.total ?? offlineSessionList.length;
   const sessionsWithHomework = offlineSessionList.filter(
     (session) => session.homeworks && session.homeworks.length > 0
   ).length;
@@ -128,7 +132,7 @@ export default function OfflineSessionsPage() {
       setShowDeleteModal(false);
       setItemToDelete(null);
       if (currentTermId) {
-        await fetchOfflineSessionList(currentTermId);
+        await fetchOfflineSessionList(currentTermId, currentPage);
       }
     } catch (error) {
       toast.error('خطا در حذف جلسه آفلاین');
@@ -296,6 +300,13 @@ export default function OfflineSessionsPage() {
                 onDelete={handleDeleteClick}
               />
             </div>
+
+            {/* Pagination */}
+            {paginationMeta && paginationMeta.last_page > 1 && (
+              <div className="mt-6 flex justify-center">
+                <Pagination totalPages={paginationMeta.last_page} />
+              </div>
+            )}
           </>
         ) : (
           <div className="mt-6 rounded-lg bg-yellow-50 p-6 text-center dark:bg-yellow-900/20">

@@ -9,6 +9,15 @@ import {
   OfflineSessionResponse,
 } from '@/lib/types/offline-session';
 
+interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number;
+  to: number;
+}
+
 interface OfflineSessionState {
   // State
   offlineSessionList: OfflineSession[];
@@ -16,6 +25,7 @@ interface OfflineSessionState {
   loading: boolean;
   error: string | null;
   currentTermId: string | number | null;
+  paginationMeta: PaginationMeta | null;
 
   // Actions
   setLoading: (loading: boolean) => void;
@@ -23,7 +33,10 @@ interface OfflineSessionState {
   clearError: () => void;
   setCurrentTermId: (termId: string | number | null) => void;
 
-  fetchOfflineSessionList: (termId?: string | number) => Promise<void>;
+  fetchOfflineSessionList: (
+    termId?: string | number,
+    page?: number
+  ) => Promise<void>;
   createOfflineSession: (
     payload: OfflineSessionCreateRequest
   ) => Promise<OfflineSessionResponse>;
@@ -43,6 +56,7 @@ export const useOfflineSessionStore = create<OfflineSessionState>()(
     loading: false,
     error: null,
     currentTermId: null,
+    paginationMeta: null,
 
     // Actions
     setLoading: (loading) => set({ loading }),
@@ -53,15 +67,26 @@ export const useOfflineSessionStore = create<OfflineSessionState>()(
 
     setCurrentTermId: (termId) => set({ currentTermId: termId }),
 
-    fetchOfflineSessionList: async (termId) => {
+    fetchOfflineSessionList: async (termId, page: number = 1) => {
       try {
         set({ loading: true, error: null });
         const useTermId = termId !== undefined ? termId : get().currentTermId;
         const response = await adminOfflineSessionService.getList(
-          useTermId !== null ? useTermId : undefined
+          useTermId !== null ? useTermId : undefined,
+          page
         );
         set({
           offlineSessionList: response.data,
+          paginationMeta: response.meta
+            ? {
+                current_page: response.meta.current_page,
+                last_page: response.meta.last_page,
+                per_page: response.meta.per_page,
+                total: response.meta.total,
+                from: response.meta.from,
+                to: response.meta.to,
+              }
+            : null,
           loading: false,
           currentTermId: useTermId,
         });
