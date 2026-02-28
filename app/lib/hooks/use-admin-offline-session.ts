@@ -9,7 +9,8 @@ export const useAdminOfflineSession = () => {
   const store = useOfflineSessionStore();
 
   const fetchOfflineSessionList = useCallback(
-    (termId?: string | number) => store.fetchOfflineSessionList(termId),
+    (termId?: string | number, page?: number) =>
+      store.fetchOfflineSessionList(termId, page),
     [store.fetchOfflineSessionList]
   );
 
@@ -47,6 +48,7 @@ export const useAdminOfflineSession = () => {
     loading: store.loading,
     error: store.error,
     currentTermId: store.currentTermId,
+    paginationMeta: store.paginationMeta,
 
     // Actions
     fetchOfflineSessionList,

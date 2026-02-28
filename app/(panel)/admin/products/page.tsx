@@ -6,9 +6,10 @@ import { toast } from 'react-hot-toast';
 import { Product } from '@/app/lib/types';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import { Button } from '@/app/components/ui/Button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useProduct } from '@/app/lib/hooks/use-product';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import Pagination from '@/app/components/ui/Pagination';
 import {
   Package,
   Plus,
@@ -21,18 +22,25 @@ import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 export default function ProductsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get('page')) || 1;
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Product | null>(null);
-  const { productList, loading, fetchProductList, deleteProduct } =
-    useProduct();
+  const {
+    productList,
+    loading,
+    fetchProductList,
+    deleteProduct,
+    paginationMeta,
+  } = useProduct();
 
   useEffect(() => {
-    fetchProductList();
-  }, [fetchProductList]);
+    fetchProductList(currentPage);
+  }, [fetchProductList, currentPage]);
 
-  // Calculate summary stats
-  const totalProducts = productList.length;
+  // Calculate summary stats from current page data
+  const totalProducts = paginationMeta?.total ?? productList.length;
   const totalValue = productList.reduce(
     (sum, product) => sum + Number(product.price) * Number(product.stock || 0),
     0
@@ -41,9 +49,9 @@ export default function ProductsPage() {
     (product) => Number(product.stock || 0) < 10
   ).length;
   const averagePrice =
-    totalProducts > 0
+    productList.length > 0
       ? productList.reduce((sum, product) => sum + Number(product.price), 0) /
-        totalProducts
+        productList.length
       : 0;
 
   const columns: Column<Product>[] = [
@@ -103,7 +111,7 @@ export default function ProductsPage() {
       toast.success('محصول با موفقیت حذف شد');
       setShowDeleteModal(false);
       setItemToDelete(null);
-      await fetchProductList();
+      await fetchProductList(currentPage);
     } catch (error) {
       toast.error('خطا در حذف محصول');
     } finally {
@@ -282,6 +290,13 @@ export default function ProductsPage() {
             onDelete={handleDeleteClick}
           />
         </div>
+
+        {/* Pagination */}
+        {paginationMeta && paginationMeta.last_page > 1 && (
+          <div className="mt-6 flex justify-center">
+            <Pagination totalPages={paginationMeta.last_page} />
+          </div>
+        )}
       </div>
 
       <ConfirmModal

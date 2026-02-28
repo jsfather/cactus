@@ -6,9 +6,19 @@ import {
   CreateProductFormData,
   UpdateProductFormData,
   GetProductResponse,
+  GetProductListResponse,
 } from '@/app/lib/types/product';
 import { productService } from '@/app/lib/services/product.service';
 import type { ProductCategory } from '@/app/lib/types/product';
+
+interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number;
+  to: number;
+}
 
 interface ProductState {
   // State
@@ -17,6 +27,7 @@ interface ProductState {
   currentProduct: Product | null;
   loading: boolean;
   error: string | null;
+  paginationMeta: PaginationMeta | null;
 
   // Actions
   setLoading: (loading: boolean) => void;
@@ -24,7 +35,7 @@ interface ProductState {
   clearError: () => void;
 
   // Product actions
-  fetchProductList: () => Promise<void>;
+  fetchProductList: (page?: number) => Promise<void>;
   createProduct: (
     payload: CreateProductFormData
   ) => Promise<GetProductResponse>;
@@ -48,6 +59,7 @@ export const useProductStore = create<ProductState>()(
       currentProduct: null,
       loading: false,
       error: null,
+      paginationMeta: null,
 
       // Basic actions
       setLoading: (loading) => set({ loading }),
@@ -55,12 +67,22 @@ export const useProductStore = create<ProductState>()(
       clearError: () => set({ error: null }),
 
       // Product actions
-      fetchProductList: async () => {
+      fetchProductList: async (page: number = 1) => {
         try {
           set({ loading: true, error: null });
-          const response = await productService.getList();
+          const response = await productService.getList(page);
           set({
             productList: response.data,
+            paginationMeta: response.meta
+              ? {
+                  current_page: response.meta.current_page,
+                  last_page: response.meta.last_page,
+                  per_page: response.meta.per_page,
+                  total: response.meta.total,
+                  from: response.meta.from,
+                  to: response.meta.to,
+                }
+              : null,
             loading: false,
           });
         } catch (error) {

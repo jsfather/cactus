@@ -44,9 +44,10 @@ export class ProductService {
   }
 
   // Product methods
-  async getList(): Promise<GetProductListResponse> {
+  async getList(page: number = 1): Promise<GetProductListResponse> {
     return apiClient.get<GetProductListResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.GET_ALL
+      API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.GET_ALL,
+      { params: { page } }
     );
   }
 
