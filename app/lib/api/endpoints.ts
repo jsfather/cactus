@@ -162,6 +162,14 @@ export const API_ENDPOINTS = {
         DELETE: (id: string) => `/admin/faqs/${id}`,
       },
 
+      COURSE_PAGES: {
+        GET_ALL: '/admin/course-pages',
+        GET_BY_ID: (id: string) => `/admin/course-pages/${id}`,
+        CREATE: '/admin/course-pages',
+        UPDATE: (id: string) => `/admin/course-pages/${id}`,
+        DELETE: (id: string) => `/admin/course-pages/${id}`,
+      },
+
       ABOUT_US: {
         GET: '/admin/about-us',
         UPDATE: '/admin/about-us',

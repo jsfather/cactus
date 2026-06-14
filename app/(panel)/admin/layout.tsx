@@ -74,6 +74,10 @@ const menuItems = [
         href: '/admin/blogs',
       },
       {
+        title: 'صفحات دوره',
+        href: '/admin/course-pages',
+      },
+      {
         title: 'محصولات',
         href: '/admin/products',
       },
