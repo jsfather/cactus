@@ -158,6 +158,13 @@ export const home = {
       },
     },
   },
+  teachers: {
+    sectionTitle: 'Expert',
+    sectionTitleHighlight: 'Instructors',
+    sectionSubtitle: 'Meet our experienced and professional instructors',
+    viewAllTeachers: 'View All Instructors',
+    noTeachers: 'No active instructors to display',
+  },
   courses: {
     title: 'Special',
     titleHighlight: 'Courses',

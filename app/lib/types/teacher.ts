@@ -45,6 +45,7 @@ export interface Teacher {
   work_experiences: WorkExperience[] | null;
   educations: Education[] | null;
   achievements: string | null;
+  show_on_website?: boolean;
   user: User;
 }
 
@@ -92,6 +93,7 @@ export interface CreateTeacherRequest {
   work_experiences?: WorkExperience[];
   educations?: Education[];
   achievements?: string;
+  show_on_website?: boolean;
 }
 
 export interface UpdateTeacherRequest {
@@ -110,6 +112,7 @@ export interface UpdateTeacherRequest {
   work_experiences?: WorkExperience[];
   educations?: Education[];
   achievements?: string;
+  show_on_website?: boolean;
 }
 
 // Legacy interface for backward compatibility

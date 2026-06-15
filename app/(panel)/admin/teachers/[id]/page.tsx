@@ -49,6 +49,7 @@ const schema = z.object({
   member_since: z.string().optional(),
   city: z.string().optional(),
   achievements: z.string().optional(),
+  show_on_website: z.boolean(),
   skills: z.array(skillSchema).optional(),
   work_experiences: z.array(workExperienceSchema).optional(),
   educations: z.array(educationSchema).optional(),
@@ -84,6 +85,7 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
       member_since: '',
       city: '',
       achievements: '',
+      show_on_website: true,
       skills: [],
       work_experiences: [],
       educations: [],
@@ -147,6 +149,7 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
         member_since: currentTeacher.member_since || '',
         city: currentTeacher.city || '',
         achievements: currentTeacher.achievements || '',
+        show_on_website: currentTeacher.show_on_website !== false,
         skills: currentTeacher.skills || [],
         work_experiences: currentTeacher.work_experiences || [],
         educations: currentTeacher.educations || [],
@@ -199,7 +202,7 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
         {/* Header */}
         <div className="flex items-center gap-4">
           <Button
-            variant="outline"
+            variant="white"
             onClick={() => router.push('/admin/teachers')}
             className="flex items-center gap-2"
           >
@@ -286,6 +289,28 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
                     error={errors.city?.message}
                   />
                 </div>
+              </div>
+
+              <div className="mb-8 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+                <h3 className="mb-3 text-lg font-medium text-gray-900 dark:text-gray-100">
+                  نمایش در سایت
+                </h3>
+                <label className="flex cursor-pointer items-center gap-3">
+                  <input
+                    type="checkbox"
+                    {...register('show_on_website')}
+                    className="text-primary-600 focus:ring-primary-500 h-5 w-5 rounded border-gray-300"
+                  />
+                  <div>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                      نمایش در صفحه اصلی و صفحه مدرسین
+                    </span>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      اگر غیرفعال باشد، این مدرس در سایت عمومی (صفحه اصلی و
+                      /teachers) نمایش داده نمی‌شود
+                    </p>
+                  </div>
+                </label>
               </div>
 
               {/* Professional Information */}

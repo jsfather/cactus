@@ -157,6 +157,13 @@ export const home = {
       },
     },
   },
+  teachers: {
+    sectionTitle: 'مدرسین',
+    sectionTitleHighlight: 'متخصص',
+    sectionSubtitle: 'با اساتید مجرب و با تجربه آکادمی کاکتوس آشنا شوید',
+    viewAllTeachers: 'مشاهده همه مدرسان',
+    noTeachers: 'مدرس فعالی برای نمایش وجود ندارد',
+  },
   courses: {
     title: 'دوره‌های',
     titleHighlight: 'ویژه',
