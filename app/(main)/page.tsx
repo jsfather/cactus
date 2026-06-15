@@ -7,9 +7,16 @@ import type { JSX } from 'react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { VideoModal } from '@/app/components/ui/VideoModal';
-import { Play } from 'lucide-react';
+import { Play, User } from 'lucide-react';
 import { ClientVideo } from '@/app/components/ui/ClientVideo';
 import { useLocale } from '@/app/contexts/LocaleContext';
+import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
+import { usePublicTeacher } from '@/app/lib/hooks/use-public-teacher';
+import {
+  convertApiProductToDisplayFormat,
+  DisplayProduct,
+} from '@/app/lib/utils/product-display';
+import { getTeacherProfileImageUrl } from '@/app/lib/utils/teacher-display';
 
 interface Feature {
   title: string;
@@ -45,6 +52,10 @@ export default function Page() {
   const { t, dir } = useLocale();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const { products: apiProducts, loading: productsLoading, fetchHomeProducts } =
+    usePublicProduct();
+  const { teachers, loading: teachersLoading, fetchHomeTeachers } =
+    usePublicTeacher();
 
   useEffect(() => {
     if (videoRef.current) {
@@ -53,6 +64,16 @@ export default function Page() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    fetchHomeProducts({ per_page: 8 });
+    fetchHomeTeachers();
+  }, [fetchHomeProducts, fetchHomeTeachers]);
+
+  const locale = dir === 'rtl' ? 'fa-IR' : 'en-US';
+  const displayProducts: DisplayProduct[] = apiProducts.map((product) =>
+    convertApiProductToDisplayFormat(product, locale)
+  );
 
   const getFeatures = (): Feature[] => [
     {
@@ -172,49 +193,6 @@ export default function Page() {
   ];
 
   const features = getFeatures();
-
-  const getProducts = () => [
-    {
-      title: t.home.shop.products.lineFollowerKit.title,
-      price: dir === 'rtl' ? '۲,۵۰۰,۰۰۰' : '2,500,000',
-      discount: dir === 'rtl' ? '۲,۱۰۰,۰۰۰' : '2,100,000',
-      image: '/product-1.jpg',
-      category: t.home.shop.products.lineFollowerKit.category,
-      rating: 4.5,
-      reviews: dir === 'rtl' ? '۲۸' : '28',
-      inStock: true,
-    },
-    {
-      title: t.home.shop.products.arduinoProController.title,
-      price: dir === 'rtl' ? '۸۵۰,۰۰۰' : '850,000',
-      discount: null,
-      image: '/product-2.jpg',
-      category: t.home.shop.products.arduinoProController.category,
-      rating: 5,
-      reviews: dir === 'rtl' ? '۴۲' : '42',
-      inStock: true,
-    },
-    {
-      title: t.home.shop.products.humanoidRobot.title,
-      price: dir === 'rtl' ? '۱۲,۰۰۰,۰۰۰' : '12,000,000',
-      discount: dir === 'rtl' ? '۱۰,۸۰۰,۰۰۰' : '10,800,000',
-      image: '/product-3.jpg',
-      category: t.home.shop.products.humanoidRobot.category,
-      rating: 4.8,
-      reviews: dir === 'rtl' ? '۱۶' : '16',
-      inStock: true,
-    },
-    {
-      title: t.home.shop.products.laserDistanceSensor.title,
-      price: dir === 'rtl' ? '۹۵۰,۰۰۰' : '950,000',
-      discount: null,
-      image: '/product-4.jpg',
-      category: t.home.shop.products.laserDistanceSensor.category,
-      rating: 4.2,
-      reviews: dir === 'rtl' ? '۳۵' : '35',
-      inStock: true,
-    },
-  ];
 
   const getCourses = (): Course[] => [
     {
@@ -655,14 +633,29 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {getProducts().map((product, index) => (
+            {productsLoading
+              ? Array.from({ length: 4 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="animate-pulse rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800"
+                  >
+                    <div className="mb-4 aspect-square rounded-xl bg-gray-200 dark:bg-gray-700" />
+                    <div className="space-y-2">
+                      <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
+                      <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
+                      <div className="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
+                    </div>
+                  </div>
+                ))
+              : displayProducts.length > 0
+                ? displayProducts.map((product, index) => (
               <motion.div
-                key={index}
+                key={product.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href={`/shop/${index + 1}`}>
+                <Link href={`/shop/${product.id}`}>
                   <div className="group flex h-full flex-col rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
                     <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
                       <Image
@@ -765,7 +758,12 @@ export default function Page() {
                   </div>
                 </Link>
               </motion.div>
-            ))}
+                ))
+                : (
+                  <div className="col-span-full py-8 text-center text-gray-500 dark:text-gray-400">
+                    {t.shop.noProducts}
+                  </div>
+                )}
           </div>
 
           <div className="mt-12 text-center">
@@ -775,6 +773,113 @@ export default function Page() {
               </Button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section id="teachers" className="bg-gray-50 py-24 dark:bg-gray-800">
+        <div className="container mx-auto px-4">
+          <div className="mb-16 flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold">
+                {t.home.teachers.sectionTitle}
+                <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
+                  {' '}
+                  {t.home.teachers.sectionTitleHighlight}
+                </span>
+              </h2>
+              <p className="mt-2 text-lg text-gray-600 dark:text-gray-300">
+                {t.home.teachers.sectionSubtitle}
+              </p>
+            </div>
+            <Link href="/teachers">
+              <Button variant="secondary" className="rounded-full px-6">
+                {t.home.teachers.viewAllTeachers}
+              </Button>
+            </Link>
+          </div>
+
+          {teachersLoading ? (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="animate-pulse overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-gray-800"
+                >
+                  <div className="h-56 bg-gray-200 dark:bg-gray-700" />
+                  <div className="space-y-3 p-6">
+                    <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : teachers.length === 0 ? (
+            <div className="rounded-2xl bg-white p-8 text-center text-gray-500 dark:bg-gray-900 dark:text-gray-400">
+              {t.home.teachers.noTeachers}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {teachers.slice(0, 4).map((teacher, index) => {
+                const fullName = teacher.user
+                  ? `${teacher.user.first_name} ${teacher.user.last_name}`
+                  : '';
+                const profilePicture = getTeacherProfileImageUrl(
+                  teacher.user?.profile_picture
+                );
+                const topSkills = (teacher.skills || []).slice(0, 2);
+
+                return (
+                  <motion.div
+                    key={teacher.user_id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <Link href={`/teachers/${teacher.user_id}`}>
+                      <div className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-gray-900">
+                        <div className="relative h-56 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+                          {profilePicture ? (
+                            <Image
+                              src={profilePicture}
+                              alt={fullName}
+                              fill
+                              className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <User className="h-24 w-24 text-gray-400 dark:text-gray-600" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-5">
+                          <h3 className="mb-2 text-lg font-bold dark:text-white">
+                            {fullName}
+                          </h3>
+                          {teacher.bio && (
+                            <p className="mb-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
+                              {teacher.bio}
+                            </p>
+                          )}
+                          {topSkills.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {topSkills.map((skill, idx) => (
+                                <span
+                                  key={idx}
+                                  className="bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 rounded-full px-3 py-1 text-xs"
+                                >
+                                  {skill.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

@@ -171,6 +171,24 @@ export default function TeachersPage() {
       },
     },
     {
+      header: 'نمایش در سایت',
+      accessor: 'show_on_website',
+      render: (value): any => {
+        const isVisible = value !== false;
+        return (
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+              isVisible
+                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+            }`}
+          >
+            {isVisible ? 'فعال' : 'غیرفعال'}
+          </span>
+        );
+      },
+    },
+    {
       header: 'شهر',
       accessor: 'city',
       render: (value): string => {

@@ -8,23 +8,9 @@ import Link from 'next/link';
 import { Search, Filter, Star, Loader2 } from 'lucide-react';
 import { useCart } from '@/app/contexts/CartContext';
 import { usePublicProduct } from '@/app/lib/hooks/use-public-product';
-import { PublicProduct } from '@/app/lib/services/public-product.service';
+import { convertApiProductToDisplayFormat } from '@/app/lib/utils/product-display';
 import { useLocale } from '@/app/contexts/LocaleContext';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
-
-interface DisplayProduct {
-  id: string | number;
-  title: string;
-  price: string;
-  discount: string | null;
-  image: string;
-  category: string;
-  rating: number;
-  reviews: number;
-  inStock: boolean;
-  originalId?: number;
-  actualPrice?: number;
-}
 
 const categories = [
   { id: 'all', name: 'همه محصولات', count: 42 },
@@ -33,31 +19,6 @@ const categories = [
   { id: 'robots', name: 'ربات کامل', count: 8 },
   { id: 'sensors', name: 'سنسور', count: 7 },
 ];
-
-// Helper function to convert API product to display format
-const convertApiProductToDisplayFormat = (
-  apiProduct: PublicProduct
-): DisplayProduct => {
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('fa-IR').format(price);
-  };
-
-  return {
-    id: apiProduct.id, // Use original ID without prefix
-    title: apiProduct.title,
-    price: formatPrice(apiProduct.price),
-    discount: apiProduct.discount_price
-      ? formatPrice(apiProduct.discount_price)
-      : null,
-    image: apiProduct.image || '/product-1.jpg', // Fallback image
-    category: apiProduct.category?.name || 'عمومی', // Use 'name' instead of 'title'
-    rating: apiProduct.rating || 4.0,
-    reviews: apiProduct.reviews_count || 0,
-    inStock: apiProduct.stock > 0,
-    originalId: apiProduct.id, // Keep original ID for cart
-    actualPrice: apiProduct.discount_price || apiProduct.price, // Numeric price for cart
-  };
-};
 
 function ShopContent() {
   const { t, dir } = useLocale();
@@ -146,7 +107,12 @@ function ShopContent() {
   }, [searchQuery, router]);
 
   // Convert API products to display format
-  const allProducts = apiProducts.map(convertApiProductToDisplayFormat);
+  const allProducts = apiProducts.map((product) =>
+    convertApiProductToDisplayFormat(
+      product,
+      dir === 'rtl' ? 'fa-IR' : 'en-US'
+    )
+  );
 
   const filteredProducts = allProducts.filter((product) => {
     const matchesCategory =

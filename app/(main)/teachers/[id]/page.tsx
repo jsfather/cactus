@@ -16,6 +16,10 @@ import {
 } from 'lucide-react';
 import { publicTeacherService } from '@/app/lib/services/public-teacher.service';
 import { Teacher } from '@/app/lib/types/teacher';
+import {
+  filterPublicTeachers,
+  isTeacherVisibleOnWebsite,
+} from '@/app/lib/utils/teacher-display';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { useLocale } from '@/app/contexts/LocaleContext';
 import ReactMarkdown from 'react-markdown';
@@ -35,13 +39,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         setLoading(true);
         setError(null);
         const response = await publicTeacherService.getHomeTeachers();
+        const publicTeachers = filterPublicTeachers(response.data);
 
-        // Filter to find the specific teacher by user_id
-        const foundTeacher = response.data.find(
+        const foundTeacher = publicTeachers.find(
           (t) => t.user_id === parseInt(resolvedParams.id)
         );
 
-        if (foundTeacher && foundTeacher.user) {
+        if (foundTeacher && foundTeacher.user && isTeacherVisibleOnWebsite(foundTeacher)) {
           setTeacher(foundTeacher);
         } else {
           setError('مدرس یافت نشد');
