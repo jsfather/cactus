@@ -4,15 +4,10 @@ FROM node:18-alpine AS base
 # Install dependencies only when needed
 FROM base AS deps
 
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG http_proxy
-ARG https_proxy
-
-ENV HTTP_PROXY=$HTTP_PROXY
-ENV HTTPS_PROXY=$HTTPS_PROXY
-ENV http_proxy=$http_proxy
-ENV https_proxy=$https_proxy
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
