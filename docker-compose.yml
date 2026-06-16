@@ -4,10 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        http_proxy: http://127.0.0.1:8118
-        https_proxy: http://127.0.0.1:8118
-        HTTP_PROXY: http://127.0.0.1:8118
-        HTTPS_PROXY: http://127.0.0.1:8118
+        http_proxy: http://10.113.0.1:8118
+        https_proxy: http://10.113.0.1:8118
+        HTTP_PROXY: http://10.113.0.1:8118
+        HTTPS_PROXY: http://10.113.0.1:8118
     container_name: nextjs-app
     restart: always
     ports:
