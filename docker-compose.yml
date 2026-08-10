@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://la.ecactus.co/api}
+        NEXT_PUBLIC_STATIC_BASE_URL: ${NEXT_PUBLIC_STATIC_BASE_URL:-https://la.ecactus.co}
         http_proxy: http://10.113.0.1:8118
         https_proxy: http://10.113.0.1:8118
         HTTP_PROXY: http://10.113.0.1:8118
@@ -14,6 +16,8 @@ services:
       - '127.0.0.1:3000:3000'
     environment:
       - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-https://la.ecactus.co/api}
+      - NEXT_PUBLIC_STATIC_BASE_URL=${NEXT_PUBLIC_STATIC_BASE_URL:-https://la.ecactus.co}
     networks:
       - app-network
     env_file:
