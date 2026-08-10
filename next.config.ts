@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'la.ecactus.co',
-        pathname: '/storage/product_images/**',
+        pathname: '/**',
       },
     ],
   },

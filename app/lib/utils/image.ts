@@ -3,7 +3,7 @@
  */
 
 const BASE_DOMAIN =
-  process.env.NEXT_PUBLIC_STATIC_BASE_URL || 'https://kaktos.kanoonbartarha.ir';
+  process.env.NEXT_PUBLIC_STATIC_BASE_URL || 'https://la.ecactus.co';
 
 /**
  * Converts a relative or absolute image path to a full URL
@@ -43,7 +43,9 @@ export function isValidImageUrl(imagePath: string | null | undefined): boolean {
   // Check if it's a valid relative path
   if (
     imagePath.startsWith('/user_files/') ||
-    imagePath.startsWith('user_files/')
+    imagePath.startsWith('user_files/') ||
+    imagePath.startsWith('/storage/') ||
+    imagePath.startsWith('storage/')
   ) {
     return true;
   }
