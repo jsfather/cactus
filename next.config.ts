@@ -25,6 +25,11 @@ const nextConfig: NextConfig = {
         hostname: 'kaktos.kanoonbartarha.ir',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'la.ecactus.co',
+        pathname: '/storage/product_images/**',
+      },
     ],
   },
 };
