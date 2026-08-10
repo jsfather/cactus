@@ -253,17 +253,17 @@ export default function Page() {
 
   const videoThumbnails: VideoThumbnail[] = [
     {
-      videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-1.mp4',
+      videoSrc: 'https://la.ecactus.co/site_videos/intro-1.mp4',
       title: t.home.about.videoTitle1,
       aspectRatio: 'square',
     },
     {
-      videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-2.mp4',
+      videoSrc: 'https://la.ecactus.co/site_videos/intro-2.mp4',
       title: t.home.about.videoTitle2,
       aspectRatio: 'video',
     },
     {
-      videoSrc: 'https://kaktos.kanoonbartarha.ir/site_videos/intro-3.mp4',
+      videoSrc: 'https://la.ecactus.co/site_videos/intro-3.mp4',
       title: t.home.about.videoTitle3,
       aspectRatio: 'video',
     },
@@ -281,7 +281,7 @@ export default function Page() {
           <div className="relative h-[70vh] w-full overflow-hidden rounded-3xl shadow-2xl">
             <ClientVideo
               className="h-full w-full object-cover"
-              src="https://kaktos.kanoonbartarha.ir/site_videos/robocup-2024.mp4"
+              src="https://la.ecactus.co/site_videos/robocup-2024.mp4"
               muted
               playsInline
               autoPlay
