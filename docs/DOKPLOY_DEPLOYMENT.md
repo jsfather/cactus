@@ -1,36 +1,37 @@
 # Deploy Cactus with Dokploy
 
-This repository deploys one Next.js frontend container. Its internal port is
-`3000`; its backend is external and must stay at:
+This repository deploys one Next.js frontend using its root `Dockerfile`. The
+frontend listens on port `3000`; its external backend remains:
 
 ```text
 https://la.ecactus.co/api
 ```
 
-Do not assign `la.ecactus.co` to this frontend in Dokploy. That hostname is the
-backend origin. Use the real frontend hostname (for example `ecactus.co`) or a
-temporary generated Dokploy hostname.
+Do not assign `la.ecactus.co` to the frontend in Dokploy. Use the real frontend
+hostname (for example `ecactus.co`) or a temporary generated hostname.
 
 ## 1. DNS
 
 Create an `A` record for the frontend hostname pointing to the VPS public IPv4.
-If Cloudflare proxies the record, use `DNS only` until Dokploy has issued the
-first certificate; proxying can be enabled afterward.
+The existing `la.ecactus.co` record must continue pointing at the backend.
 
-The existing `la.ecactus.co` DNS record must continue pointing at the backend.
-
-## 2. Create the Compose service
+## 2. Create the application
 
 1. In Dokploy create or select a Project.
-2. Add a `Docker Compose` service (not Docker Stack).
-3. Choose GitHub as the provider and authorize the `jsfather/cactus` repository.
+2. Add an `Application`.
+3. Select GitHub as the provider and authorize `jsfather/cactus`.
 4. Select the production branch (`main` is recommended).
-5. Set Compose Path to `./docker-compose.yml`.
-6. Save.
+5. Select `Dockerfile` as the Build Type.
+6. Set Dockerfile Path to `Dockerfile`.
+7. Set Docker Context Path to `.`.
+8. Leave Docker Build Stage empty and save.
 
-## 3. Set environment variables
+The repository has no GitHub Actions workflows. Dokploy performs the clone,
+Docker build, deployment, and automatic deployment on pushes itself.
 
-In the Compose service's Environment tab add exactly:
+## 3. Build-time configuration
+
+The Dockerfile already has these production defaults:
 
 ```dotenv
 NEXT_PUBLIC_API_BASE_URL=https://la.ecactus.co/api
@@ -38,55 +39,43 @@ NEXT_PUBLIC_STATIC_BASE_URL=https://la.ecactus.co
 NEXT_PUBLIC_API_URL=https://la.ecactus.co
 ```
 
-These are public browser values, not secrets. They are passed as Docker build
-arguments because Next.js compiles `NEXT_PUBLIC_*` values into the client bundle.
-Changing one requires a rebuild/redeploy, not only a container restart.
+No Dokploy variables are required while these values remain correct. To override
+one, add it under the application's **Build Time Arguments**, then rebuild. Adding
+only a runtime environment variable is insufficient because Next.js compiles
+`NEXT_PUBLIC_*` values into the browser bundle during the build.
 
 ## 4. Add the frontend domain
 
-Before the first deployment, open the Compose service's Domains tab and add:
+Open the application's Domains tab and configure:
 
-- Service: `nextjs`
 - Container port: `3000`
-- Host: the frontend hostname (not `la.ecactus.co`)
+- Host: the frontend hostname, not `la.ecactus.co`
 - HTTPS: enabled
 - Certificate: Let's Encrypt
 - Path: `/`
 
-Dokploy 0.7+ adds the Traefik labels and network automatically. The Compose file
-therefore intentionally has no host port, fixed container name, or Traefik
-labels. Use Preview Compose to confirm the generated route targets `nextjs:3000`.
-
 ## 5. Deploy and verify
 
-Click Deploy. The deployment should build the Dockerfile and the container should
-become healthy. Verify:
+Click Deploy. The Dockerfile includes a container health check. Verify the public
+endpoint after deployment:
 
 ```text
 https://FRONTEND_HOST/healthz
 ```
 
-It must return `{"status":"ok"}`. Then open the browser developer tools and
-confirm API requests start with `https://la.ecactus.co/api`.
+It must return `{"status":"ok"}`. Then confirm browser API requests start with
+`https://la.ecactus.co/api`.
 
 ## 6. Backend CORS
 
-The backend must allow the final frontend origins, for example:
-
-```text
-https://ecactus.co
-https://www.ecactus.co
-```
-
-It must allow the `Authorization` and `Content-Type` headers and the HTTP methods
-used by the application. Do not use `*` together with credentialed requests.
+Allow the final frontend origin in the backend CORS configuration. It must allow
+the `Authorization` and `Content-Type` headers and the HTTP methods used by the
+application.
 
 ## Updates and rollback
 
-The GitHub provider can auto-deploy pushes to the selected branch. The repository
-workflow only verifies the production build; it no longer SSH-deploys a second,
-conflicting container to `/opt/cactus`.
+Enable automatic deployments for the selected GitHub branch in Dokploy. Use
+Dokploy's Deployments tab to inspect logs or redeploy a previous revision.
 
-Use Dokploy's Deployments tab to inspect logs or redeploy an earlier working
-revision. If the old manually deployed Cactus Compose project is still running on
-the VPS, stop it only after the Dokploy deployment has passed the health check.
+If an old manually deployed Cactus container is still running, stop it only after
+the Dokploy deployment has passed its health check.
