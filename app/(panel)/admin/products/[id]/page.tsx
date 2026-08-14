@@ -168,7 +168,7 @@ export default function ProductFormPage({ params }: Props) {
   }
 
   return (
-    <main>
+    <main className="mx-auto max-w-6xl space-y-6 pb-10">
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
@@ -182,9 +182,9 @@ export default function ProductFormPage({ params }: Props) {
       />
 
       <div className="mt-8">
-        <div className="flex items-center justify-between">
+        <div className="relative flex items-center justify-between overflow-hidden rounded-3xl bg-gradient-to-l from-slate-900 via-emerald-900 to-teal-700 p-7 text-white shadow-xl shadow-emerald-500/15">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <h1 className="text-2xl font-extrabold text-white">
               {isEditing ? 'ویرایش محصول' : 'افزودن محصول جدید'}
             </h1>
             <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">

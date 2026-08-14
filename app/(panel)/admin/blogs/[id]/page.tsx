@@ -269,7 +269,7 @@ export default function BlogFormPage({
   }
 
   return (
-    <main>
+    <main className="mx-auto max-w-6xl space-y-6 pb-10">
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
@@ -283,7 +283,7 @@ export default function BlogFormPage({
       />
 
       <div className="mt-8">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="relative mb-8 flex items-center justify-between overflow-hidden rounded-3xl bg-gradient-to-l from-slate-900 via-violet-900 to-fuchsia-700 p-7 text-white shadow-xl shadow-violet-500/15">
           <div className="flex items-center gap-4">
             <Button
               variant="secondary"
@@ -294,10 +294,10 @@ export default function BlogFormPage({
               بازگشت
             </Button>
             <div>
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              <h1 className="text-2xl font-extrabold text-white">
                 {isNew ? 'افزودن مقاله جدید' : 'ویرایش مقاله'}
               </h1>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              <p className="mt-1 text-sm text-violet-100">
                 {isNew
                   ? 'مقاله جدید ایجاد کنید'
                   : 'اطلاعات مقاله را ویرایش کنید'}
@@ -314,7 +314,7 @@ export default function BlogFormPage({
           </div>
         )}
 
-        <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+        <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg shadow-gray-200/40 dark:border-white/10 dark:bg-gray-800 dark:shadow-none">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <div className="lg:col-span-2">

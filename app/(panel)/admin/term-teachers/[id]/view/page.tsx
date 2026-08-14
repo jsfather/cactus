@@ -149,17 +149,17 @@ export default function TermTeacherViewPage({
   const { user, days, schedules } = currentTermTeacher;
 
   return (
-    <main>
+    <main className="mx-auto max-w-7xl space-y-6 pb-10">
       <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
-      <div className="mt-8">
+      <div className="mt-8 space-y-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="relative flex flex-col gap-5 overflow-hidden rounded-3xl bg-gradient-to-l from-slate-900 via-cyan-900 to-blue-700 p-7 text-white shadow-xl shadow-cyan-500/15 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-extrabold text-white">
               جزئیات مدرس ترم
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-cyan-100">
               مشاهده اطلاعات کامل مدرس و برنامه زمانی کلاس‌ها
             </p>
           </div>
@@ -173,10 +173,10 @@ export default function TermTeacherViewPage({
           </Button>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 [&>div>div]:border-gray-100 [&>div>div]:shadow-md dark:[&>div>div]:border-white/10">
           {/* Teacher Information */}
           <div className="lg:col-span-1">
-            <Card className="p-6">
+            <Card className="overflow-hidden bg-gradient-to-b from-cyan-50/70 to-white p-6 dark:from-cyan-950/20 dark:to-gray-800">
               <div className="text-center">
                 {user.profile_picture ? (
                   <img

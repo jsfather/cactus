@@ -107,11 +107,11 @@ export default function StudentViewPage({ params }: PageProps) {
   const user = student.user;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6 pb-10 [&>div:not(:first-child)]:transition-all">
       <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="relative flex flex-col gap-5 overflow-hidden rounded-3xl bg-gradient-to-l from-slate-900 via-blue-900 to-blue-700 p-6 text-white shadow-xl shadow-blue-500/15 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Button
             onClick={() => router.push('/admin/students')}
@@ -121,7 +121,7 @@ export default function StudentViewPage({ params }: PageProps) {
             <ArrowRight className="h-4 w-4" />
             بازگشت
           </Button>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold text-white">
             {user?.first_name} {user?.last_name}
           </h1>
         </div>
@@ -136,7 +136,7 @@ export default function StudentViewPage({ params }: PageProps) {
 
       {/* Profile Picture */}
       {user?.profile_picture && (
-        <Card className="p-6">
+        <Card className="border-0 bg-gradient-to-l from-blue-50 to-white p-6 shadow-md dark:from-blue-950/30 dark:to-gray-800">
           <div className="flex items-center gap-4">
             <img
               src={`${process.env.NEXT_PUBLIC_API_BASE_URL?.replace('/api', '')}/${user.profile_picture}`}
@@ -156,7 +156,7 @@ export default function StudentViewPage({ params }: PageProps) {
       )}
 
       {/* User Information */}
-      <Card className="p-6">
+      <Card className="border-gray-100 p-6 shadow-md dark:border-white/10">
         <h2 className="mb-4 flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white">
           <User className="h-5 w-5" />
           اطلاعات کاربری

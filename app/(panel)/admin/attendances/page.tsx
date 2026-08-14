@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { ClipboardCheck, Plus, UserCheck, UserX } from 'lucide-react';
+import {
+  CalendarDays,
+  CheckCircle2,
+  ClipboardCheck,
+  Plus,
+  UserCheck,
+  UserX,
+} from 'lucide-react';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
 import { Card } from '@/app/components/ui/Card';
@@ -153,7 +160,7 @@ export default function AdminAttendancesPage() {
   ];
 
   return (
-    <main>
+    <main className="mx-auto max-w-7xl space-y-6 pb-10">
       <Breadcrumbs
         breadcrumbs={[
           { label: 'مدیریت آموزش', href: '/admin/terms' },
@@ -164,32 +171,36 @@ export default function AdminAttendancesPage() {
           },
         ]}
       />
-      <div className="mt-8">
-        <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white">
-          <ClipboardCheck className="text-primary-600 h-7 w-7" />
+      <div className="relative mt-8 overflow-hidden rounded-3xl bg-gradient-to-l from-slate-900 via-blue-900 to-cyan-700 p-7 text-white shadow-xl shadow-cyan-500/15">
+        <div className="absolute -left-12 -top-16 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
+        <h1 className="relative flex items-center gap-3 text-2xl font-extrabold">
+          <span className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/20"><ClipboardCheck className="h-7 w-7" /></span>
           مدیریت حضور و غیاب
         </h1>
+        <p className="relative mr-16 mt-2 text-sm text-cyan-100">ابتدا ترم را انتخاب کنید، سپس وضعیت حضور دانش‌پژوهان را ثبت و پیگیری کنید.</p>
       </div>
 
-      <Card className="mt-8 p-6">
-        <Select
-          id="term"
-          label="ترم"
-          value={form.term_id}
-          onChange={(event) => loadTerm(event.target.value)}
-          options={[
-            { value: '', label: 'انتخاب ترم' },
-            ...terms.map((term) => ({
-              value: term.id.toString(),
-              label: term.title,
-            })),
-          ]}
-        />
+      <Card className="mt-8 overflow-hidden border-gray-100 p-0 shadow-md dark:border-white/10">
+        <div className="border-b border-gray-100 px-6 py-5 dark:border-white/10">
+          <h2 className="flex items-center gap-2 font-bold text-gray-900 dark:text-white"><CalendarDays className="h-5 w-5 text-blue-600" />انتخاب ترم</h2>
+          <p className="mt-1 text-sm text-gray-500">برای شروع، یکی از ترم‌های زیر را انتخاب کنید.</p>
+        </div>
+        <div className="grid max-h-80 grid-cols-1 gap-3 overflow-y-auto p-5 sm:grid-cols-2 lg:grid-cols-3">
+          {terms.map((term) => {
+            const active = form.term_id === term.id.toString();
+            return (
+              <button key={term.id} type="button" onClick={() => loadTerm(term.id.toString())} className={`group flex min-h-24 items-center gap-4 rounded-2xl border p-4 text-right transition-all duration-200 ${active ? 'border-blue-500 bg-blue-50 shadow-md ring-2 ring-blue-500/15 dark:bg-blue-500/10' : 'border-gray-200 bg-gray-50/60 hover:-translate-y-0.5 hover:border-blue-300 hover:bg-white hover:shadow-md dark:border-gray-700 dark:bg-gray-900/30 dark:hover:border-blue-500/50'}`}>
+                <span className={`rounded-xl p-2.5 ${active ? 'bg-blue-600 text-white' : 'bg-white text-gray-400 shadow-sm dark:bg-gray-800'}`}>{active ? <CheckCircle2 className="h-5 w-5" /> : <CalendarDays className="h-5 w-5" />}</span>
+                <span className="min-w-0"><span className="block truncate font-bold text-gray-900 dark:text-white">{term.title}</span><span className="mt-1 block text-xs text-gray-500">انتخاب برای ثبت حضور</span></span>
+              </button>
+            );
+          })}
+        </div>
       </Card>
 
       {selectedTerm && (
         <>
-          <Card className="mt-6 p-6">
+          <Card className="mt-6 overflow-hidden border-gray-100 p-6 shadow-md dark:border-white/10">
             <h2 className="mb-5 flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
               <Plus className="h-5 w-5" /> ثبت حضور و غیاب
             </h2>

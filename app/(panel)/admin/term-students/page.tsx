@@ -145,9 +145,9 @@ export default function TermStudentsPage() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-4">
+        <Card className="group relative overflow-hidden border border-blue-100 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-blue-500/10">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900">
+            <div className="rounded-2xl bg-blue-50 p-3 ring-1 ring-blue-100 transition-transform group-hover:scale-110 dark:bg-blue-500/15 dark:ring-blue-500/20">
               <Trophy className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
@@ -161,9 +161,9 @@ export default function TermStudentsPage() {
           </div>
         </Card>
 
-        <Card className="p-4">
+        <Card className="group relative overflow-hidden border border-emerald-100 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-emerald-500/10">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900">
+            <div className="rounded-2xl bg-emerald-50 p-3 ring-1 ring-emerald-100 transition-transform group-hover:scale-110 dark:bg-emerald-500/15 dark:ring-emerald-500/20">
               <Users className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
@@ -180,9 +180,9 @@ export default function TermStudentsPage() {
           </div>
         </Card>
 
-        <Card className="p-4">
+        <Card className="group relative overflow-hidden border border-violet-100 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-violet-500/10">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-purple-100 p-2 dark:bg-purple-900">
+            <div className="rounded-2xl bg-violet-50 p-3 ring-1 ring-violet-100 transition-transform group-hover:scale-110 dark:bg-violet-500/15 dark:ring-violet-500/20">
               <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
@@ -203,9 +203,9 @@ export default function TermStudentsPage() {
           </div>
         </Card>
 
-        <Card className="p-4">
+        <Card className="group relative overflow-hidden border border-amber-100 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-amber-500/10">
           <div className="flex items-center gap-3">
-            <div className="rounded-lg bg-orange-100 p-2 dark:bg-orange-900">
+            <div className="rounded-2xl bg-amber-50 p-3 ring-1 ring-amber-100 transition-transform group-hover:scale-110 dark:bg-amber-500/15 dark:ring-amber-500/20">
               <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
             </div>
             <div>
@@ -255,13 +255,14 @@ export default function TermStudentsPage() {
             </div>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
             {termsWithStudents.map((term) => (
               <Card
                 key={term.id}
-                className="p-6 transition-shadow hover:shadow-lg"
+                className="group relative overflow-hidden border border-gray-100 p-0 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10"
               >
-                <div className="space-y-4">
+                <div className="h-1.5 bg-gradient-to-l from-blue-600 via-cyan-500 to-emerald-400" />
+                <div className="space-y-5 p-6">
                   {/* Term Header */}
                   <div className="flex items-start justify-between">
                     <div>

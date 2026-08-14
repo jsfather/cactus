@@ -271,7 +271,7 @@ export default function TeachersPage() {
         </div>
 
         {/* Summary Stats */}
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 [&>div]:rounded-2xl [&>div]:border [&>div]:border-gray-100 [&>div]:shadow-sm [&>div]:transition-all [&>div]:duration-300 [&>div:hover]:-translate-y-1 [&>div:hover]:shadow-xl dark:[&>div]:border-white/10">
           <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">

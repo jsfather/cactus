@@ -19,6 +19,13 @@ import Select from '@/app/components/ui/Select';
 import InfiniteSelect from '@/app/components/ui/InfiniteSelect';
 import { Button } from '@/app/components/ui/Button';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import {
+  ArrowRight,
+  CheckCircle2,
+  GraduationCap,
+  Sparkles,
+  UserRound,
+} from 'lucide-react';
 
 const termStudentSchema = z.object({
   user_id: z.string().min(1, 'دانش‌پژوه الزامی است'),
@@ -212,7 +219,7 @@ export default function CreateTermStudentPage() {
   }
 
   return (
-    <main>
+    <main className="mx-auto max-w-5xl space-y-6 pb-10">
       <Breadcrumbs
         breadcrumbs={[
           { label: 'دانش‌پژوهان ترم', href: '/admin/term-students' },
@@ -224,8 +231,36 @@ export default function CreateTermStudentPage() {
         ]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <section className="relative mt-6 overflow-hidden rounded-3xl bg-gradient-to-l from-blue-700 via-blue-600 to-cyan-500 px-6 py-7 text-white shadow-xl shadow-blue-500/15 sm:px-8">
+        <div className="absolute -left-12 -top-16 h-44 w-44 rounded-full bg-white/10 blur-2xl" />
+        <div className="relative flex items-center gap-4">
+          <div className="rounded-2xl bg-white/15 p-3 ring-1 ring-white/20">
+            <GraduationCap className="h-7 w-7" />
+          </div>
+          <div>
+            <div className="mb-1 flex items-center gap-2 text-blue-100">
+              <Sparkles className="h-4 w-4" />
+              <span className="text-xs font-semibold">ثبت‌نام سریع و هوشمند</span>
+            </div>
+            <h1 className="text-2xl font-extrabold">افزودن دانش‌پژوه به ترم</h1>
+            <p className="mt-1 text-sm text-blue-100">
+              مدرس ترم و دانش‌پژوه را انتخاب کنید؛ ترم مرتبط به‌صورت خودکار تکمیل می‌شود.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm dark:border-white/10 dark:bg-gray-800">
+        <div className="border-b border-gray-100 px-6 py-5 dark:border-white/10 sm:px-8">
+          <h2 className="flex items-center gap-2 font-bold text-gray-900 dark:text-white">
+            <UserRound className="h-5 w-5 text-blue-600" />
+            اطلاعات تخصیص
+          </h2>
+          <p className="mt-1 text-sm text-gray-500">
+            فیلدهای ستاره‌دار برای ثبت الزامی هستند.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 sm:p-8">
           <Controller
             name="term_teacher_id"
             control={control}
@@ -295,16 +330,16 @@ export default function CreateTermStudentPage() {
           />
         </div>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex flex-col-reverse justify-between gap-3 border-t border-gray-100 bg-gray-50/70 px-6 py-5 sm:flex-row sm:px-8 dark:border-white/10 dark:bg-gray-900/30">
           <Button
             type="button"
             variant="white"
             onClick={() => router.push('/admin/term-students')}
           >
-            انصراف
+            <ArrowRight className="h-4 w-4" /> انصراف
           </Button>
           <Button type="submit" loading={isSubmitting || submitting}>
-            اضافه کردن دانش‌پژوه به ترم
+            <CheckCircle2 className="h-4 w-4" /> اضافه کردن دانش‌پژوه به ترم
           </Button>
         </div>
       </form>
