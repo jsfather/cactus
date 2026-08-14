@@ -14,6 +14,18 @@ const menuItems = [
         title: 'اطلاعات کاربری',
         href: '/user/profile',
       },
+      {
+        title: 'تغییر رمز عبور',
+        href: '/user/security',
+      },
+      {
+        title: 'اعلان‌های من',
+        href: '/user/notifications',
+      },
+      {
+        title: 'راهنمای پنل',
+        href: '/user/guides',
+      },
     ],
   },
 ];

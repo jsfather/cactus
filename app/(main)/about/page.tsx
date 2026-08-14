@@ -18,15 +18,13 @@ import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { useLocale } from '@/app/contexts/LocaleContext';
-
-interface FAQ {
-  question: string;
-  answer: string;
-}
+import { faqService } from '@/app/lib/services/faq.service';
+import type { FAQ } from '@/app/lib/types/faq';
 
 export default function Page() {
   const { t, dir } = useLocale();
   const [activeTab, setActiveTab] = useState(0);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   const getStats = () => [
     {
@@ -57,24 +55,12 @@ export default function Page() {
     fetchSettings();
   }, [fetchSettings]);
 
-  // Define FAQs array - you can populate from settings or use static data
-  const faqs: FAQ[] = [
-    {
-      question: 'چگونه می‌توانم در دوره‌ها ثبت نام کنم؟',
-      answer:
-        'برای ثبت نام در دوره‌ها، کافیست وارد صفحه دوره‌ها شوید و دوره مورد نظر خود را انتخاب کنید. سپس روی دکمه ثبت نام کلیک کنید و مراحل ثبت نام را تکمیل نمایید.',
-    },
-    {
-      question: 'آیا دوره‌ها گواهینامه دارند؟',
-      answer:
-        'بله، تمامی دوره‌های ما دارای گواهینامه معتبر می‌باشند که پس از اتمام موفقیت‌آمیز دوره برای شما صادر خواهد شد.',
-    },
-    {
-      question: 'آیا امکان پرداخت اقساطی وجود دارد؟',
-      answer:
-        'بله، برای دوره‌های خاص امکان پرداخت اقساطی فراهم شده است. برای اطلاعات بیشتر با بخش پشتیبانی تماس بگیرید.',
-    },
-  ];
+  useEffect(() => {
+    faqService
+      .getPublicList()
+      .then((response) => setFaqs(response.data))
+      .catch(() => setFaqs([]));
+  }, []);
 
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
@@ -445,7 +431,7 @@ export default function Page() {
             <div className="space-y-4">
               {faqs.map((faq, index) => (
                 <motion.div
-                  key={index}
+                  key={faq.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}

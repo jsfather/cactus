@@ -35,7 +35,7 @@ const menuItems = [
       },
       {
         title: 'کلاس های آفلاین',
-        href: '/teacher/offline_sessions',
+        href: '/teacher/offline-sessions',
       },
       {
         title: 'گزارش ها',
@@ -60,6 +60,18 @@ const menuItems = [
       {
         title: 'تیکت ها',
         href: '/teacher/tickets',
+      },
+      {
+        title: 'اعلان‌های من',
+        href: '/user/notifications',
+      },
+      {
+        title: 'راهنمای پنل',
+        href: '/user/guides',
+      },
+      {
+        title: 'تغییر رمز عبور',
+        href: '/user/security',
       },
     ],
   },

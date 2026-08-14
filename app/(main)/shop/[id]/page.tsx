@@ -32,6 +32,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 interface ProductPageProps {
   params: Promise<{
@@ -308,7 +309,9 @@ const convertApiProductToDisplayFormat = (
     description: apiProduct.description || 'توضیحات محصول در دسترس نیست.',
     features,
     specifications,
-    images: apiProduct.image ? [apiProduct.image] : ['/product-1.jpg'],
+    images: apiProduct.image
+      ? [getImageUrl(apiProduct.image) || '/product-1.jpg']
+      : ['/product-1.jpg'],
     relatedProducts: [], // Will be populated from the products list
     isFromApi: true,
     originalId: apiProduct.id,
@@ -515,7 +518,7 @@ export default function Page({ params }: ProductPageProps) {
     try {
       setCommentLoading(true);
       await publicProductService.addComment(resolvedParams.id, {
-        content: commentContent,
+        comment: commentContent,
       });
 
       toast.success(
@@ -994,7 +997,7 @@ export default function Page({ params }: ProductPageProps) {
                         <div className="flex items-center gap-3">
                           {comment.user?.profile_picture ? (
                             <Image
-                              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${comment.user.profile_picture}`}
+                              src={getImageUrl(comment.user.profile_picture)!}
                               alt={`${comment.user.first_name} ${comment.user.last_name}`}
                               width={40}
                               height={40}

@@ -9,9 +9,10 @@ import {
 } from '@/app/lib/types/offline-session';
 
 export class OfflineSessionService {
-  async getList(): Promise<GetOfflineSessionListResponse> {
+  async getList(termId?: string): Promise<GetOfflineSessionListResponse> {
     return apiClient.get<GetOfflineSessionListResponse>(
-      API_ENDPOINTS.PANEL.TEACHER.OFFLINE_SESSIONS.GET_ALL
+      API_ENDPOINTS.PANEL.TEACHER.OFFLINE_SESSIONS.GET_ALL,
+      termId ? { params: { term_id: termId } } : undefined
     );
   }
 

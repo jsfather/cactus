@@ -49,7 +49,7 @@ export const updateUser = async (
   data: FormData | Partial<User>
 ) => {
   const options: RequestInit = {
-    method: 'PUT',
+    method: 'PATCH',
   };
 
   if (data instanceof FormData) {

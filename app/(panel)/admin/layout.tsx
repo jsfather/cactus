@@ -60,6 +60,10 @@ const menuItems = [
         href: '/admin/reports',
       },
       {
+        title: 'حضور و غیاب',
+        href: '/admin/attendances',
+      },
+      {
         title: 'آزمون ها',
         href: '/admin/exams',
       },
@@ -74,7 +78,7 @@ const menuItems = [
         href: '/admin/blogs',
       },
       {
-        title: 'صفحات دوره',
+        title: 'دوره‌ها',
         href: '/admin/course-pages',
       },
       {
@@ -120,16 +124,6 @@ const menuItems = [
       {
         title: 'درباره ما',
         href: '/admin/about-us',
-      },
-    ],
-  },
-  {
-    title: 'توسعه',
-    isGroupTitle: true,
-    subItems: [
-      {
-        title: 'Playground',
-        href: '/admin/playground',
       },
     ],
   },

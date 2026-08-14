@@ -10,7 +10,8 @@ interface ModalProps {
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  description: string;
+  description?: React.ReactNode;
+  message?: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
   loading?: boolean;
@@ -35,6 +36,7 @@ export default function ConfirmModal({
   onConfirm,
   title,
   description,
+  message,
   confirmText = 'تایید',
   cancelText = 'انصراف',
   loading = false,
@@ -87,9 +89,9 @@ export default function ConfirmModal({
                       {title}
                     </Dialog.Title>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {description}
-                      </p>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {description ?? message}
+                      </div>
                     </div>
                   </div>
                 </div>

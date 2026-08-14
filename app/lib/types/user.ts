@@ -15,6 +15,7 @@ export interface User {
   profile_picture: string | null;
   role: UserRole | null;
   files: File[] | [];
+  terms?: unknown[];
 }
 
 export interface SendOTPResponse {

@@ -14,8 +14,11 @@ import {
   XCircle,
   Clock,
   Package,
+  Reply,
 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import Textarea from '@/app/components/ui/Textarea';
+import { Card } from '@/app/components/ui/Card';
 
 export default function ProductCommentsPage() {
   const [actionLoading, setActionLoading] = useState(false);
@@ -23,12 +26,17 @@ export default function ProductCommentsPage() {
   const [itemToDelete, setItemToDelete] = useState<AdminProductComment | null>(
     null
   );
+  const [itemToAnswer, setItemToAnswer] = useState<AdminProductComment | null>(
+    null
+  );
+  const [answer, setAnswer] = useState('');
   const {
     commentList,
     loading,
     fetchCommentList,
     approveComment,
     rejectComment,
+    answerComment,
     deleteComment,
   } = useProductComment();
 
@@ -143,6 +151,21 @@ export default function ProductCommentsPage() {
     setTimeout(() => {
       setItemToDelete(null);
     }, 500);
+  };
+
+  const handleAnswer = async () => {
+    if (!itemToAnswer || !answer.trim()) return;
+    try {
+      setActionLoading(true);
+      await answerComment(itemToAnswer.id.toString(), answer.trim());
+      toast.success('پاسخ نظر ثبت شد');
+      setItemToAnswer(null);
+      setAnswer('');
+    } catch {
+      toast.error('ثبت پاسخ نظر انجام نشد');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   if (loading) {
@@ -268,6 +291,17 @@ export default function ProductCommentsPage() {
             onDelete={handleDeleteClick}
             actions={(comment: AdminProductComment) => (
               <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setItemToAnswer(comment);
+                    setAnswer(comment.answer || '');
+                  }}
+                  disabled={actionLoading}
+                  className="rounded-md bg-blue-100 p-1.5 text-blue-700 transition-colors hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-400"
+                  title="پاسخ به نظر"
+                >
+                  <Reply className="h-4 w-4" />
+                </button>
                 {!comment.approved && (
                   <button
                     onClick={() => handleApprove(comment)}
@@ -292,6 +326,40 @@ export default function ProductCommentsPage() {
             )}
           />
         </div>
+
+        {itemToAnswer && (
+          <Card className="mt-6 p-6">
+            <h2 className="font-semibold text-gray-900 dark:text-white">
+              پاسخ به نظر
+            </h2>
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              {itemToAnswer.content}
+            </p>
+            <div className="mt-4">
+              <Textarea
+                id="comment-answer"
+                label="پاسخ مدیر"
+                value={answer}
+                onChange={(event) => setAnswer(event.target.value)}
+                required
+              />
+            </div>
+            <div className="mt-4 flex gap-3">
+              <Button onClick={handleAnswer} loading={actionLoading}>
+                ثبت پاسخ
+              </Button>
+              <Button
+                variant="white"
+                onClick={() => {
+                  setItemToAnswer(null);
+                  setAnswer('');
+                }}
+              >
+                انصراف
+              </Button>
+            </div>
+          </Card>
+        )}
       </div>
 
       <ConfirmModal

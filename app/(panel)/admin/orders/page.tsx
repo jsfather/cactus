@@ -9,7 +9,18 @@ import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { useOrder } from '@/app/lib/hooks/use-order';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
-import { ShoppingCart, DollarSign, Clock, CheckCircle, Users, TrendingUp, AlertTriangle, Eye, Trash2, Edit } from 'lucide-react';
+import {
+  ShoppingCart,
+  DollarSign,
+  Clock,
+  CheckCircle,
+  Users,
+  TrendingUp,
+  AlertTriangle,
+  Eye,
+  Trash2,
+  Edit,
+} from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
 export default function OrdersPage() {
@@ -18,16 +29,13 @@ export default function OrdersPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<Order | null>(null);
-  const [itemToUpdateStatus, setItemToUpdateStatus] = useState<Order | null>(null);
+  const [itemToUpdateStatus, setItemToUpdateStatus] = useState<Order | null>(
+    null
+  );
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>('pending');
   const [statusLoading, setStatusLoading] = useState(false);
-  const {
-    orderList,
-    loading,
-    fetchOrderList,
-    deleteOrder,
-    updateOrderStatus,
-  } = useOrder();
+  const { orderList, loading, fetchOrderList, deleteOrder, updateOrderStatus } =
+    useOrder();
 
   useEffect(() => {
     fetchOrderList();
@@ -35,9 +43,16 @@ export default function OrdersPage() {
 
   // Calculate summary stats
   const totalOrders = orderList.length;
-  const totalRevenue = orderList.reduce((sum, order) => sum + Number(order.total_amount || 0), 0);
-  const pendingOrders = orderList.filter(order => order.status === 'pending').length;
-  const deliveredOrders = orderList.filter(order => order.status === 'delivered').length;
+  const totalRevenue = orderList.reduce(
+    (sum, order) => sum + Number(order.total_amount || 0),
+    0
+  );
+  const pendingOrders = orderList.filter(
+    (order) => order.status === 'pending'
+  ).length;
+  const deliveredOrders = orderList.filter(
+    (order) => order.status === 'delivered'
+  ).length;
   const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
   const columns: Column<Order>[] = [
@@ -50,7 +65,11 @@ export default function OrdersPage() {
       accessor: 'user',
       render: (value): string => {
         const user = value as any;
-        return `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || user?.phone || '-';
+        return (
+          `${user?.first_name || ''} ${user?.last_name || ''}`.trim() ||
+          user?.phone ||
+          '-'
+        );
       },
     },
     {
@@ -65,11 +84,16 @@ export default function OrdersPage() {
       accessor: 'status',
       render: (value): any => {
         const statusColors = {
-          pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-          processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-          shipped: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-          delivered: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-          cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+          pending:
+            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+          processing:
+            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+          shipped:
+            'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+          delivered:
+            'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+          cancelled:
+            'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
         };
         const statusMap = {
           pending: 'در انتظار',
@@ -80,7 +104,9 @@ export default function OrdersPage() {
         };
         const status = value as keyof typeof statusMap;
         return (
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}
+          >
             {statusMap[status] || String(value)}
           </span>
         );
@@ -91,10 +117,12 @@ export default function OrdersPage() {
       accessor: 'payment_status',
       render: (value): any => {
         const paymentColors = {
-          pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+          pending:
+            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
           paid: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
           failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-          refunded: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+          refunded:
+            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
         };
         const paymentMap = {
           pending: 'در انتظار',
@@ -104,7 +132,9 @@ export default function OrdersPage() {
         };
         const payment = value as keyof typeof paymentMap;
         return (
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${paymentColors[payment] || 'bg-gray-100 text-gray-800'}`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${paymentColors[payment] || 'bg-gray-100 text-gray-800'}`}
+          >
             {paymentMap[payment] || String(value)}
           </span>
         );
@@ -160,7 +190,9 @@ export default function OrdersPage() {
 
     try {
       setStatusLoading(true);
-      await updateOrderStatus(itemToUpdateStatus.id.toString(), { status: selectedStatus });
+      await updateOrderStatus(itemToUpdateStatus.id.toString(), {
+        status: selectedStatus,
+      });
       toast.success('وضعیت سفارش با موفقیت به‌روزرسانی شد');
       setShowStatusModal(false);
       setItemToUpdateStatus(null);
@@ -322,7 +354,10 @@ export default function OrdersPage() {
                       نرخ تکمیل سفارشات
                     </dt>
                     <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                      {totalOrders > 0 ? ((deliveredOrders / totalOrders) * 100).toFixed(1) : 0}%
+                      {totalOrders > 0
+                        ? ((deliveredOrders / totalOrders) * 100).toFixed(1)
+                        : 0}
+                      %
                     </dd>
                   </dl>
                 </div>
@@ -344,7 +379,8 @@ export default function OrdersPage() {
                 </h3>
                 <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
                   <p>
-                    {pendingOrders} سفارش در انتظار پردازش هستند. لطفاً وضعیت آن‌ها را بررسی و به‌روزرسانی کنید.
+                    {pendingOrders} سفارش در انتظار پردازش هستند. لطفاً وضعیت
+                    آن‌ها را بررسی و به‌روزرسانی کنید.
                   </p>
                 </div>
               </div>
@@ -403,22 +439,30 @@ export default function OrdersPage() {
       {showStatusModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={handleStatusUpdateCancel}></div>
-            <span className="hidden sm:inline-block sm:h-screen sm:align-middle">&#8203;</span>
-            <div className="inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-right align-bottom shadow-xl transition-all dark:bg-gray-800 sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle">
+            <div
+              className="bg-opacity-75 fixed inset-0 bg-gray-500 transition-opacity"
+              onClick={handleStatusUpdateCancel}
+            ></div>
+            <span className="hidden sm:inline-block sm:h-screen sm:align-middle">
+              &#8203;
+            </span>
+            <div className="inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-right align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 sm:align-middle dark:bg-gray-800">
               <div className="sm:flex sm:items-start">
-                <div className="mt-3 text-center sm:mr-4 sm:mt-0 sm:text-right">
-                  <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">
+                <div className="mt-3 text-center sm:mt-0 sm:mr-4 sm:text-right">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                     تغییر وضعیت سفارش
                   </h3>
                   <div className="mt-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                      وضعیت جدید سفارش شماره "{itemToUpdateStatus?.id}" را انتخاب کنید:
+                    <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                      وضعیت جدید سفارش شماره &ldquo;{itemToUpdateStatus?.id}
+                      &rdquo; را انتخاب کنید:
                     </p>
                     <select
                       value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.target.value as OrderStatus)}
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      onChange={(e) =>
+                        setSelectedStatus(e.target.value as OrderStatus)
+                      }
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     >
                       <option value="pending">در انتظار</option>
                       <option value="processing">در حال پردازش</option>
@@ -433,14 +477,14 @@ export default function OrdersPage() {
                 <Button
                   onClick={handleStatusUpdateConfirm}
                   disabled={statusLoading}
-                  className="w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mr-3 sm:w-auto sm:text-sm"
+                  className="w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none sm:mr-3 sm:w-auto sm:text-sm"
                 >
                   {statusLoading ? 'در حال به‌روزرسانی...' : 'به‌روزرسانی'}
                 </Button>
                 <Button
                   variant="secondary"
                   onClick={handleStatusUpdateCancel}
-                  className="mt-3 w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 sm:mt-0 sm:w-auto sm:text-sm"
+                  className="mt-3 w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                 >
                   انصراف
                 </Button>

@@ -1,5 +1,3 @@
-import { User, Product } from './';
-
 export type OrderStatus =
   | 'pending'
   | 'processing'
@@ -11,6 +9,8 @@ export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 export interface OrderUser {
   id: number;
   name: string;
+  first_name?: string;
+  last_name?: string;
   email: string | null;
   phone: string;
 }
@@ -26,6 +26,7 @@ export interface OrderProduct {
 }
 
 export interface OrderItem {
+  product_id?: number;
   product: OrderProduct;
   quantity: number;
   price: number;
@@ -37,9 +38,15 @@ export interface Order {
   user: OrderUser;
   status: OrderStatus;
   total_price: number;
+  total_amount: number;
+  payment_status: PaymentStatus;
   address: string;
+  shipping_address?: string;
+  billing_address?: string;
+  notes?: string | null;
   postal_code: string;
   created_at: string;
+  updated_at?: string;
   items: OrderItem[];
 }
 

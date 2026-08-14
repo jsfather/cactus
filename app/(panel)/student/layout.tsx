@@ -73,6 +73,14 @@ const menuItems = [
         title: 'تابلوی اعلانات',
         href: '/student/guides',
       },
+      {
+        title: 'اعلان‌های من',
+        href: '/user/notifications',
+      },
+      {
+        title: 'تغییر رمز عبور',
+        href: '/user/security',
+      },
     ],
   },
 ];

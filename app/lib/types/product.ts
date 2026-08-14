@@ -136,7 +136,7 @@ export interface ProductComment {
 }
 
 export interface ProductCommentRequest {
-  content: string;
+  comment: string;
 }
 
 export interface ProductCommentResponse {
@@ -153,7 +153,10 @@ export interface AdminProductComment {
   product_id: number;
   user_id: number;
   content: string;
+  comment?: string;
+  answer?: string | null;
   approved: boolean;
+  is_approved?: boolean | number;
   created_at: string;
   updated_at: string;
   user?: ProductCommentUser;

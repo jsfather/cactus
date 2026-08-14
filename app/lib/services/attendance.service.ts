@@ -8,6 +8,7 @@ import {
   UpdateAttendanceResponse,
   GetStudentTermsResponse,
 } from '@/app/lib/types/attendance';
+import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 
 /**
  * Teacher Attendance Service
@@ -44,7 +45,7 @@ class AttendanceService {
     scheduleId: string
   ): Promise<GetAttendanceListResponse> {
     return await apiClient.get<GetAttendanceListResponse>(
-      `/attendances/schedule/${scheduleId}`
+      `/teacher/attendances/schedule/${scheduleId}`
     );
   }
 
@@ -151,3 +152,45 @@ class AttendanceService {
 // Export singleton instance
 export const attendanceService = new AttendanceService();
 export default attendanceService;
+
+class AdminAttendanceService {
+  async getAbsents(): Promise<GetAttendanceListResponse> {
+    return apiClient.get<GetAttendanceListResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ATTENDANCES.GET_ABSENTS
+    );
+  }
+
+  async getByStudent(studentId: string): Promise<GetAttendanceListResponse> {
+    return apiClient.get<GetAttendanceListResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ATTENDANCES.GET_BY_STUDENT(studentId)
+    );
+  }
+
+  async getByTerm(termId: string): Promise<GetAttendanceListResponse> {
+    return apiClient.get<GetAttendanceListResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ATTENDANCES.GET_BY_TERM(termId)
+    );
+  }
+
+  async getBySchedule(scheduleId: string): Promise<GetAttendanceListResponse> {
+    return apiClient.get<GetAttendanceListResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ATTENDANCES.GET_BY_SCHEDULE(scheduleId)
+    );
+  }
+
+  async create(
+    payload: CreateAttendanceRequest
+  ): Promise<CreateAttendanceResponse> {
+    const formData = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value !== undefined) formData.append(key, value);
+    });
+
+    return apiClient.post<CreateAttendanceResponse>(
+      API_ENDPOINTS.PANEL.ADMIN.ATTENDANCES.CREATE,
+      formData
+    );
+  }
+}
+
+export const adminAttendanceService = new AdminAttendanceService();

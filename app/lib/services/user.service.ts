@@ -8,6 +8,12 @@ import {
   CreateUserRequest,
   UpdateUserRequest,
 } from '@/app/lib/types';
+import type {
+  GetNotificationsResponse,
+  UpdatePasswordRequest,
+  UpdatePasswordResponse,
+  SendSampleNotificationRequest,
+} from '@/app/lib/types/notification';
 
 export class UserService {
   async getProfile(): Promise<GetProfileResponse> {
@@ -55,6 +61,39 @@ export class UserService {
     );
   }
 
+  async updatePassword(
+    payload: UpdatePasswordRequest
+  ): Promise<UpdatePasswordResponse> {
+    return apiClient.post<UpdatePasswordResponse>(
+      API_ENDPOINTS.USER.UPDATE_PASSWORD,
+      payload
+    );
+  }
+
+  async getNotifications(): Promise<GetNotificationsResponse> {
+    return apiClient.get<GetNotificationsResponse>(
+      API_ENDPOINTS.USER.NOTIFICATIONS.GET_ALL
+    );
+  }
+
+  async markNotificationRead(id: string): Promise<void> {
+    return apiClient.post<void>(API_ENDPOINTS.USER.NOTIFICATIONS.MARK_READ(id));
+  }
+
+  async sendSampleNotification(
+    payload: SendSampleNotificationRequest
+  ): Promise<{ message?: string }> {
+    const body = new URLSearchParams();
+    body.set('userId', payload.userId.toString());
+    body.set('type', payload.type);
+    body.set('url', payload.url || '');
+    return apiClient.post<{ message?: string }>(
+      API_ENDPOINTS.USER.NOTIFICATIONS.SEND_SAMPLE,
+      body,
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+    );
+  }
+
   // Admin user management methods
   async getList(): Promise<GetUserListResponse> {
     return apiClient.get<GetUserListResponse>(
@@ -79,7 +118,7 @@ export class UserService {
     id: string,
     payload: UpdateUserRequest
   ): Promise<GetUserResponse> {
-    return apiClient.put<GetUserResponse>(
+    return apiClient.patch<GetUserResponse>(
       API_ENDPOINTS.PANEL.ADMIN.USERS.UPDATE(id),
       payload
     );

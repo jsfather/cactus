@@ -55,7 +55,7 @@ export default function PlacementExamPage({
         }
 
         // Start the exam attempt
-        const attemptResponse = await startPlacementExam(examId);
+        const attemptResponse = await startPlacementExam();
         setAttempt(attemptResponse.data);
 
         // Get exam questions

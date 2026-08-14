@@ -25,6 +25,7 @@ export const common = {
   hour: 'ساعت',
   hours: 'ساعت',
   toman: 'تومان',
+  retry: 'تلاش دوباره',
 };
 
 export const nav = {
@@ -381,7 +382,7 @@ export const courses = {
     enroll: 'ثبت‌نام در دوره',
     guarantee: '۷ روز ضمانت بازگشت وجه',
     introVideo: 'ویدیو معرفی دوره',
-    certificateVideo: 'ویدیو مدرک دوره',
+    certificateImage: 'تصویر مدرک دوره',
     faq: 'سوالات متداول',
     testimonials: 'نظرات ویدیویی دانشجویان',
     syllabus: 'سرفصل‌های دوره',
@@ -429,6 +430,12 @@ export const shop = {
   cartEmpty: 'سبد خرید شما خالی است',
   total: 'مجموع',
   quantity: 'تعداد',
+  backToShop: 'بازگشت به فروشگاه',
+  discount: 'تخفیف',
+  reviews: 'نظرات',
+  items: 'کالا',
+  specifications: 'مشخصات',
+  relatedProducts: 'محصولات مرتبط',
   pageTitle: 'فروشگاه',
   pageTitleHighlight: 'کاکتوس',
   pageSubtitle: 'خرید آنلاین تجهیزات و کیت‌های آموزشی رباتیک',
@@ -481,8 +488,11 @@ export const shop = {
     completeOrder: 'تکمیل سفارش',
     emptyCart: 'سبد خرید شما خالی است',
     emptyCartDesc: 'برای خرید به فروشگاه بازگردید',
+    emptyCartDescription: 'برای خرید به فروشگاه بازگردید',
     backToShop: 'بازگشت به فروشگاه',
     remove: 'حذف',
+    processing: 'در حال پردازش...',
+    total: 'مجموع',
   },
 };
 
@@ -538,6 +548,9 @@ export const requirements = {
   pageTitleHighlight: 'مورد نیاز',
   pageSubtitle: 'نرم‌افزارها و ابزارهای مورد نیاز برای شرکت در دوره‌های آموزشی',
   searchPlaceholder: 'جستجو در نرم‌افزارها...',
+  allCategories: 'همه دسته‌بندی‌ها',
+  allPlatforms: 'همه پلتفرم‌ها',
+  category: 'دسته‌بندی',
   categories: {
     all: 'همه',
     programming: 'برنامه‌نویسی',

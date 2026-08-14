@@ -9,7 +9,7 @@ export { useExam } from './use-exam';
 export { useAuth } from './use-auth';
 export { useSettings } from './use-settings';
 export { useTicket } from './useTicket';
-export { useFAQ } from './useFAQ';
+export { useFAQ } from './use-faq';
 export { useStudentOrder } from './use-student-order';
 export { usePublicProduct } from './use-public-product';
 export { useSearch } from './use-search';

@@ -14,7 +14,7 @@ export const MOCK_COURSE_PAGES: CoursePageContent[] = [
     supplementary_description:
       'در این دوره با اصول پایه رباتیک، الکترونیک و برنامه‌نویسی آشنا می‌شوید و اولین ربات خود را می‌سازید.',
     intro_video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    certificate_video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    certificate_image_url: '/course-robotics-intro.png',
     faqs: [
       {
         id: 1,
@@ -71,11 +71,7 @@ export const MOCK_COURSE_PAGES: CoursePageContent[] = [
       {
         id: 2,
         title: 'فصل دوم: الکترونیک پایه',
-        items: [
-          'آشنایی با Arduino',
-          'سنسورها و عملگرها',
-          'مدارهای ساده',
-        ],
+        items: ['آشنایی با Arduino', 'سنسورها و عملگرها', 'مدارهای ساده'],
       },
       {
         id: 3,
@@ -116,7 +112,7 @@ export const MOCK_COURSE_PAGES: CoursePageContent[] = [
     supplementary_description:
       'یادگیری برنامه‌نویسی پیشرفته برای کنترل ربات‌های صنعتی و هوشمند.',
     intro_video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    certificate_video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    certificate_image_url: '/course-robotics-intro.png',
     faqs: [
       {
         id: 1,
@@ -162,7 +158,7 @@ export const MOCK_COURSE_PAGES: CoursePageContent[] = [
     supplementary_description:
       'آموزش پردازش تصویر و بینایی ماشین برای ربات‌های هوشمند.',
     intro_video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-    certificate_video_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    certificate_image_url: '/course-robotics-intro.png',
     faqs: [
       {
         id: 1,
@@ -286,7 +282,9 @@ export const MOCK_COURSES: PublicCourse[] = [
 
 function getCourseDetail(course: PublicCourse): PublicCourseDetail {
   const pageContent = MOCK_COURSE_PAGES.find(
-    (p) => String(p.course_id) === String(course.id) || String(p.term_id) === String(course.term_id)
+    (p) =>
+      String(p.course_id) === String(course.id) ||
+      String(p.term_id) === String(course.term_id)
   );
 
   return {
@@ -375,6 +373,8 @@ export function getMockCoursePageById(id: string): CoursePageContent | null {
   return MOCK_COURSE_PAGES.find((p) => String(p.id) === id) || null;
 }
 
-export function getMockCoursePageByTermId(termId: string): CoursePageContent | null {
+export function getMockCoursePageByTermId(
+  termId: string
+): CoursePageContent | null {
   return MOCK_COURSE_PAGES.find((p) => String(p.term_id) === termId) || null;
 }

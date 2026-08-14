@@ -24,6 +24,7 @@ import { useUser } from '@/app/hooks/useUser';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/Button';
 import Textarea from '@/app/components/ui/Textarea';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { t, dir } = useLocale();
@@ -163,7 +164,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               <div className="flex items-center gap-2">
                 {blog.user.profile_picture ? (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${blog.user.profile_picture}`}
+                    src={getImageUrl(blog.user.profile_picture)!}
                     alt={`${blog.user.first_name} ${blog.user.last_name}`}
                     width={32}
                     height={32}
@@ -311,7 +312,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                         <div className="flex items-center gap-3">
                           {comment.user?.profile_picture ? (
                             <Image
-                              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${comment.user.profile_picture}`}
+                              src={getImageUrl(comment.user.profile_picture)!}
                               alt={`${comment.user.first_name} ${comment.user.last_name}`}
                               width={40}
                               height={40}

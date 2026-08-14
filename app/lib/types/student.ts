@@ -44,6 +44,7 @@ export interface CreateStudentRequest {
   last_name: string;
   username: string;
   phone: string;
+  password: string;
   email?: string;
   national_code?: string;
   level_id: number;
@@ -56,10 +57,9 @@ export interface CreateStudentRequest {
   interest_level: number;
   focus_level: number;
   birth_date: string; // Format: 1375-12-10
-  // TODO: Add file support later
-  // profile_picture?: File;
-  // national_card?: File;
-  // certificate?: File;
+  profile_picture?: globalThis.File;
+  national_card?: globalThis.File;
+  certificate?: globalThis.File;
 }
 
 export interface UpdateStudentRequest {
@@ -67,6 +67,7 @@ export interface UpdateStudentRequest {
   last_name?: string;
   username?: string;
   phone?: string;
+  password?: string;
   email?: string;
   national_code?: string;
   level_id?: number;
@@ -79,8 +80,7 @@ export interface UpdateStudentRequest {
   interest_level?: number;
   focus_level?: number;
   birth_date?: string; // Format: 1375-12-10
-  // TODO: Add file support later
-  // profile_picture?: File;
-  // national_card?: File;
-  // certificate?: File;
+  profile_picture?: globalThis.File;
+  national_card?: globalThis.File;
+  certificate?: globalThis.File;
 }

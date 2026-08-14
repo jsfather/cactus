@@ -108,10 +108,7 @@ function ShopContent() {
 
   // Convert API products to display format
   const allProducts = apiProducts.map((product) =>
-    convertApiProductToDisplayFormat(
-      product,
-      dir === 'rtl' ? 'fa-IR' : 'en-US'
-    )
+    convertApiProductToDisplayFormat(product, dir === 'rtl' ? 'fa-IR' : 'en-US')
   );
 
   const filteredProducts = allProducts.filter((product) => {
@@ -424,7 +421,7 @@ function ShopContent() {
                   : `Error loading products: ${error}`}
               </p>
               <button
-                onClick={fetchHomeProducts}
+                onClick={() => fetchHomeProducts()}
                 className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
               >
                 {dir === 'rtl' ? 'تلاش مجدد' : 'Try Again'}

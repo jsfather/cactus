@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import { Button } from '@/app/components/ui/Button';
@@ -9,6 +9,8 @@ import { Card } from '@/app/components/ui/Card';
 import { useTeacherTerm } from '@/app/lib/hooks/use-teacher-term';
 import { getTeacherTermTypeLabel } from '@/app/lib/types/teacher-term';
 import { formatDateToPersian } from '@/app/lib/utils';
+import { teacherTermService } from '@/app/lib/services/teacher-term.service';
+import toast from 'react-hot-toast';
 import {
   ArrowRight,
   Calendar,
@@ -28,12 +30,14 @@ import {
   MapPin,
   FileText,
   AlertCircle,
+  Video,
 } from 'lucide-react';
 
 export default function TeacherTermDetailPage() {
   const params = useParams();
   const router = useRouter();
   const termId = params.id as string;
+  const [creatingRoomId, setCreatingRoomId] = useState<number | null>(null);
 
   const { currentTerm, loading, fetchTermById, clearCurrentTerm } =
     useTeacherTerm();
@@ -74,6 +78,26 @@ export default function TeacherTermDetailPage() {
 
   const enrolledStudents = currentTerm.students?.filter((s) => s.user) || [];
   const emptySlots = currentTerm.capacity - enrolledStudents.length;
+
+  const handleCreateRoom = async (scheduleId: number) => {
+    try {
+      setCreatingRoomId(scheduleId);
+      const response = await teacherTermService.createRoom(
+        scheduleId.toString()
+      );
+      const roomUrl = response.url || response.data?.url;
+
+      if (roomUrl) {
+        window.open(roomUrl, '_blank', 'noopener,noreferrer');
+      } else {
+        toast.success('اتاق کلاس با موفقیت ایجاد شد');
+      }
+    } catch {
+      toast.error('خطا در ایجاد یا دریافت اتاق کلاس');
+    } finally {
+      setCreatingRoomId(null);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -360,6 +384,16 @@ export default function TeacherTermDetailPage() {
                                     {schedule.homeworks?.length || 0} مورد
                                   </span>
                                 </div>
+                                <Button
+                                  type="button"
+                                  variant="info"
+                                  className="mt-3 w-full gap-2"
+                                  loading={creatingRoomId === schedule.id}
+                                  onClick={() => handleCreateRoom(schedule.id)}
+                                >
+                                  <Video className="h-4 w-4" />
+                                  ایجاد / ورود به کلاس
+                                </Button>
                               </div>
                             </div>
                           ))}

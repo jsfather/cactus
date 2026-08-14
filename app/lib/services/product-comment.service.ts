@@ -7,8 +7,35 @@ import {
 
 export class ProductCommentService {
   async getAll(): Promise<GetAdminProductCommentsResponse> {
-    return apiClient.get<GetAdminProductCommentsResponse>(
+    const response = await apiClient.get<GetAdminProductCommentsResponse>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.GET_ALL
+    );
+    return {
+      ...response,
+      data: response.data.map((comment) => ({
+        ...comment,
+        content: comment.content || comment.comment || '',
+        approved:
+          typeof comment.approved === 'boolean'
+            ? comment.approved
+            : Boolean(comment.is_approved),
+      })),
+    };
+  }
+
+  async getById(id: string): Promise<{ data: AdminProductComment }> {
+    return apiClient.get<{ data: AdminProductComment }>(
+      API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.GET_BY_ID(id)
+    );
+  }
+
+  async setApproval(
+    id: string,
+    isApproved: boolean
+  ): Promise<{ message: string; data?: AdminProductComment }> {
+    return apiClient.post<{ message: string; data?: AdminProductComment }>(
+      API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.UPDATE(id),
+      { is_approved: isApproved ? 1 : 0 }
     );
   }
 
@@ -26,9 +53,16 @@ export class ProductCommentService {
     );
   }
 
+  async answer(id: string, answer: string): Promise<{ message: string }> {
+    return apiClient.post<{ message: string }>(
+      API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.ANSWER(id),
+      { answer }
+    );
+  }
+
   async delete(id: string): Promise<void> {
     return apiClient.delete<void>(
-      API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.DELETE(id)
+      API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.DELETE_GENERIC(id)
     );
   }
 }

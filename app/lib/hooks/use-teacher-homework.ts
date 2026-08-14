@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useTeacherHomeworkStore } from '@/app/lib/stores/teacher-homework.store';
-import { CreateTeacherHomeworkRequest, UpdateTeacherHomeworkRequest } from '@/app/lib/types/teacher-homework';
+import { CreateTeacherHomeworkRequest } from '@/app/lib/types/teacher-homework';
 
 export const useTeacherHomework = () => {
   const {
@@ -17,7 +17,6 @@ export const useTeacherHomework = () => {
     fetchHomeworks,
     fetchHomeworkById,
     createHomework,
-    updateHomework,
     deleteHomework,
     fetchConversation,
     sendConversationMessage,
@@ -30,21 +29,26 @@ export const useTeacherHomework = () => {
     await fetchHomeworks();
   }, [fetchHomeworks]);
 
-  const handleFetchHomeworkById = useCallback(async (id: string) => {
-    await fetchHomeworkById(id);
-  }, [fetchHomeworkById]);
+  const handleFetchHomeworkById = useCallback(
+    async (id: string) => {
+      await fetchHomeworkById(id);
+    },
+    [fetchHomeworkById]
+  );
 
-  const handleCreateHomework = useCallback(async (payload: CreateTeacherHomeworkRequest) => {
-    return await createHomework(payload);
-  }, [createHomework]);
+  const handleCreateHomework = useCallback(
+    async (payload: CreateTeacherHomeworkRequest) => {
+      return await createHomework(payload);
+    },
+    [createHomework]
+  );
 
-  const handleUpdateHomework = useCallback(async (id: string, payload: UpdateTeacherHomeworkRequest) => {
-    return await updateHomework(id, payload);
-  }, [updateHomework]);
-
-  const handleDeleteHomework = useCallback(async (id: string) => {
-    return await deleteHomework(id);
-  }, [deleteHomework]);
+  const handleDeleteHomework = useCallback(
+    async (id: string) => {
+      return await deleteHomework(id);
+    },
+    [deleteHomework]
+  );
 
   const handleClearCurrentHomework = useCallback(() => {
     clearCurrentHomework();
@@ -54,13 +58,19 @@ export const useTeacherHomework = () => {
     clearError();
   }, [clearError]);
 
-  const handleFetchConversation = useCallback(async (conversationId: string) => {
-    await fetchConversation(conversationId);
-  }, [fetchConversation]);
+  const handleFetchConversation = useCallback(
+    async (conversationId: string) => {
+      await fetchConversation(conversationId);
+    },
+    [fetchConversation]
+  );
 
-  const handleSendConversationMessage = useCallback(async (conversationId: string, message: string) => {
-    return await sendConversationMessage(conversationId, message);
-  }, [sendConversationMessage]);
+  const handleSendConversationMessage = useCallback(
+    async (conversationId: string, message: string) => {
+      return await sendConversationMessage(conversationId, message);
+    },
+    [sendConversationMessage]
+  );
 
   return {
     // State
@@ -79,7 +89,6 @@ export const useTeacherHomework = () => {
     fetchHomeworks: handleFetchHomeworks,
     fetchHomeworkById: handleFetchHomeworkById,
     createHomework: handleCreateHomework,
-    updateHomework: handleUpdateHomework,
     deleteHomework: handleDeleteHomework,
     fetchConversation: handleFetchConversation,
     sendConversationMessage: handleSendConversationMessage,

@@ -25,6 +25,7 @@ export const common = {
   hour: 'hour',
   hours: 'hours',
   toman: 'Toman',
+  retry: 'Try again',
 };
 
 export const nav = {
@@ -384,7 +385,7 @@ export const courses = {
     enroll: 'Enroll in Course',
     guarantee: '7-day money-back guarantee',
     introVideo: 'Course Introduction Video',
-    certificateVideo: 'Certificate Video',
+    certificateImage: 'Course Certificate Image',
     faq: 'Frequently Asked Questions',
     testimonials: 'Student Video Testimonials',
     syllabus: 'Course Syllabus',
@@ -432,6 +433,12 @@ export const shop = {
   cartEmpty: 'Your cart is empty',
   total: 'Total',
   quantity: 'Quantity',
+  backToShop: 'Back to Shop',
+  discount: 'Discount',
+  reviews: 'Reviews',
+  items: 'items',
+  specifications: 'Specifications',
+  relatedProducts: 'Related Products',
   pageTitle: 'Shop',
   pageTitleHighlight: 'Cactus',
   pageSubtitle: 'Online purchase of robotics educational equipment and kits',
@@ -461,6 +468,12 @@ export const shop = {
     available: 'Available',
     unavailable: 'Unavailable',
     reviews: 'Reviews',
+    fastShipping: 'Fast shipping',
+    shippingDescription: 'Shipping nationwide',
+    authenticityGuarantee: 'Authenticity guarantee',
+    qualityAssurance: 'Product quality assurance',
+    returnGuarantee: 'Return guarantee',
+    returnDescription: '7-day product return guarantee',
   },
   checkoutPage: {
     title: 'Checkout',
@@ -478,8 +491,11 @@ export const shop = {
     completeOrder: 'Complete Order',
     emptyCart: 'Your cart is empty',
     emptyCartDesc: 'Return to shop to make a purchase',
+    emptyCartDescription: 'Return to shop to make a purchase',
     backToShop: 'Back to Shop',
     remove: 'Remove',
+    processing: 'Processing...',
+    total: 'Total',
   },
 };
 
@@ -536,6 +552,9 @@ export const requirements = {
   pageTitleHighlight: 'Software',
   pageSubtitle: 'Software and tools needed to participate in training courses',
   searchPlaceholder: 'Search software...',
+  allCategories: 'All Categories',
+  allPlatforms: 'All Platforms',
+  category: 'Category',
   categories: {
     all: 'All',
     programming: 'Programming',

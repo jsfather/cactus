@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import { StudentTerm } from '@/app/lib/types/student-term';
 import { useRouter } from 'next/navigation';
 import { useStudentTerm } from '@/app/lib/hooks/use-student-term';
 import { useAvailableTerm } from '@/app/lib/hooks/use-available-term';
-import { useCart } from '@/app/contexts/CartContext';
+import { availableTermService } from '@/app/lib/services/available-term.service';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import AvailableTermCard from '@/app/components/student/AvailableTermCard';
 import {
@@ -39,7 +39,9 @@ export default function StudentTermsPage() {
     getAvailableTerms,
     resetError: resetAvailableError,
   } = useAvailableTerm();
-  const { addItem } = useCart();
+  const [registeringTeacherId, setRegisteringTeacherId] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -283,30 +285,27 @@ export default function StudentTermsPage() {
     router.push(`/student/terms/${term.term.id}`);
   };
 
-  const handleRegisterTerm = (termId: number) => {
-    // Find the selected term from available terms
-    const selectedTerm = availableTerms.find((term) => term.id === termId);
-
-    if (!selectedTerm) {
-      toast.error('ترم مورد نظر یافت نشد');
-      return;
-    }
-
-    // Add term to cart as a product
+  const handleRegisterTerm = async (termTeacherId: number) => {
     try {
-      addItem({
-        id: selectedTerm.id,
-        title: selectedTerm.title,
-        price: selectedTerm.price.toString(),
-        image: '/course-robotics-intro.png', // Default course image
-      });
+      setRegisteringTeacherId(termTeacherId);
+      const response = await availableTermService.pay(termTeacherId);
+      const paymentUrl =
+        response.payment_url ||
+        response.url ||
+        response.data?.payment_url ||
+        response.data?.url;
 
-      toast.success('ترم به سبد خرید اضافه شد');
+      if (paymentUrl) {
+        window.location.assign(paymentUrl);
+        return;
+      }
 
-      // Navigate to checkout page
-      router.push('/shop/checkout');
+      toast.success(response.message || 'ثبت‌نام در ترم با موفقیت انجام شد');
+      await Promise.all([getTermList(), getAvailableTerms()]);
     } catch (error) {
-      toast.error('خطا در اضافه کردن ترم به سبد خرید');
+      toast.error('خطا در ثبت‌نام یا انتقال به درگاه پرداخت');
+    } finally {
+      setRegisteringTeacherId(null);
     }
   };
 
@@ -544,6 +543,7 @@ export default function StudentTermsPage() {
                   key={term.id}
                   term={term}
                   onRegister={handleRegisterTerm}
+                  registering={registeringTeacherId === term.teachers[0]?.id}
                 />
               ))}
             </div>

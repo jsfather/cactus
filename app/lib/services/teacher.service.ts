@@ -56,7 +56,7 @@ export class TeacherService {
     id: string,
     payload: UpdateTeacherRequest
   ): Promise<GetTeacherResponse> {
-    return apiClient.put<GetTeacherResponse>(
+    return apiClient.patch<GetTeacherResponse>(
       API_ENDPOINTS.PANEL.ADMIN.TEACHERS.UPDATE(id),
       payload
     );

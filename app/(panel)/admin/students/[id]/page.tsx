@@ -36,6 +36,11 @@ const studentSchema = z.object({
   last_name: z.string().min(1, 'نام خانوادگی ضروری است'),
   username: z.string().min(1, 'نام کاربری ضروری است'),
   phone: z.string().min(11, 'شماره تلفن باید حداقل ۱۱ رقم باشد'),
+  password: z
+    .string()
+    .min(6, 'رمز عبور باید حداقل ۶ کاراکتر باشد')
+    .optional()
+    .or(z.literal('')),
   email: z.string().email('ایمیل معتبر وارد کنید').optional().or(z.literal('')),
   national_code: z.string().optional(),
   level_id: z.string().min(1, 'سطح ضروری است'),
@@ -112,6 +117,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
           last_name: '',
           username: '',
           phone: '',
+          password: '',
           email: '',
           national_code: '',
           level_id: '',
@@ -150,6 +156,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
         last_name: currentStudent.user?.last_name || '',
         username: currentStudent.user?.username || '',
         phone: currentStudent.user?.phone || '',
+        password: '',
         email: currentStudent.user?.email || '',
         national_code: currentStudent.user?.national_code || '',
         level_id: currentStudent.level_id?.toString() || '',
@@ -174,6 +181,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
           last_name: data.last_name.trim(),
           username: data.username.trim(),
           phone: convertToEnglishNumbers(data.phone).trim(),
+          password: data.password!,
           email: data.email?.trim() || undefined,
           national_code: data.national_code?.trim() || undefined,
           level_id: parseInt(data.level_id),
@@ -186,10 +194,9 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
           interest_level: parseInt(data.interest_level),
           focus_level: parseInt(data.focus_level),
           birth_date: data.birth_date,
-          // TODO: Handle file uploads separately
-          // profile_picture: profilePicture || undefined,
-          // national_card: nationalCard || undefined,
-          // certificate: certificate || undefined,
+          profile_picture: profilePicture || undefined,
+          national_card: nationalCard || undefined,
+          certificate: certificate || undefined,
         };
 
         await createStudent(formData);
@@ -200,6 +207,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
           last_name: data.last_name.trim(),
           username: data.username.trim(),
           phone: convertToEnglishNumbers(data.phone).trim(),
+          password: data.password?.trim() || undefined,
           email: data.email?.trim() || undefined,
           national_code: data.national_code?.trim() || undefined,
           level_id: parseInt(data.level_id),
@@ -212,10 +220,9 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
           interest_level: parseInt(data.interest_level),
           focus_level: parseInt(data.focus_level),
           birth_date: data.birth_date,
-          // TODO: Handle file uploads separately
-          // profile_picture: profilePicture || undefined,
-          // national_card: nationalCard || undefined,
-          // certificate: certificate || undefined,
+          profile_picture: profilePicture || undefined,
+          national_card: nationalCard || undefined,
+          certificate: certificate || undefined,
         };
 
         await updateStudent(resolvedParams!.id, formData);
@@ -339,6 +346,25 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
                   />
                 )}
               />
+
+              {isNew && (
+                <Controller
+                  name="password"
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      id="password"
+                      label="رمز عبور"
+                      type="password"
+                      value={field.value}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      error={errors.password?.message}
+                      required
+                    />
+                  )}
+                />
+              )}
 
               <Controller
                 name="email"

@@ -2,15 +2,13 @@
 
 export interface AvailableTermSchedule {
   id: number;
-  session_date: string; // Date format: YYYY-MM-DD  
+  session_date: string; // Date format: YYYY-MM-DD
   start_time: string; // Time format: HH:mm:ss
   end_time: string; // Time format: HH:mm:ss
   homeworks: any[]; // Based on API response structure
 }
 
-export interface AvailableTermOfflineSession {
-  // Add offline session structure if needed
-}
+export type AvailableTermOfflineSession = Record<string, unknown>;
 
 export interface AvailableTermDay {
   id: number;
@@ -40,7 +38,12 @@ export interface AvailableTerm {
   number_of_sessions: number;
   start_date: string; // Persian date format like "1404-07-20"
   end_date: string; // Persian date format like "1404-08-20"
-  type: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  type:
+    | 'normal'
+    | 'capacity_completion'
+    | 'project_based'
+    | 'specialized'
+    | 'ai';
   project_type: any | null;
   capacity: number;
   price: number;
@@ -55,6 +58,21 @@ export interface AvailableTerm {
 // API Response interface
 export interface GetAvailableTermsResponse {
   data: AvailableTerm[];
+}
+
+export interface PayForTermRequest {
+  term_teacher_id: number;
+}
+
+export interface PayForTermResponse {
+  success?: boolean;
+  message?: string;
+  payment_url?: string;
+  url?: string;
+  data?: {
+    payment_url?: string;
+    url?: string;
+  };
 }
 
 // Summary stats for available terms

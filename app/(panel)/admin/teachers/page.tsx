@@ -11,6 +11,7 @@ import { useTeacher } from '@/app/lib/hooks/use-teacher';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import SearchFilters, { SearchFilter } from '@/app/components/ui/SearchFilters';
 import { TeacherSearchFilters } from '@/app/lib/services/teacher.service';
+import { isTeacherVisibleOnWebsite } from '@/app/lib/utils/teacher-display';
 import { Users, Plus, UserCheck, Clock, Award, TrendingUp } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
@@ -174,7 +175,7 @@ export default function TeachersPage() {
       header: 'نمایش در سایت',
       accessor: 'show_on_website',
       render: (value): any => {
-        const isVisible = value !== false;
+        const isVisible = isTeacherVisibleOnWebsite(value as 0 | 1);
         return (
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${

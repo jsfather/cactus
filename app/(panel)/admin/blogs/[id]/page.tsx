@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, use } from 'react';
+import { useEffect, use, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
@@ -16,9 +16,15 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useBlog } from '@/app/lib/hooks/use-blog';
 import { useUser } from '@/app/hooks/useUser';
-import { CreateBlogRequest, UpdateBlogRequest } from '@/app/lib/types';
-import { ArrowRight, Save } from 'lucide-react';
+import {
+  BlogComment,
+  CreateBlogRequest,
+  UpdateBlogRequest,
+} from '@/app/lib/types';
+import { ArrowRight, CheckCircle, Reply, Save, Trash2 } from 'lucide-react';
 import Select from '@/app/components/ui/Select';
+import { Card } from '@/app/components/ui/Card';
+import { blogService } from '@/app/lib/services/blog.service';
 
 const schema = z
   .object({
@@ -34,7 +40,7 @@ const schema = z
         /^[a-z0-9-]+$/,
         'اسلاگ باید شامل حروف انگلیسی کوچک، اعداد و خط تیره باشد'
       ),
-    tags: z.array(z.string()).default([]),
+    tags: z.array(z.string()),
     status: z.enum(['draft', 'published'], {
       required_error: 'وضعیت انتشار الزامی است',
     }),
@@ -54,7 +60,7 @@ const schema = z
     }
   );
 
-type FormData = z.infer<typeof schema>;
+type BlogFormValues = z.infer<typeof schema>;
 
 export default function BlogFormPage({
   params,
@@ -64,6 +70,12 @@ export default function BlogFormPage({
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
+  const [image, setImage] = useState<File | null>(null);
+  const [commentToAnswer, setCommentToAnswer] = useState<BlogComment | null>(
+    null
+  );
+  const [commentAnswer, setCommentAnswer] = useState('');
+  const [commentLoadingId, setCommentLoadingId] = useState<number | null>(null);
 
   const {
     register,
@@ -73,7 +85,7 @@ export default function BlogFormPage({
     reset,
     setValue,
     watch,
-  } = useForm<FormData>({
+  } = useForm<BlogFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       title: '',
@@ -156,7 +168,7 @@ export default function BlogFormPage({
     }
   }, [currentBlog, isNew, reset]);
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: BlogFormValues) => {
     try {
       clearError();
 
@@ -175,6 +187,7 @@ export default function BlogFormPage({
         tags: data.tags,
         user_id: user.id, // استفاده از آیدی کاربر لاگین شده
         publish_at: data.publish_at || new Date().toISOString().split('T')[0],
+        ...(isNew && image ? { image } : {}),
       };
 
       if (isNew) {
@@ -197,6 +210,57 @@ export default function BlogFormPage({
     } catch (error: any) {
       console.error('Error saving blog:', error);
       toast.error(error?.message || 'خطا در ذخیره مقاله');
+    }
+  };
+
+  const refreshBlog = () => fetchBlogById(resolvedParams.id);
+
+  const handleCommentApproval = async (
+    comment: BlogComment,
+    approved: boolean
+  ) => {
+    try {
+      setCommentLoadingId(comment.id);
+      await blogService.setCommentApproval(comment.id.toString(), approved);
+      toast.success(approved ? 'نظر تایید شد' : 'تایید نظر لغو شد');
+      await refreshBlog();
+    } catch {
+      toast.error('تغییر وضعیت نظر انجام نشد');
+    } finally {
+      setCommentLoadingId(null);
+    }
+  };
+
+  const handleDeleteComment = async (comment: BlogComment) => {
+    if (!window.confirm('این نظر حذف شود؟')) return;
+    try {
+      setCommentLoadingId(comment.id);
+      await blogService.deleteComment(comment.id.toString());
+      toast.success('نظر حذف شد');
+      await refreshBlog();
+    } catch {
+      toast.error('حذف نظر انجام نشد');
+    } finally {
+      setCommentLoadingId(null);
+    }
+  };
+
+  const handleAnswerComment = async () => {
+    if (!commentToAnswer || !commentAnswer.trim()) return;
+    try {
+      setCommentLoadingId(commentToAnswer.id);
+      await blogService.answerComment(
+        commentToAnswer.id.toString(),
+        commentAnswer.trim()
+      );
+      toast.success('پاسخ نظر ثبت شد');
+      setCommentToAnswer(null);
+      setCommentAnswer('');
+      await refreshBlog();
+    } catch {
+      toast.error('ثبت پاسخ نظر انجام نشد');
+    } finally {
+      setCommentLoadingId(null);
     }
   };
 
@@ -262,6 +326,22 @@ export default function BlogFormPage({
                   required
                 />
               </div>
+
+              {isNew && (
+                <div className="lg:col-span-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                    تصویر شاخص
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(event) =>
+                      setImage(event.target.files?.[0] || null)
+                    }
+                    className="block w-full rounded-lg border border-gray-300 bg-white p-3 text-sm text-gray-900 file:ml-4 file:rounded-md file:border-0 file:bg-gray-100 file:px-4 file:py-2 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:file:bg-gray-800"
+                  />
+                </div>
+              )}
 
               <div className="lg:col-span-2">
                 <Textarea
@@ -449,6 +529,110 @@ export default function BlogFormPage({
             </div>
           </form>
         </div>
+
+        {!isNew && currentBlog && (
+          <Card className="mt-8 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              مدیریت نظرات مقاله
+            </h2>
+            {!currentBlog.comments?.length ? (
+              <p className="mt-4 text-sm text-gray-500">
+                نظری برای این مقاله ثبت نشده است.
+              </p>
+            ) : (
+              <div className="mt-5 space-y-4">
+                {currentBlog.comments.map((comment) => {
+                  const approved =
+                    typeof comment.approved === 'boolean'
+                      ? comment.approved
+                      : Boolean(comment.is_approved);
+                  return (
+                    <div
+                      key={comment.id}
+                      className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+                    >
+                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <p className="text-sm text-gray-900 dark:text-white">
+                            {comment.content}
+                          </p>
+                          <p className="mt-2 text-xs text-gray-500">
+                            {comment.user
+                              ? `${comment.user.first_name} ${comment.user.last_name}`
+                              : 'کاربر'}
+                          </p>
+                          {comment.answer && (
+                            <p className="mt-3 rounded-lg bg-gray-50 p-3 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                              پاسخ: {comment.answer}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex shrink-0 gap-2">
+                          <Button
+                            variant={approved ? 'warning' : 'info'}
+                            loading={commentLoadingId === comment.id}
+                            onClick={() =>
+                              handleCommentApproval(comment, !approved)
+                            }
+                            className="gap-2"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                            {approved ? 'لغو تایید' : 'تایید'}
+                          </Button>
+                          <Button
+                            variant="white"
+                            className="gap-2"
+                            onClick={() => {
+                              setCommentToAnswer(comment);
+                              setCommentAnswer(comment.answer || '');
+                            }}
+                          >
+                            <Reply className="h-4 w-4" /> پاسخ
+                          </Button>
+                          <Button
+                            variant="danger"
+                            onClick={() => handleDeleteComment(comment)}
+                            className="gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" /> حذف
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {commentToAnswer && (
+              <div className="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700">
+                <Textarea
+                  id="blog-comment-answer"
+                  label="پاسخ مدیر"
+                  value={commentAnswer}
+                  onChange={(event) => setCommentAnswer(event.target.value)}
+                />
+                <div className="mt-4 flex gap-3">
+                  <Button
+                    onClick={handleAnswerComment}
+                    loading={commentLoadingId === commentToAnswer.id}
+                  >
+                    ثبت پاسخ
+                  </Button>
+                  <Button
+                    variant="white"
+                    onClick={() => {
+                      setCommentToAnswer(null);
+                      setCommentAnswer('');
+                    }}
+                  >
+                    انصراف
+                  </Button>
+                </div>
+              </div>
+            )}
+          </Card>
+        )}
       </div>
     </main>
   );

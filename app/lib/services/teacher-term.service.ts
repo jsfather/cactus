@@ -46,6 +46,14 @@ export class TeacherTermService {
       throw error;
     }
   }
+
+  async createRoom(
+    scheduleId: string
+  ): Promise<{ data?: { url?: string }; url?: string }> {
+    return apiClient.get<{ data?: { url?: string }; url?: string }>(
+      API_ENDPOINTS.PANEL.TEACHER.TERMS.CREATE_ROOM(scheduleId)
+    );
+  }
 }
 
 export const teacherTermService = new TeacherTermService();

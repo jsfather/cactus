@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink } from 'lucide-react';
 import { publicBlogService } from '@/app/lib/services/public-blog.service';
 import { Blog, CourseRecommendedTool } from '@/app/lib/types';
 import { useLocale } from '@/app/contexts/LocaleContext';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 interface RelatedArticlesProps {
   tags: string[];
@@ -50,7 +52,7 @@ export function RelatedArticles({ tags }: RelatedArticlesProps) {
             className="group overflow-hidden rounded-2xl border border-gray-200 bg-white transition-shadow hover:shadow-lg dark:border-gray-700 dark:bg-gray-800"
           >
             <div className="p-4">
-              <h3 className="mb-2 font-bold text-gray-900 group-hover:text-primary-600 dark:text-white">
+              <h3 className="group-hover:text-primary-600 mb-2 font-bold text-gray-900 dark:text-white">
                 {blog.title}
               </h3>
               <p className="line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
@@ -82,7 +84,7 @@ export function RecommendedTools({ tools }: RecommendedToolsProps) {
         {tools.map((tool, index) => (
           <a
             key={tool.id ?? index}
-            href={tool.link}
+            href={tool.link || tool.url || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="hover:border-primary-300 dark:hover:border-primary-600 flex items-start gap-4 rounded-2xl border border-gray-200 bg-white p-5 transition-colors dark:border-gray-700 dark:bg-gray-800"
@@ -111,6 +113,35 @@ export function RecommendedTools({ tools }: RecommendedToolsProps) {
 interface CourseVideoEmbedProps {
   title: string;
   videoUrl?: string;
+}
+
+export function CourseImageSection({
+  title,
+  imageUrl,
+}: {
+  title: string;
+  imageUrl?: string;
+}) {
+  const resolvedUrl = getImageUrl(imageUrl);
+  if (!resolvedUrl) return null;
+
+  return (
+    <section className="mb-12">
+      <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
+        {title}
+      </h2>
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+        <div className="relative mx-auto aspect-[4/3] max-w-2xl">
+          <Image
+            src={resolvedUrl}
+            alt={title}
+            fill
+            className="object-contain"
+          />
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export function CourseVideoEmbed({ title, videoUrl }: CourseVideoEmbedProps) {

@@ -115,7 +115,7 @@ function SearchContent() {
                 <p className="text-lg text-gray-600 dark:text-gray-300">
                   نتایج جستجو برای:{' '}
                   <span className="font-bold text-gray-900 dark:text-white">
-                    "{query}"
+                    &ldquo;{query}&rdquo;
                   </span>{' '}
                   ({blogs.length + products.length} نتیجه)
                 </p>

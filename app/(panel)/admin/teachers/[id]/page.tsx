@@ -14,8 +14,15 @@ import { z } from 'zod';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTeacher } from '@/app/lib/hooks/use-teacher';
-import { CreateTeacherRequest, UpdateTeacherRequest } from '@/app/lib/types/teacher';
+import {
+  CreateTeacherRequest,
+  UpdateTeacherRequest,
+} from '@/app/lib/types/teacher';
 import { ArrowRight, Save, Plus, Trash2 } from 'lucide-react';
+import {
+  booleanToShowOnWebsite,
+  showOnWebsiteToBoolean,
+} from '@/app/lib/utils/teacher-display';
 
 const skillSchema = z.object({
   name: z.string().min(1, 'نام مهارت الزامی است'),
@@ -32,7 +39,10 @@ const workExperienceSchema = z.object({
 const educationSchema = z.object({
   degree: z.string().min(1, 'مدرک تحصیلی الزامی است'),
   university: z.string().min(1, 'دانشگاه الزامی است'),
-  year: z.number().min(1900).max(new Date().getFullYear(), 'سال تحصیل نامعتبر است'),
+  year: z
+    .number()
+    .min(1900)
+    .max(new Date().getFullYear(), 'سال تحصیل نامعتبر است'),
   description: z.string().optional(),
 });
 
@@ -41,7 +51,10 @@ const schema = z.object({
   last_name: z.string().min(1, 'نام خانوادگی الزامی است'),
   username: z.string().min(3, 'نام کاربری حداقل ۳ کاراکتر است'),
   email: z.string().email('ایمیل نامعتبر است'),
-  national_code: z.string().min(10, 'کد ملی باید ۱۰ رقم باشد').max(10, 'کد ملی باید ۱۰ رقم باشد'),
+  national_code: z
+    .string()
+    .min(10, 'کد ملی باید ۱۰ رقم باشد')
+    .max(10, 'کد ملی باید ۱۰ رقم باشد'),
   phone: z.string().min(11, 'شماره موبایل نامعتبر است'),
   password: z.string().min(6, 'رمز عبور حداقل ۶ کاراکتر است').optional(),
   bio: z.string().optional(),
@@ -57,7 +70,11 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function TeacherFormPage({ params }: { params: Promise<{ id: string }> }) {
+export default function TeacherFormPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const resolvedParams = use(params);
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
@@ -95,28 +112,28 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
   const {
     fields: skillFields,
     append: appendSkill,
-    remove: removeSkill
+    remove: removeSkill,
   } = useFieldArray({
     control,
-    name: 'skills'
+    name: 'skills',
   });
 
   const {
     fields: workFields,
     append: appendWork,
-    remove: removeWork
+    remove: removeWork,
   } = useFieldArray({
     control,
-    name: 'work_experiences'
+    name: 'work_experiences',
   });
 
   const {
     fields: educationFields,
     append: appendEducation,
-    remove: removeEducation
+    remove: removeEducation,
   } = useFieldArray({
     control,
-    name: 'educations'
+    name: 'educations',
   });
 
   const {
@@ -149,7 +166,7 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
         member_since: currentTeacher.member_since || '',
         city: currentTeacher.city || '',
         achievements: currentTeacher.achievements || '',
-        show_on_website: currentTeacher.show_on_website !== false,
+        show_on_website: showOnWebsiteToBoolean(currentTeacher.show_on_website),
         skills: currentTeacher.skills || [],
         work_experiences: currentTeacher.work_experiences || [],
         educations: currentTeacher.educations || [],
@@ -160,16 +177,20 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
   const onSubmit = async (data: FormData) => {
     try {
       clearError();
+      const showOnWebsite = booleanToShowOnWebsite(data.show_on_website);
+
       if (isNew) {
         const payload: CreateTeacherRequest = {
           ...data,
           password: data.password!,
+          show_on_website: showOnWebsite,
         };
         await createTeacher(payload);
         toast.success('مربی با موفقیت ایجاد شد');
       } else {
         const payload: UpdateTeacherRequest = {
           ...data,
+          show_on_website: showOnWebsite,
         };
         await updateTeacher(resolvedParams.id, payload);
         toast.success('مربی با موفقیت به‌روزرسانی شد');
@@ -190,10 +211,10 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
           { label: 'مدیریت مربیان', href: '/admin/teachers' },
-          { 
-            label: isNew ? 'افزودن مربی جدید' : 'ویرایش مربی', 
-            href: `/admin/teachers/${resolvedParams.id}`, 
-            active: true 
+          {
+            label: isNew ? 'افزودن مربی جدید' : 'ویرایش مربی',
+            href: `/admin/teachers/${resolvedParams.id}`,
+            active: true,
           },
         ]}
       />
@@ -214,18 +235,20 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
               {isNew ? 'افزودن مربی جدید' : 'ویرایش مربی'}
             </h1>
             <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-              {isNew ? 'اطلاعات مربی جدید را وارد کنید' : 'اطلاعات مربی را ویرایش کنید'}
+              {isNew
+                ? 'اطلاعات مربی جدید را وارد کنید'
+                : 'اطلاعات مربی را ویرایش کنید'}
             </p>
           </div>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-          <div className="bg-white shadow-sm dark:bg-gray-800 sm:rounded-lg">
+          <div className="bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
             <div className="px-4 py-5 sm:p-6">
               {/* Personal Information */}
               <div className="mb-8">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                   اطلاعات شخصی
                 </h3>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -315,7 +338,7 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
 
               {/* Professional Information */}
               <div className="mb-8">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                <h3 className="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">
                   اطلاعات حرفه‌ای
                 </h3>
                 <div className="grid grid-cols-1 gap-6">
@@ -379,7 +402,7 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
 
               {/* Skills */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                     مهارت‌ها
                   </h3>
@@ -395,7 +418,10 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div className="space-y-4">
                   {skillFields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div
+                      key={field.id}
+                      className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+                    >
                       <Input
                         label="نام مهارت"
                         {...register(`skills.${index}.name`)}
@@ -406,7 +432,9 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
                         type="number"
                         min="0"
                         max="100"
-                        {...register(`skills.${index}.score`, { valueAsNumber: true })}
+                        {...register(`skills.${index}.score`, {
+                          valueAsNumber: true,
+                        })}
                         error={errors.skills?.[index]?.score?.message}
                       />
                       <div className="flex items-end">
@@ -427,14 +455,21 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
 
               {/* Work Experiences */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                     تجربیات کاری
                   </h3>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => appendWork({ company: '', role: '', years: '', description: '' })}
+                    onClick={() =>
+                      appendWork({
+                        company: '',
+                        role: '',
+                        years: '',
+                        description: '',
+                      })
+                    }
                     className="flex items-center gap-2"
                   >
                     <Plus className="h-4 w-4" />
@@ -443,29 +478,40 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div className="space-y-6">
                   {workFields.map((field, index) => (
-                    <div key={field.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-4">
+                    <div
+                      key={field.id}
+                      className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+                    >
+                      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <Input
                           label="نام شرکت"
                           {...register(`work_experiences.${index}.company`)}
-                          error={errors.work_experiences?.[index]?.company?.message}
+                          error={
+                            errors.work_experiences?.[index]?.company?.message
+                          }
                         />
                         <Input
                           label="سمت"
                           {...register(`work_experiences.${index}.role`)}
-                          error={errors.work_experiences?.[index]?.role?.message}
+                          error={
+                            errors.work_experiences?.[index]?.role?.message
+                          }
                         />
                         <Input
                           label="سال‌های فعالیت"
                           placeholder="مثال: ۲۰۱۸-۲۰۲۰"
                           {...register(`work_experiences.${index}.years`)}
-                          error={errors.work_experiences?.[index]?.years?.message}
+                          error={
+                            errors.work_experiences?.[index]?.years?.message
+                          }
                         />
                       </div>
                       <Textarea
                         label="توضیحات"
                         {...register(`work_experiences.${index}.description`)}
-                        error={errors.work_experiences?.[index]?.description?.message}
+                        error={
+                          errors.work_experiences?.[index]?.description?.message
+                        }
                       />
                       <div className="mt-4 flex justify-end">
                         <Button
@@ -485,14 +531,21 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
 
               {/* Education */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4 flex items-center justify-between">
                   <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                     تحصیلات
                   </h3>
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => appendEducation({ degree: '', university: '', year: new Date().getFullYear(), description: '' })}
+                    onClick={() =>
+                      appendEducation({
+                        degree: '',
+                        university: '',
+                        year: new Date().getFullYear(),
+                        description: '',
+                      })
+                    }
                     className="flex items-center gap-2"
                   >
                     <Plus className="h-4 w-4" />
@@ -501,8 +554,11 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
                 </div>
                 <div className="space-y-6">
                   {educationFields.map((field, index) => (
-                    <div key={field.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-4">
+                    <div
+                      key={field.id}
+                      className="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+                    >
+                      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <Input
                           label="مدرک تحصیلی"
                           {...register(`educations.${index}.degree`)}
@@ -511,14 +567,18 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
                         <Input
                           label="دانشگاه"
                           {...register(`educations.${index}.university`)}
-                          error={errors.educations?.[index]?.university?.message}
+                          error={
+                            errors.educations?.[index]?.university?.message
+                          }
                         />
                         <Input
                           label="سال فارغ‌التحصیلی"
                           type="number"
                           min="1900"
                           max={new Date().getFullYear()}
-                          {...register(`educations.${index}.year`, { valueAsNumber: true })}
+                          {...register(`educations.${index}.year`, {
+                            valueAsNumber: true,
+                          })}
                           error={errors.educations?.[index]?.year?.message}
                         />
                       </div>
@@ -558,7 +618,11 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
                   className="flex items-center gap-2"
                 >
                   <Save className="h-4 w-4" />
-                  {isSubmitting ? 'در حال ذخیره...' : isNew ? 'ایجاد مربی' : 'به‌روزرسانی'}
+                  {isSubmitting
+                    ? 'در حال ذخیره...'
+                    : isNew
+                      ? 'ایجاد مربی'
+                      : 'به‌روزرسانی'}
                 </Button>
               </div>
             </div>
@@ -568,4 +632,3 @@ export default function TeacherFormPage({ params }: { params: Promise<{ id: stri
     </main>
   );
 }
-
