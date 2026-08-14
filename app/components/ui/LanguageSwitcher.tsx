@@ -37,9 +37,12 @@ export default function LanguageSwitcher() {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="icon-button gap-2 px-2"
         aria-label="Change language"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
         <Languages className="h-5 w-5" />
         <span className="hidden text-sm font-medium md:inline">
@@ -48,12 +51,16 @@ export default function LanguageSwitcher() {
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-40 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+        <div
+          role="menu"
+          className="absolute top-full left-0 z-50 mt-2 w-40 overflow-hidden rounded-2xl border border-gray-200 bg-white p-1.5 shadow-xl dark:border-gray-700 dark:bg-gray-800"
+        >
           {locales.map((loc) => (
             <button
+              type="button"
               key={loc}
               onClick={() => handleLocaleChange(loc)}
-              className={`block w-full px-4 py-2 text-right text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 ${
+              className={`block min-h-10 w-full rounded-xl px-3 py-2 text-right text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 ${
                 locale === loc
                   ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 font-semibold'
                   : 'text-gray-700 dark:text-gray-300'

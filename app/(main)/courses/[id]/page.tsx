@@ -294,21 +294,19 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 </div>
               </div>
 
-              <Link href="/send-otp">
-                <button className="bg-primary-600 hover:bg-primary-700 mb-3 w-full rounded-lg px-6 py-3 text-center text-white transition-colors">
-                  {t.courses.detail.enroll}
-                </button>
+              <Link
+                href="/send-otp"
+                className="bg-primary-600 hover:bg-primary-700 mb-3 flex min-h-11 w-full items-center justify-center rounded-xl px-6 py-3 text-center font-semibold text-white transition-colors"
+              >
+                {t.courses.detail.enroll}
               </Link>
 
-              <Link href="/about">
-                <Button
-                  variant="secondary"
-                  className="flex w-full items-center justify-center gap-2"
-                >
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/about">
                   <Phone className="h-4 w-4" />
                   {t.courses.detail.consultation}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
 
               <p className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
                 {t.courses.detail.guarantee}

@@ -24,6 +24,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +61,29 @@ export default function Header() {
   useEffect(() => {
     setIsDrawerOpen(false);
     setShowMobileSearch(false);
+    setIsMoreOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 12);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!isDrawerOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsDrawerOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isDrawerOpen]);
 
   const isActive = (href: string) => {
     // Exact match
@@ -76,44 +99,53 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-50 border-b border-gray-200 bg-white/80 backdrop-blur-lg transition-colors duration-200 dark:border-gray-800 dark:bg-gray-900/80 ${
-          isScrolled ? 'shadow-lg' : ''
+        className={`fixed inset-x-0 top-0 z-50 border-b border-gray-200/80 bg-white/90 backdrop-blur-xl transition-[background-color,box-shadow] duration-200 dark:border-gray-800 dark:bg-gray-900/90 ${
+          isScrolled ? 'shadow-lg shadow-gray-950/5' : ''
         }`}
       >
-        <div className="container mx-auto h-20 px-4">
+        <div className="mx-auto h-[72px] max-w-[1440px] px-3 sm:px-5 lg:px-6">
           <div className="flex h-full items-center justify-between">
             {/* Mobile Menu Button */}
             <button
+              type="button"
               onClick={() => setIsDrawerOpen(true)}
-              className="cursor-pointer rounded-lg p-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:hidden dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
+              className="icon-button xl:hidden"
+              aria-label={
+                locale === 'fa' ? 'باز کردن منوی اصلی' : 'Open main menu'
+              }
+              aria-haspopup="dialog"
             >
               <Menu className="h-6 w-6" />
             </button>
 
-            <div className="flex items-center gap-8">
-              <Link href="/" className="hidden items-center gap-2 lg:flex">
+            <div className="flex min-w-0 items-center gap-5 2xl:gap-8">
+              <Link href="/" className="flex shrink-0 items-center gap-2">
                 <Image
                   src="/logo.svg"
                   alt="کاکتوس"
-                  width={56}
-                  height={56}
+                  width={46}
+                  height={40}
                   priority
                   className="transition-all duration-300 dark:brightness-0 dark:invert"
                 />
-                <span className="from-primary-600 to-primary-800 mx-2 hidden bg-gradient-to-l bg-clip-text text-2xl font-black text-transparent lg:block">
+                <span className="from-primary-600 to-primary-800 hidden bg-gradient-to-l bg-clip-text text-xl font-black text-transparent 2xl:block">
                   {t.common.siteName}
                 </span>
               </Link>
 
-              <nav className="hidden items-center gap-4 lg:flex xl:gap-6">
+              <nav
+                className="hidden items-center gap-3 xl:flex 2xl:gap-5"
+                aria-label={locale === 'fa' ? 'منوی اصلی' : 'Main navigation'}
+              >
                 {menuItems.slice(0, 5).map((item) => (
                   <Link
                     key={item.title}
                     href={item.href}
-                    className={`text-sm font-medium transition-colors duration-200 xl:text-base ${
+                    aria-current={isActive(item.href) ? 'page' : undefined}
+                    className={`relative rounded-lg px-2 py-2 text-sm font-semibold transition-colors duration-200 ${
                       isActive(item.href)
-                        ? 'text-primary-600 dark:text-primary-400'
-                        : 'hover:text-primary-600 dark:hover:text-primary-400 text-gray-900 dark:text-gray-100'
+                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
+                        : 'hover:text-primary-700 dark:hover:text-primary-300 text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'
                     }`}
                   >
                     {item.title}
@@ -122,8 +154,14 @@ export default function Header() {
 
                 {/* More menu for additional items */}
                 {menuItems.length > 5 && (
-                  <div className="group relative">
-                    <button className="hover:text-primary-600 dark:hover:text-primary-400 flex items-center gap-1 text-sm font-medium text-gray-900 transition-colors duration-200 xl:text-base dark:text-gray-100">
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsMoreOpen((open) => !open)}
+                      className="hover:text-primary-700 dark:hover:text-primary-300 flex min-h-10 items-center gap-1 rounded-lg px-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                      aria-expanded={isMoreOpen}
+                      aria-haspopup="menu"
+                    >
                       {t.common.more}
                       <svg
                         className="h-4 w-4"
@@ -141,33 +179,41 @@ export default function Header() {
                     </button>
 
                     {/* Dropdown menu */}
-                    <div className="invisible absolute top-full right-0 z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white opacity-0 shadow-lg transition-all duration-200 group-hover:visible group-hover:opacity-100 dark:border-gray-700 dark:bg-gray-800">
-                      <div className="py-2">
-                        {menuItems.slice(5).map((item) => (
-                          <Link
-                            key={item.title}
-                            href={item.href}
-                            className={`block px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                              isActive(item.href)
-                                ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
-                                : 'text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-700'
-                            }`}
-                          >
-                            {item.title}
-                          </Link>
-                        ))}
+                    {isMoreOpen && (
+                      <div
+                        role="menu"
+                        className="absolute top-full right-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-gray-200 bg-white p-1.5 shadow-xl shadow-gray-950/10 dark:border-gray-700 dark:bg-gray-800"
+                      >
+                        <div className="py-2">
+                          {menuItems.slice(5).map((item) => (
+                            <Link
+                              key={item.title}
+                              href={item.href}
+                              className={`block rounded-xl px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${
+                                isActive(item.href)
+                                  ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                                  : 'text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-700'
+                              }`}
+                            >
+                              {item.title}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
               </nav>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
               {/* Mobile Search Toggle */}
               <button
+                type="button"
                 onClick={() => setShowMobileSearch(!showMobileSearch)}
-                className="cursor-pointer text-gray-600 hover:text-gray-900 lg:hidden dark:text-gray-300 dark:hover:text-white"
+                className="icon-button xl:hidden"
+                aria-label={locale === 'fa' ? 'جست‌وجو' : 'Search'}
+                aria-expanded={showMobileSearch}
               >
                 <Search className="h-6 w-6" />
               </button>
@@ -175,7 +221,7 @@ export default function Header() {
               {/* Desktop Search */}
               <form
                 onSubmit={handleSearch}
-                className="relative hidden lg:block"
+                className="relative hidden 2xl:block"
               >
                 <input
                   type="text"
@@ -183,7 +229,7 @@ export default function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
-                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                  className="focus:border-primary-600 focus:ring-primary-100 dark:focus:ring-primary-950 h-11 w-56 rounded-xl border border-gray-200 bg-gray-50 px-4 pe-10 text-sm text-gray-900 placeholder-gray-500 focus:ring-4 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
                 />
                 <button
                   type="submit"
@@ -193,8 +239,12 @@ export default function Header() {
                 </button>
               </form>
 
-              <LanguageSwitcher />
-              <DarkModeToggle />
+              <div className="hidden sm:block">
+                <LanguageSwitcher />
+              </div>
+              <div className="hidden sm:block">
+                <DarkModeToggle />
+              </div>
               <CartMenu />
 
               {/* Auth Section */}
@@ -207,11 +257,12 @@ export default function Header() {
                     locale={locale}
                   />
                 ) : !loading ? (
-                  <Link href="/send-otp">
-                    <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">
-                      {t.nav.login}
-                    </Button>
-                  </Link>
+                  <Button asChild className="px-3 sm:px-5">
+                    <Link href="/send-otp">
+                      <span className="hidden sm:inline">{t.nav.login}</span>
+                      <span className="sm:hidden">ورود</span>
+                    </Link>
+                  </Button>
                 ) : null}
               </div>
             </div>
@@ -225,7 +276,7 @@ export default function Header() {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="border-t border-gray-200 bg-white lg:hidden dark:border-gray-700 dark:bg-gray-900"
+              className="border-t border-gray-200 bg-white xl:hidden dark:border-gray-700 dark:bg-gray-900"
             >
               <div className="container mx-auto p-4">
                 <form onSubmit={handleSearch} className="relative">
@@ -235,11 +286,15 @@ export default function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={handleSearchKeyDown}
-                    className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 pe-10 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                    className="focus:border-primary-600 focus:ring-primary-100 dark:focus:ring-primary-950 h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 pe-10 text-sm text-gray-900 placeholder-gray-500 focus:ring-4 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
+                    autoFocus
                   />
                   <button
                     type="submit"
-                    className="absolute end-3 top-2.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    className="absolute end-1 top-0 flex h-11 w-10 items-center justify-center rounded-lg text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                    aria-label={
+                      locale === 'fa' ? 'اجرای جست‌وجو' : 'Submit search'
+                    }
                   >
                     <Search className="h-5 w-5" />
                   </button>
@@ -260,6 +315,7 @@ export default function Header() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsDrawerOpen(false)}
+              aria-hidden="true"
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
             />
 
@@ -269,15 +325,18 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.3 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-80 overflow-y-auto bg-white p-6 shadow-xl dark:bg-gray-900"
+              role="dialog"
+              aria-modal="true"
+              aria-label={locale === 'fa' ? 'منوی اصلی' : 'Main menu'}
+              className="fixed top-0 right-0 bottom-0 z-50 w-[min(88vw,22rem)] overflow-y-auto overscroll-contain bg-white p-5 shadow-2xl dark:bg-gray-900"
             >
               <div className="flex items-center justify-between">
                 <Link href="/" className="flex items-center gap-2">
                   <Image
-                    src="/logo.png"
+                    src="/logo.svg"
                     alt="لوگو کاکتوس"
                     width={48}
-                    height={48}
+                    height={42}
                     className="rounded-xl"
                   />
                   <span className="from-primary-600 to-primary-800 bg-gradient-to-l bg-clip-text text-xl font-black text-transparent">
@@ -285,21 +344,28 @@ export default function Header() {
                   </span>
                 </Link>
                 <button
+                  type="button"
                   onClick={() => setIsDrawerOpen(false)}
-                  className="cursor-pointer text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                  className="icon-button"
+                  aria-label={locale === 'fa' ? 'بستن منو' : 'Close menu'}
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
 
-              <nav className="mt-8 space-y-4">
+              <nav
+                className="mt-7 space-y-1.5"
+                aria-label={
+                  locale === 'fa' ? 'منوی موبایل' : 'Mobile navigation'
+                }
+              >
                 {menuItems.map((item) => (
                   <Link
                     key={item.title}
                     href={item.href}
                     className={`block rounded-lg px-4 py-2.5 font-medium transition-colors duration-200 ${
                       isActive(item.href)
-                        ? 'bg-primary-200 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400'
+                        ? 'bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300'
                         : 'text-gray-900 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
@@ -308,13 +374,17 @@ export default function Header() {
                 ))}
               </nav>
 
-              <div className="mt-8 border-t border-gray-200 pt-8 dark:border-gray-700">
+              <div className="mt-7 border-t border-gray-200 pt-5 dark:border-gray-700">
+                <div className="mb-5 flex items-center gap-2 sm:hidden">
+                  <LanguageSwitcher />
+                  <DarkModeToggle />
+                </div>
                 {!user && (
-                  <Link href="/send-otp" className="block">
-                    <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 w-full transform rounded-full px-6 py-2.5 text-white transition-all duration-200 hover:scale-105">
+                  <Button asChild className="w-full px-6">
+                    <Link href="/send-otp" className="block">
                       {t.nav.login}
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
               </div>
             </motion.div>

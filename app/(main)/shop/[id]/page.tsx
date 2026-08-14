@@ -223,11 +223,9 @@ export default function Page({ params }: ProductPageProps) {
             <Button onClick={() => setReloadKey((value) => value + 1)}>
               تلاش دوباره
             </Button>
-            <Link href="/shop">
-              <Button variant="secondary" className="w-full">
-                بازگشت به فروشگاه
-              </Button>
-            </Link>
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/shop">بازگشت به فروشگاه</Link>
+            </Button>
           </div>
         </div>
       </div>

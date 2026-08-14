@@ -50,13 +50,13 @@ export default function SendOtpPage() {
 
     try {
       const normalizedPhone = convertToEnglishNumbers(identifier.trim());
-      const res = await sendOtp({phone: normalizedPhone });
+      const res = await sendOtp({ phone: normalizedPhone });
       toast.success(res.message || 'کد ارسال شد.');
-      
+
       // Pass both phone and is_new flag to verify-otp
       const queryParams = new URLSearchParams({
         identifier: normalizedPhone,
-        is_new: res.data.is_new.toString()
+        is_new: res.data.is_new.toString(),
       });
       router.push(`/verify-otp?${queryParams.toString()}`);
     } catch (error: unknown) {
@@ -106,12 +106,18 @@ export default function SendOtpPage() {
               required
               placeholder="09123456789"
               dir="ltr"
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'identifier-error' : undefined}
             />
           </div>
         </div>
 
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-500 dark:bg-red-900/50 dark:text-red-200">
+          <div
+            id="identifier-error"
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          >
             {error}
           </div>
         )}
@@ -119,7 +125,8 @@ export default function SendOtpPage() {
         <button
           type="submit"
           disabled={loading}
-          className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-600 relative w-full transform rounded-lg px-4 py-3 text-sm font-medium text-white transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-500 relative min-h-12 w-full rounded-xl px-4 py-3 text-sm font-bold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          aria-busy={loading}
         >
           {loading ? (
             <>

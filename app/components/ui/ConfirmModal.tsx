@@ -107,9 +107,7 @@ export default function ConfirmModal({
                   </div>
                 </div>
 
-                <div
-                  className={`mt-5 gap-3 sm:mt-4 sm:flex ${direction === 'rtl' ? 'sm:flex-row-reverse' : 'sm:flex-row'}`}
-                >
+                <div className="mt-5 gap-3 sm:mt-4 sm:flex sm:flex-row">
                   <Button
                     type="button"
                     variant={variant}

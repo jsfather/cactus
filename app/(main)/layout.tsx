@@ -9,9 +9,9 @@ export default function Layout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <LocaleProvider>
-      <div className="flex min-h-screen flex-col">
+      <div className="app-shell flex min-h-screen flex-col">
         <Header />
-        <main className="flex-1">{children}</main>
+        <main className="public-content flex-1">{children}</main>
         <Footer />
       </div>
     </LocaleProvider>

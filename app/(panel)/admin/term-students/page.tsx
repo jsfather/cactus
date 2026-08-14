@@ -135,12 +135,12 @@ export default function TermStudentsPage() {
             مدیریت دانش‌پژوهان تخصیص یافته به ترم‌ها
           </p>
         </div>
-        <Link href="/admin/term-students/new">
-          <Button className="flex items-center gap-2">
+        <Button asChild>
+          <Link href="/admin/term-students/new">
             <Plus className="h-4 w-4" />
             اضافه کردن دانش‌پژوه به ترم
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       {/* Summary Stats */}
@@ -245,12 +245,12 @@ export default function TermStudentsPage() {
                 <p className="mb-4 text-gray-600 dark:text-gray-400">
                   ترم‌هایی که دانش‌پژوه دارند اینجا نمایش داده می‌شوند
                 </p>
-                <Link href="/admin/term-students/new">
-                  <Button>
+                <Button asChild>
+                  <Link href="/admin/term-students/new">
                     <Plus className="ml-2 h-4 w-4" />
                     اضافه کردن دانش‌پژوه به ترم
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             </div>
           </Card>

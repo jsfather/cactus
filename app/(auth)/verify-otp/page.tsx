@@ -63,12 +63,14 @@ export default function VerifyOtpPage() {
         phone: normalizedPhone,
         otp: normalizedOtp,
       });
-      
+
       toast.success('ورود موفقیت‌آمیز بود');
-      
+
       // Check if user is new and redirect accordingly
       if (isNew) {
-        router.push(`/onboarding/information?phone=${encodeURIComponent(normalizedPhone)}`);
+        router.push(
+          `/onboarding/information?phone=${encodeURIComponent(normalizedPhone)}`
+        );
       } else {
         router.push('/user'); // Existing user goes to dashboard
       }
@@ -131,18 +133,25 @@ export default function VerifyOtpPage() {
               inputMode="numeric"
               pattern="[0-9۰-۹٠-٩]*"
               maxLength={6}
+              autoComplete="one-time-code"
               value={otp}
               onChange={handleOtpChange}
               className="focus:border-primary-500 focus:ring-primary-500/20 block w-full rounded-lg border border-gray-300 bg-white/50 p-3 pr-10 text-gray-900 placeholder-gray-500 backdrop-blur-sm transition-colors focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-900/50 dark:text-white dark:placeholder-gray-400"
               required
               placeholder="کد تایید را وارد کنید"
               dir="ltr"
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'otp-error' : undefined}
             />
           </div>
         </div>
 
         {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-500 dark:bg-red-900/50 dark:text-red-200">
+          <div
+            id="otp-error"
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          >
             {error}
           </div>
         )}
@@ -151,7 +160,8 @@ export default function VerifyOtpPage() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 dark:bg-primary-700 dark:hover:bg-primary-600 relative w-full transform rounded-lg px-4 py-3 text-sm font-medium text-white transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-500 relative min-h-12 w-full rounded-xl px-4 py-3 text-sm font-bold text-white shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            aria-busy={loading}
           >
             {loading ? (
               <>

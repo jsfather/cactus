@@ -72,6 +72,15 @@ export function UserMenu({ userName, locale = 'fa' }: UserMenuProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
@@ -91,8 +100,12 @@ export function UserMenu({ userName, locale = 'fa' }: UserMenuProps) {
   return (
     <div className="relative" ref={menuRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex cursor-pointer items-center gap-2 rounded-full transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
+        className="icon-button rounded-full"
+        aria-label={copy.account}
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
         <div className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gray-50 ring-2 ring-gray-100 dark:bg-gray-800 dark:ring-gray-800">
           {hasValidAvatar ? (
@@ -112,7 +125,8 @@ export function UserMenu({ userName, locale = 'fa' }: UserMenuProps) {
       {isOpen && (
         <div
           dir={direction}
-          className={`absolute z-50 mt-2 w-56 overflow-hidden rounded-xl bg-white text-start shadow-lg ring-1 ring-gray-200 transition-all dark:bg-gray-900 dark:shadow-gray-900/50 dark:ring-gray-800 ${locale === 'en' ? 'right-0' : 'left-0'}`}
+          role="menu"
+          className={`absolute z-50 mt-2 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl bg-white text-start shadow-xl ring-1 shadow-gray-950/10 ring-gray-200 transition-all dark:bg-gray-900 dark:shadow-gray-950/40 dark:ring-gray-800 ${locale === 'en' ? 'right-0' : 'left-0'}`}
         >
           <div className="py-2">
             <div className="border-b border-gray-200 px-4 py-3 text-sm text-gray-900 dark:border-gray-800 dark:text-gray-100">

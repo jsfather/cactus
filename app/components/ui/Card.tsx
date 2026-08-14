@@ -10,7 +10,7 @@ export const Card: React.FC<CardProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm';
+    'min-w-0 rounded-2xl border border-gray-200/90 bg-white shadow-sm shadow-gray-950/[0.035] dark:border-gray-700/80 dark:bg-gray-800';
   const combinedClasses = className
     ? `${baseClasses} ${className}`
     : baseClasses;

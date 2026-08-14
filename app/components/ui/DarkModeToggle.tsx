@@ -65,9 +65,11 @@ export default function DarkModeToggle() {
 
   return (
     <button
+      type="button"
       onClick={toggleDarkMode}
-      className="flex cursor-pointer items-center justify-center rounded-full bg-gray-100 p-2 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="icon-button bg-gray-100 dark:bg-gray-800"
+      aria-label={isDark ? 'فعال کردن حالت روشن' : 'فعال کردن حالت تاریک'}
+      title={isDark ? 'حالت روشن' : 'حالت تاریک'}
     >
       <motion.div
         initial={false}
