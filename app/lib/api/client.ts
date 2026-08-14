@@ -165,6 +165,9 @@ class ApiClient {
 
 export const apiClient = new ApiClient();
 
+// Backward-compatible name used by the placement-exam API modules.
+export const ApiService = apiClient;
+
 // Default request function for backward compatibility
 const request = async <T>(
   url: string,
