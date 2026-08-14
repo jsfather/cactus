@@ -234,7 +234,7 @@ function BlogContent() {
           {/* Blog Posts Grid */}
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {blogs.map((post, index) => {
-              const postTags = post.tags
+              const postTags = (Array.isArray(post.tags) ? post.tags : [])
                 .flatMap((tagString) =>
                   tagString.split(',').map((t) => t.trim())
                 )

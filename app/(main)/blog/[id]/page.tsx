@@ -139,7 +139,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
-  const postTags = blog.tags
+  const postTags = (Array.isArray(blog.tags) ? blog.tags : [])
     .flatMap((tagString) => tagString.split(',').map((t) => t.trim()))
     .filter(Boolean);
 
@@ -300,7 +300,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
             {/* Comments List */}
             <div className="space-y-6">
-              {blog.comments && blog.comments.length > 0 ? (
+              {Array.isArray(blog.comments) && blog.comments.length > 0 ? (
                 blog.comments
                   .filter((comment) => comment.approved)
                   .map((comment) => (

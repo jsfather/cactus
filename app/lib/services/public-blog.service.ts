@@ -8,7 +8,31 @@ import {
   BlogReactionResponse,
   BlogCommentRequest,
   BlogCommentResponse,
+  Blog,
 } from '@/app/lib/types';
+
+function normalizeStringList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter(
+      (item): item is string => typeof item === 'string' && item.trim() !== ''
+    );
+  }
+
+  return typeof value === 'string' && value.trim() !== '' ? [value] : [];
+}
+
+function normalizeBlog(value: Blog): Blog {
+  const rawBlog = value as Blog & {
+    tags?: unknown;
+    comments?: unknown;
+  };
+
+  return {
+    ...value,
+    tags: normalizeStringList(rawBlog.tags),
+    comments: Array.isArray(rawBlog.comments) ? rawBlog.comments : [],
+  };
+}
 
 // Public blog service that doesn't require authentication
 export class PublicBlogService {
@@ -32,21 +56,32 @@ export class PublicBlogService {
     const url = `${this.baseURL}${API_ENDPOINTS.PUBLIC.BLOG.GET_ALL}${queryString ? `?${queryString}` : ''}`;
 
     const response = await axios.get<GetBlogListResponse>(url);
-    return response.data;
+    const blogs = Array.isArray(response.data.data) ? response.data.data : [];
+
+    return {
+      ...response.data,
+      data: blogs.map(normalizeBlog),
+    };
   }
 
   async getById(id: string): Promise<GetBlogResponse> {
     const response = await axios.get<GetBlogResponse>(
       `${this.baseURL}${API_ENDPOINTS.PUBLIC.BLOG.GET_BY_ID(id)}`
     );
-    return response.data;
+    return {
+      ...response.data,
+      data: normalizeBlog(response.data.data),
+    };
   }
 
   async getTags(): Promise<{ data: string[] }> {
     const response = await axios.get<{ data: string[] }>(
       `${this.baseURL}${API_ENDPOINTS.PUBLIC.BLOG.GET_TAGS}`
     );
-    return response.data;
+    return {
+      ...response.data,
+      data: normalizeStringList(response.data.data),
+    };
   }
 
   // Reaction methods (require authentication)
