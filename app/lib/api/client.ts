@@ -247,8 +247,10 @@ class PublicApiClient {
           errors: error.response?.data?.errors,
         };
 
-        // Show toast error automatically
-        showApiError(apiError);
+        const suppressedStatuses = error.config?.suppressErrorStatuses ?? [];
+        if (!suppressedStatuses.includes(error.response?.status)) {
+          showApiError(apiError);
+        }
 
         return Promise.reject(apiError);
       }

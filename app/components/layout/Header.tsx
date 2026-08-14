@@ -17,7 +17,7 @@ import { useLocale } from '@/app/contexts/LocaleContext';
 
 export default function Header() {
   const { user, loading, error } = useUser();
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -202,7 +202,10 @@ export default function Header() {
                 {!user && loading ? (
                   <div className="h-10 w-32 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
                 ) : user ? (
-                  <UserMenu userName={user.first_name + ' ' + user.last_name} />
+                  <UserMenu
+                    userName={user.first_name + ' ' + user.last_name}
+                    locale={locale}
+                  />
                 ) : !loading ? (
                   <Link href="/send-otp">
                     <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-6 py-2 text-white transition-all duration-200 hover:scale-105">

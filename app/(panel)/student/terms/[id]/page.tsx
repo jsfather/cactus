@@ -418,7 +418,7 @@ export default function StudentTermDetailPage({
             <h3 className="text-md mb-3 font-medium text-gray-900 dark:text-white">
               برنامه جلسات
             </h3>
-            <div className="ring-opacity-5 overflow-hidden shadow ring-1 ring-black md:rounded-lg">
+            <div className="ring-opacity-5 max-w-full overflow-x-auto shadow ring-1 ring-black md:rounded-lg">
               <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>

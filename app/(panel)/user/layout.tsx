@@ -37,7 +37,11 @@ export default function Layout({
   const { user, loading } = useUser();
 
   return (
-    <div className="flex h-screen">
+    <div
+      dir="rtl"
+      lang="fa"
+      className="flex h-dvh min-w-0 overflow-hidden bg-gray-50 dark:bg-gray-900"
+    >
       <Sidebar
         user={user || undefined}
         menuItems={menuItems}
@@ -45,14 +49,16 @@ export default function Layout({
         onClose={() => setIsMobileMenuOpen(false)}
         loading={loading}
       />
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <Header
           user={user}
           onMenuClick={() => setIsMobileMenuOpen(true)}
           loading={loading}
         />
-        <main className="flex-1 overflow-y-auto p-4 dark:bg-gray-900">
-          {children}
+        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 dark:bg-gray-900">
+          <div className="mx-auto w-full max-w-[1600px] min-w-0">
+            {children}
+          </div>
         </main>
       </div>
     </div>

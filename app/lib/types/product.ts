@@ -131,8 +131,11 @@ export interface ProductComment {
   id: number;
   product_id?: string | number;
   content: string;
+  comment?: string;
   user?: ProductCommentUser;
   approved?: boolean;
+  is_approved?: boolean | number;
+  answer?: string | null;
   created_at: string;
 }
 

@@ -26,8 +26,8 @@ const Header = ({ user, onMenuClick, loading = false }: HeaderProps) => {
   }, [pathname]);
 
   return (
-    <div className="flex flex-col">
-      <header className="flex h-[80px] flex-row bg-white shadow-sm dark:border-b dark:border-gray-800 dark:bg-gray-900">
+    <div className="min-w-0 shrink-0">
+      <header className="flex h-[80px] min-w-0 flex-row bg-white shadow-sm dark:border-b dark:border-gray-800 dark:bg-gray-900">
         {/* Mobile menu button */}
         <button
           onClick={onMenuClick}
@@ -36,8 +36,8 @@ const Header = ({ user, onMenuClick, loading = false }: HeaderProps) => {
           <Menu className="h-6 w-6 cursor-pointer text-gray-600 dark:text-gray-300" />
         </button>
 
-        <nav className="flex w-full items-center justify-between px-4 lg:px-6">
-          <div className="flex w-full items-center">
+        <nav className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 lg:px-6">
+          <div className="flex min-w-0 flex-1 items-center">
             {loading ? (
               <div className="hidden items-center gap-2 lg:flex">
                 {/* Welcome text skeleton */}
@@ -58,7 +58,7 @@ const Header = ({ user, onMenuClick, loading = false }: HeaderProps) => {
             )}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             {/* Mobile search toggle */}
             <button
               onClick={() => setShowMobileSearch(!showMobileSearch)}

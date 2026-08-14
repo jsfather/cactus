@@ -1,210 +1,227 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Button } from '@/app/components/ui/Button';
-import { Card } from '@/app/components/ui/Card';
+import { useEffect, useRef, useState } from 'react';
 import {
+  AlertCircle,
+  Clock3,
+  FileText,
+  Loader2,
   MessageCircle,
   Send,
-  User,
-  Clock,
-  Loader2,
-  AlertCircle,
+  UserRound,
 } from 'lucide-react';
-import { Message } from '@/app/lib/types/ticket';
+import { Button } from '@/app/components/ui/Button';
+import type { Message } from '@/app/lib/types/ticket';
 
 interface TicketConversationProps {
-  messages: Message[] | undefined;
-  loading: boolean;
-  sendingMessage: boolean;
-  onSendMessage: (message: string) => Promise<boolean>;
+  messages?: Message[];
+  loading?: boolean;
+  sendingMessage?: boolean;
+  onSendMessage?: (message: string) => Promise<boolean>;
   ticketStatus?: string;
+  viewerRole?: 'student' | 'support';
+  composerLabel?: string;
+}
+
+function formatDate(dateString: string) {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString('fa-IR', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 export default function TicketConversation({
   messages = [],
-  loading,
-  sendingMessage,
+  loading = false,
+  sendingMessage = false,
   onSendMessage,
   ticketStatus = 'open',
+  viewerRole = 'support',
+  composerLabel = 'پاسخ شما',
 }: TicketConversationProps) {
   const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    scrollToBottom();
+    const container = scrollContainerRef.current;
+    if (container) container.scrollTop = container.scrollHeight;
   }, [messages]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!newMessage.trim() || sendingMessage) return;
-
+  const sendMessage = async () => {
+    if (!onSendMessage || !newMessage.trim() || sendingMessage) return;
     const messageToSend = newMessage.trim();
     setNewMessage('');
 
     try {
       const success = await onSendMessage(messageToSend);
-      if (!success) {
-        setNewMessage(messageToSend); // Restore message on failure
-      }
-    } catch (error) {
-      setNewMessage(messageToSend); // Restore message on error
+      if (!success) setNewMessage(messageToSend);
+    } catch {
+      setNewMessage(messageToSend);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 1) {
-      return `امروز، ${date.toLocaleTimeString('fa-IR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`;
-    } else if (diffDays === 2) {
-      return `دیروز، ${date.toLocaleTimeString('fa-IR', {
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`;
-    } else {
-      return date.toLocaleDateString('fa-IR', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    }
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    await sendMessage();
   };
 
   if (loading) {
     return (
-      <Card className="p-6">
-        <div className="flex h-64 items-center justify-center">
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
-            <span className="text-gray-600 dark:text-gray-400">
-              در حال بارگذاری گفتگو...
-            </span>
-          </div>
-        </div>
-      </Card>
+      <div className="flex min-h-80 items-center justify-center rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+        <Loader2 className="text-primary-600 h-6 w-6 animate-spin" />
+        <span className="mr-2 text-sm text-gray-500 dark:text-gray-400">
+          در حال دریافت گفتگو...
+        </span>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {/* Messages Container */}
-      <Card className="overflow-hidden p-0">
-        <div className="border-b border-gray-200 p-4 dark:border-gray-700">
-          <div className="flex items-center space-x-2 space-x-reverse">
-            <MessageCircle className="h-5 w-5 text-blue-600" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-              گفتگوی تیکت
-            </h3>
-          </div>
+    <section className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+      <header className="flex items-center justify-between border-b border-gray-200 px-4 py-3 sm:px-5 dark:border-gray-700">
+        <div className="flex items-center gap-2">
+          <MessageCircle className="text-primary-600 dark:text-primary-400 h-5 w-5" />
+          <h2 className="font-semibold text-gray-900 dark:text-white">
+            گفتگوی تیکت
+          </h2>
         </div>
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          {messages.length.toLocaleString('fa-IR')} پیام
+        </span>
+      </header>
 
-        <div className="h-96 space-y-4 overflow-y-auto p-4">
-          {messages.length === 0 ? (
-            <div className="flex h-full flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-              <MessageCircle className="mb-2 h-12 w-12 opacity-50" />
-              <p>هنوز پیامی ارسال نشده است</p>
-            </div>
-          ) : (
-            messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${message.is_student ? 'justify-start' : 'justify-end'}`}
+      <div
+        ref={scrollContainerRef}
+        className="max-h-[58vh] min-h-80 space-y-5 overflow-y-auto bg-gray-50/70 p-4 sm:p-6 dark:bg-gray-900/40"
+      >
+        {messages.length === 0 ? (
+          <div className="flex min-h-64 flex-col items-center justify-center text-center">
+            <MessageCircle className="h-12 w-12 text-gray-300 dark:text-gray-600" />
+            <h3 className="mt-3 font-medium text-gray-900 dark:text-white">
+              هنوز پیامی ثبت نشده است
+            </h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              اولین پیام گفتگو پس از ثبت در این قسمت نمایش داده می‌شود.
+            </p>
+          </div>
+        ) : (
+          messages.map((message, index) => {
+            const isStudent = Boolean(message.is_student);
+            const isOwn = viewerRole === 'student' ? isStudent : !isStudent;
+            return (
+              <article
+                key={`${message.created_at}-${index}`}
+                className={`flex items-end gap-2 ${isOwn ? 'justify-start' : 'justify-end'}`}
               >
+                {isOwn && (
+                  <span className="bg-primary-100 text-primary-600 dark:bg-primary-900/40 dark:text-primary-300 flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+                    <UserRound className="h-4 w-4" />
+                  </span>
+                )}
                 <div
-                  className={`max-w-xs rounded-lg px-4 py-2 lg:max-w-md ${
-                    message.is_student
-                      ? 'bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
-                      : 'bg-blue-600 text-white'
+                  className={`max-w-[86%] rounded-2xl px-4 py-3 sm:max-w-[72%] ${
+                    isOwn
+                      ? 'bg-primary-600 rounded-br-md text-white'
+                      : 'rounded-bl-md border border-gray-200 bg-white text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100'
                   }`}
                 >
-                  <div className="mb-1 flex items-center space-x-2 space-x-reverse">
-                    <User className="h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      {message.sender}
+                  <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="text-xs font-semibold">
+                      {message.sender || (isOwn ? 'شما' : 'پشتیبانی')}
                     </span>
-                    <span className="text-xs opacity-75">
-                      {message.is_student ? '(دانش‌پژوه)' : '(مدرس)'}
+                    <span
+                      className={`text-[11px] ${isOwn ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}
+                    >
+                      {isStudent ? 'دانش‌پژوه' : 'پشتیبانی'}
                     </span>
                   </div>
-                  <p className="text-sm whitespace-pre-wrap">
+                  <p className="text-sm leading-7 break-words whitespace-pre-wrap">
                     {message.message}
                   </p>
-                  <div className="mt-2 flex items-center space-x-1 space-x-reverse">
-                    <Clock className="h-3 w-3 opacity-75" />
-                    <span className="text-xs opacity-75">
-                      {formatDate(message.created_at)}
-                    </span>
-                  </div>
+                  {message.attachment && (
+                    <a
+                      href={message.attachment}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`mt-3 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium ${
+                        isOwn
+                          ? 'bg-white/15 text-white hover:bg-white/25'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200'
+                      }`}
+                    >
+                      <FileText className="h-3.5 w-3.5" />
+                      مشاهده فایل پیوست
+                    </a>
+                  )}
+                  <time
+                    className={`mt-2 flex items-center gap-1 text-[11px] ${isOwn ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'}`}
+                  >
+                    <Clock3 className="h-3 w-3" />
+                    {formatDate(message.created_at)}
+                  </time>
                 </div>
-              </div>
-            ))
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </Card>
+              </article>
+            );
+          })
+        )}
+      </div>
 
-      {/* Message Input */}
-      {ticketStatus === 'open' ? (
-        <Card className="p-4">
-          <form onSubmit={handleSendMessage} className="space-y-4">
-            <div>
-              <label
-                htmlFor="message"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-              >
-                پیام جدید
-              </label>
-              <textarea
-                id="message"
-                rows={3}
-                className="w-full resize-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-                placeholder="پیام خود را اینجا بنویسید..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                disabled={sendingMessage}
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={!newMessage.trim() || sendingMessage}
-                loading={sendingMessage}
-                className="flex items-center space-x-2 space-x-reverse"
-              >
-                {sendingMessage ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-                <span>{sendingMessage ? 'در حال ارسال...' : 'ارسال پیام'}</span>
-              </Button>
-            </div>
-          </form>
-        </Card>
-      ) : (
-        <Card className="p-4">
-          <div className="flex items-center justify-center space-x-2 space-x-reverse text-gray-500 dark:text-gray-400">
-            <AlertCircle className="h-5 w-5" />
-            <span>
-              این تیکت بسته شده است و امکان ارسال پیام جدید وجود ندارد.
-            </span>
+      {ticketStatus === 'closed' ? (
+        <div className="flex items-center justify-center gap-2 border-t border-gray-200 bg-gray-50 px-4 py-4 text-sm text-gray-500 dark:border-gray-700 dark:bg-gray-900/40 dark:text-gray-400">
+          <AlertCircle className="h-5 w-5" />
+          این تیکت بسته شده و امکان ارسال پاسخ جدید وجود ندارد.
+        </div>
+      ) : onSendMessage ? (
+        <form
+          onSubmit={handleSubmit}
+          className="border-t border-gray-200 p-4 sm:p-5 dark:border-gray-700"
+        >
+          <label
+            htmlFor="ticket-message"
+            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+          >
+            {composerLabel}
+          </label>
+          <textarea
+            id="ticket-message"
+            rows={4}
+            value={newMessage}
+            onChange={(event) => setNewMessage(event.target.value)}
+            onKeyDown={(event) => {
+              if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+                event.preventDefault();
+                void sendMessage();
+              }
+            }}
+            disabled={sendingMessage}
+            placeholder="پیام را واضح و همراه با جزئیات لازم بنویسید..."
+            className="focus:border-primary-500 focus:ring-primary-500 w-full resize-y rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm leading-6 text-gray-900 focus:ring-1 focus:outline-none disabled:opacity-60 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+          />
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              برای ارسال سریع از Ctrl + Enter استفاده کنید.
+            </p>
+            <Button
+              type="submit"
+              disabled={!newMessage.trim() || sendingMessage}
+              loading={sendingMessage}
+              className="w-full gap-2 sm:w-auto"
+            >
+              <Send className="h-4 w-4" />
+              ارسال پاسخ
+            </Button>
           </div>
-        </Card>
+        </form>
+      ) : (
+        <div className="border-t border-gray-200 px-4 py-4 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+          این گفتگو فقط برای مشاهده است.
+        </div>
       )}
-    </div>
+    </section>
   );
 }

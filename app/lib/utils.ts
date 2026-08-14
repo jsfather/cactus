@@ -1,3 +1,5 @@
+import moment from 'jalali-moment';
+
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
     style: 'currency',
@@ -24,9 +26,18 @@ export const formatDateToPersian = (dateStr: string): string => {
   if (!dateStr) return '';
 
   try {
-    // If the date is already in Persian format (contains Persian digits), return as is
+    // If the date is already in Persian digits, return it unchanged.
     if (/[۰-۹]/.test(dateStr)) {
       return dateStr;
+    }
+
+    // API term dates are Jalali strings such as 1404-07-20. Native Date treats
+    // those as Gregorian year 1404, so format them with the Jalali calendar.
+    if (/^1[34]\d{2}[-/]/.test(dateStr)) {
+      return moment
+        .from(dateStr.replace(/-/g, '/'), 'fa', 'YYYY/MM/DD')
+        .locale('fa')
+        .format('YYYY/MM/DD');
     }
 
     // Parse the date (assuming it's in YYYY-MM-DD or ISO format)
@@ -45,6 +56,13 @@ export const formatDateToPersian = (dateStr: string): string => {
     console.error('Error formatting date to Persian:', error);
     return dateStr;
   }
+};
+
+export const parseApiDate = (dateStr: string): Date => {
+  if (/^1[34]\d{2}[-/]/.test(dateStr)) {
+    return moment.from(dateStr.replace(/-/g, '/'), 'fa', 'YYYY/MM/DD').toDate();
+  }
+  return new Date(dateStr.replace(/\//g, '-'));
 };
 
 export const generatePagination = (currentPage: number, totalPages: number) => {

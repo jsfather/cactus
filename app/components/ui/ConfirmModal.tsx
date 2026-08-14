@@ -16,6 +16,8 @@ interface ModalProps {
   cancelText?: string;
   loading?: boolean;
   variant?: 'danger' | 'warning' | 'info';
+  direction?: 'rtl' | 'ltr';
+  closeLabel?: string;
 }
 
 const variantStyles = {
@@ -41,6 +43,8 @@ export default function ConfirmModal({
   cancelText = 'انصراف',
   loading = false,
   variant = 'danger',
+  direction = 'rtl',
+  closeLabel = 'بستن',
 }: ModalProps) {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -68,20 +72,27 @@ export default function ConfirmModal({
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-xl bg-white px-4 pt-5 pb-4 text-right shadow-xl ring-1 ring-gray-950/5 transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-900 dark:ring-white/5">
-                <div className="absolute top-0 left-0 hidden pt-4 pl-4 sm:block">
+              <Dialog.Panel
+                dir={direction}
+                className={`relative transform overflow-hidden rounded-xl bg-white px-4 pt-5 pb-4 shadow-xl ring-1 ring-gray-950/5 transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6 dark:bg-gray-900 dark:ring-white/5 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}
+              >
+                <div
+                  className={`absolute top-0 hidden pt-4 sm:block ${direction === 'rtl' ? 'left-0 pl-4' : 'right-0 pr-4'}`}
+                >
                   <button
                     type="button"
                     className={`cursor-pointer rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 ${variantStyles[variant].icon}`}
                     onClick={onClose}
                   >
-                    <span className="sr-only">بستن</span>
+                    <span className="sr-only">{closeLabel}</span>
                     <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                   </button>
                 </div>
 
                 <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:text-right">
+                  <div
+                    className={`mt-3 text-center sm:mt-0 ${direction === 'rtl' ? 'sm:text-right' : 'sm:text-left'}`}
+                  >
                     <Dialog.Title
                       as="h3"
                       className="text-lg leading-6 font-semibold text-gray-900 dark:text-white"
@@ -96,7 +107,9 @@ export default function ConfirmModal({
                   </div>
                 </div>
 
-                <div className="mt-5 gap-3 sm:mt-4 sm:flex sm:flex-row-reverse">
+                <div
+                  className={`mt-5 gap-3 sm:mt-4 sm:flex ${direction === 'rtl' ? 'sm:flex-row-reverse' : 'sm:flex-row'}`}
+                >
                   <Button
                     type="button"
                     variant={variant}

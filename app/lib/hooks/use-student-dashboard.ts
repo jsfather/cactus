@@ -1,8 +1,16 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useStudentTerm } from './use-student-term';
 import { useAvailableTerm } from './use-available-term';
 import { useStudentTicket } from './use-student-ticket';
 import { useStudentOrder } from './use-student-order';
+import { attendanceService } from '@/app/lib/services/attendance.service';
+import type { Attendance } from '@/app/lib/types/attendance';
+import { formatDateToPersian, parseApiDate } from '@/app/lib/utils';
+
+const formatActivityDate = (value?: string) => {
+  if (!value) return 'تاریخ نامشخص';
+  return formatDateToPersian(value);
+};
 
 export interface StudentDashboardStats {
   // Terms
@@ -10,19 +18,19 @@ export interface StudentDashboardStats {
   activeTerms: number;
   completedTerms: number;
   availableTerms: number;
-  
+
   // Academic
   totalHomeworks: number;
   pendingHomeworks: number;
   completedHomeworks: number;
   attendanceRate: number;
-  
+
   // Support
   totalTickets: number;
   openTickets: number;
   closedTickets: number;
   pendingTickets: number;
-  
+
   // Orders
   totalOrders: number;
   pendingOrders: number;
@@ -50,42 +58,42 @@ export interface StudentUpcomingSession {
 }
 
 export const useStudentDashboard = () => {
+  const [studentAbsences, setStudentAbsences] = useState<Attendance[]>([]);
+  const [attendanceLoading, setAttendanceLoading] = useState(false);
   // Import all the hooks
-  const { 
-    termList, 
-    loading: termsLoading, 
-    getTermList 
-  } = useStudentTerm();
-  
-  const { 
-    availableTerms, 
-    loading: availableTermsLoading, 
-    getAvailableTerms 
+  const { termList, loading: termsLoading, getTermList } = useStudentTerm();
+
+  const {
+    availableTerms,
+    loading: availableTermsLoading,
+    getAvailableTerms,
   } = useAvailableTerm();
-  
-  const { 
-    tickets, 
-    isListLoading: ticketsLoading, 
-    fetchTickets 
+
+  const {
+    tickets,
+    isListLoading: ticketsLoading,
+    fetchTickets,
   } = useStudentTicket();
-  
-  const { 
-    orders, 
-    loading: ordersLoading, 
-    fetchOrders 
-  } = useStudentOrder();
+
+  const { orders, loading: ordersLoading, fetchOrders } = useStudentOrder();
 
   // Fetch all data
   const fetchAllData = useCallback(async () => {
     try {
+      setAttendanceLoading(true);
       await Promise.all([
         getTermList(),
         getAvailableTerms(),
         fetchTickets(),
         fetchOrders(),
+        attendanceService
+          .getStudentAbsents()
+          .then((response) => setStudentAbsences(response.data)),
       ]);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+    } finally {
+      setAttendanceLoading(false);
     }
   }, [getTermList, getAvailableTerms, fetchTickets, fetchOrders]);
 
@@ -100,40 +108,69 @@ export const useStudentDashboard = () => {
     const totalTerms = termList.length;
     const activeTerms = termList.filter((term) => {
       const today = new Date();
-      const startDate = new Date(term.term.start_date.replace(/\//g, '-'));
-      const endDate = new Date(term.term.end_date.replace(/\//g, '-'));
+      const startDate = parseApiDate(term.term.start_date);
+      const endDate = parseApiDate(term.term.end_date);
       return startDate <= today && endDate >= today;
     }).length;
-    
+
     const completedTerms = termList.filter((term) => {
       const today = new Date();
-      const endDate = new Date(term.term.end_date.replace(/\//g, '-'));
+      const endDate = parseApiDate(term.term.end_date);
       return endDate < today;
     }).length;
 
     // Academic stats (calculated from term data)
-    const totalHomeworks = termList.reduce((sum, term) => {
-      return sum + (term.schedules?.filter(s => s.homeworks?.length > 0).length || 0);
-    }, 0);
-    
-    // For now, calculate a mock attendance rate since attendance structure is incomplete
-    const attendanceRate = termList.length > 0 ? 
-      Math.round(termList.reduce((sum, term) => {
-        const totalSessions = term.schedules?.length || 0;
-        const attendedSessions = Math.floor(totalSessions * 0.85); // Mock 85% attendance
-        return sum + (totalSessions > 0 ? (attendedSessions / totalSessions) * 100 : 0);
-      }, 0) / termList.length) : 0;
+    const homeworks = termList.flatMap((term) =>
+      (term.schedules ?? []).flatMap((schedule) => schedule.homeworks ?? [])
+    );
+    const totalHomeworks = homeworks.length;
+    const completedHomeworks = homeworks.filter(
+      (homework) => (homework.answers?.length ?? 0) > 0
+    ).length;
+    const pendingHomeworks = totalHomeworks - completedHomeworks;
+
+    const now = new Date();
+    const completedSchedules = termList.flatMap((term) =>
+      (term.schedules ?? []).filter((schedule) => {
+        const sessionDate = new Date(schedule.session_date);
+        return !Number.isNaN(sessionDate.getTime()) && sessionDate < now;
+      })
+    );
+    const absentScheduleIds = new Set(
+      studentAbsences.map((attendance) => attendance.schedule?.id)
+    );
+    const absenceCount = completedSchedules.filter((schedule) =>
+      absentScheduleIds.has(schedule.id)
+    ).length;
+    const attendanceRate =
+      completedSchedules.length > 0
+        ? Math.round(
+            ((completedSchedules.length - absenceCount) /
+              completedSchedules.length) *
+              100
+          )
+        : 0;
 
     // Support stats
     const totalTickets = tickets.length;
-    const openTickets = tickets.filter(ticket => ticket.status === 'open').length;
-    const closedTickets = tickets.filter(ticket => ticket.status === 'closed').length;
-    const pendingTickets = tickets.filter(ticket => ticket.status === 'pending').length;
+    const openTickets = tickets.filter(
+      (ticket) => ticket.status === 'open'
+    ).length;
+    const closedTickets = tickets.filter(
+      (ticket) => ticket.status === 'closed'
+    ).length;
+    const pendingTickets = tickets.filter(
+      (ticket) => ticket.status === 'pending'
+    ).length;
 
     // Orders stats
     const totalOrders = orders.length;
-    const pendingOrders = orders.filter(order => order.status === 'pending').length;
-    const completedOrders = orders.filter(order => order.status === 'delivered').length;
+    const pendingOrders = orders.filter(
+      (order) => order.status === 'pending'
+    ).length;
+    const completedOrders = orders.filter(
+      (order) => order.status === 'delivered'
+    ).length;
 
     return {
       totalTerms,
@@ -141,8 +178,8 @@ export const useStudentDashboard = () => {
       completedTerms,
       availableTerms: availableTerms.length,
       totalHomeworks,
-      pendingHomeworks: 0, // Will be calculated when homework data is available
-      completedHomeworks: 0, // Will be calculated when homework data is available
+      pendingHomeworks,
+      completedHomeworks,
       attendanceRate,
       totalTickets,
       openTickets,
@@ -152,7 +189,7 @@ export const useStudentDashboard = () => {
       pendingOrders,
       completedOrders,
     };
-  }, [termList, availableTerms, tickets, orders]);
+  }, [termList, availableTerms, tickets, orders, studentAbsences]);
 
   // Generate recent activities
   const recentActivities: StudentRecentActivity[] = useMemo(() => {
@@ -165,7 +202,7 @@ export const useStudentDashboard = () => {
         type: 'term',
         title: 'ترم جدید',
         description: `ترم ${term.term.title} شروع شده است`,
-        time: 'امروز',
+        time: formatActivityDate(term.term.start_date),
         color: 'blue',
       });
     });
@@ -177,7 +214,7 @@ export const useStudentDashboard = () => {
         type: 'ticket',
         title: ticket.status === 'open' ? 'تیکت جدید' : 'پاسخ تیکت',
         description: ticket.subject,
-        time: '۲ ساعت پیش',
+        time: formatActivityDate(ticket.created_at),
         status: ticket.status,
         color: ticket.status === 'open' ? 'amber' : 'emerald',
       });
@@ -190,7 +227,7 @@ export const useStudentDashboard = () => {
         type: 'order',
         title: 'سفارش جدید',
         description: `سفارش شماره ${order.code}`,
-        time: '۵ ساعت پیش',
+        time: formatActivityDate(order.created_at),
         status: order.status,
         color: order.status === 'delivered' ? 'emerald' : 'blue',
       });
@@ -215,7 +252,9 @@ export const useStudentDashboard = () => {
               sessionDate: schedule.session_date,
               startTime: schedule.start_time,
               endTime: schedule.end_time,
-              teacher: term.user ? `${term.user.first_name} ${term.user.last_name}` : 'نامشخص',
+              teacher: term.user
+                ? `${term.user.first_name} ${term.user.last_name}`
+                : 'نامشخص',
               type: term.term.type,
             });
           }
@@ -224,11 +263,19 @@ export const useStudentDashboard = () => {
     });
 
     return sessions
-      .sort((a, b) => new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime())
+      .sort(
+        (a, b) =>
+          new Date(a.sessionDate).getTime() - new Date(b.sessionDate).getTime()
+      )
       .slice(0, 5); // Limit to 5 upcoming sessions
   }, [termList]);
 
-  const loading = termsLoading || availableTermsLoading || ticketsLoading || ordersLoading;
+  const loading =
+    termsLoading ||
+    availableTermsLoading ||
+    ticketsLoading ||
+    ordersLoading ||
+    attendanceLoading;
 
   return {
     stats,

@@ -37,12 +37,36 @@ The Dockerfile already has these production defaults:
 NEXT_PUBLIC_API_BASE_URL=https://la.ecactus.co/api
 NEXT_PUBLIC_STATIC_BASE_URL=https://la.ecactus.co
 NEXT_PUBLIC_API_URL=https://la.ecactus.co
+NEXT_PUBLIC_HOME_HERO_VIDEO_URL=https://la.ecactus.co/site_videos/robocup-2024.mp4
+NEXT_PUBLIC_HOME_VIDEO_1_URL=https://la.ecactus.co/site_videos/intro-1.mp4
+NEXT_PUBLIC_HOME_VIDEO_2_URL=https://la.ecactus.co/site_videos/intro-2.mp4
+NEXT_PUBLIC_HOME_VIDEO_3_URL=https://la.ecactus.co/site_videos/intro-3.mp4
 ```
 
 No Dokploy variables are required while these values remain correct. To override
 one, add it under the application's **Build Time Arguments**, then rebuild. Adding
 only a runtime environment variable is insufficient because Next.js compiles
 `NEXT_PUBLIC_*` values into the browser bundle during the build.
+
+### Homepage video files
+
+The homepage expects these four public files:
+
+| Position | Public URL                                           | File to upload     |
+| -------- | ---------------------------------------------------- | ------------------ |
+| Hero     | `https://la.ecactus.co/site_videos/robocup-2024.mp4` | `robocup-2024.mp4` |
+| About 1  | `https://la.ecactus.co/site_videos/intro-1.mp4`      | `intro-1.mp4`      |
+| About 2  | `https://la.ecactus.co/site_videos/intro-2.mp4`      | `intro-2.mp4`      |
+| About 3  | `https://la.ecactus.co/site_videos/intro-3.mp4`      | `intro-3.mp4`      |
+
+They currently return `404`, so upload them into the backend domain's public
+webroot at `site_videos/`. The resulting URLs must be publicly readable over
+HTTPS, return `Content-Type: video/mp4`, and support byte-range requests. H.264
+video with AAC audio is the safest browser-compatible encoding.
+
+If the files will live elsewhere, add the corresponding four variables under
+Dokploy **Build Time Arguments** and rebuild the application. The video player
+now shows a clear unavailable state instead of a broken blank frame.
 
 ## 4. Add the frontend domain
 
@@ -71,6 +95,24 @@ It must return `{"status":"ok"}`. Then confirm browser API requests start with
 Allow the final frontend origin in the backend CORS configuration. It must allow
 the `Authorization` and `Content-Type` headers and the HTTP methods used by the
 application.
+
+## 7. Required public product route
+
+The deployed Laravel backend currently has no `GET /api/products/{id}` route.
+For example, product `187` exists in `GET /api/home/products`, but
+`GET /api/products/187` returns a route-level `404`. The frontend now resolves
+the real product from the public product list as a compatibility fallback, but
+the backend should add the dedicated detail route for correct REST behavior and
+efficient loading:
+
+```php
+Route::get('/products/{product}', [ProductController::class, 'show']);
+```
+
+The `show` action should return the same public product shape as the list,
+including its category and approved comments, and return a normal JSON `404`
+when the product does not exist. Keep Laravel `APP_DEBUG=false` in production so
+framework file paths and stack traces are not exposed to visitors.
 
 ## Updates and rollback
 

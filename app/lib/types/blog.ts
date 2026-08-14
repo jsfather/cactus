@@ -33,6 +33,8 @@ export interface Blog {
   meta_description: string;
   tags: string[];
   slug: string;
+  image?: string;
+  featured_image?: string;
   user_id?: number;
   user?: BlogUser;
   publish_at: string;

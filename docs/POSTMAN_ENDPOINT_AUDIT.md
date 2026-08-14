@@ -46,6 +46,10 @@ Mutations that could affect real users or money (payments, order changes, notifi
 
 ## Backend contract drift
 
+- The deployed backend has no public `GET /products/{id}` route even though
+  public product records are returned by `GET /home/products` and authenticated
+  comment creation uses `POST /products/{id}/comments`. The frontend has a
+  real-data list fallback, but Laravel should add the public detail route.
 - The collection documents `GET/POST/DELETE /admin/comments`, but the deployed backend currently returns `404` for `/admin/comments`. The admin product-comment screen now falls back to comments embedded in `/admin/products`, while approve, reject, answer, and delete continue to use the deployed `/admin/product_comments/{id}/...` action routes.
 - Several numeric IDs hard-coded in the collection are no longer present. Missing student/teacher example IDs cause a backend `500` instead of a safe `404`; current live IDs return `200`. This error handling must be fixed in the backend application, which is not part of this frontend repository.
 

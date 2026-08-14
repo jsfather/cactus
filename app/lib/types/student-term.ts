@@ -44,7 +44,12 @@ export interface StudentTermInfo {
   is_bought: boolean;
 }
 
-export type StudentTermHomework = Record<string, unknown>;
+export interface StudentTermHomework {
+  id?: number;
+  description?: string;
+  file_url?: string | null;
+  answers?: Array<Record<string, unknown>>;
+}
 
 export type StudentTermAttendance = Record<string, unknown>;
 

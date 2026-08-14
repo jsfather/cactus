@@ -18,15 +18,48 @@ import { getImageUrl, isValidImageUrl } from '@/app/lib/utils/image';
 
 interface UserMenuProps {
   userName: string;
+  locale?: 'fa' | 'en';
 }
 
-export function UserMenu({ userName }: UserMenuProps) {
+const menuTranslations = {
+  fa: {
+    account: 'حساب کاربری',
+    adminDashboard: 'داشبورد ادمین',
+    teacherDashboard: 'داشبورد مدرس',
+    studentDashboard: 'داشبورد دانش‌پژوه',
+    logout: 'خروج',
+    loggingOut: 'در حال خروج...',
+    logoutTitle: 'خروج از حساب کاربری',
+    logoutDescription:
+      'آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟',
+    cancel: 'انصراف',
+    close: 'بستن',
+    settings: 'تنظیمات حساب',
+  },
+  en: {
+    account: 'User account',
+    adminDashboard: 'Admin dashboard',
+    teacherDashboard: 'Teacher dashboard',
+    studentDashboard: 'Student dashboard',
+    logout: 'Log out',
+    loggingOut: 'Logging out...',
+    logoutTitle: 'Log out of your account',
+    logoutDescription: 'Are you sure you want to log out of your account?',
+    cancel: 'Cancel',
+    close: 'Close',
+    settings: 'Account settings',
+  },
+} as const;
+
+export function UserMenu({ userName, locale = 'fa' }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user } = useUser();
+  const copy = menuTranslations[locale];
+  const direction = locale === 'en' ? 'ltr' : 'rtl';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -77,7 +110,10 @@ export function UserMenu({ userName }: UserMenuProps) {
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 z-50 mt-2 w-56 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-gray-200 transition-all dark:bg-gray-900 dark:shadow-gray-900/50 dark:ring-gray-800">
+        <div
+          dir={direction}
+          className={`absolute z-50 mt-2 w-56 overflow-hidden rounded-xl bg-white text-start shadow-lg ring-1 ring-gray-200 transition-all dark:bg-gray-900 dark:shadow-gray-900/50 dark:ring-gray-800 ${locale === 'en' ? 'right-0' : 'left-0'}`}
+        >
           <div className="py-2">
             <div className="border-b border-gray-200 px-4 py-3 text-sm text-gray-900 dark:border-gray-800 dark:text-gray-100">
               <div className="flex items-center justify-between">
@@ -100,12 +136,13 @@ export function UserMenu({ userName }: UserMenuProps) {
                   <div>
                     <div className="font-medium">{userName}</div>
                     <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      حساب کاربری
+                      {copy.account}
                     </div>
                   </div>
                 </div>
                 <Link
                   href="/user/profile"
+                  aria-label={copy.settings}
                   className="p-1.5 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 >
                   <Settings className="text-primary-500 h-4 w-4" />
@@ -121,10 +158,10 @@ export function UserMenu({ userName }: UserMenuProps) {
                 className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
               >
                 <LayoutDashboard
-                  className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
+                  className="text-primary-600 dark:text-primary-400 h-5 w-5 transition-colors"
                   strokeWidth={1.7}
                 />
-                <span>داشبورد ادمین</span>
+                <span>{copy.adminDashboard}</span>
               </button>
             )}
             {user?.role === 'teacher' && (
@@ -136,10 +173,10 @@ export function UserMenu({ userName }: UserMenuProps) {
                 className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
               >
                 <GraduationCap
-                  className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
+                  className="text-primary-600 dark:text-primary-400 h-5 w-5 transition-colors"
                   strokeWidth={1.7}
                 />
-                <span>داشبورد مدرس</span>
+                <span>{copy.teacherDashboard}</span>
               </button>
             )}
             {user?.role === 'student' && (
@@ -151,17 +188,21 @@ export function UserMenu({ userName }: UserMenuProps) {
                 className="flex w-full cursor-pointer items-center gap-2 p-3 text-gray-900 transition-colors hover:bg-gray-50/80 active:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-800/50 dark:active:bg-gray-800"
               >
                 <User
-                  className="text-primary-600 dark:text-primary-400 mr-3 h-5 w-5 transition-colors"
+                  className="text-primary-600 dark:text-primary-400 h-5 w-5 transition-colors"
                   strokeWidth={1.7}
                 />
-                <span>داشبورد دانش‌پژوه</span>
+                <span>{copy.studentDashboard}</span>
               </button>
             )}
             <div className="px-3">
               <div className="my-1 h-px bg-gray-200 dark:bg-gray-800" />
             </div>
             <div onClick={() => setShowLogoutConfirm(true)}>
-              <LogoutButton />
+              <LogoutButton
+                loading={isLoggingOut}
+                label={copy.logout}
+                loadingLabel={copy.loggingOut}
+              />
             </div>
           </div>
         </div>
@@ -171,10 +212,12 @@ export function UserMenu({ userName }: UserMenuProps) {
         isOpen={showLogoutConfirm}
         onClose={() => setShowLogoutConfirm(false)}
         onConfirm={handleLogout}
-        title="خروج از حساب کاربری"
-        description="آیا مطمئن هستید که می‌خواهید از حساب کاربری خود خارج شوید؟"
-        confirmText="خروج"
-        cancelText="انصراف"
+        title={copy.logoutTitle}
+        description={copy.logoutDescription}
+        confirmText={copy.logout}
+        cancelText={copy.cancel}
+        closeLabel={copy.close}
+        direction={direction}
         loading={isLoggingOut}
         variant="danger"
       />

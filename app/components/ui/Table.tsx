@@ -31,9 +31,9 @@ export default function Table<T>({
 }: TableProps<T>) {
   if (loading) {
     return (
-      <div className="mt-6 flow-root">
-        <div className="inline-block min-w-full align-middle">
-          <div className="rounded-lg bg-gray-50 p-2 md:pt-0 dark:bg-gray-800/50">
+      <div className="mt-6 w-full min-w-0">
+        <div className="block w-full max-w-full min-w-0 align-middle">
+          <div className="w-full max-w-full overflow-x-auto rounded-lg bg-gray-50 p-2 md:pt-0 dark:bg-gray-800/50">
             <div className="animate-pulse">
               <div className="md:hidden">
                 {[1, 2, 3].map((i) => (
@@ -84,7 +84,7 @@ export default function Table<T>({
                       {columns.map((_, index) => (
                         <td
                           key={index}
-                          className="py-3 pr-3 pl-6 whitespace-nowrap"
+                          className="max-w-xs py-3 pr-3 pl-6 break-words whitespace-normal"
                         >
                           <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-700"></div>
                         </td>
@@ -109,9 +109,9 @@ export default function Table<T>({
   }
 
   return (
-    <div className="mt-6 flow-root">
-      <div className="inline-block min-w-full align-middle">
-        <div className="rounded-lg bg-gray-50 p-2 md:pt-0 dark:bg-gray-800/50">
+    <div className="mt-6 w-full min-w-0">
+      <div className="block w-full max-w-full min-w-0 align-middle">
+        <div className="w-full max-w-full overflow-x-auto rounded-lg bg-gray-50 p-2 md:pt-0 dark:bg-gray-800/50">
           <div className="md:hidden">
             {data.length === 0 ? (
               <div className="mb-2 w-full rounded-md bg-white p-4 text-center dark:bg-gray-800">
@@ -125,8 +125,8 @@ export default function Table<T>({
                   key={getRowId(item)}
                   className="mb-2 w-full rounded-md bg-white p-4 dark:bg-gray-800"
                 >
-                  <div className="flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700">
-                    <div>
+                  <div className="flex min-w-0 items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700">
+                    <div className="min-w-0 break-words">
                       <div className="text-sm text-gray-500 dark:text-gray-400">
                         {columns[0].render
                           ? columns[0].render(item[columns[0].accessor], item)
@@ -134,8 +134,8 @@ export default function Table<T>({
                       </div>
                     </div>
                   </div>
-                  <div className="flex w-full items-center justify-between pt-4">
-                    <div>
+                  <div className="flex w-full min-w-0 items-start justify-between gap-3 pt-4">
+                    <div className="min-w-0 flex-1 break-words">
                       {columns.slice(1).map((column, index) => (
                         <div
                           key={`${getRowId(item)}-mobile-col-${index}`}
@@ -151,7 +151,7 @@ export default function Table<T>({
                         </div>
                       ))}
                     </div>
-                    <div className="flex justify-start gap-2">
+                    <div className="flex shrink-0 justify-start gap-2">
                       {actions?.(item)}
                       {(onEdit || onDelete || onView) && (
                         <div className="flex gap-2">
@@ -269,7 +269,7 @@ export default function Table<T>({
                     {columns.map((column, index) => (
                       <td
                         key={`${getRowId(item)}-col-${index}`}
-                        className="py-3 pr-3 pl-6 whitespace-nowrap"
+                        className="max-w-xs py-3 pr-3 pl-6 break-words whitespace-normal"
                       >
                         <div className="flex items-center gap-3">
                           {column.render

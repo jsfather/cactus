@@ -2,10 +2,9 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useTeacherTerm } from './use-teacher-term';
 import { useTeacherStudent } from './use-teacher-student';
 import { useTeacherHomework } from './use-teacher-homework';
-import { useAttendance } from './use-attendance';
 import { useReport } from './use-report';
 import { useTeacherTicket } from './use-teacher-ticket';
-import { formatDateToPersian } from '../utils';
+import { formatDateToPersian, parseApiDate } from '../utils';
 
 export interface DashboardStats {
   totalTerms: number;
@@ -47,8 +46,9 @@ export interface RecentActivity {
 export interface UpcomingClass {
   title: string;
   time: string;
-  location: string;
+  date: string;
   termId?: string;
+  startsAt: number;
 }
 
 export const useTeacherDashboard = () => {
@@ -98,7 +98,7 @@ export const useTeacherDashboard = () => {
     const totalTerms = terms.length;
     const activeTerms = terms.filter((term) => {
       const today = new Date();
-      const endDate = new Date(term.end_date.replace(/\//g, '-'));
+      const endDate = parseApiDate(term.end_date);
       return endDate >= today;
     }).length;
     const totalSessions = terms.reduce(
@@ -157,7 +157,7 @@ export const useTeacherDashboard = () => {
     // Calculate additional metrics
     const completedSessions = terms.reduce((sum, term) => {
       const today = new Date();
-      const endDate = new Date(term.end_date.replace(/\//g, '-'));
+      const endDate = parseApiDate(term.end_date);
       return sum + (endDate < today ? term.number_of_sessions : 0);
     }, 0);
 
@@ -235,25 +235,31 @@ export const useTeacherDashboard = () => {
     return activities.slice(0, 5);
   }, [homeworks, reportList, ticketList]);
 
-  // Generate upcoming classes from active terms
+  // Generate upcoming classes from real schedule records.
   const upcomingClasses: UpcomingClass[] = useMemo(() => {
-    const today = new Date();
+    const now = new Date();
     const classes: UpcomingClass[] = [];
 
     terms.forEach((term) => {
-      const endDate = new Date(term.end_date.replace(/\//g, '-'));
-      if (endDate >= today) {
-        // Add mock upcoming classes for active terms
-        classes.push({
-          title: term.title,
-          time: '۱۰:۰۰ - ۱۲:۰۰',
-          location: 'کلاس ۳۰۱ - طبقه سوم',
-          termId: term.id.toString(),
+      term.teachers.forEach((teacher) => {
+        teacher.schedules.forEach((schedule) => {
+          const startsAt = new Date(
+            `${schedule.session_date}T${schedule.start_time}`
+          );
+          if (Number.isNaN(startsAt.getTime()) || startsAt < now) return;
+
+          classes.push({
+            title: term.title,
+            time: `${schedule.start_time.slice(0, 5)} تا ${schedule.end_time.slice(0, 5)}`,
+            date: formatDateToPersian(schedule.session_date),
+            termId: term.id.toString(),
+            startsAt: startsAt.getTime(),
+          });
         });
-      }
+      });
     });
 
-    return classes.slice(0, 3); // Limit to 3 upcoming classes
+    return classes.sort((a, b) => a.startsAt - b.startsAt).slice(0, 3);
   }, [terms]);
 
   // Calculate loading state
