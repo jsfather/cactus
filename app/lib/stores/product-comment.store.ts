@@ -36,7 +36,7 @@ export const useProductCommentStore = create<ProductCommentState>(
 
     approveComment: async (id: string) => {
       try {
-        await productCommentService.setApproval(id, true);
+        await productCommentService.approve(id);
         // Update local state
         const { commentList } = get();
         set({
@@ -54,7 +54,7 @@ export const useProductCommentStore = create<ProductCommentState>(
 
     rejectComment: async (id: string) => {
       try {
-        await productCommentService.setApproval(id, false);
+        await productCommentService.reject(id);
         // Update local state
         const { commentList } = get();
         set({

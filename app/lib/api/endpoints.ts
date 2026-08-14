@@ -346,7 +346,7 @@ export const API_ENDPOINTS = {
 
     USER: {
       DASHBOARD: '/user/dashboard',
-      PROFILE: '/user/profile',
+      PROFILE: '/profile',
       ORDERS: '/user/orders',
       TICKETS: '/user/tickets',
     },

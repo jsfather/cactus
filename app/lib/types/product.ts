@@ -12,6 +12,7 @@ export interface Product {
   image: string | null;
   attributes: Record<string, string>;
   category: ProductCategory | null;
+  comments?: AdminProductComment[];
   created_at?: string;
   updated_at?: string;
 }

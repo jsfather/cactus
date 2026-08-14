@@ -33,15 +33,21 @@ All collection groups now have a frontend client/service path. Existing screens 
 
 ## Live validation
 
-The following public routes were checked against the live API and returned the expected JSON envelope:
+Authenticated and public checks were run against the deployed API using schema-only output (no personal record values were logged). The following route groups returned successful responses with the expected JSON shapes:
 
-- `GET /home/faqs`
-- `GET /home/courses`
-- `GET /home/teachers`
-- `GET /home/products`
-- `GET /home/blogs`
+- Public: FAQs, courses, teachers, products, blogs, blog tags, certificates, settings, and a live blog detail.
+- Admin collections: dashboard, blogs, courses, certificates, exams, FAQs, levels, offline sessions, orders, panel guides, product categories, products, reports, students, teachers, term teachers, terms, tickets, teacher tickets, ticket departments, users, and attendance absences.
+- Admin details: live records for blogs, certificates, exams, FAQs, offline sessions, orders, panel guides, product categories, products, students, teachers, term teachers, terms, and users.
+- Shared and role routes: profile, notifications, panel guides, orders, student terms/tickets/attendance, and teacher terms/students/homeworks/offline sessions/reports/tickets/attendance.
 
-Authenticated routes require a current bearer token for live response-shape and permission validation. Until that token is supplied, those routes are validated against the Postman contract, TypeScript, and the production build.
+A temporary FAQ was used to validate the complete write lifecycle. `POST`, detail `GET`, `PUT`, and `DELETE` returned `201/200/200/200`; the fixture was removed immediately.
+
+Mutations that could affect real users or money (payments, order changes, notifications, classrooms, attendance, and student/teacher records) were intentionally not executed on production.
+
+## Backend contract drift
+
+- The collection documents `GET/POST/DELETE /admin/comments`, but the deployed backend currently returns `404` for `/admin/comments`. The admin product-comment screen now falls back to comments embedded in `/admin/products`, while approve, reject, answer, and delete continue to use the deployed `/admin/product_comments/{id}/...` action routes.
+- Several numeric IDs hard-coded in the collection are no longer present. Missing student/teacher example IDs cause a backend `500` instead of a safe `404`; current live IDs return `200`. This error handling must be fixed in the backend application, which is not part of this frontend repository.
 
 ## Collection issue
 
@@ -50,5 +56,7 @@ The request named `certificate-categories` points to `/home/blogs`. This is a du
 ## Verification
 
 - `npx tsc --noEmit`: passes
+- `npx eslint app lib --quiet`: passes
 - `npm run build`: passes
-- Next production routes generated: 100+
+- `git diff --check`: passes
+- Next application pages/routes: 108

@@ -1,18 +1,44 @@
-import { apiClient } from '@/app/lib/api/client';
+import { apiClient, type ApiError } from '@/app/lib/api/client';
 import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 import {
   AdminProductComment,
   GetAdminProductCommentsResponse,
+  Product,
 } from '@/app/lib/types/product';
 
 export class ProductCommentService {
   async getAll(): Promise<GetAdminProductCommentsResponse> {
-    const response = await apiClient.get<GetAdminProductCommentsResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.GET_ALL
-    );
+    let comments: AdminProductComment[];
+
+    try {
+      const response = await apiClient.get<GetAdminProductCommentsResponse>(
+        API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.GET_ALL,
+        { suppressErrorStatuses: [404] }
+      );
+      comments = response.data;
+    } catch (error) {
+      if ((error as ApiError).status !== 404) throw error;
+
+      // The supplied collection documents /admin/comments, but the deployed
+      // API currently returns 404 for it. Product responses include comments,
+      // so keep moderation usable until the backend restores the list route.
+      const response = await apiClient.get<{ data: Product[] }>(
+        API_ENDPOINTS.PANEL.ADMIN.PRODUCTS.GET_ALL
+      );
+      comments = response.data.flatMap((product) =>
+        (product.comments ?? []).map((comment) => ({
+          ...comment,
+          product_id: Number(comment.product_id ?? product.id),
+          product: comment.product ?? {
+            id: Number(product.id),
+            title: product.title,
+          },
+        }))
+      );
+    }
+
     return {
-      ...response,
-      data: response.data.map((comment) => ({
+      data: comments.map((comment) => ({
         ...comment,
         content: comment.content || comment.comment || '',
         approved:
@@ -29,7 +55,7 @@ export class ProductCommentService {
     );
   }
 
-  async setApproval(
+  async updateApproval(
     id: string,
     isApproved: boolean
   ): Promise<{ message: string; data?: AdminProductComment }> {
@@ -61,6 +87,12 @@ export class ProductCommentService {
   }
 
   async delete(id: string): Promise<void> {
+    return apiClient.delete<void>(
+      API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.DELETE(id)
+    );
+  }
+
+  async deleteGeneric(id: string): Promise<void> {
     return apiClient.delete<void>(
       API_ENDPOINTS.PANEL.ADMIN.PRODUCT_COMMENTS.DELETE_GENERIC(id)
     );

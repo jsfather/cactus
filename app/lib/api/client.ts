@@ -1,6 +1,13 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { handleApiError as showApiError } from '@/app/lib/utils/error';
 
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    /** HTTP statuses that a caller handles locally without a global toast. */
+    suppressErrorStatuses?: number[];
+  }
+}
+
 export interface ApiError {
   message: string;
   status: number;
@@ -107,8 +114,14 @@ class ApiClient {
           errors: error.response?.data?.errors,
         };
 
-        // Show toast error automatically (except for 401 which redirects)
-        if (error.response?.status !== 401) {
+        const suppressedStatuses = error.config?.suppressErrorStatuses ?? [];
+
+        // Show toast errors automatically unless the caller explicitly owns
+        // recovery for this status (for example, a documented API fallback).
+        if (
+          error.response?.status !== 401 &&
+          !suppressedStatuses.includes(error.response?.status)
+        ) {
           showApiError(apiError);
         }
 
