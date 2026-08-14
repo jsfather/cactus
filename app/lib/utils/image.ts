@@ -10,10 +10,25 @@ const BASE_DOMAIN =
  * @param imagePath - The image path from backend (could be relative or absolute)
  * @returns Full URL to the image
  */
-export function getImageUrl(
-  imagePath: string | null | undefined
-): string | null {
+export function getImageUrl(imagePath: unknown): string | null {
   if (!imagePath) return null;
+
+  if (Array.isArray(imagePath)) {
+    return getImageUrl(imagePath[0]);
+  }
+
+  if (typeof imagePath === 'object') {
+    const image = imagePath as Record<string, unknown>;
+    return getImageUrl(
+      image.url ||
+        image.path ||
+        image.original_url ||
+        image.file_url ||
+        image.src
+    );
+  }
+
+  if (typeof imagePath !== 'string') return null;
 
   // If already a full URL, return as is
   if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
@@ -45,7 +60,9 @@ export function isValidImageUrl(imagePath: string | null | undefined): boolean {
     imagePath.startsWith('/user_files/') ||
     imagePath.startsWith('user_files/') ||
     imagePath.startsWith('/storage/') ||
-    imagePath.startsWith('storage/')
+    imagePath.startsWith('storage/') ||
+    imagePath.startsWith('/blog_images/') ||
+    imagePath.startsWith('blog_images/')
   ) {
     return true;
   }

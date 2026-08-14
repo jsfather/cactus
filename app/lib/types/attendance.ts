@@ -44,8 +44,7 @@ export interface CreateAttendanceRequest {
   mark: string;
 }
 
-export interface UpdateAttendanceRequest
-  extends Partial<CreateAttendanceRequest> {}
+export type UpdateAttendanceRequest = Partial<CreateAttendanceRequest>;
 
 // Response interfaces
 export interface GetAttendanceListResponse {
@@ -60,7 +59,7 @@ export interface CreateAttendanceResponse {
   data: Attendance;
 }
 
-export interface UpdateAttendanceResponse extends CreateAttendanceResponse {}
+export type UpdateAttendanceResponse = CreateAttendanceResponse;
 
 // Summary stats for attendances
 export interface AttendanceStats {

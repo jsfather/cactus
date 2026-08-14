@@ -24,6 +24,7 @@ import { useUser } from '@/app/hooks/useUser';
 import { toast } from 'react-toastify';
 import { Button } from '@/app/components/ui/Button';
 import Textarea from '@/app/components/ui/Textarea';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { t, dir } = useLocale();
@@ -138,9 +139,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     );
   }
 
-  const postTags = blog.tags
+  const postTags = (Array.isArray(blog.tags) ? blog.tags : [])
     .flatMap((tagString) => tagString.split(',').map((t) => t.trim()))
     .filter(Boolean);
+  const blogImageUrl = getImageUrl(blog.image || blog.featured_image);
 
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
@@ -163,7 +165,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               <div className="flex items-center gap-2">
                 {blog.user.profile_picture ? (
                   <Image
-                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${blog.user.profile_picture}`}
+                    src={getImageUrl(blog.user.profile_picture)!}
                     alt={`${blog.user.first_name} ${blog.user.last_name}`}
                     width={32}
                     height={32}
@@ -186,6 +188,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               {blog.little_description}
             </p>
           </div>
+
+          {/* Featured Image */}
+          {blogImageUrl && (
+            <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
+              <Image
+                src={blogImageUrl}
+                alt={blog.title}
+                fill
+                priority
+                sizes="(min-width: 896px) 896px, 100vw"
+                className="object-cover"
+              />
+            </div>
+          )}
 
           {/* Article Content */}
           <div className="prose prose-lg dark:prose-invert max-w-none">
@@ -299,7 +315,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
             {/* Comments List */}
             <div className="space-y-6">
-              {blog.comments && blog.comments.length > 0 ? (
+              {Array.isArray(blog.comments) && blog.comments.length > 0 ? (
                 blog.comments
                   .filter((comment) => comment.approved)
                   .map((comment) => (
@@ -311,7 +327,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                         <div className="flex items-center gap-3">
                           {comment.user?.profile_picture ? (
                             <Image
-                              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${comment.user.profile_picture}`}
+                              src={getImageUrl(comment.user.profile_picture)!}
                               alt={`${comment.user.first_name} ${comment.user.last_name}`}
                               width={40}
                               height={40}

@@ -60,6 +60,20 @@ export interface ProductSearchParams {
 }
 
 export class PublicProductService {
+  private normalizeProduct(product: PublicProduct): PublicProduct {
+    return {
+      ...product,
+      comments: (product.comments ?? []).map((comment) => ({
+        ...comment,
+        content: comment.content || comment.comment || '',
+        approved:
+          typeof comment.approved === 'boolean'
+            ? comment.approved
+            : Boolean(comment.is_approved),
+      })),
+    };
+  }
+
   async getHomeProducts(
     params?: ProductSearchParams
   ): Promise<GetPublicProductsResponse> {
@@ -82,9 +96,11 @@ export class PublicProductService {
   }
 
   async getById(id: string): Promise<GetPublicProductResponse> {
-    return publicApiClient.get<GetPublicProductResponse>(
+    const response = await publicApiClient.get<GetPublicProductResponse>(
       API_ENDPOINTS.PUBLIC.SHOP.PRODUCT_BY_ID(id)
     );
+
+    return { data: this.normalizeProduct(response.data) };
   }
 
   // Comment methods (require authentication)

@@ -1,6 +1,13 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { handleApiError as showApiError } from '@/app/lib/utils/error';
 
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    /** HTTP statuses that a caller handles locally without a global toast. */
+    suppressErrorStatuses?: number[];
+  }
+}
+
 export interface ApiError {
   message: string;
   status: number;
@@ -107,8 +114,14 @@ class ApiClient {
           errors: error.response?.data?.errors,
         };
 
-        // Show toast error automatically (except for 401 which redirects)
-        if (error.response?.status !== 401) {
+        const suppressedStatuses = error.config?.suppressErrorStatuses ?? [];
+
+        // Show toast errors automatically unless the caller explicitly owns
+        // recovery for this status (for example, a documented API fallback).
+        if (
+          error.response?.status !== 401 &&
+          !suppressedStatuses.includes(error.response?.status)
+        ) {
           showApiError(apiError);
         }
 
@@ -152,8 +165,22 @@ class ApiClient {
     return response.data;
   }
 
+  async patch<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T> {
+    const response = await this.client.patch<T>(url, data, config);
+    return response.data;
+  }
+
   async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.delete<T>(url, config);
+    return response.data;
+  }
+
+  async request<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.client.request<T>({ ...config, url });
     return response.data;
   }
 
@@ -171,9 +198,22 @@ export const ApiService = apiClient;
 // Default request function for backward compatibility
 const request = async <T>(
   url: string,
-  config?: AxiosRequestConfig
+  config?: AxiosRequestConfig | RequestInit
 ): Promise<T> => {
-  return apiClient.get<T>(url, config);
+  if (!config) {
+    return apiClient.get<T>(url);
+  }
+
+  // Older modules use the Fetch RequestInit shape (`body`) while newer code
+  // uses Axios (`data`). Normalize both so non-GET requests are not silently
+  // converted to GET requests.
+  const legacyConfig = config as RequestInit & AxiosRequestConfig;
+  const { body, ...axiosConfig } = legacyConfig;
+
+  return apiClient.request<T>(url, {
+    ...(axiosConfig as AxiosRequestConfig),
+    data: body ?? legacyConfig.data,
+  });
 };
 
 export default request;
@@ -207,8 +247,10 @@ class PublicApiClient {
           errors: error.response?.data?.errors,
         };
 
-        // Show toast error automatically
-        showApiError(apiError);
+        const suppressedStatuses = error.config?.suppressErrorStatuses ?? [];
+        if (!suppressedStatuses.includes(error.response?.status)) {
+          showApiError(apiError);
+        }
 
         return Promise.reject(apiError);
       }

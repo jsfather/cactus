@@ -10,13 +10,32 @@ export const API_ENDPOINTS = {
   USER: {
     ME: '/profile',
     UPDATE: '/profile',
+    UPDATE_PASSWORD: '/update-password',
+    SKY_ROOM_URL: (scheduleId: string) => `/sky_room_url/${scheduleId}`,
+    PANEL_GUIDES: {
+      GET_ALL: '/panel-guides',
+      GET_BY_ID: (id: string) => `/panel-guides/${id}`,
+    },
+    NOTIFICATIONS: {
+      GET_ALL: '/notifications',
+      MARK_READ: (id: string) => `/notifications/${id}/read`,
+      SEND_SAMPLE: '/notifications/sample_send',
+    },
   },
   SETTINGS: {
     GET: '/home/settings',
     UPDATE: '/admin/settings',
   },
   HOME: {
+    FAQS: '/home/faqs',
+    BLOGS: '/home/blogs',
+    BLOG_TAGS: '/home/blog-tags',
+    BLOG: (id: string) => `/home/blog/${id}`,
+    COURSES: '/home/courses',
+    COURSE: (id: string) => `/home/courses/${id}`,
     CERTIFICATES: '/home/certificates',
+    PRODUCTS: '/home/products',
+    TEACHERS: '/home/teachers',
   },
   PANEL: {
     ADMIN: {
@@ -28,6 +47,19 @@ export const API_ENDPOINTS = {
         CREATE: '/admin/blogs',
         UPDATE: (id: string) => `/admin/blogs/${id}`,
         DELETE: (id: string) => `/admin/blogs/${id}`,
+        COMMENTS: {
+          DELETE: (id: string) => `/admin/blog_comments/${id}`,
+          APPROVE: (id: string) => `/admin/blog_comments/${id}/approve`,
+          ANSWER: (id: string) => `/admin/blog_comments/${id}/answer`,
+        },
+      },
+
+      COURSES: {
+        GET_ALL: '/admin/courses',
+        GET_BY_ID: (id: string) => `/admin/courses/${id}`,
+        CREATE: '/admin/courses',
+        UPDATE: (id: string) => `/admin/courses/${id}`,
+        DELETE: (id: string) => `/admin/courses/${id}`,
       },
 
       USERS: {
@@ -55,10 +87,14 @@ export const API_ENDPOINTS = {
       },
 
       PRODUCT_COMMENTS: {
-        GET_ALL: '/admin/product_comments',
+        GET_ALL: '/admin/comments',
+        GET_BY_ID: (id: string) => `/admin/comments/${id}`,
+        UPDATE: (id: string) => `/admin/comments/${id}`,
         APPROVE: (id: string) => `/admin/product_comments/${id}/approve`,
         REJECT: (id: string) => `/admin/product_comments/${id}/reject`,
+        ANSWER: (id: string) => `/admin/product_comments/${id}/answer`,
         DELETE: (id: string) => `/admin/product_comments/${id}`,
+        DELETE_GENERIC: (id: string) => `/admin/comments/${id}`,
       },
 
       ORDERS: {
@@ -74,6 +110,8 @@ export const API_ENDPOINTS = {
         CREATE: '/admin/students',
         UPDATE: (id: string) => `/admin/students/${id}`,
         DELETE: (id: string) => `/admin/students/${id}`,
+        TOGGLE_TERM: '/admin/active_deactivate_term',
+        PLACEMENT_EXAM: (id: string) => `/admin/students/placement-exam/${id}`,
       },
 
       TEACHERS: {
@@ -141,7 +179,7 @@ export const API_ENDPOINTS = {
         GET_ALL: '/admin/tickets',
         GET_TEACHERS: '/admin/teacher_tickets',
         GET_BY_ID: (id: string) => `/admin/ticket/${id}`,
-        CREATE: '/admin/tickets',
+        CREATE: '/admin/ticket',
         UPDATE: (id: string) => `/admin/tickets/${id}`,
         DELETE: (id: string) => `/admin/tickets/${id}`,
         CLOSE: (id: string) => `/admin/ticket/${id}/close`,
@@ -194,6 +232,14 @@ export const API_ENDPOINTS = {
       REPORTS: {
         GET_ALL: '/admin/reports',
       },
+
+      ATTENDANCES: {
+        GET_ABSENTS: '/admin/attendances/absents',
+        GET_BY_STUDENT: (id: string) => `/admin/attendances/student/${id}`,
+        GET_BY_TERM: (id: string) => `/admin/attendances/term/${id}`,
+        GET_BY_SCHEDULE: (id: string) => `/admin/attendances/schedule/${id}`,
+        CREATE: '/admin/attendances',
+      },
     },
 
     STUDENT: {
@@ -218,6 +264,7 @@ export const API_ENDPOINTS = {
         GET_ALL: '/student/terms',
         GET_BY_ID: (id: string) => `/student/terms/${id}`,
         GET_AVAILABLE: '/student/terms/available',
+        PAY: '/student/pay',
         GET_SKY_ROOM_URL: (scheduleId: string) => `/sky_room_url/${scheduleId}`,
       },
       HOMEWORKS: {
@@ -227,6 +274,17 @@ export const API_ENDPOINTS = {
         REPLY_MESSAGE: '/student/homeworks-conversation-reply',
         GET_CONVERSATION: (conversationId: string) =>
           `/student/homeworks-conversation/${conversationId}`,
+      },
+      PLACEMENT_EXAM: {
+        START: '/student/placement-exam/start',
+        SUBMIT_ANSWER: '/student/placement-exam/submit-answer',
+        FINISH: (attemptId: string) =>
+          `/student/placement-exam/finish/${attemptId}`,
+      },
+      ATTENDANCES: {
+        GET_ABSENTS: '/student/attendances/absents',
+        GET_BY_TERM: (id: string) => `/student/attendances/term/${id}`,
+        GET_BY_SCHEDULE: (id: string) => `/student/attendances/schedule/${id}`,
       },
     },
 
@@ -248,6 +306,8 @@ export const API_ENDPOINTS = {
       TERMS: {
         GET_ALL: '/teacher/terms',
         GET_BY_ID: (id: string) => `/teacher/terms/${id}`,
+        CREATE_ROOM: (scheduleId: string) =>
+          `/teacher/terms/create_room/${scheduleId}`,
       },
       HOMEWORKS: {
         GET_ALL: '/teacher/homeworks',
@@ -275,11 +335,18 @@ export const API_ENDPOINTS = {
         CREATE: '/teacher/reports',
         DELETE: (id: string) => `/teacher/reports/${id}`,
       },
+      ATTENDANCES: {
+        GET_ABSENTS: '/teacher/attendances/absents',
+        GET_BY_STUDENT: (id: string) => `/teacher/attendances/student/${id}`,
+        GET_BY_TERM: (id: string) => `/teacher/attendances/term/${id}`,
+        GET_BY_SCHEDULE: (id: string) => `/teacher/attendances/schedule/${id}`,
+        CREATE: '/teacher/attendances',
+      },
     },
 
     USER: {
       DASHBOARD: '/user/dashboard',
-      PROFILE: '/user/profile',
+      PROFILE: '/profile',
       ORDERS: '/user/orders',
       TICKETS: '/user/tickets',
     },
@@ -294,21 +361,21 @@ export const API_ENDPOINTS = {
     },
 
     COURSES: {
-      GET_ALL: '/courses',
-      GET_BY_ID: (id: string) => `/courses/${id}`,
+      GET_ALL: '/home/courses',
+      GET_BY_ID: (id: string) => `/home/courses/${id}`,
     },
 
     SHOP: {
       PRODUCTS: '/products',
       HOME_PRODUCTS: '/home/products',
-      PRODUCT_BY_ID: (id: string) => `/products/${id}`,
+      PRODUCT_BY_ID: (id: string) => `/home/products/${id}`,
       PRODUCT_COMMENTS: (id: string) => `/products/${id}/comments`,
       CATEGORIES: '/product-categories',
     },
 
     TEACHERS: {
-      GET_ALL: '/teachers',
-      GET_BY_ID: (id: string) => `/teachers/${id}`,
+      GET_ALL: '/home/teachers',
+      GET_BY_ID: (id: string) => `/home/teachers/${id}`,
     },
 
     ABOUT: '/about',

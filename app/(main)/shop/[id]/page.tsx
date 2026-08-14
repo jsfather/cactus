@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,9 +8,6 @@ import {
   Star,
   Minus,
   Plus,
-  Truck,
-  Shield,
-  RefreshCw,
   ChevronLeft,
   MessageSquare,
   User,
@@ -31,7 +28,8 @@ import Textarea from '@/app/components/ui/Textarea';
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import { getImageUrl } from '@/app/lib/utils/image';
+import type { ApiError } from '@/app/lib/api/client';
 
 interface ProductPageProps {
   params: Promise<{
@@ -39,7 +37,6 @@ interface ProductPageProps {
   }>;
 }
 
-// Enhanced interface for display with fallback data
 interface DisplayProductDetail {
   id: string | number;
   title: string;
@@ -54,219 +51,9 @@ interface DisplayProductDetail {
   features: string[];
   specifications: { name: string; value: string }[];
   images: string[];
-  relatedProducts: {
-    id: string;
-    title: string;
-    price: string;
-    image: string;
-    category: string;
-  }[];
-  isFromApi: boolean;
   originalId?: number;
   actualPrice?: number;
-  comments?: ProductComment[];
 }
-
-// Static fallback data
-const staticProducts: Record<string, DisplayProductDetail> = {
-  '1': {
-    id: '1',
-    title: 'کیت آموزشی ربات مسیریاب',
-    price: '۲,۵۰۰,۰۰۰',
-    discount: '۲,۱۰۰,۰۰۰',
-    category: 'کیت آموزشی',
-    rating: 4.5,
-    reviews: 28,
-    inStock: true,
-    stockCount: 12,
-    description:
-      'کیت آموزشی ربات مسیریاب یک مجموعه کامل برای یادگیری مفاهیم پایه رباتیک و برنامه‌نویسی است. این کیت شامل تمام قطعات مورد نیاز برای ساخت یک ربات مسیریاب هوشمند می‌باشد.',
-    features: [
-      'قابلیت تشخیص و تعقیب خط',
-      'سنسورهای مادون قرمز با دقت بالا',
-      'موتورهای DC با کیفیت',
-      'برد کنترلر آردوینو',
-      'قطعات پلاستیکی با دوام',
-      'باتری قابل شارژ',
-    ],
-    specifications: [
-      { name: 'ابعاد', value: '۲۰×۱۵×۱۰ سانتی‌متر' },
-      { name: 'وزن', value: '۵۰۰ گرم' },
-      { name: 'ولتاژ کاری', value: '۷.۴ ولت' },
-      { name: 'زمان شارژ', value: '۲ ساعت' },
-      { name: 'مدت زمان کارکرد', value: '۳ ساعت' },
-    ],
-    images: [
-      '/product-1.jpg',
-      '/product-2.jpg',
-      '/product-3.jpg',
-      '/product-4.jpg',
-    ],
-    relatedProducts: [
-      {
-        id: '2',
-        title: 'بورد کنترلر آردوینو پرو',
-        price: '۸۵۰,۰۰۰',
-        image: '/product-2.jpg',
-        category: 'قطعات الکترونیکی',
-      },
-      {
-        id: '4',
-        title: 'سنسور فاصله‌سنج لیزری',
-        price: '۹۵۰,۰۰۰',
-        image: '/product-4.jpg',
-        category: 'سنسور',
-      },
-    ],
-    isFromApi: false,
-    originalId: 1,
-    actualPrice: 2100000,
-  },
-  '2': {
-    id: '2',
-    title: 'بورد کنترلر آردوینو پرو',
-    price: '۸۵۰,۰۰۰',
-    discount: null,
-    category: 'قطعات الکترونیکی',
-    rating: 5,
-    reviews: 42,
-    inStock: true,
-    stockCount: 25,
-    description:
-      'بورد کنترلر آردوینو پرو یک میکروکنترلر قدرتمند و انعطاف‌پذیر برای پروژه‌های رباتیک و الکترونیک است.',
-    features: [
-      'میکروکنترلر ATmega328P',
-      'فرکانس کاری 16 مگاهرتز',
-      '14 پین دیجیتال',
-      '6 پین آنالوگ',
-      'پشتیبانی از USB',
-      'قابلیت برنامه‌نویسی آسان',
-    ],
-    specifications: [
-      { name: 'ابعاد', value: '۶.۸×۵.۳ سانتی‌متر' },
-      { name: 'وزن', value: '۲۵ گرم' },
-      { name: 'ولتاژ ورودی', value: '۷-۱۲ ولت' },
-      { name: 'جریان خروجی', value: '۴۰ میلی‌آمپر' },
-      { name: 'حافظه Flash', value: '۳۲ کیلوبایت' },
-    ],
-    images: ['/product-2.jpg', '/product-1.jpg', '/product-3.jpg'],
-    relatedProducts: [
-      {
-        id: '1',
-        title: 'کیت آموزشی ربات مسیریاب',
-        price: '۲,۱۰۰,۰۰۰',
-        image: '/product-1.jpg',
-        category: 'کیت آموزشی',
-      },
-      {
-        id: '4',
-        title: 'سنسور فاصله‌سنج لیزری',
-        price: '۹۵۰,۰۰۰',
-        image: '/product-4.jpg',
-        category: 'سنسور',
-      },
-    ],
-    isFromApi: false,
-    originalId: 2,
-    actualPrice: 850000,
-  },
-  '3': {
-    id: '3',
-    title: 'ربات انسان‌نمای آموزشی',
-    price: '۱۲,۰۰۰,۰۰۰',
-    discount: '۱۰,۸۰۰,۰۰۰',
-    category: 'ربات کامل',
-    rating: 4.8,
-    reviews: 16,
-    inStock: false,
-    stockCount: 0,
-    description:
-      'ربات انسان‌نمای آموزشی برای آموزش مفاهیم پیشرفته رباتیک و هوش مصنوعی طراحی شده است.',
-    features: [
-      'سیستم حرکتی پیشرفته',
-      'سنسورهای تشخیص محیط',
-      'قابلیت تعامل صوتی',
-      'کنترل از راه دور',
-      'برنامه‌نویسی ساده',
-      'باتری بادوام',
-    ],
-    specifications: [
-      { name: 'ابعاد', value: '۴۰×۲۰×۱۵ سانتی‌متر' },
-      { name: 'وزن', value: '۲ کیلوگرم' },
-      { name: 'ولتاژ کاری', value: '۱۲ ولت' },
-      { name: 'زمان شارژ', value: '۴ ساعت' },
-      { name: 'مدت زمان کارکرد', value: '۶ ساعت' },
-    ],
-    images: ['/product-3.jpg', '/product-1.jpg', '/product-2.jpg'],
-    relatedProducts: [
-      {
-        id: '1',
-        title: 'کیت آموزشی ربات مسیریاب',
-        price: '۲,۱۰۰,۰۰۰',
-        image: '/product-1.jpg',
-        category: 'کیت آموزشی',
-      },
-      {
-        id: '2',
-        title: 'بورد کنترلر آردوینو پرو',
-        price: '۸۵۰,۰۰۰',
-        image: '/product-2.jpg',
-        category: 'قطعات الکترونیکی',
-      },
-    ],
-    isFromApi: false,
-    originalId: 3,
-    actualPrice: 10800000,
-  },
-  '4': {
-    id: '4',
-    title: 'سنسور فاصله‌سنج لیزری',
-    price: '۹۵۰,۰۰۰',
-    discount: null,
-    category: 'سنسور',
-    rating: 4.2,
-    reviews: 35,
-    inStock: true,
-    stockCount: 18,
-    description:
-      'سنسور فاصله‌سنج لیزری با دقت بالا برای اندازه‌گیری دقیق فاصله در پروژه‌های رباتیک.',
-    features: [
-      'دقت اندازه‌گیری بالا',
-      'سرعت پاسخ‌دهی فوق‌العاده',
-      'مقاوم در برابر نور محیط',
-      'اتصال آسان',
-      'مصرف انرژی کم',
-      'قابل استفاده در فضای باز',
-    ],
-    specifications: [
-      { name: 'ابعاد', value: '۳×۲×۱ سانتی‌متر' },
-      { name: 'وزن', value: '۱۰ گرم' },
-      { name: 'برد اندازه‌گیری', value: '۰.۱ تا ۴۰ متر' },
-      { name: 'دقت', value: '±۱ میلی‌متر' },
-      { name: 'ولتاژ کاری', value: '۳.۳-۵ ولت' },
-    ],
-    images: ['/product-4.jpg', '/product-1.jpg', '/product-2.jpg'],
-    relatedProducts: [
-      {
-        id: '1',
-        title: 'کیت آموزشی ربات مسیریاب',
-        price: '۲,۱۰۰,۰۰۰',
-        image: '/product-1.jpg',
-        category: 'کیت آموزشی',
-      },
-      {
-        id: '2',
-        title: 'بورد کنترلر آردوینو پرو',
-        price: '۸۵۰,۰۰۰',
-        image: '/product-2.jpg',
-        category: 'قطعات الکترونیکی',
-      },
-    ],
-    isFromApi: false,
-    originalId: 4,
-    actualPrice: 950000,
-  },
-};
 
 // Helper function to convert API product to display format
 const convertApiProductToDisplayFormat = (
@@ -276,22 +63,19 @@ const convertApiProductToDisplayFormat = (
     return new Intl.NumberFormat('fa-IR').format(price);
   };
 
-  // Extract features from attributes or use defaults
+  // Attributes are the only source of product specifications; never invent
+  // product claims when the backend has not supplied them.
   const features = apiProduct.attributes
     ? Object.values(apiProduct.attributes).filter(
         (value) => value && value.length > 0
       )
-    : ['محصول با کیفیت', 'گارانتی معتبر', 'پشتیبانی فنی', 'ارسال سریع'];
+    : [];
 
-  // Extract specifications from attributes or use defaults
   const specifications = apiProduct.attributes
     ? Object.entries(apiProduct.attributes)
         .filter(([key, value]) => key && value)
         .map(([key, value]) => ({ name: key, value }))
-    : [
-        { name: 'وضعیت', value: 'جدید' },
-        { name: 'گارانتی', value: '۶ ماه' },
-      ];
+    : [];
 
   return {
     id: apiProduct.id.toString(),
@@ -300,17 +84,17 @@ const convertApiProductToDisplayFormat = (
     discount: apiProduct.discount_price
       ? formatPrice(apiProduct.discount_price)
       : null,
-    category: apiProduct.category?.name || 'عمومی', // Use 'name' instead of 'title'
-    rating: apiProduct.rating || 4.0,
+    category: apiProduct.category?.name || 'بدون دسته‌بندی',
+    rating: apiProduct.rating || 0,
     reviews: apiProduct.reviews_count || 0,
     inStock: apiProduct.stock > 0,
     stockCount: apiProduct.stock,
     description: apiProduct.description || 'توضیحات محصول در دسترس نیست.',
     features,
     specifications,
-    images: apiProduct.image ? [apiProduct.image] : ['/product-1.jpg'],
-    relatedProducts: [], // Will be populated from the products list
-    isFromApi: true,
+    images: apiProduct.image
+      ? [getImageUrl(apiProduct.image) || '/logo.svg']
+      : ['/logo.svg'],
     originalId: apiProduct.id,
     actualPrice: apiProduct.discount_price || apiProduct.price,
   };
@@ -323,116 +107,63 @@ export default function Page({ params }: ProductPageProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState<DisplayProductDetail | null>(null);
+  const [productLoading, setProductLoading] = useState(true);
+  const [productError, setProductError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [comments, setComments] = useState<ProductComment[]>([]);
   const [commentContent, setCommentContent] = useState('');
   const [commentLoading, setCommentLoading] = useState(false);
   const [imageError, setImageError] = useState<Record<number, boolean>>({});
+  const relatedProductsRequested = useRef(false);
   const { addItem } = useCart();
 
   // Fetch API products
   const {
     allProducts,
-    allProductsLoading,
-    error,
+    error: productsError,
     fetchAllProducts,
-    findProductById,
     clearError,
   } = usePublicProduct();
 
   useEffect(() => {
-    // Clear error and fetch all products if not already loaded
+    if (relatedProductsRequested.current) return;
+    relatedProductsRequested.current = true;
     clearError();
-
-    if (allProducts.length === 0 && !allProductsLoading) {
-      fetchAllProducts();
+    if (allProducts.length === 0) {
+      fetchAllProducts().catch(() => undefined);
     }
-  }, [allProducts.length, allProductsLoading, fetchAllProducts, clearError]);
+  }, [allProducts.length, fetchAllProducts, clearError]);
 
-  // Fetch product with comments
   useEffect(() => {
-    const fetchProductWithComments = async () => {
+    let cancelled = false;
+
+    const fetchProduct = async () => {
       try {
+        setProductLoading(true);
+        setProductError(null);
         const response = await publicProductService.getById(resolvedParams.id);
-        if (response.data.comments) {
-          setComments(response.data.comments);
-        }
-      } catch (error) {
-        console.error('Error fetching product comments:', error);
+        if (cancelled) return;
+        setProduct(convertApiProductToDisplayFormat(response.data));
+        setComments(response.data.comments ?? []);
+      } catch (requestError) {
+        if (cancelled) return;
+        setProduct(null);
+        setProductError(
+          (requestError as ApiError).message || 'دریافت محصول انجام نشد'
+        );
+      } finally {
+        if (!cancelled) setProductLoading(false);
       }
     };
 
-    fetchProductWithComments();
-  }, [resolvedParams.id]);
-
-  useEffect(() => {
-    // Find product by ID once products are loaded
-    if (allProducts.length > 0) {
-      const productId = parseInt(resolvedParams.id);
-      const foundProduct = findProductById(productId);
-
-      if (foundProduct) {
-        // Use API data
-        const displayProduct = convertApiProductToDisplayFormat(foundProduct);
-
-        // Add related products from the same category
-        const relatedProducts = allProducts
-          .filter(
-            (p) =>
-              p.id !== foundProduct.id &&
-              p.category?.name === foundProduct.category?.name
-          )
-          .slice(0, 3)
-          .map((p) => ({
-            id: p.id.toString(),
-            title: p.title,
-            price: new Intl.NumberFormat('fa-IR').format(
-              p.discount_price || p.price
-            ),
-            image: p.image || '/product-1.jpg',
-            category: p.category?.name || 'عمومی',
-          }));
-
-        displayProduct.relatedProducts = relatedProducts;
-        setProduct(displayProduct);
-      } else {
-        // Fall back to static data if API product not found
-        const staticProduct = staticProducts[resolvedParams.id];
-        if (staticProduct) {
-          setProduct(staticProduct);
-        } else {
-          // If no static data either, use a default fallback
-          setProduct({
-            id: resolvedParams.id,
-            title: 'محصول یافت نشد',
-            price: '0',
-            discount: null,
-            category: 'عمومی',
-            rating: 0,
-            reviews: 0,
-            inStock: false,
-            stockCount: 0,
-            description: 'متأسفانه این محصول یافت نشد.',
-            features: [],
-            specifications: [],
-            images: ['/product-1.jpg'],
-            relatedProducts: [],
-            isFromApi: false,
-            originalId: parseInt(resolvedParams.id) || 0,
-            actualPrice: 0,
-          });
-        }
-      }
-    } else if (!allProductsLoading && allProducts.length === 0) {
-      // If API fails, use static data
-      const staticProduct = staticProducts[resolvedParams.id];
-      if (staticProduct) {
-        setProduct(staticProduct);
-      }
-    }
-  }, [allProducts, resolvedParams.id, findProductById, allProductsLoading]);
+    fetchProduct();
+    return () => {
+      cancelled = true;
+    };
+  }, [resolvedParams.id, reloadKey]);
 
   // Show loading state
-  if (allProductsLoading || !product) {
+  if (productLoading) {
     return (
       <div
         dir={dir}
@@ -473,6 +204,52 @@ export default function Page({ params }: ProductPageProps) {
       </div>
     );
   }
+
+  if (!product) {
+    return (
+      <div
+        dir={dir}
+        className="min-h-screen bg-gray-50 pt-32 pb-20 dark:bg-gray-900"
+      >
+        <div className="container mx-auto max-w-2xl px-4 text-center">
+          <Package className="mx-auto h-16 w-16 text-gray-400" />
+          <h1 className="mt-6 text-2xl font-bold text-gray-900 dark:text-white">
+            محصول در دسترس نیست
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            {productError || 'محصول مورد نظر یافت نشد.'}
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button onClick={() => setReloadKey((value) => value + 1)}>
+              تلاش دوباره
+            </Button>
+            <Link href="/shop">
+              <Button variant="secondary" className="w-full">
+                بازگشت به فروشگاه
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const relatedProducts = allProducts
+    .filter(
+      (item) =>
+        item.id !== product.originalId &&
+        item.category?.name === product.category
+    )
+    .slice(0, 3)
+    .map((item) => ({
+      id: item.id.toString(),
+      title: item.title,
+      price: new Intl.NumberFormat('fa-IR').format(
+        item.discount_price || item.price
+      ),
+      image: getImageUrl(item.image) || '/logo.svg',
+      category: item.category?.name || 'بدون دسته‌بندی',
+    }));
 
   const incrementQuantity = () => {
     if (quantity < product.stockCount) {
@@ -515,7 +292,7 @@ export default function Page({ params }: ProductPageProps) {
     try {
       setCommentLoading(true);
       await publicProductService.addComment(resolvedParams.id, {
-        content: commentContent,
+        comment: commentContent,
       });
 
       toast.success(
@@ -528,8 +305,8 @@ export default function Page({ params }: ProductPageProps) {
       if (response.data.comments) {
         setComments(response.data.comments);
       }
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'خطا در ارسال نظر');
+    } catch (requestError) {
+      toast.error((requestError as ApiError).message || 'خطا در ارسال نظر');
     } finally {
       setCommentLoading(false);
     }
@@ -542,7 +319,7 @@ export default function Page({ params }: ProductPageProps) {
     >
       <div className="container mx-auto px-4">
         {/* Error message */}
-        {error && (
+        {productsError && (
           <div className="mb-8 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <div className="flex items-center justify-between">
               <div>
@@ -550,10 +327,7 @@ export default function Page({ params }: ProductPageProps) {
                   خطا در بارگذاری محصولات
                 </h3>
                 <p className="mt-1 text-sm text-red-700 dark:text-red-300">
-                  {error}
-                  {!product?.isFromApi && product
-                    ? ' (نمایش داده‌های آفلاین)'
-                    : ''}
+                  {productsError}
                 </p>
               </div>
               <button
@@ -655,22 +429,9 @@ export default function Page({ params }: ProductPageProps) {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <div className="flex items-start justify-between">
-                <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
-                  {product.title}
-                </h1>
-                <div className="flex gap-2">
-                  {product.isFromApi ? (
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-200">
-                      آنلاین
-                    </span>
-                  ) : (
-                    <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-200">
-                      آفلاین
-                    </span>
-                  )}
-                </div>
-              </div>
+              <h1 className="mb-2 text-3xl font-bold break-words text-gray-900 dark:text-white">
+                {product.title}
+              </h1>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -753,43 +514,6 @@ export default function Page({ params }: ProductPageProps) {
                 >
                   {t.shop.addToCart}
                 </button>
-              </div>
-            </div>
-
-            {/* Features */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
-                <RefreshCw className="text-primary-600 dark:text-primary-400 h-8 w-8 shrink-0" />
-                <div>
-                  <p className="font-medium">
-                    {t.shop.productDetail.fastShipping}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t.shop.productDetail.shippingDescription}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
-                <Shield className="text-primary-600 dark:text-primary-400 h-8 w-8 shrink-0" />
-                <div>
-                  <p className="font-medium">
-                    {t.shop.productDetail.authenticityGuarantee}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t.shop.productDetail.qualityAssurance}
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-gray-800">
-                <Truck className="text-primary-600 dark:text-primary-400 h-8 w-8 shrink-0" />
-                <div>
-                  <p className="font-medium">
-                    {t.shop.productDetail.returnGuarantee}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {t.shop.productDetail.returnDescription}
-                  </p>
-                </div>
               </div>
             </div>
 
@@ -878,65 +602,71 @@ export default function Page({ params }: ProductPageProps) {
               )}
             </div>
 
-            {/* Specifications */}
-            <div className="rounded-2xl bg-white p-6 dark:bg-gray-800">
-              <h2 className="mb-4 text-xl font-bold">
-                {t.shop.specifications}
-              </h2>
-              <div className="space-y-4">
-                {product.specifications.map((spec, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between border-b border-gray-100 pb-2 last:border-0 last:pb-0 dark:border-gray-700"
-                  >
-                    <span className="text-gray-600 dark:text-gray-400">
-                      {spec.name}
-                    </span>
-                    <span className="font-medium">{spec.value}</span>
-                  </div>
-                ))}
+            {product.specifications.length > 0 && (
+              <div className="rounded-2xl bg-white p-6 dark:bg-gray-800">
+                <h2 className="mb-4 text-xl font-bold">
+                  {t.shop.specifications}
+                </h2>
+                <div className="space-y-4">
+                  {product.specifications.map((spec, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between gap-4 border-b border-gray-100 pb-2 last:border-0 last:pb-0 dark:border-gray-700"
+                    >
+                      <span className="text-gray-600 dark:text-gray-400">
+                        {spec.name}
+                      </span>
+                      <span className="text-left font-medium break-words">
+                        {spec.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Related Products */}
-        <section className="mt-16">
-          <h2 className="mb-8 text-2xl font-bold">{t.shop.relatedProducts}</h2>
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {product.relatedProducts.map((relatedProduct, index) => (
-              <motion.div
-                key={relatedProduct.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800"
-              >
-                <Link href={`/shop/${relatedProduct.id}`}>
-                  <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
-                    <Image
-                      src={relatedProduct.image}
-                      alt={relatedProduct.title}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-primary-600 dark:text-primary-400 mb-2 text-sm">
-                      {relatedProduct.category}
-                    </p>
-                    <h3 className="mb-2 font-bold dark:text-white">
-                      {relatedProduct.title}
-                    </h3>
-                    <p className="text-primary-600 dark:text-primary-400 font-bold">
-                      {relatedProduct.price} {t.common.toman}
-                    </p>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </section>
+        {relatedProducts.length > 0 && (
+          <section className="mt-16">
+            <h2 className="mb-8 text-2xl font-bold">
+              {t.shop.relatedProducts}
+            </h2>
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedProducts.map((relatedProduct, index) => (
+                <motion.div
+                  key={relatedProduct.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800"
+                >
+                  <Link href={`/shop/${relatedProduct.id}`}>
+                    <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
+                      <Image
+                        src={relatedProduct.image}
+                        alt={relatedProduct.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-primary-600 dark:text-primary-400 mb-2 text-sm">
+                        {relatedProduct.category}
+                      </p>
+                      <h3 className="mb-2 font-bold dark:text-white">
+                        {relatedProduct.title}
+                      </h3>
+                      <p className="text-primary-600 dark:text-primary-400 font-bold">
+                        {relatedProduct.price} {t.common.toman}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Comments Section */}
         <section className="mt-16">
@@ -994,7 +724,7 @@ export default function Page({ params }: ProductPageProps) {
                         <div className="flex items-center gap-3">
                           {comment.user?.profile_picture ? (
                             <Image
-                              src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${comment.user.profile_picture}`}
+                              src={getImageUrl(comment.user.profile_picture)!}
                               alt={`${comment.user.first_name} ${comment.user.last_name}`}
                               width={40}
                               height={40}

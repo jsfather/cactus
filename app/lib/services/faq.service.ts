@@ -1,4 +1,4 @@
-import { apiClient } from '@/app/lib/api/client';
+import { apiClient, publicApiClient } from '@/app/lib/api/client';
 import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 import {
   GetFAQListResponse,
@@ -8,6 +8,10 @@ import {
 } from '@/app/lib/types';
 
 export class FAQService {
+  async getPublicList(): Promise<GetFAQListResponse> {
+    return publicApiClient.get<GetFAQListResponse>(API_ENDPOINTS.HOME.FAQS);
+  }
+
   async getList(): Promise<GetFAQListResponse> {
     return apiClient.get<GetFAQListResponse>(
       API_ENDPOINTS.PANEL.ADMIN.FAQS.GET_ALL
@@ -35,9 +39,7 @@ export class FAQService {
   }
 
   async delete(id: string): Promise<void> {
-    return apiClient.delete<void>(
-      API_ENDPOINTS.PANEL.ADMIN.FAQS.DELETE(id)
-    );
+    return apiClient.delete<void>(API_ENDPOINTS.PANEL.ADMIN.FAQS.DELETE(id));
   }
 }
 

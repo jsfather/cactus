@@ -29,6 +29,11 @@ export function useProductComment() {
     [store.deleteComment]
   );
 
+  const answerComment = useCallback(
+    (id: string, answer: string) => store.answerComment(id, answer),
+    [store.answerComment]
+  );
+
   const clearError = useCallback(() => {
     store.clearError();
   }, [store.clearError]);
@@ -41,6 +46,7 @@ export function useProductComment() {
     approveComment,
     rejectComment,
     deleteComment,
+    answerComment,
     clearError,
   };
 }

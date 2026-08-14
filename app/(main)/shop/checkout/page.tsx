@@ -29,14 +29,7 @@ export default function CheckoutPage() {
 
     try {
       // Prepare the order data - ensure product IDs are numbers
-      const productIds = state.items.map((item) => {
-        // If the ID is a string (like "api-6"), extract the numeric part
-        if (typeof item.id === 'string') {
-          return parseInt(item.id.toString().replace('api-', ''));
-        }
-        // If it's already a number, use it directly
-        return item.id;
-      });
+      const productIds = state.items.map((item) => item.id);
 
       const orderData = {
         products: productIds,

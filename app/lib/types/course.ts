@@ -27,8 +27,10 @@ export interface CourseRecommendedTool {
   id?: number | string;
   name: string;
   description?: string;
-  link: string;
+  link?: string;
   icon?: string;
+  url?: string;
+  emoji?: string;
 }
 
 export interface PublicCourse {
@@ -60,13 +62,22 @@ export interface CoursePageContent {
   term_id: number | string;
   course_id?: number | string;
   title: string;
+  topic?: string;
+  description?: string;
+  teacher_id?: number | string;
+  level_id?: number | string;
+  price?: number;
+  capacity?: number;
+  level?: CourseLevel;
+  price_type?: CoursePriceType;
   supplementary_description?: string;
   intro_video_url?: string;
-  certificate_video_url?: string;
+  certificate_image_url?: string;
   faqs: CourseFAQ[];
   video_testimonials: CourseVideoTestimonial[];
   syllabus: CourseSyllabusSection[];
   related_blog_tags: string[];
+  related_blog_ids?: number[];
   recommended_tools: CourseRecommendedTool[];
   rating?: number;
   rating_count?: number;
@@ -116,14 +127,21 @@ export interface GetCoursePageResponse {
 
 export interface CreateCoursePageRequest {
   term_id: number | string;
-  title: string;
+  teacher_id: number | string;
+  level_id: number | string;
+  topic: string;
+  description: string;
+  price: number;
+  capacity: number;
+  level: CourseLevel;
+  price_type: CoursePriceType;
   supplementary_description?: string;
   intro_video_url?: string;
-  certificate_video_url?: string;
+  certificate_image_url?: string;
   faqs?: CourseFAQ[];
   video_testimonials?: CourseVideoTestimonial[];
   syllabus?: CourseSyllabusSection[];
-  related_blog_tags?: string[];
+  related_blog_ids?: number[];
   recommended_tools?: CourseRecommendedTool[];
   is_published?: boolean;
 }

@@ -9,6 +9,7 @@ interface ProductCommentState {
   fetchCommentList: () => Promise<void>;
   approveComment: (id: string) => Promise<void>;
   rejectComment: (id: string) => Promise<void>;
+  answerComment: (id: string, answer: string) => Promise<void>;
   deleteComment: (id: string) => Promise<void>;
   clearError: () => void;
 }
@@ -65,6 +66,21 @@ export const useProductCommentStore = create<ProductCommentState>(
         });
       } catch (error: any) {
         set({ error: error.message || 'خطا در رد نظر' });
+        throw error;
+      }
+    },
+
+    answerComment: async (id: string, answer: string) => {
+      try {
+        await productCommentService.answer(id, answer);
+        const { commentList } = get();
+        set({
+          commentList: commentList.map((comment) =>
+            comment.id.toString() === id ? { ...comment, answer } : comment
+          ),
+        });
+      } catch (error: any) {
+        set({ error: error.message || 'خطا در ثبت پاسخ نظر' });
         throw error;
       }
     },

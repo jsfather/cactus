@@ -66,9 +66,7 @@ export interface UpdateOfflineSessionRequest {
   title: string;
   description: string;
   video_url: string;
-  term_id: string; // API expects string
-  term_teacher_id: string; // API expects string
 }
 
 // Legacy interface for backward compatibility
-export interface OfflineSessionRequest extends CreateOfflineSessionRequest {}
+export type OfflineSessionRequest = CreateOfflineSessionRequest;

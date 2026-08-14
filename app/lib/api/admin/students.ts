@@ -37,7 +37,7 @@ export const createStudent = async (data: FormData) => {
 };
 
 export const updateStudent = async (id: number | string, data: FormData) => {
-  const response = await ApiService.put<{ data: Student }>(
+  const response = await ApiService.patch<{ data: Student }>(
     `admin/students/${id}`,
     data
   );

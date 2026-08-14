@@ -28,8 +28,8 @@ export function useRoleGuard({
     }
 
     // If user role is not allowed, redirect
-    if (!allowedRoles.includes(user.role)) {
-      const userDashboard = `/${user.role}/dashboard`;
+    if (!user.role || !allowedRoles.includes(user.role)) {
+      const userDashboard = user.role ? `/${user.role}/dashboard` : '/';
       router.push(redirectTo || userDashboard);
       return;
     }
@@ -38,7 +38,7 @@ export function useRoleGuard({
   return {
     user,
     loading: loading || userLoading,
-    hasAccess: user ? allowedRoles.includes(user.role) : false,
+    hasAccess: Boolean(user?.role && allowedRoles.includes(user.role)),
   };
 }
 

@@ -10,6 +10,7 @@ import { publicBlogService } from '@/app/lib/services/public-blog.service';
 import { Blog } from '@/app/lib/types';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { useLocale } from '@/app/contexts/LocaleContext';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 function BlogContent() {
   const { t, dir } = useLocale();
@@ -234,11 +235,14 @@ function BlogContent() {
           {/* Blog Posts Grid */}
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {blogs.map((post, index) => {
-              const postTags = post.tags
+              const postTags = (Array.isArray(post.tags) ? post.tags : [])
                 .flatMap((tagString) =>
                   tagString.split(',').map((t) => t.trim())
                 )
                 .filter(Boolean);
+              const blogImageUrl = getImageUrl(
+                post.image || post.featured_image
+              );
 
               return (
                 <motion.article
@@ -250,21 +254,31 @@ function BlogContent() {
                 >
                   <Link href={`/blog/${post.id}`}>
                     <div className="from-primary-100 to-primary-200 dark:from-primary-900 dark:to-primary-800 relative h-48 bg-gradient-to-br">
-                      <div className="text-primary-600 dark:text-primary-300 flex h-full items-center justify-center">
-                        <svg
-                          className="h-16 w-16 opacity-50"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                          />
-                        </svg>
-                      </div>
+                      {blogImageUrl ? (
+                        <Image
+                          src={blogImageUrl}
+                          alt={post.title}
+                          fill
+                          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="text-primary-600 dark:text-primary-300 flex h-full items-center justify-center">
+                          <svg
+                            className="h-16 w-16 opacity-50"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                            />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                     <div className="p-6">
                       <div className="mb-4 flex flex-wrap gap-2">
@@ -293,7 +307,7 @@ function BlogContent() {
                           <div className="flex items-center gap-2">
                             {post.user.profile_picture ? (
                               <Image
-                                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/${post.user.profile_picture}`}
+                                src={getImageUrl(post.user.profile_picture)!}
                                 alt={`${post.user.first_name} ${post.user.last_name}`}
                                 width={24}
                                 height={24}

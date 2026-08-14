@@ -45,12 +45,13 @@ export interface StudentTermInfo {
 }
 
 export interface StudentTermHomework {
-  // Add homework structure if needed
+  id?: number;
+  description?: string;
+  file_url?: string | null;
+  answers?: Array<Record<string, unknown>>;
 }
 
-export interface StudentTermAttendance {
-  // Add attendance structure if needed
-}
+export type StudentTermAttendance = Record<string, unknown>;
 
 export interface StudentTermSchedule {
   id: number;
@@ -61,9 +62,7 @@ export interface StudentTermSchedule {
   myAttendance?: StudentTermAttendance | null; // Only available in detail view
 }
 
-export interface StudentTermOfflineSession {
-  // Add offline session structure if needed
-}
+export type StudentTermOfflineSession = Record<string, unknown>;
 
 export interface StudentTermDay {
   id: number;

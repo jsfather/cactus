@@ -9,12 +9,15 @@ import {
   Users,
   BookOpen,
   Eye,
+  Power,
 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Term } from '@/app/lib/types/term';
 import { TermStudent } from '@/app/lib/types/term_student';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
+import { studentService } from '@/app/lib/services/student.service';
+import toast from 'react-hot-toast';
 
 interface StudentActiveTermsProps {
   studentId: string;
@@ -39,6 +42,7 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
   const [termsWithDetails, setTermsWithDetails] = useState<TermWithDetails[]>(
     []
   );
+  const [togglingTermId, setTogglingTermId] = useState<string | null>(null);
 
   useEffect(() => {
     if (studentId && studentId !== 'new') {
@@ -78,6 +82,19 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
   }, [studentActiveTerms, termList]);
 
   const loading = termStudentLoading || termLoading;
+
+  const handleToggleTerm = async (termId: string) => {
+    try {
+      setTogglingTermId(termId);
+      await studentService.toggleTerm(studentId, termId);
+      toast.success('وضعیت ترم دانش‌پژوه تغییر کرد');
+      await fetchStudentActiveTerms(studentId);
+    } catch {
+      toast.error('تغییر وضعیت ترم انجام نشد');
+    } finally {
+      setTogglingTermId(null);
+    }
+  };
 
   const getTermTypeLabel = (type: string): string => {
     const typeLabels: Record<string, string> = {
@@ -227,7 +244,16 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
                 </div>
               )}
 
-              <div className="mt-3 flex justify-end">
+              <div className="mt-3 flex justify-end gap-2">
+                <Button
+                  variant="warning"
+                  loading={togglingTermId === term.id.toString()}
+                  onClick={() => handleToggleTerm(term.id.toString())}
+                  className="flex items-center gap-2"
+                >
+                  <Power className="h-4 w-4" />
+                  فعال / غیرفعال
+                </Button>
                 <Button
                   variant="secondary"
                   onClick={() => router.push(`/admin/terms/${term.id}`)}

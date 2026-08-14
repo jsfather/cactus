@@ -24,6 +24,7 @@ import {
   RelatedArticles,
   RecommendedTools,
   CourseVideoEmbed,
+  CourseImageSection,
 } from '@/app/components/courses/CourseSections';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Button } from '@/app/components/ui/Button';
@@ -55,7 +56,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   if (error || !course) {
     return (
-      <div dir={dir} className="flex min-h-screen items-center justify-center pt-20">
+      <div
+        dir={dir}
+        className="flex min-h-screen items-center justify-center pt-20"
+      >
         <div className="text-center">
           <p className="mb-4 text-xl text-gray-600 dark:text-gray-400">
             {t.courses.detail.notFound}
@@ -226,9 +230,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             <CourseSyllabus sections={content.syllabus} />
             <VideoTestimonialSlider testimonials={content.video_testimonials} />
 
-            <CourseVideoEmbed
-              title={t.courses.detail.certificateVideo}
-              videoUrl={content.certificate_video_url}
+            <CourseImageSection
+              title={t.courses.detail.certificateImage}
+              imageUrl={content.certificate_image_url}
             />
 
             {course.instructor && (

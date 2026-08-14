@@ -25,6 +25,7 @@ export interface TeacherTermHomework {
 
 export interface TeacherTermSchedule {
   id: number;
+  sky_room_id?: string | null;
   session_date: string; // Format: "2025-10-12"
   start_time: string; // Format: "11:30:00"
   end_time: string; // Format: "13:30:00"
@@ -83,7 +84,12 @@ export interface TeacherTerm {
   number_of_sessions: number;
   start_date: string; // Persian date format like "1404-07-20"
   end_date: string; // Persian date format like "1404-08-20"
-  type: 'normal' | 'capacity_completion' | 'project_based' | 'specialized' | 'ai';
+  type:
+    | 'normal'
+    | 'capacity_completion'
+    | 'project_based'
+    | 'specialized'
+    | 'ai';
   project_type: any | null;
   capacity: number;
   price: number;

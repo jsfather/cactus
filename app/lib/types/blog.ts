@@ -19,6 +19,8 @@ export interface BlogComment {
   content: string;
   user?: BlogUser;
   approved?: boolean;
+  is_approved?: boolean | number;
+  answer?: string | null;
   created_at: string;
 }
 
@@ -31,6 +33,8 @@ export interface Blog {
   meta_description: string;
   tags: string[];
   slug: string;
+  image?: string;
+  featured_image?: string;
   user_id?: number;
   user?: BlogUser;
   publish_at: string;
@@ -79,6 +83,7 @@ export interface CreateBlogRequest {
   slug: string;
   user_id: number;
   publish_at: string;
+  image?: globalThis.File;
 }
 
 export interface UpdateBlogRequest {
@@ -94,4 +99,4 @@ export interface UpdateBlogRequest {
 }
 
 // Legacy interface for backward compatibility
-export interface BlogRequest extends CreateBlogRequest {}
+export type BlogRequest = CreateBlogRequest;

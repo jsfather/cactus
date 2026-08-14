@@ -5,7 +5,7 @@ import { Button } from '@/app/components/ui/Button';
 import { motion } from 'framer-motion';
 import type { JSX } from 'react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { VideoModal } from '@/app/components/ui/VideoModal';
 import { Play, User } from 'lucide-react';
 import { ClientVideo } from '@/app/components/ui/ClientVideo';
@@ -17,29 +17,17 @@ import {
   DisplayProduct,
 } from '@/app/lib/utils/product-display';
 import { getTeacherProfileImageUrl } from '@/app/lib/utils/teacher-display';
+import { publicCourseService } from '@/app/lib/services/public-course.service';
+import { publicBlogService } from '@/app/lib/services/public-blog.service';
+import type { PublicCourse } from '@/app/lib/types/course';
+import type { Blog } from '@/app/lib/types/blog';
+import { formatDateToPersian } from '@/app/lib/utils';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 interface Feature {
   title: string;
   description: string;
   icon: JSX.Element;
-}
-
-interface Course {
-  title: string;
-  description: string;
-  duration: string;
-  level: string;
-  image: string;
-  price: string;
-}
-
-interface BlogPost {
-  title: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  image: string;
-  readTime: string;
 }
 
 interface VideoThumbnail {
@@ -48,27 +36,77 @@ interface VideoThumbnail {
   aspectRatio: 'video' | 'square';
 }
 
+const homeVideoUrls = {
+  hero:
+    process.env.NEXT_PUBLIC_HOME_HERO_VIDEO_URL ||
+    'https://la.ecactus.co/site_videos/robocup-2024.mp4',
+  first:
+    process.env.NEXT_PUBLIC_HOME_VIDEO_1_URL ||
+    'https://la.ecactus.co/site_videos/intro-1.mp4',
+  second:
+    process.env.NEXT_PUBLIC_HOME_VIDEO_2_URL ||
+    'https://la.ecactus.co/site_videos/intro-2.mp4',
+  third:
+    process.env.NEXT_PUBLIC_HOME_VIDEO_3_URL ||
+    'https://la.ecactus.co/site_videos/intro-3.mp4',
+};
+
 export default function Page() {
   const { t, dir } = useLocale();
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-  const { products: apiProducts, loading: productsLoading, fetchHomeProducts } =
-    usePublicProduct();
-  const { teachers, loading: teachersLoading, fetchHomeTeachers } =
-    usePublicTeacher();
+  const [courses, setCourses] = useState<PublicCourse[]>([]);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [blogsLoading, setBlogsLoading] = useState(true);
+  const {
+    products: apiProducts,
+    loading: productsLoading,
+    fetchHomeProducts,
+  } = usePublicProduct();
+  const {
+    teachers,
+    loading: teachersLoading,
+    fetchHomeTeachers,
+  } = usePublicTeacher();
 
   useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch((error) => {
-        console.log('Video autoplay failed:', error);
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchHomeProducts({ per_page: 8 });
-    fetchHomeTeachers();
+    Promise.allSettled([
+      fetchHomeProducts({ per_page: 100 }),
+      fetchHomeTeachers(),
+    ]);
   }, [fetchHomeProducts, fetchHomeTeachers]);
+
+  useEffect(() => {
+    let active = true;
+
+    publicCourseService
+      .getList()
+      .then((response) => {
+        if (active) setCourses(response.data);
+      })
+      .catch(() => {
+        if (active) setCourses([]);
+      })
+      .finally(() => {
+        if (active) setCoursesLoading(false);
+      });
+
+    publicBlogService
+      .getList()
+      .then((response) => {
+        if (active) setBlogs(response.data);
+      })
+      .catch(() => {
+        if (active) setBlogs([]);
+      })
+      .finally(() => {
+        if (active) setBlogsLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const locale = dir === 'rtl' ? 'fa-IR' : 'en-US';
   const displayProducts: DisplayProduct[] = apiProducts.map((product) =>
@@ -194,76 +232,19 @@ export default function Page() {
 
   const features = getFeatures();
 
-  const getCourses = (): Course[] => [
-    {
-      title: t.home.courses.items.roboticsBasics.title,
-      description: t.home.courses.items.roboticsBasics.description,
-      duration: dir === 'rtl' ? '۸ هفته' : '8 Weeks',
-      level: t.home.courses.beginner,
-      image: '/course-robotics-intro.png',
-      price: dir === 'rtl' ? '۲,۹۹۰,۰۰۰' : '2,990,000',
-    },
-    {
-      title: t.home.courses.items.advancedRobotProgramming.title,
-      description: t.home.courses.items.advancedRobotProgramming.description,
-      duration: dir === 'rtl' ? '۱۲ هفته' : '12 Weeks',
-      level: t.home.courses.advanced,
-      image: '/course-robot-programming.png',
-      price: dir === 'rtl' ? '۴,۹۹۰,۰۰۰' : '4,990,000',
-    },
-    {
-      title: t.home.courses.items.robotVisionSystems.title,
-      description: t.home.courses.items.robotVisionSystems.description,
-      duration: dir === 'rtl' ? '۱۰ هفته' : '10 Weeks',
-      level: t.home.courses.intermediate,
-      image: '/course-robot-vision.png',
-      price: dir === 'rtl' ? '۳,۹۹۰,۰۰۰' : '3,990,000',
-    },
-  ];
-
-  const getBlogPosts = (): BlogPost[] => [
-    {
-      title: t.home.blog.posts.futureOfRobotics.title,
-      excerpt: t.home.blog.posts.futureOfRobotics.excerpt,
-      date: t.home.blog.posts.futureOfRobotics.date,
-      author: t.home.blog.posts.futureOfRobotics.author,
-      image: '/blog-robotics-education.png',
-      readTime: dir === 'rtl' ? '۵ دقیقه مطالعه' : '5 min read',
-    },
-    {
-      title: t.home.blog.posts.top5Projects.title,
-      excerpt: t.home.blog.posts.top5Projects.excerpt,
-      date: t.home.blog.posts.top5Projects.date,
-      author: t.home.blog.posts.top5Projects.author,
-      image: '/blog-robotics-projects.png',
-      readTime: dir === 'rtl' ? '۸ دقیقه مطالعه' : '8 min read',
-    },
-    {
-      title: t.home.blog.posts.aiAndRobotics.title,
-      excerpt: t.home.blog.posts.aiAndRobotics.excerpt,
-      date: t.home.blog.posts.aiAndRobotics.date,
-      author: t.home.blog.posts.aiAndRobotics.author,
-      image: '/blog-ai-robotics.png',
-      readTime: dir === 'rtl' ? '۶ دقیقه مطالعه' : '6 min read',
-    },
-  ];
-
-  const courses = getCourses();
-  const blogPosts = getBlogPosts();
-
   const videoThumbnails: VideoThumbnail[] = [
     {
-      videoSrc: 'https://la.ecactus.co/site_videos/intro-1.mp4',
+      videoSrc: homeVideoUrls.first,
       title: t.home.about.videoTitle1,
       aspectRatio: 'square',
     },
     {
-      videoSrc: 'https://la.ecactus.co/site_videos/intro-2.mp4',
+      videoSrc: homeVideoUrls.second,
       title: t.home.about.videoTitle2,
       aspectRatio: 'video',
     },
     {
-      videoSrc: 'https://la.ecactus.co/site_videos/intro-3.mp4',
+      videoSrc: homeVideoUrls.third,
       title: t.home.about.videoTitle3,
       aspectRatio: 'video',
     },
@@ -281,7 +262,8 @@ export default function Page() {
           <div className="relative h-[70vh] w-full overflow-hidden rounded-3xl shadow-2xl">
             <ClientVideo
               className="h-full w-full object-cover"
-              src="https://la.ecactus.co/site_videos/robocup-2024.mp4"
+              src={homeVideoUrls.hero}
+              fallbackLabel="ویدئوی اصلی هنوز بارگذاری نشده است"
               muted
               playsInline
               autoPlay
@@ -322,15 +304,19 @@ export default function Page() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="mt-8 flex flex-wrap items-center justify-center gap-4"
               >
-                <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-                  {t.home.hero.startLearning}
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="rounded-full px-8 py-3 text-lg"
-                >
-                  {t.home.hero.viewCourses}
-                </Button>
+                <Link href="/courses">
+                  <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+                    {t.home.hero.startLearning}
+                  </Button>
+                </Link>
+                <Link href="/courses">
+                  <Button
+                    variant="secondary"
+                    className="rounded-full px-8 py-3 text-lg"
+                  >
+                    {t.home.hero.viewCourses}
+                  </Button>
+                </Link>
               </motion.div>
 
               {/* Stats Section */}
@@ -350,30 +336,34 @@ export default function Page() {
                   <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
                     {[
                       {
-                        number: dir === 'rtl' ? '+۵۰۰' : '+500',
-                        label: t.home.stats.students,
-                        description:
-                          dir === 'rtl' ? 'دانشجوی فعال' : 'Active Students',
-                      },
-                      {
-                        number: dir === 'rtl' ? '+۵۰' : '+50',
+                        number: courses.length.toLocaleString(locale),
                         label: t.home.stats.courses,
                         description:
-                          dir === 'rtl' ? 'دوره تخصصی' : 'Specialized Courses',
+                          dir === 'rtl' ? 'دوره منتشرشده' : 'Published courses',
                       },
                       {
-                        number: dir === 'rtl' ? '٪۹۵' : '95%',
-                        label: t.home.stats.satisfaction,
-                        description:
-                          dir === 'rtl'
-                            ? 'رضایت دانشجویان'
-                            : 'Student Satisfaction',
-                      },
-                      {
-                        number: dir === 'rtl' ? '+۲۰' : '+20',
+                        number: teachers.length.toLocaleString(locale),
                         label: dir === 'rtl' ? 'مدرس' : 'Instructors',
                         description:
-                          dir === 'rtl' ? 'اساتید مجرب' : 'Expert Instructors',
+                          dir === 'rtl'
+                            ? 'مدرس معرفی‌شده'
+                            : 'Listed instructors',
+                      },
+                      {
+                        number: apiProducts.length.toLocaleString(locale),
+                        label: dir === 'rtl' ? 'محصول' : 'Products',
+                        description:
+                          dir === 'rtl'
+                            ? 'محصول فعال فروشگاه'
+                            : 'Store products',
+                      },
+                      {
+                        number: blogs.length.toLocaleString(locale),
+                        label: dir === 'rtl' ? 'مقاله' : 'Articles',
+                        description:
+                          dir === 'rtl'
+                            ? 'مقاله منتشرشده'
+                            : 'Published articles',
                       },
                     ].map((stat, index) => (
                       <div key={index} className="group relative">
@@ -469,44 +459,6 @@ export default function Page() {
                   {t.home.about.description3}
                 </p>
               </div>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                {[
-                  {
-                    title: t.home.about.experience,
-                    value:
-                      dir === 'rtl'
-                        ? t.home.about.experienceValue
-                        : '+10 Years',
-                  },
-                  {
-                    title: t.home.about.successfulProjects,
-                    value:
-                      dir === 'rtl'
-                        ? t.home.about.successfulProjectsValue
-                        : '+200',
-                  },
-                  {
-                    title: t.home.about.awards,
-                    value: dir === 'rtl' ? t.home.about.awardsValue : '+50',
-                  },
-                  {
-                    title: t.home.about.colleagues,
-                    value: dir === 'rtl' ? t.home.about.colleaguesValue : '+30',
-                  },
-                ].map((item, index) => (
-                  <div
-                    key={index}
-                    className="rounded-xl bg-white p-6 shadow-md transition-all duration-200 hover:shadow-lg dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
-                  >
-                    <div className="text-primary-600 dark:text-primary-400 text-2xl font-bold">
-                      {item.value}
-                    </div>
-                    <div className="text-gray-600 dark:text-gray-300">
-                      {item.title}
-                    </div>
-                  </div>
-                ))}
-              </div>
               <div className="flex flex-wrap gap-4">
                 {[
                   t.home.about.specializedTraining,
@@ -546,6 +498,7 @@ export default function Page() {
                       preload="metadata"
                       muted
                       playsInline
+                      fallbackLabel="ویدئو هنوز بارگذاری نشده است"
                     />
                     <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -575,6 +528,7 @@ export default function Page() {
                         preload="metadata"
                         muted
                         playsInline
+                        fallbackLabel="ویدئو هنوز بارگذاری نشده است"
                       />
                       <div className="absolute inset-0 bg-black/30 transition-opacity group-hover:bg-black/50" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
@@ -608,8 +562,8 @@ export default function Page() {
       <section id="shop" className="py-24 dark:bg-gray-900">
         <div className="container mx-auto px-4">
           <div className="mb-16">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <h2 className="text-3xl font-bold">
                   {t.home.shop.sectionTitle}
                   <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
@@ -621,149 +575,113 @@ export default function Page() {
                   {t.home.shop.sectionSubtitle}
                 </p>
               </div>
-              <div className="flex items-center gap-4">
-                <button className="rounded-full bg-gray-100 px-6 py-2 font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
-                  {t.home.shop.allProductsButton}
-                </button>
-                <button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 rounded-full px-6 py-2 font-medium text-white transition-colors">
-                  {t.home.shop.discountedButton}
-                </button>
-              </div>
+              <Link
+                href="/shop"
+                className="self-start rounded-full bg-gray-100 px-6 py-2 font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                {t.home.shop.allProductsButton}
+              </Link>
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {productsLoading
-              ? Array.from({ length: 4 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="animate-pulse rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800"
-                  >
-                    <div className="mb-4 aspect-square rounded-xl bg-gray-200 dark:bg-gray-700" />
-                    <div className="space-y-2">
-                      <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
-                      <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
-                      <div className="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
-                    </div>
+            {productsLoading ? (
+              Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="animate-pulse rounded-2xl bg-white p-4 shadow-lg dark:bg-gray-800"
+                >
+                  <div className="mb-4 aspect-square rounded-xl bg-gray-200 dark:bg-gray-700" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
                   </div>
-                ))
-              : displayProducts.length > 0
-                ? displayProducts.map((product, index) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link href={`/shop/${product.id}`}>
-                  <div className="group flex h-full flex-col rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
-                    <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
-                      <Image
-                        src={product.image || '/placeholder-image.jpg'}
-                        alt={product.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
-                      />
-                      {product.discount && (
-                        <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
-                          {t.home.shop.discount}
-                        </div>
-                      )}
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Add to cart logic will be implemented
-                        }}
-                        className="absolute right-2 bottom-2 rounded-full bg-white/90 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
-                      >
-                        <svg
-                          className="text-primary-600 dark:text-primary-400 h-6 w-6"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    <div className="flex flex-1 flex-col space-y-2">
-                      <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
-                        {product.category}
+                </div>
+              ))
+            ) : displayProducts.length > 0 ? (
+              displayProducts.slice(0, 4).map((product, index) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Link href={`/shop/${product.id}`}>
+                    <div className="group flex h-full flex-col rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70">
+                      <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
+                        <Image
+                          src={product.image || '/logo.svg'}
+                          alt={product.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-110 dark:opacity-90"
+                        />
+                        {product.discount && (
+                          <div className="absolute top-2 left-2 rounded-full bg-red-500 px-3 py-1 text-sm font-medium text-white dark:bg-red-600">
+                            {t.home.shop.discount}
+                          </div>
+                        )}
                       </div>
-                      <h3 className="font-bold dark:text-gray-100">
-                        {product.title}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <div className="flex items-center">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <svg
-                              key={i}
-                              className={`h-4 w-4 ${
-                                i < Math.floor(product.rating)
-                                  ? 'text-yellow-400 dark:text-yellow-500'
-                                  : 'text-gray-300 dark:text-gray-600'
-                              }`}
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          ))}
+                      <div className="flex flex-1 flex-col space-y-2">
+                        <div className="text-primary-600 dark:text-primary-400 text-sm font-medium">
+                          {product.category}
                         </div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          ({product.reviews})
-                        </span>
-                      </div>
-                      <div className="mb-3 flex items-baseline">
-                        {product.discount ? (
-                          <>
+                        <h3 className="font-bold dark:text-gray-100">
+                          {product.title}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <svg
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < Math.floor(product.rating)
+                                    ? 'text-yellow-400 dark:text-yellow-500'
+                                    : 'text-gray-300 dark:text-gray-600'
+                                }`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                          </div>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            ({product.reviews})
+                          </span>
+                        </div>
+                        <div className="mb-3 flex items-baseline">
+                          {product.discount ? (
+                            <>
+                              <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
+                                {product.discount}
+                              </span>
+                              <span className="mx-2 text-sm text-gray-500 line-through dark:text-gray-400">
+                                {product.price}
+                              </span>
+                            </>
+                          ) : (
                             <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
-                              {product.discount}
-                            </span>
-                            <span className="mx-2 text-sm text-gray-500 line-through dark:text-gray-400">
                               {product.price}
                             </span>
-                          </>
-                        ) : (
-                          <span className="text-primary-600 dark:text-primary-400 text-lg font-bold">
-                            {product.price}
+                          )}
+                          <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
+                            {t.home.shop.toman}
                           </span>
-                        )}
-                        <span className="mr-1 text-sm text-gray-600 dark:text-gray-300">
-                          {t.home.shop.toman}
+                        </div>
+                        <span className="bg-primary-600 dark:bg-primary-700 mt-auto block w-full rounded-lg py-2.5 text-center text-sm font-medium text-white">
+                          {dir === 'rtl' ? 'مشاهده جزئیات' : 'View details'}
                         </span>
                       </div>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          // Add to cart logic will be implemented
-                        }}
-                        className={`mt-auto w-full rounded-lg py-2.5 text-sm font-medium transition-colors ${
-                          product.inStock
-                            ? 'bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 text-white'
-                            : 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500'
-                        }`}
-                        disabled={!product.inStock}
-                      >
-                        {product.inStock
-                          ? t.home.shop.addToCart
-                          : t.home.shop.outOfStock}
-                      </button>
                     </div>
-                  </div>
-                </Link>
-              </motion.div>
-                ))
-                : (
-                  <div className="col-span-full py-8 text-center text-gray-500 dark:text-gray-400">
-                    {t.shop.noProducts}
-                  </div>
-                )}
+                  </Link>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full py-8 text-center text-gray-500 dark:text-gray-400">
+                {t.shop.noProducts}
+              </div>
+            )}
           </div>
 
           <div className="mt-12 text-center">
@@ -778,8 +696,8 @@ export default function Page() {
 
       <section id="teachers" className="bg-gray-50 py-24 dark:bg-gray-800">
         <div className="container mx-auto px-4">
-          <div className="mb-16 flex items-center justify-between">
-            <div>
+          <div className="mb-16 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <h2 className="text-3xl font-bold">
                 {t.home.teachers.sectionTitle}
                 <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
@@ -898,53 +816,81 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {courses.map((course, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
-              >
-                <div className="relative h-48">
-                  <Image
-                    src={course.image || '/placeholder-image.jpg'}
-                    alt={course.title}
-                    fill
-                    className="object-cover dark:opacity-90"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <div className="absolute right-4 bottom-4 left-4">
-                    <span className="bg-primary-600 dark:bg-primary-700 rounded-full px-3 py-1 text-sm text-white">
-                      {course.level}
-                    </span>
+          {coursesLoading ? (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="animate-pulse overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-gray-800"
+                >
+                  <div className="h-48 bg-gray-200 dark:bg-gray-700" />
+                  <div className="space-y-3 p-6">
+                    <div className="h-5 w-2/3 rounded bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-4 w-full rounded bg-gray-200 dark:bg-gray-700" />
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="mb-2 text-xl font-bold dark:text-gray-100">
-                    {course.title}
-                  </h3>
-                  <p className="mb-4 text-gray-600 dark:text-gray-300">
-                    {course.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {course.duration}
-                    </span>
-                    <span className="text-primary-600 dark:text-primary-400 font-bold">
-                      {course.price} {t.home.courses.toman}
-                    </span>
-                  </div>
-                </div>
-                <div className="px-6 pb-6">
-                  <button className="text-primary-600 dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                    {t.home.courses.moreInfo}
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : courses.length === 0 ? (
+            <div className="rounded-2xl bg-white p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+              {t.courses.noCourses}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {courses.slice(0, 3).map((course, index) => (
+                <motion.div
+                  key={course.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="h-full"
+                >
+                  <Link
+                    href={`/courses/${course.id}`}
+                    className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
+                  >
+                    <div className="relative h-48 shrink-0">
+                      <Image
+                        src={getImageUrl(course.image) || '/logo.svg'}
+                        alt={course.title}
+                        fill
+                        className="object-cover dark:opacity-90"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      <div className="absolute right-4 bottom-4 left-4">
+                        <span className="bg-primary-600 dark:bg-primary-700 rounded-full px-3 py-1 text-sm text-white">
+                          {course.level_label}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-1 flex-col p-6">
+                      <h3 className="mb-2 text-xl font-bold dark:text-gray-100">
+                        {course.title}
+                      </h3>
+                      <p className="mb-4 text-gray-600 dark:text-gray-300">
+                        {course.little_description || course.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {course.duration}
+                        </span>
+                        <span className="text-primary-600 dark:text-primary-400 font-bold">
+                          {course.price_type === 'free'
+                            ? t.courses.filters.prices.free
+                            : `${course.price_label || course.price.toLocaleString(locale)} ${t.home.courses.toman}`}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="px-6 pb-6">
+                      <span className="text-primary-600 dark:text-primary-400 block w-full rounded-xl bg-gray-100 py-2 text-center font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
+                        {t.home.courses.moreInfo}
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          )}
 
           <div className="mt-12 text-center">
             <Link href="/courses">
@@ -971,58 +917,85 @@ export default function Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {blogPosts.map((post, index) => (
-              <motion.article
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
-              >
-                <div className="relative h-48">
-                  <Image
-                    src={post.image || '/placeholder-image.jpg'}
-                    alt={post.title}
-                    fill
-                    className="object-cover dark:opacity-90"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="mb-4 flex items-center gap-4">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {post.date}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      •
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {post.readTime}
-                    </span>
-                  </div>
-                  <h3 className="mb-2 text-xl font-bold dark:text-gray-100">
-                    {post.title}
-                  </h3>
-                  <p className="mb-4 text-gray-600 dark:text-gray-300">
-                    {post.excerpt}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                      {t.home.blog.author}: {post.author}
-                    </span>
-                    <button className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
-                      {t.home.blog.continueReading} {dir === 'rtl' ? '←' : '→'}
-                    </button>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
+          {blogsLoading ? (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="h-80 animate-pulse rounded-2xl bg-white shadow-lg dark:bg-gray-800"
+                />
+              ))}
+            </div>
+          ) : blogs.length === 0 ? (
+            <div className="rounded-2xl bg-white p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+              {dir === 'rtl'
+                ? 'مقاله‌ای منتشر نشده است.'
+                : 'No articles have been published.'}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {blogs.slice(0, 3).map((post, index) => (
+                <motion.article
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="h-full"
+                >
+                  <Link
+                    href={`/blog/${post.id}`}
+                    className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition-shadow duration-200 hover:shadow-xl dark:bg-gray-800 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/70"
+                  >
+                    <div className="relative h-48">
+                      <Image
+                        src={
+                          getImageUrl(post.featured_image || post.image) ||
+                          '/logo.svg'
+                        }
+                        alt={post.title}
+                        fill
+                        className="object-cover dark:opacity-90"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <div className="mb-4 flex items-center gap-4">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {formatDateToPersian(
+                            post.publish_at || post.created_at
+                          )}
+                        </span>
+                      </div>
+                      <h3 className="mb-2 text-xl font-bold dark:text-gray-100">
+                        {post.title}
+                      </h3>
+                      <p className="mb-4 text-gray-600 dark:text-gray-300">
+                        {post.little_description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                          {t.home.blog.author}:{' '}
+                          {post.user
+                            ? `${post.user.first_name} ${post.user.last_name}`
+                            : t.common.siteName}
+                        </span>
+                        <span className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium">
+                          {t.home.blog.continueReading}{' '}
+                          {dir === 'rtl' ? '←' : '→'}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.article>
+              ))}
+            </div>
+          )}
 
           <div className="mt-12 text-center">
-            <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-              {t.home.blog.viewAllArticles}
-            </Button>
+            <Link href="/blog">
+              <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+                {t.home.blog.viewAllArticles}
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

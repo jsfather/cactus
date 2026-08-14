@@ -115,7 +115,7 @@ function SearchContent() {
                 <p className="text-lg text-gray-600 dark:text-gray-300">
                   نتایج جستجو برای:{' '}
                   <span className="font-bold text-gray-900 dark:text-white">
-                    "{query}"
+                    &ldquo;{query}&rdquo;
                   </span>{' '}
                   ({blogs.length + products.length} نتیجه)
                 </p>
@@ -262,7 +262,7 @@ function SearchContent() {
                             <div className="group rounded-2xl bg-white p-4 shadow-lg transition-all duration-200 hover:shadow-xl dark:bg-gray-800">
                               <div className="relative mb-4 aspect-square overflow-hidden rounded-xl">
                                 <Image
-                                  src={product.image || '/product-1.jpg'}
+                                  src={product.image || '/logo.svg'}
                                   alt={product.title}
                                   fill
                                   className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -290,8 +290,7 @@ function SearchContent() {
                                           product.discount_price ||
                                             product.price
                                         ),
-                                        image:
-                                          product.image || '/product-1.jpg',
+                                        image: product.image || '/logo.svg',
                                       });
                                     }
                                   }}

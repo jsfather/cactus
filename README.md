@@ -9,7 +9,8 @@ Cactus is a comprehensive online robotics education platform that brings togethe
 - **Interactive Courses**: Wide range of robotics courses from beginner to advanced levels
 - **Hands-on Projects**: Real-world experience with actual robots and equipment
 - **Innovation Hub**: Space for creativity and innovation in robotics
-- **Active Community**: Over 500 students and 50+ courses
+- **Active Community**: Live course, instructor, product, and article totals are
+  loaded from the public API
 - **Equipment Shop**: Access to robotics parts and tools
 - **Expert Blog**: Latest news and articles in robotics
 

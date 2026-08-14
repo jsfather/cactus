@@ -11,6 +11,7 @@ import { useTeacher } from '@/app/lib/hooks/use-teacher';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import SearchFilters, { SearchFilter } from '@/app/components/ui/SearchFilters';
 import { TeacherSearchFilters } from '@/app/lib/services/teacher.service';
+import { isTeacherVisibleOnWebsite } from '@/app/lib/utils/teacher-display';
 import { Users, Plus, UserCheck, Clock, Award, TrendingUp } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 
@@ -174,7 +175,7 @@ export default function TeachersPage() {
       header: 'نمایش در سایت',
       accessor: 'show_on_website',
       render: (value): any => {
-        const isVisible = value !== false;
+        const isVisible = isTeacherVisibleOnWebsite(value as 0 | 1);
         return (
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -241,8 +242,8 @@ export default function TeachersPage() {
 
       <div className="mt-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               مدیریت مربیان
             </h1>
@@ -250,7 +251,10 @@ export default function TeachersPage() {
               ایجاد، ویرایش و مدیریت مربیان آموزشگاه
             </p>
           </div>
-          <Button onClick={() => router.push('/admin/teachers/new')}>
+          <Button
+            className="w-full shrink-0 sm:w-auto"
+            onClick={() => router.push('/admin/teachers/new')}
+          >
             <Plus className="ml-2 h-4 w-4" />
             افزودن مربی جدید
           </Button>

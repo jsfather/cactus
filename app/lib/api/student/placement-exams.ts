@@ -5,9 +5,9 @@ import {
 } from '@/app/lib/types/placement-exam';
 
 // Start a placement exam attempt
-export const startPlacementExam = async (examId: number | string) => {
+export const startPlacementExam = async () => {
   const response = await ApiService.post<{ data: PlacementExamAttempt }>(
-    `student/placement-exam/start/${examId}`
+    'student/placement-exam/start'
   );
 
   if (!response) {

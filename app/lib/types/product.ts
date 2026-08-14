@@ -12,6 +12,7 @@ export interface Product {
   image: string | null;
   attributes: Record<string, string>;
   category: ProductCategory | null;
+  comments?: AdminProductComment[];
   created_at?: string;
   updated_at?: string;
 }
@@ -130,13 +131,16 @@ export interface ProductComment {
   id: number;
   product_id?: string | number;
   content: string;
+  comment?: string;
   user?: ProductCommentUser;
   approved?: boolean;
+  is_approved?: boolean | number;
+  answer?: string | null;
   created_at: string;
 }
 
 export interface ProductCommentRequest {
-  content: string;
+  comment: string;
 }
 
 export interface ProductCommentResponse {
@@ -153,7 +157,10 @@ export interface AdminProductComment {
   product_id: number;
   user_id: number;
   content: string;
+  comment?: string;
+  answer?: string | null;
   approved: boolean;
+  is_approved?: boolean | number;
   created_at: string;
   updated_at: string;
   user?: ProductCommentUser;

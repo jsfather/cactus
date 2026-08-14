@@ -11,9 +11,7 @@ export interface ExamQuestion {
   options: ExamQuestionOption[];
 }
 
-export interface ExamAttempt {
-  // Add attempt fields as needed based on API
-}
+export type ExamAttempt = Record<string, unknown>;
 
 export interface Exam {
   id: number;

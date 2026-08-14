@@ -17,6 +17,13 @@ export default function PanelLayout({
 
   useEffect(() => {
     setMounted(true);
+
+    // Public pages may be switched to English. Panel routes intentionally use
+    // a fixed Persian/RTL presentation without changing the saved public locale.
+    document.documentElement.lang = 'fa';
+    document.documentElement.dir = 'rtl';
+    document.body.classList.remove('font-dana');
+    document.body.classList.add('font-dana-fanum');
   }, []);
 
   useEffect(() => {
@@ -42,14 +49,14 @@ export default function PanelLayout({
 
   if (loading) {
     return (
-      <div className="flex h-screen">
+      <div dir="rtl" lang="fa" className="flex h-dvh min-w-0 overflow-hidden">
         <Sidebar
           menuItems={[]}
           isOpen={false}
           onClose={() => {}}
           loading={true}
         />
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
           <Header user={null} onMenuClick={() => {}} loading={true} />
         </div>
       </div>
@@ -60,5 +67,9 @@ export default function PanelLayout({
     return null;
   }
 
-  return children;
+  return (
+    <div dir="rtl" lang="fa" className="contents">
+      {children}
+    </div>
+  );
 }

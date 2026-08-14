@@ -103,7 +103,7 @@ export interface TermTeacherDetail {
 }
 
 // Legacy interface for backward compatibility
-export interface SessionRecord extends TermTeacher {}
+export type SessionRecord = TermTeacher;
 
 // Request interfaces
 export interface CreateTermTeacherRequest {
@@ -116,7 +116,7 @@ export interface CreateTermTeacherRequest {
   }>;
 }
 
-export interface UpdateTermTeacherRequest extends CreateTermTeacherRequest {}
+export type UpdateTermTeacherRequest = CreateTermTeacherRequest;
 
 // Response interfaces
 export interface GetTermTeacherListResponse {
@@ -135,4 +135,4 @@ export interface CreateTermTeacherResponse {
   };
 }
 
-export interface UpdateTermTeacherResponse extends CreateTermTeacherResponse {}
+export type UpdateTermTeacherResponse = CreateTermTeacherResponse;

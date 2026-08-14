@@ -45,7 +45,7 @@ export interface Teacher {
   work_experiences: WorkExperience[] | null;
   educations: Education[] | null;
   achievements: string | null;
-  show_on_website?: boolean;
+  show_on_website?: boolean | 0 | 1;
   user: User;
 }
 
@@ -93,7 +93,7 @@ export interface CreateTeacherRequest {
   work_experiences?: WorkExperience[];
   educations?: Education[];
   achievements?: string;
-  show_on_website?: boolean;
+  show_on_website?: boolean | 0 | 1;
 }
 
 export interface UpdateTeacherRequest {
@@ -112,8 +112,8 @@ export interface UpdateTeacherRequest {
   work_experiences?: WorkExperience[];
   educations?: Education[];
   achievements?: string;
-  show_on_website?: boolean;
+  show_on_website?: boolean | 0 | 1;
 }
 
 // Legacy interface for backward compatibility
-export interface TeacherRequest extends CreateTeacherRequest {}
+export type TeacherRequest = CreateTeacherRequest;

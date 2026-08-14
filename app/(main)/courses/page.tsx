@@ -23,6 +23,7 @@ import CourseFilters, {
 } from '@/app/components/courses/CourseFilters';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Button } from '@/app/components/ui/Button';
+import { getImageUrl } from '@/app/lib/utils/image';
 
 const emptyFilters: CourseFilterValues = {
   topic: '',
@@ -107,27 +108,33 @@ function CoursesContent() {
     setShowFilters(false);
   };
 
-  const activeFilterCount = Object.values(filters).filter((v) => v !== '').length;
+  const activeFilterCount = Object.values(filters).filter(
+    (v) => v !== ''
+  ).length;
 
-  const getStats = () => [
+  const totalStudents = courses.reduce(
+    (total, course) => total + (course.student_count || 0),
+    0
+  );
+  const levelCount = new Set(courses.map((course) => course.level)).size;
+
+  const stats = [
     {
       icon: <BookOpen className="h-6 w-6" />,
-      value: t.courses.stats.coursesValue,
+      value: courses.length.toLocaleString(dir === 'rtl' ? 'fa-IR' : 'en-US'),
       label: t.courses.stats.courses,
     },
     {
       icon: <Clock className="h-6 w-6" />,
-      value: t.courses.stats.hoursValue,
-      label: t.courses.stats.hours,
+      value: levelCount.toLocaleString(dir === 'rtl' ? 'fa-IR' : 'en-US'),
+      label: dir === 'rtl' ? 'سطح آموزشی' : 'Learning levels',
     },
     {
       icon: <Users className="h-6 w-6" />,
-      value: t.courses.stats.studentsValue,
+      value: totalStudents.toLocaleString(dir === 'rtl' ? 'fa-IR' : 'en-US'),
       label: t.courses.stats.students,
     },
   ];
-
-  const stats = getStats();
 
   return (
     <div
@@ -235,9 +242,9 @@ function CoursesContent() {
             show={showFilters}
           />
 
-          <div className="mb-12 flex items-center justify-between">
+          <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-2xl font-bold">{t.courses.specialCourses}</h2>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => setSort('newest')}
                 className={`rounded-lg px-4 py-2 ${
@@ -271,7 +278,7 @@ function CoursesContent() {
               {activeFilterCount > 0 && (
                 <button
                   onClick={clearFilters}
-                  className="text-primary-600 mt-4 flex items-center gap-1 mx-auto hover:underline"
+                  className="text-primary-600 mx-auto mt-4 flex items-center gap-1 hover:underline"
                 >
                   <X className="h-4 w-4" />
                   {t.courses.filters.clear}
@@ -290,7 +297,7 @@ function CoursesContent() {
                 >
                   <div className="relative h-48">
                     <Image
-                      src={course.image}
+                      src={getImageUrl(course.image) || '/logo.svg'}
                       alt={course.title}
                       fill
                       className="object-cover dark:opacity-90"
