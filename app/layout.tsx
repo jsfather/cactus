@@ -8,6 +8,9 @@ import Script from 'next/script';
 export const metadata: Metadata = {
   title: 'کاکتوس',
   description: 'آموزش‌های حضوری و آنلاین رباتیک',
+  verification: {
+    google: '4yPUl6Z87f9hQvQsLNyPjixGWaZL3CHmjJ1FT41jqt0',
+  },
 };
 
 export default function RootLayout({
