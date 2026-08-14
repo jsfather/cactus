@@ -211,6 +211,7 @@ const InfiniteSelect = forwardRef<HTMLSelectElement, InfiniteSelectProps>(
         <div className="relative">
           <button
             type="button"
+            id={`${props.id}-trigger`}
             onClick={() => !props.disabled && setIsOpen(!isOpen)}
             disabled={props.disabled}
             className={clsx(
@@ -226,6 +227,11 @@ const InfiniteSelect = forwardRef<HTMLSelectElement, InfiniteSelectProps>(
             )}
             aria-invalid={error ? 'true' : 'false'}
             aria-required={required}
+            aria-expanded={isOpen}
+            aria-haspopup="listbox"
+            aria-controls={`${props.id}-listbox`}
+            aria-describedby={error ? `${props.id}-error` : undefined}
+            role="combobox"
           >
             <span
               className={clsx(
@@ -286,23 +292,28 @@ const InfiniteSelect = forwardRef<HTMLSelectElement, InfiniteSelectProps>(
 
               {/* Options list */}
               <div
+                id={`${props.id}-listbox`}
                 ref={listRef}
                 onScroll={handleScroll}
                 className="max-h-48 overflow-auto"
+                role="listbox"
               >
                 {placeholder && (
-                  <div
+                  <button
+                    type="button"
                     onClick={() =>
                       handleSelect({ label: placeholder, value: '' })
                     }
                     className={clsx(
-                      'cursor-pointer px-4 py-2.5 text-sm text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700',
+                      'block w-full cursor-pointer px-4 py-2.5 text-right text-sm text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700',
                       selectedValue === '' &&
                         'bg-primary-50 dark:bg-primary-900/20'
                     )}
+                    role="option"
+                    aria-selected={selectedValue === ''}
                   >
                     {placeholder}
-                  </div>
+                  </button>
                 )}
 
                 {options.length === 0 && !loading && (
@@ -312,19 +323,24 @@ const InfiniteSelect = forwardRef<HTMLSelectElement, InfiniteSelectProps>(
                 )}
 
                 {options.map((option) => (
-                  <div
+                  <button
+                    type="button"
                     key={option.value}
                     onClick={() => handleSelect(option)}
                     className={clsx(
-                      'cursor-pointer px-4 py-2.5 text-sm transition-colors',
+                      'block w-full cursor-pointer px-4 py-2.5 text-right text-sm transition-colors',
                       'hover:bg-gray-100 dark:hover:bg-gray-700',
                       selectedValue?.toString() === option.value.toString()
                         ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400'
                         : 'text-gray-900 dark:text-white'
                     )}
+                    role="option"
+                    aria-selected={
+                      selectedValue?.toString() === option.value.toString()
+                    }
                   >
                     {option.label}
-                  </div>
+                  </button>
                 ))}
 
                 {/* Loading more indicator */}

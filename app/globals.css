@@ -4,26 +4,284 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-primary-100: #f2fee8;
-  --color-primary-200: #e7fdd4;
-  --color-primary-300: #cafcab;
-  --color-primary-400: #a5f780;
-  --color-primary-500: #81f05f;
-  --color-primary-600: #4ae72d;
-  --color-primary-700: #2dc620;
-  --color-primary-800: #16a616;
-  --color-primary-900: #086e18;
+  --color-primary-50: #f0fdf6;
+  --color-primary-100: #dcfce9;
+  --color-primary-200: #bbf7d4;
+  --color-primary-300: #86efb5;
+  --color-primary-400: #4ade8b;
+  --color-primary-500: #22c76a;
+  --color-primary-600: #16a657;
+  --color-primary-700: #158348;
+  --color-primary-800: #16683d;
+  --color-primary-900: #145535;
+  --color-primary-950: #062f1c;
   --font-dana: var(--font-dana);
   --font-dana-fanum: var(--font-dana-fanum);
 }
 
 :root {
   --toast-background-color: #ffffff;
+  --surface-page: #f7f8fa;
+  --surface-raised: #ffffff;
+  --border-subtle: #e5e7eb;
+  --focus-ring: #16a657;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --toast-background-color: #000000;
+.dark {
+  --toast-background-color: #111827;
+  --surface-page: #0b111d;
+  --surface-raised: #111827;
+  --border-subtle: #263244;
+  --focus-ring: #4ade8b;
+}
+
+@layer base {
+  * {
+    border-color: var(--border-subtle);
+  }
+
+  html {
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    line-height: 1.65;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--focus-ring) 24%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    touch-action: manipulation;
+  }
+
+  button:disabled,
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    cursor: not-allowed;
+  }
+}
+
+@layer components {
+  .app-shell {
+    background:
+      radial-gradient(
+        circle at 85% -10%,
+        rgb(22 166 87 / 0.08),
+        transparent 28rem
+      ),
+      var(--surface-page);
+  }
+
+  .panel-content {
+    scrollbar-gutter: stable;
+  }
+
+  .panel-content > * {
+    min-width: 0;
+  }
+
+  .panel-content :where(main.min-h-screen) {
+    min-height: auto;
+    background: transparent;
+  }
+
+  .panel-content :where(main.min-h-screen > .w-full) {
+    padding-inline: 0;
+    padding-block: 0;
+  }
+
+  .panel-content :where(nav[aria-label='مسیر صفحه'] + .mt-8) {
+    margin-top: 0;
+  }
+
+  .panel-content :where(h1) {
+    font-size: clamp(1.375rem, 1.15rem + 0.65vw, 1.875rem);
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+
+  .panel-content :where(h2) {
+    line-height: 1.45;
+  }
+
+  .panel-content :where(.rounded-lg.bg-white, .rounded-xl.bg-white) {
+    border-color: rgb(229 231 235 / 0.9);
+  }
+
+  .panel-content :where(.shadow-lg) {
+    box-shadow: 0 8px 24px rgb(15 23 42 / 0.06);
+  }
+
+  .dark .panel-content :where(.rounded-lg.bg-white, .rounded-xl.bg-white) {
+    border-color: rgb(55 65 81 / 0.75);
+  }
+
+  .public-content :where(section) {
+    scroll-margin-top: 5.5rem;
+  }
+
+  .public-content :where(h1) {
+    font-size: clamp(2rem, 1.45rem + 2vw, 3.5rem);
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+
+  .public-content :where(h2) {
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+
+  .public-content :where(.container) {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+  }
+
+  .auth-card
+    :where(
+      input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
+          [type='file']
+        ),
+      select,
+      textarea
+    ) {
+    min-height: 2.75rem;
+    border-radius: 0.75rem;
+    border-width: 1px;
+    border-color: rgb(209 213 219);
+    background: white;
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.03);
+  }
+
+  .auth-card
+    :where(
+      input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
+          [type='file']
+        ),
+      select,
+      textarea
+    ):focus {
+    border-color: var(--focus-ring);
+    box-shadow: 0 0 0 4px rgb(220 252 233);
+    outline: none;
+  }
+
+  .auth-card :where(button) {
+    min-height: 2.75rem;
+  }
+
+  .dark
+    .auth-card
+    :where(
+      input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
+          [type='file']
+        ),
+      select,
+      textarea
+    ) {
+    border-color: rgb(75 85 99);
+    background: rgb(17 24 39);
+  }
+
+  .dark
+    .auth-card
+    :where(
+      input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
+          [type='file']
+        ),
+      select,
+      textarea
+    ):focus {
+    box-shadow: 0 0 0 4px rgb(6 47 28 / 0.8);
+  }
+
+  .icon-button {
+    display: inline-flex;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    color: rgb(75 85 99);
+    transition:
+      color 150ms ease,
+      background-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .icon-button:hover {
+    background: rgb(243 244 246);
+    color: rgb(17 24 39);
+  }
+
+  .icon-button:active {
+    transform: scale(0.96);
+  }
+
+  .dark .icon-button {
+    color: rgb(209 213 219);
+  }
+
+  .dark .icon-button:hover {
+    background: rgb(31 41 55);
+    color: white;
+  }
+}
+
+@media (max-width: 639px) {
+  .panel-content {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .panel-content :where(.p-8) {
+    padding: 1.25rem;
+  }
+
+  .panel-content :where(.p-6) {
+    padding: 1rem;
+  }
+
+  .panel-content
+    :where(.flex.items-center.justify-between, .flex.justify-between) {
+    column-gap: 0.75rem;
+  }
+
+  .public-content :where(.py-20) {
+    padding-block: 3.5rem;
+  }
+
+  .public-content :where(.pt-20) {
+    padding-top: 4.5rem;
+  }
+
+  .public-content :where(.mb-12) {
+    margin-bottom: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

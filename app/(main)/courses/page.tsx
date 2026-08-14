@@ -347,10 +347,11 @@ function CoursesContent() {
                     </div>
                   </div>
                   <div className="px-6 pb-6">
-                    <Link href={`/courses/${course.id}`}>
-                      <button className="text-primary-600 dark:text-primary-400 w-full rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600">
-                        {t.home.courses.moreInfo}
-                      </button>
+                    <Link
+                      href={`/courses/${course.id}`}
+                      className="text-primary-700 dark:text-primary-300 flex min-h-11 w-full items-center justify-center rounded-xl bg-gray-100 py-2 font-semibold transition duration-200 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+                    >
+                      {t.home.courses.moreInfo}
                     </Link>
                   </div>
                 </motion.div>
@@ -367,11 +368,9 @@ function CoursesContent() {
             <p className="mb-8 text-lg text-gray-600 dark:text-gray-300">
               {t.courses.cta.subtitle}
             </p>
-            <Link href="/about">
-              <Button className="bg-primary-600 hover:bg-primary-700 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
-                {t.courses.cta.button}
-              </Button>
-            </Link>
+            <Button asChild className="px-8 text-base">
+              <Link href="/about">{t.courses.cta.button}</Link>
+            </Button>
           </div>
         </div>
       </section>

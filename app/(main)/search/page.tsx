@@ -42,7 +42,7 @@ function SearchContent() {
       setSearchInput(initialQuery);
       searchAll(initialQuery);
     }
-  }, [initialQuery]);
+  }, [initialQuery, query, searchAll]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +92,7 @@ function SearchContent() {
                 <button
                   type="submit"
                   className="bg-primary-600 hover:bg-primary-700 absolute end-2 top-2 rounded-full p-3 text-white transition-colors"
+                  aria-label="اجرای جست‌وجو"
                 >
                   <Search className="h-6 w-6" />
                 </button>

@@ -1,12 +1,10 @@
 'use client';
 
-import { Search, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import moment from 'jalali-moment';
-import { User } from '@/app/lib/types';
+import type { User } from '@/app/lib/types';
 import DarkModeToggle from '@/app/components/ui/DarkModeToggle';
-import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import { UserMenu } from '@/app/components/layout/UserMenu';
 
 interface HeaderProps {
@@ -15,128 +13,101 @@ interface HeaderProps {
   loading?: boolean;
 }
 
-const Header = ({ user, onMenuClick, loading = false }: HeaderProps) => {
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const pathname = usePathname();
-  const formattedDate = moment().locale('fa').format('dddd، D MMMM YYYY');
-
-  // Reset mobile search when route changes
-  useEffect(() => {
-    setShowMobileSearch(false);
-  }, [pathname]);
-
-  return (
-    <div className="min-w-0 shrink-0">
-      <header className="flex h-[80px] min-w-0 flex-row bg-white shadow-sm dark:border-b dark:border-gray-800 dark:bg-gray-900">
-        {/* Mobile menu button */}
-        <button
-          onClick={onMenuClick}
-          className="flex w-16 items-center justify-center border-l border-gray-100 lg:hidden dark:border-gray-800"
-        >
-          <Menu className="h-6 w-6 cursor-pointer text-gray-600 dark:text-gray-300" />
-        </button>
-
-        <nav className="flex min-w-0 flex-1 items-center justify-between gap-3 px-4 lg:px-6">
-          <div className="flex min-w-0 flex-1 items-center">
-            {loading ? (
-              <div className="hidden items-center gap-2 lg:flex">
-                {/* Welcome text skeleton */}
-                <div className="h-5 w-16 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="h-5 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                <div className="mx-2 h-5 w-1 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-                {/* Date skeleton */}
-                <div className="h-5 w-32 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
-              </div>
-            ) : !user ? null : (
-              <div className="hidden items-center text-gray-700 lg:flex dark:text-gray-200">
-                <span>وقت بخیر</span>
-                <div className="mx-1">{user.first_name}</div>
-                <span>عزیز</span>
-                <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
-                <span>{formattedDate}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
-            {/* Mobile search toggle */}
-            <button
-              onClick={() => setShowMobileSearch(!showMobileSearch)}
-              className="cursor-pointer text-gray-600 hover:text-gray-900 lg:hidden dark:text-gray-300 dark:hover:text-white"
-            >
-              <Search className="h-6 w-6" />
-            </button>
-
-            {/* Desktop search */}
-            {loading ? (
-              <div className="relative hidden lg:block">
-                <div className="h-10 w-64 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-                <span className="absolute top-2.5 left-3 text-gray-400">
-                  <Search className="h-5 w-5" />
-                </span>
-              </div>
-            ) : (
-              <div className="relative hidden lg:block">
-                <input
-                  type="text"
-                  placeholder="جستجو ..."
-                  className="focus:ring-primary-500 w-64 rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                />
-                <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
-                  <Search className="h-5 w-5" />
-                </span>
-              </div>
-            )}
-
-            {/* Dark mode toggle skeleton */}
-            {loading ? (
-              <div className="h-9 w-9 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
-            ) : (
-              <DarkModeToggle />
-            )}
-
-            {/* User menu skeleton */}
-            {loading ? (
-              <div className="h-10 w-40 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700" />
-            ) : (
-              <UserMenu userName={user?.first_name + ' ' + user?.last_name} />
-            )}
-          </div>
-        </nav>
-      </header>
-
-      {/* Mobile search bar */}
-      <AnimatePresence>
-        {showMobileSearch && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="border-t border-gray-200 bg-white lg:hidden dark:border-gray-700 dark:bg-gray-900"
-          >
-            <div className="container mx-auto p-4">
-              <div className="relative">
-                {loading ? (
-                  <div className="h-10 w-full animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
-                ) : (
-                  <>
-                    <input
-                      type="text"
-                      placeholder="جستجو ..."
-                      className="focus:ring-primary-500 w-full rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-transparent focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400"
-                    />
-                    <span className="absolute top-2.5 left-3 text-gray-500 dark:text-gray-400">
-                      <Search className="h-5 w-5" />
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+const routeTitles: Record<string, string> = {
+  dashboard: 'داشبورد',
+  students: 'دانش‌پژوهان',
+  teachers: 'مدرسین',
+  users: 'همکاران',
+  terms: 'ترم‌ها',
+  'term-teachers': 'ترم مدرسین',
+  'term-students': 'ترم دانش‌پژوهان',
+  homeworks: 'تکلیف‌ها',
+  attendances: 'حضور و غیاب',
+  'offline-sessions': 'جلسات آفلاین',
+  reports: 'گزارش‌ها',
+  exams: 'آزمون‌ها',
+  blogs: 'بلاگ',
+  'course-pages': 'دوره‌ها',
+  products: 'محصولات',
+  'product-comments': 'نظرات محصولات',
+  orders: 'سفارش‌ها',
+  certificates: 'گواهینامه‌ها',
+  faqs: 'سوالات متداول',
+  'panel-guides': 'تابلوی اعلانات',
+  guides: 'راهنمای پنل',
+  notifications: 'اعلان‌های من',
+  tickets: 'تیکت‌ها',
+  profile: 'اطلاعات کاربری',
+  security: 'امنیت حساب',
+  'about-us': 'درباره ما',
+  'placement-exam': 'آزمون تعیین سطح',
 };
 
-export default Header;
+function getPageTitle(pathname: string) {
+  const segments = pathname.split('/').filter(Boolean);
+  const section = segments[1] || segments[0] || 'dashboard';
+  return routeTitles[section] || 'پنل کاربری';
+}
+
+export default function Header({
+  user,
+  onMenuClick,
+  loading = false,
+}: HeaderProps) {
+  const pathname = usePathname();
+  const formattedDate = moment().locale('fa').format('dddd، D MMMM');
+  const title = getPageTitle(pathname);
+  const fullName = user ? `${user.first_name} ${user.last_name}`.trim() : '';
+
+  return (
+    <header className="relative z-20 flex h-[72px] min-w-0 shrink-0 items-center border-b border-gray-200/80 bg-white/90 px-3 backdrop-blur-xl sm:px-5 dark:border-gray-800 dark:bg-gray-900/90">
+      <button
+        type="button"
+        onClick={onMenuClick}
+        className="icon-button ml-2 lg:hidden"
+        aria-label="باز کردن منوی اصلی"
+        aria-haspopup="dialog"
+      >
+        <Menu className="h-5.5 w-5.5" aria-hidden="true" />
+      </button>
+
+      <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+        <div className="min-w-0">
+          {loading ? (
+            <div
+              className="space-y-2"
+              role="status"
+              aria-label="در حال بارگذاری اطلاعات کاربر"
+            >
+              <div className="h-4 w-28 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+              <div className="h-3 w-20 animate-pulse rounded bg-gray-100 dark:bg-gray-800" />
+            </div>
+          ) : (
+            <>
+              <p className="truncate text-sm font-bold text-gray-900 sm:text-base dark:text-white">
+                {title}
+              </p>
+              <p className="mt-0.5 hidden truncate text-xs text-gray-500 sm:block dark:text-gray-400">
+                {fullName ? `${fullName}، ${formattedDate}` : formattedDate}
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          {loading ? (
+            <>
+              <div className="h-11 w-11 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
+              <div className="h-11 w-24 animate-pulse rounded-xl bg-gray-100 sm:w-36 dark:bg-gray-800" />
+            </>
+          ) : (
+            <>
+              <DarkModeToggle />
+              <UserMenu userName={fullName || 'حساب کاربری'} />
+            </>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}

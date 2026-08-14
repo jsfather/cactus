@@ -1,4 +1,8 @@
+'use client';
+
 import Image from 'next/image';
+import Link from 'next/link';
+import { Mail, MapPin, Phone } from 'lucide-react';
 import { useSettings } from '@/app/lib/hooks/use-settings';
 import { useEffect } from 'react';
 import { useLocale } from '@/app/contexts/LocaleContext';
@@ -11,190 +15,159 @@ export default function Footer() {
     fetchSettings();
   }, [fetchSettings]);
 
+  const quickLinks = [
+    { title: t.nav.courses, href: '/courses' },
+    { title: t.nav.teachers, href: '/teachers' },
+    { title: t.nav.about, href: '/about' },
+    { title: t.nav.blog, href: '/blog' },
+  ];
+  const serviceLinks = [
+    { title: t.nav.shop, href: '/shop' },
+    { title: t.nav.certifications, href: '/certifications' },
+    { title: t.nav.requirements, href: '/requirements' },
+  ];
+
   return (
-    <footer className="bg-gray-900 px-4 py-12 text-gray-300">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+    <footer className="border-t border-gray-800 bg-gray-950 text-gray-300">
+      <div className="mx-auto max-w-[1440px] px-5 py-12 sm:px-8 lg:py-16">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_0.8fr_0.8fr_1.2fr] lg:gap-12">
           <div>
-            <div className="mb-6 flex items-center gap-2">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-3 rounded-xl"
+            >
               <Image
-                src="/logo.png"
+                src="/logo.svg"
                 alt="لوگو کاکتوس"
-                width={40}
-                height={40}
-                className="rounded-lg transition-all duration-300 dark:brightness-0 dark:invert"
+                width={44}
+                height={38}
+                className="brightness-0 invert"
               />
-              <span className="text-xl font-bold text-white">
+              <span className="text-xl font-black text-white">
                 {t.common.siteName}
               </span>
-            </div>
-            <p className="mb-6 text-gray-400">{t.footer.description}</p>
-            <div className="mb-6 flex gap-4">
-              {[
-                { name: 'توییتر', link: 'twitter' },
-                { name: 'فیسبوک', link: 'facebook' },
-                { name: 'لینکدین', link: 'linkedin' },
-                { name: 'اینستاگرام', link: 'instagram' },
-              ].map((social) => (
-                <a
-                  key={social.link}
-                  href={`#${social.link}`}
-                  className="text-gray-400 transition-colors duration-200 hover:text-white"
-                >
-                  <span className="sr-only">{social.name}</span>
-                  <svg
-                    className="h-6 w-6"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 16h-2v-6h2v6zm-1-6.891c-.607 0-1.1-.496-1.1-1.109 0-.612.492-1.109 1.1-1.109s1.1.497 1.1 1.109c0 .613-.493 1.109-1.1 1.109zm8 6.891h-1.998v-2.861c0-1.881-2.002-1.722-2.002 0v2.861h-2v-6h2v1.093c.872-1.616 4-1.736 4 1.548v3.359z" />
-                  </svg>
-                </a>
-              ))}
-            </div>
-            <div className="mt-4 inline-block rounded-lg bg-white p-2">
-              <a
-                referrerPolicy="origin"
-                target="_blank"
-                href="https://trustseal.enamad.ir/?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
-                className="block"
-              >
-                <img
-                  referrerPolicy="origin"
-                  src="https://trustseal.enamad.ir/logo.aspx?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
-                  alt="نماد اعتماد الکترونیکی"
-                  className="h-24 w-auto cursor-pointer"
-                  data-code="NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
-                />
-              </a>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-white">
-              {t.footer.quickLinks}
-            </h3>
-            <ul className="space-y-3">
-              {[
-                { title: t.nav.courses, href: 'courses' },
-                { title: t.nav.teachers, href: 'teachers' },
-                { title: t.nav.about, href: 'about' },
-                { title: t.nav.blog, href: 'blog' },
-              ].map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={`#${link.href}`}
-                    className="transition-colors duration-200 hover:text-white"
-                  >
-                    {link.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-white">
-              {t.footer.contactUs}
-            </h3>
-            <ul className="space-y-3">
-              <li className="flex items-center gap-2">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                  />
-                </svg>
-                {settings?.phone ? (
-                  <span>{settings.phone}</span>
-                ) : (
-                  <span className="inline-block h-4 w-24 animate-pulse rounded bg-gray-700" />
-                )}
-              </li>
-              <li className="flex items-center gap-2">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-                {settings?.email ? (
-                  <span>{settings.email}</span>
-                ) : (
-                  <span className="inline-block h-4 w-32 animate-pulse rounded bg-gray-700" />
-                )}
-              </li>
-              <li className="flex items-center gap-2">
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                {settings?.address ? (
-                  <span>{settings.address}</span>
-                ) : (
-                  <span className="inline-block h-4 w-40 animate-pulse rounded bg-gray-700" />
-                )}
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-white">
-              {t.footer.newsletter}
-            </h3>
-            <p className="mb-4 text-gray-400">
-              {t.footer.newsletterDescription}
+            </Link>
+            <p className="mt-5 max-w-sm leading-7 text-gray-400">
+              {t.footer.description}
             </p>
-            <form className="space-y-3">
-              <input
-                type="email"
-                placeholder={t.footer.emailPlaceholder}
-                className="focus:ring-primary-500 w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-2 text-right focus:border-transparent focus:outline-none focus:ring-2"
+            <a
+              referrerPolicy="origin"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://trustseal.enamad.ir/?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
+              className="mt-6 inline-flex rounded-xl bg-white p-2 transition-transform hover:-translate-y-0.5"
+              aria-label="مشاهده نماد اعتماد الکترونیکی"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                referrerPolicy="origin"
+                src="https://trustseal.enamad.ir/logo.aspx?id=644259&Code=NQ6KftoTWfPqW2ucLd1nKGXwRVOJWJT8"
+                alt="نماد اعتماد الکترونیکی"
+                className="h-20 w-auto"
               />
-              <button className="bg-primary-600 hover:bg-primary-700 w-full rounded-lg py-2 font-medium text-white transition duration-200">
-                {t.footer.subscribe}
-              </button>
-            </form>
+            </a>
+          </div>
+
+          <FooterLinks title={t.footer.quickLinks} links={quickLinks} />
+          <FooterLinks title={t.common.more} links={serviceLinks} />
+
+          <div>
+            <h2 className="text-sm font-bold text-white">
+              {t.footer.contactUs}
+            </h2>
+            <ul className="mt-5 space-y-4 text-sm text-gray-400">
+              <li className="flex items-start gap-3">
+                <Phone
+                  className="text-primary-400 mt-0.5 h-5 w-5 shrink-0"
+                  aria-hidden="true"
+                />
+                {settings?.phone ? (
+                  <a
+                    dir="ltr"
+                    href={`tel:${settings.phone}`}
+                    className="transition-colors hover:text-white"
+                  >
+                    {settings.phone}
+                  </a>
+                ) : (
+                  <FooterSkeleton width="w-24" />
+                )}
+              </li>
+              <li className="flex items-start gap-3">
+                <Mail
+                  className="text-primary-400 mt-0.5 h-5 w-5 shrink-0"
+                  aria-hidden="true"
+                />
+                {settings?.email ? (
+                  <a
+                    dir="ltr"
+                    href={`mailto:${settings.email}`}
+                    className="break-all transition-colors hover:text-white"
+                  >
+                    {settings.email}
+                  </a>
+                ) : (
+                  <FooterSkeleton width="w-32" />
+                )}
+              </li>
+              <li className="flex items-start gap-3">
+                <MapPin
+                  className="text-primary-400 mt-0.5 h-5 w-5 shrink-0"
+                  aria-hidden="true"
+                />
+                {settings?.address ? (
+                  <span className="leading-7">{settings.address}</span>
+                ) : (
+                  <FooterSkeleton width="w-40" />
+                )}
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-gray-800 pt-8 text-center text-gray-400">
+        <div className="mt-12 border-t border-gray-800 pt-6 text-center text-xs text-gray-500 sm:text-start">
           {settings?.footer_text ? (
             <p>{settings.footer_text}</p>
           ) : (
-            <div className="mx-auto h-4 w-64 animate-pulse rounded bg-gray-700" />
+            <FooterSkeleton width="w-64" />
           )}
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterLinks({
+  title,
+  links,
+}: {
+  title: string;
+  links: { title: string; href: string }[];
+}) {
+  return (
+    <nav aria-label={title}>
+      <h2 className="text-sm font-bold text-white">{title}</h2>
+      <ul className="mt-5 space-y-3 text-sm text-gray-400">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              className="inline-flex min-h-8 items-center transition-colors hover:text-white"
+            >
+              {link.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+function FooterSkeleton({ width }: { width: string }) {
+  return (
+    <span
+      className={`inline-block h-4 animate-pulse rounded bg-gray-800 ${width}`}
+      aria-hidden="true"
+    />
   );
 }

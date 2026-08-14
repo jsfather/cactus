@@ -32,14 +32,17 @@ export default function Pagination({
   if (totalPages <= 1) return null;
 
   return (
-    <div className={`inline-flex ${className}`}>
+    <nav
+      aria-label="صفحه‌بندی"
+      className={`inline-flex max-w-full items-center ${className}`}
+    >
       <PaginationArrow
         direction="right"
         href={createPageURL(currentPage - 1)}
         isDisabled={currentPage <= 1}
       />
 
-      <div className="flex -space-x-px">
+      <div className="flex items-center gap-1 overflow-hidden">
         {allPages.map((page, index) => {
           let position: 'first' | 'last' | 'single' | 'middle' | undefined;
 
@@ -65,7 +68,7 @@ export default function Pagination({
         href={createPageURL(currentPage + 1)}
         isDisabled={currentPage >= totalPages}
       />
-    </div>
+    </nav>
   );
 }
 
@@ -81,23 +84,20 @@ function PaginationNumber({
   isActive: boolean;
 }) {
   const className = clsx(
-    'flex h-10 w-10 items-center justify-center text-sm border',
+    'flex h-10 min-w-10 items-center justify-center rounded-lg border text-sm font-medium transition-colors',
     {
-      'rounded-r-md': position === 'first' || position === 'single',
-      'rounded-l-md': position === 'last' || position === 'single',
-      'z-10 bg-primary-600 border-primary-600 text-white': isActive,
-      'hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700':
+      'z-10 bg-primary-600 border-primary-600 text-white shadow-sm': isActive,
+      'hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200':
         !isActive && position !== 'middle',
       'text-gray-300 dark:text-gray-600': position === 'middle',
       'dark:bg-primary-500 dark:border-primary-500': isActive,
-      'dark:text-white': !isActive && position !== 'middle',
     }
   );
 
   return isActive || position === 'middle' ? (
     <div className={className}>{page}</div>
   ) : (
-    <Link href={href} className={className}>
+    <Link href={href} className={className} aria-label={`صفحه ${page}`}>
       {page}
     </Link>
   );
@@ -113,13 +113,13 @@ function PaginationArrow({
   isDisabled?: boolean;
 }) {
   const className = clsx(
-    'flex h-10 w-10 items-center justify-center rounded-md border',
+    'flex h-10 w-10 items-center justify-center rounded-lg border bg-white transition-colors dark:bg-gray-900',
     {
       'pointer-events-none text-gray-300 dark:text-gray-600': isDisabled,
       'hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700':
         !isDisabled,
-      'mr-2 md:mr-4': direction === 'left',
-      'ml-2 md:ml-4': direction === 'right',
+      'mr-1 sm:mr-2': direction === 'left',
+      'ml-1 sm:ml-2': direction === 'right',
     }
   );
 
@@ -133,7 +133,11 @@ function PaginationArrow({
   return isDisabled ? (
     <div className={className}>{icon}</div>
   ) : (
-    <Link className={className} href={href}>
+    <Link
+      className={className}
+      href={href}
+      aria-label={direction === 'left' ? 'صفحه بعد' : 'صفحه قبل'}
+    >
       {icon}
     </Link>
   );

@@ -40,7 +40,7 @@ export default function Layout({
     <div
       dir="rtl"
       lang="fa"
-      className="flex h-dvh min-w-0 overflow-hidden bg-gray-50 dark:bg-gray-900"
+      className="app-shell flex h-dvh min-w-0 overflow-hidden"
     >
       <Sidebar
         user={user || undefined}
@@ -55,8 +55,8 @@ export default function Layout({
           onMenuClick={() => setIsMobileMenuOpen(true)}
           loading={loading}
         />
-        <main className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 dark:bg-gray-900">
-          <div className="mx-auto w-full max-w-[1600px] min-w-0">
+        <main className="panel-content min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-5 sm:px-6 sm:py-7 xl:px-8">
+          <div className="mx-auto w-full max-w-[1520px] min-w-0">
             {children}
           </div>
         </main>

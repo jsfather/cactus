@@ -12,6 +12,7 @@ import {
   BookOpen,
   Circle,
   CircleHelp,
+  ChevronDown,
   ClipboardCheck,
   FileQuestion,
   GraduationCap,
@@ -91,7 +92,7 @@ function menuIcon(href = ''): LucideIcon {
 function SidebarSkeleton({ compact = false }: { compact?: boolean }) {
   return (
     <aside
-      className={`flex h-full flex-col border-l border-gray-100 bg-white shadow-lg transition-[width] duration-200 dark:border-gray-800 dark:bg-gray-900 ${compact ? 'w-20' : 'w-64'}`}
+      className={`flex h-full flex-col border-l border-gray-200/80 bg-white shadow-xl shadow-gray-950/5 transition-[width] duration-200 dark:border-gray-800 dark:bg-gray-900 ${compact ? 'w-20' : 'w-72'}`}
     >
       <div className="flex h-20 items-center justify-center border-b border-gray-100 dark:border-gray-800">
         <div className="h-10 w-10 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700" />
@@ -129,6 +130,18 @@ export default function Sidebar({
   const previousPathname = useRef(pathname);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
+    const activeGroup = menuItems.find((item) =>
+      item.subItems?.some(
+        (subItem) =>
+          subItem.href &&
+          (pathname === subItem.href || pathname.startsWith(`${subItem.href}/`))
+      )
+    );
+    return new Set(
+      activeGroup ? [activeGroup.title] : [menuItems[0]?.title].filter(Boolean)
+    );
+  });
 
   useEffect(() => {
     setIsCollapsed(localStorage.getItem(COLLAPSED_STORAGE_KEY) === 'true');
@@ -138,6 +151,33 @@ export default function Sidebar({
     if (pathname !== previousPathname.current && isOpen && onClose) onClose();
     previousPathname.current = pathname;
   }, [isOpen, onClose, pathname]);
+
+  useEffect(() => {
+    const activeGroup = menuItems.find((item) =>
+      item.subItems?.some(
+        (subItem) =>
+          subItem.href &&
+          (pathname === subItem.href || pathname.startsWith(`${subItem.href}/`))
+      )
+    );
+    if (activeGroup) {
+      setOpenGroups((current) => new Set(current).add(activeGroup.title));
+    }
+  }, [pathname, menuItems]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose?.();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
 
   const toggleCollapsed = () => {
     setIsCollapsed((current) => {
@@ -158,19 +198,40 @@ export default function Sidebar({
 
   const renderMenuItem = (item: MenuItem, expanded: boolean) => {
     if (item.isGroupTitle) {
+      const isExpanded = openGroups.has(item.title);
       return (
         <div
           key={item.title}
           className={expanded ? 'space-y-1' : 'space-y-1.5'}
         >
           {expanded && (
-            <div className="px-3 pt-3 pb-1 text-xs font-semibold text-gray-400 dark:text-gray-500">
-              {item.title}
+            <button
+              type="button"
+              onClick={() =>
+                setOpenGroups((current) => {
+                  const next = new Set(current);
+                  if (next.has(item.title)) next.delete(item.title);
+                  else next.add(item.title);
+                  return next;
+                })
+              }
+              className="flex min-h-9 w-full items-center justify-between rounded-lg px-3 pt-3 text-[11px] font-bold tracking-wide text-gray-400 transition-colors hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300"
+              aria-expanded={isExpanded}
+            >
+              <span>{item.title}</span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                aria-hidden="true"
+              />
+            </button>
+          )}
+          {(!expanded || isExpanded) && (
+            <div className={expanded ? 'space-y-1' : 'space-y-1.5'}>
+              {item.subItems?.map((subItem) =>
+                renderMenuItem(subItem, expanded)
+              )}
             </div>
           )}
-          <div className={expanded ? 'space-y-1' : 'space-y-1.5'}>
-            {item.subItems?.map((subItem) => renderMenuItem(subItem, expanded))}
-          </div>
         </div>
       );
     }
@@ -184,11 +245,12 @@ export default function Sidebar({
         key={item.href}
         href={item.href}
         title={!expanded ? item.title : undefined}
-        className={`group flex h-10 items-center rounded-lg text-sm transition-colors ${
+        aria-current={active ? 'page' : undefined}
+        className={`group relative flex min-h-11 items-center rounded-xl text-sm transition-[background-color,color,transform] active:scale-[0.99] ${
           expanded ? 'gap-3 px-3' : 'mx-auto w-12 justify-center px-0'
         } ${
           active
-            ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 font-medium'
+            ? 'bg-primary-50 text-primary-800 dark:bg-primary-950/55 dark:text-primary-300 font-semibold'
             : 'text-gray-600 hover:bg-gray-100 hover:text-gray-950 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
         }`}
       >
@@ -198,20 +260,26 @@ export default function Sidebar({
           />
         )}
         {expanded && <span className="truncate">{item.title}</span>}
+        {active && expanded && (
+          <span
+            className="bg-primary-600 absolute inset-y-2 right-0 w-1 rounded-l-full"
+            aria-hidden="true"
+          />
+        )}
       </Link>
     );
   };
 
   const sidebarContent = (expanded: boolean, mobile = false) => (
     <aside
-      className={`relative flex h-full flex-col border-l border-gray-100 bg-white shadow-lg transition-[width] duration-200 dark:border-gray-800 dark:bg-gray-900 ${expanded ? 'w-64' : 'w-20'}`}
+      className={`relative flex h-full flex-col border-l border-gray-200/80 bg-white shadow-xl shadow-gray-950/5 transition-[width] duration-200 dark:border-gray-800 dark:bg-gray-900 ${expanded ? 'w-72' : 'w-20'}`}
     >
       <div className="relative flex h-20 shrink-0 items-center border-b border-gray-100 px-4 dark:border-gray-800">
         <Link
           href="/"
           className={`flex min-w-0 items-center transition-opacity hover:opacity-80 ${expanded ? 'gap-2' : 'mx-auto'}`}
         >
-          <Image src="/logo.svg" alt="کاکتوس" width={40} height={40} priority />
+          <Image src="/logo.svg" alt="کاکتوس" width={40} height={35} priority />
           {expanded && (
             <span className="from-primary-600 to-primary-800 dark:from-primary-400 dark:to-primary-600 bg-gradient-to-l bg-clip-text text-xl font-black text-transparent">
               کاکتوس
@@ -223,7 +291,7 @@ export default function Sidebar({
             type="button"
             onClick={onClose}
             aria-label="بستن منوی کناری"
-            className="mr-auto rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="icon-button mr-auto"
           >
             <X className="h-5 w-5" />
           </button>
@@ -235,7 +303,7 @@ export default function Sidebar({
               isCollapsed ? 'باز نگه داشتن سایدبار' : 'کوچک کردن سایدبار'
             }
             title={isCollapsed ? 'باز نگه داشتن سایدبار' : 'حالت مینی'}
-            className="absolute top-7 -left-3 z-10 flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-white"
+            className="absolute top-6 -left-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 shadow-sm transition hover:border-gray-300 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-white"
           >
             {isCollapsed ? (
               <PanelRightOpen className="h-4 w-4" />
@@ -289,7 +357,8 @@ export default function Sidebar({
       )}
 
       <nav
-        className={`flex-1 overflow-y-auto py-2 ${expanded ? 'px-3' : 'px-1'}`}
+        aria-label="منوی اصلی پنل"
+        className={`flex-1 overflow-y-auto overscroll-contain py-2 ${expanded ? 'px-3' : 'px-1'}`}
       >
         {menuItems.map((item) => renderMenuItem(item, expanded))}
       </nav>
@@ -307,7 +376,7 @@ export default function Sidebar({
   return (
     <>
       <div
-        className={`relative hidden h-full shrink-0 transition-[width] duration-200 lg:block ${isCollapsed ? 'w-20' : 'w-64'}`}
+        className={`relative hidden h-full shrink-0 transition-[width] duration-200 lg:block ${isCollapsed ? 'w-20' : 'w-72'}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -328,6 +397,7 @@ export default function Sidebar({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
+              aria-hidden="true"
               className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
             />
             <motion.div
@@ -335,7 +405,10 @@ export default function Sidebar({
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.25 }}
-              className="fixed inset-y-0 right-0 z-50 w-64 lg:hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-label="منوی اصلی"
+              className="fixed inset-y-0 right-0 z-50 w-[min(88vw,18rem)] lg:hidden"
             >
               {loading ? (
                 <SidebarSkeleton />

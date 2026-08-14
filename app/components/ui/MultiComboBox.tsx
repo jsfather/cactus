@@ -152,9 +152,11 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
           disabled={disabled}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
+          aria-controls={`${id}-listbox`}
           aria-invalid={error ? 'true' : 'false'}
           aria-errormessage={error ? `${id}-error` : undefined}
           aria-required={required}
+          role="combobox"
         >
           <div className="flex items-center justify-between">
             <span className="truncate">{displayText()}</span>
@@ -213,7 +215,12 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
             </div>
 
             {/* Options list */}
-            <div className="max-h-48 overflow-y-auto">
+            <div
+              id={`${id}-listbox`}
+              className="max-h-48 overflow-y-auto"
+              role="listbox"
+              aria-multiselectable="true"
+            >
               {filteredOptions.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
                   موردی یافت نشد
@@ -225,6 +232,8 @@ const MultiComboBox: React.FC<MultiComboBoxProps> = ({
                     <label
                       key={option.value}
                       className="flex cursor-pointer items-center gap-3 px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      role="option"
+                      aria-selected={isSelected}
                     >
                       <input
                         type="checkbox"

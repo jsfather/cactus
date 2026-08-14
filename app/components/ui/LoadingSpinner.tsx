@@ -1,10 +1,14 @@
 export default function LoadingSpinner() {
   return (
-    <div className="flex h-[50vh] w-full items-center justify-center">
-      <div className="relative">
-        <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200"></div>
-        <div className="border-primary-500 absolute top-0 left-0 h-16 w-16 animate-spin rounded-full border-4 border-t-transparent"></div>
-      </div>
+    <div
+      className="flex min-h-52 w-full flex-col items-center justify-center gap-3"
+      role="status"
+      aria-live="polite"
+    >
+      <span className="border-primary-600 h-9 w-9 animate-spin rounded-full border-3 border-t-transparent" />
+      <span className="text-sm text-gray-500 dark:text-gray-400">
+        در حال بارگذاری…
+      </span>
     </div>
   );
 }

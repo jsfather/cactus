@@ -27,8 +27,12 @@ export function CartMenu() {
   return (
     <div className="relative" ref={menuRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex cursor-pointer items-center justify-center rounded-full bg-gray-100 p-2 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+        className="icon-button relative rounded-full bg-gray-100 dark:bg-gray-800"
+        aria-label="سبد خرید"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
       >
         <ShoppingBasket className="h-5 w-5" />
         {state.totalItems > 0 && (
@@ -45,7 +49,9 @@ export function CartMenu() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 mt-2 w-80 origin-top-left rounded-2xl bg-white p-4 shadow-lg ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
+            role="dialog"
+            aria-label="سبد خرید"
+            className="absolute top-full left-0 mt-2 w-[min(20rem,calc(100vw-2rem))] origin-top-left rounded-2xl bg-white p-4 shadow-xl ring-1 shadow-gray-950/10 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700"
           >
             <div className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
               سبد خرید
@@ -78,9 +84,11 @@ export function CartMenu() {
                         <div className="mt-1 flex items-center justify-between">
                           <div className="flex items-center gap-1">
                             <button
+                              type="button"
                               onClick={() => updateQuantity(item.id, -1)}
                               disabled={item.quantity <= 1}
-                              className="rounded p-1 text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
+                              className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 disabled:opacity-50 dark:text-gray-400 dark:hover:bg-gray-700"
+                              aria-label="کم کردن تعداد"
                             >
                               <Minus className="h-4 w-4" />
                             </button>
@@ -88,15 +96,19 @@ export function CartMenu() {
                               {item.quantity}
                             </span>
                             <button
+                              type="button"
                               onClick={() => updateQuantity(item.id, 1)}
-                              className="rounded p-1 text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                              className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                              aria-label="افزایش تعداد"
                             >
                               <Plus className="h-4 w-4" />
                             </button>
                           </div>
                           <button
+                            type="button"
                             onClick={() => removeItem(item.id)}
-                            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                            aria-label={`حذف ${item.title} از سبد`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -112,11 +124,12 @@ export function CartMenu() {
                     <span>{state.totalPrice?.toLocaleString() || 0} تومان</span>
                   </div>
                   <button
+                    type="button"
                     onClick={() => {
                       setIsOpen(false);
                       router.push('/shop/checkout');
                     }}
-                    className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 mt-4 w-full rounded-lg px-4 py-2 text-center text-sm font-medium text-white transition-colors"
+                    className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 mt-4 min-h-11 w-full rounded-xl px-4 py-2 text-center text-sm font-semibold text-white transition-colors"
                   >
                     تکمیل خرید
                   </button>

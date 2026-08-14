@@ -24,11 +24,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     return (
-      <div className="w-full">
+      <div className="w-full min-w-0">
         {label && (
           <label
             htmlFor={props.id}
-            className="mb-2 block text-sm font-medium text-gray-900 dark:text-white"
+            className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-200"
           >
             {label}
             {required && <span className="mr-1 text-red-500">*</span>}
@@ -39,12 +39,12 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             {...props}
             className={clsx(
-              'block w-full appearance-none rounded-lg border px-4 py-3 text-sm transition-all outline-none',
+              'block min-h-11 w-full appearance-none rounded-xl border px-3.5 py-2.5 text-sm shadow-sm shadow-gray-950/[0.02] transition-[border-color,box-shadow,background-color] outline-none',
               'bg-white dark:bg-gray-900',
               'disabled:cursor-not-allowed disabled:opacity-50',
               error
-                ? 'border-red-500 text-red-900 focus:border-red-500 focus:ring-2 focus:ring-red-200 dark:border-red-500 dark:text-red-400 dark:focus:border-red-500 dark:focus:ring-red-200/20'
-                : 'focus:border-primary-500 focus:ring-primary-200 dark:focus:border-primary-500 dark:focus:ring-primary-200/20 border-gray-300 text-gray-900 focus:ring-2 dark:border-gray-700 dark:text-white',
+                ? 'border-red-500 text-red-900 focus:border-red-500 focus:ring-4 focus:ring-red-100 dark:border-red-500 dark:text-red-300 dark:focus:ring-red-950'
+                : 'focus:border-primary-600 focus:ring-primary-100 dark:focus:border-primary-400 dark:focus:ring-primary-950/60 border-gray-300 text-gray-900 focus:ring-4 dark:border-gray-700 dark:text-white',
               className
             )}
             aria-invalid={error ? 'true' : 'false'}
@@ -66,7 +66,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         </div>
         {error && (
           <p
-            className="mt-2 text-sm text-red-600 dark:text-red-400"
+            className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400"
             id={`${props.id}-error`}
           >
             {error}
