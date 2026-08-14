@@ -142,6 +142,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const postTags = (Array.isArray(blog.tags) ? blog.tags : [])
     .flatMap((tagString) => tagString.split(',').map((t) => t.trim()))
     .filter(Boolean);
+  const blogImageUrl = getImageUrl(blog.image || blog.featured_image);
 
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
@@ -187,6 +188,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               {blog.little_description}
             </p>
           </div>
+
+          {/* Featured Image */}
+          {blogImageUrl && (
+            <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800">
+              <Image
+                src={blogImageUrl}
+                alt={blog.title}
+                fill
+                priority
+                sizes="(min-width: 896px) 896px, 100vw"
+                className="object-cover"
+              />
+            </div>
+          )}
 
           {/* Article Content */}
           <div className="prose prose-lg dark:prose-invert max-w-none">

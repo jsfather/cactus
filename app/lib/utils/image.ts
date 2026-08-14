@@ -60,7 +60,9 @@ export function isValidImageUrl(imagePath: string | null | undefined): boolean {
     imagePath.startsWith('/user_files/') ||
     imagePath.startsWith('user_files/') ||
     imagePath.startsWith('/storage/') ||
-    imagePath.startsWith('storage/')
+    imagePath.startsWith('storage/') ||
+    imagePath.startsWith('/blog_images/') ||
+    imagePath.startsWith('blog_images/')
   ) {
     return true;
   }
