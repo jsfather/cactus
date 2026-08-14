@@ -254,118 +254,138 @@ export default function Page() {
       className="min-h-screen text-gray-900 dark:bg-gray-900 dark:text-gray-100"
     >
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-4 pt-28 pb-16 sm:px-6 lg:pt-32 lg:pb-20">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_80%_10%,rgba(34,199,106,0.12),transparent_30rem)]" />
-        <div className="container grid items-center gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="min-w-0"
-          >
-            <span className="border-primary-200 bg-primary-50 text-primary-700 dark:border-primary-900 dark:bg-primary-950/50 dark:text-primary-300 inline-flex rounded-full border px-3 py-1.5 text-sm font-bold">
-              {dir === 'rtl'
-                ? 'آموزش مهارتی رباتیک'
-                : 'Hands-on robotics education'}
-            </span>
-            <h1 className="mt-5 font-black text-gray-950 dark:text-white">
-              <span className="from-primary-600 to-primary-800 dark:from-primary-400 dark:to-primary-600 bg-gradient-to-l bg-clip-text text-transparent">
-                {t.home.hero.title}
-              </span>{' '}
-              {t.home.hero.subtitle}
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-gray-600 sm:text-lg dark:text-gray-300">
-              {t.home.hero.description}
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Button asChild className="w-full px-6 sm:w-auto">
-                <Link href="/courses" className="sm:w-auto">
-                  {t.home.hero.startLearning}
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="w-full px-6 sm:w-auto"
-              >
-                <Link href="/courses" className="sm:w-auto">
-                  {t.home.hero.viewCourses}
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.55, delay: 0.08 }}
-            className="relative min-w-0"
-          >
-            <div className="border-primary-100 dark:border-primary-900/50 relative aspect-[16/11] min-h-64 overflow-hidden rounded-[2rem] border bg-gray-200 shadow-2xl shadow-gray-950/15 dark:bg-gray-800">
-              <ClientVideo
-                className="h-full w-full object-cover"
-                src={homeVideoUrls.hero}
-                fallbackLabel="ویدئوی معرفی در دسترس نیست"
-                muted
-                playsInline
-                autoPlay
-                loop
-                preload="metadata"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-950/35 via-transparent to-transparent" />
-              <div className="absolute right-5 bottom-5 left-5 flex items-end justify-between gap-4 text-white">
-                <div>
-                  <p className="text-xs font-semibold text-white/70">
-                    {dir === 'rtl' ? 'یادگیری در عمل' : 'Learning by doing'}
-                  </p>
-                  <p className="mt-1 font-bold">
-                    {dir === 'rtl'
-                      ? 'مسابقات و پروژه‌های واقعی'
-                      : 'Real projects and competitions'}
-                  </p>
-                </div>
-                <span
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur-md"
-                  aria-hidden="true"
-                >
-                  <Play className="h-5 w-5 fill-white" />
-                </span>
-              </div>
-            </div>
-          </motion.div>
+      <section className="relative mt-24">
+        {/* Full-width Video Container */}
+        <div className="container mx-auto px-4">
+          <div className="relative h-[70vh] w-full overflow-hidden rounded-3xl shadow-2xl">
+            <ClientVideo
+              className="h-full w-full object-cover"
+              src={homeVideoUrls.hero}
+              fallbackLabel="ویدئوی اصلی هنوز بارگذاری نشده است"
+              muted
+              playsInline
+              autoPlay
+              loop
+              preload="metadata"
+            />
+            {/* Gradient overlay */}
+            <div className="pointer-events-none absolute inset-0 rounded-3xl bg-gradient-to-b from-gray-500/10 via-gray-500/20 to-gray-500/30 dark:from-black/10 dark:via-black/20 dark:to-black/30" />
+          </div>
         </div>
 
-        <div className="container mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:mt-12">
-          {[
-            {
-              number: courses.length.toLocaleString(locale),
-              label: t.home.stats.courses,
-            },
-            {
-              number: teachers.length.toLocaleString(locale),
-              label: dir === 'rtl' ? 'مدرس' : 'Instructors',
-            },
-            {
-              number: apiProducts.length.toLocaleString(locale),
-              label: dir === 'rtl' ? 'محصول' : 'Products',
-            },
-            {
-              number: blogs.length.toLocaleString(locale),
-              label: dir === 'rtl' ? 'مقاله' : 'Articles',
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-2xl border border-gray-200/80 bg-white/80 p-4 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/70"
-            >
-              <p className="text-primary-700 dark:text-primary-400 text-2xl font-black">
-                {stat.number}
-              </p>
-              <p className="mt-1 text-sm font-medium text-gray-600 dark:text-gray-300">
-                {stat.label}
-              </p>
+        {/* Content Section - Below Video */}
+        <div className="relative z-10 mt-12 bg-gradient-to-b from-transparent to-gray-100 pb-24 dark:to-gray-900">
+          <div className="container mx-auto px-4">
+            {/* Main Content */}
+            <div className="mx-auto max-w-4xl text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="space-y-6"
+              >
+                <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
+                  <span className="from-primary-600 to-primary-800 bg-gradient-to-r bg-clip-text text-transparent">
+                    {t.home.hero.title}
+                  </span>
+                  <br />
+                  {t.home.hero.subtitle}
+                </h1>
+                <p className="mx-auto max-w-2xl text-lg text-gray-700 sm:text-xl dark:text-gray-300">
+                  {t.home.hero.description}
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-8 flex flex-wrap items-center justify-center gap-4"
+              >
+                <Link href="/courses">
+                  <Button className="bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transform rounded-full px-8 py-3 text-lg text-white transition-all duration-200 hover:scale-105">
+                    {t.home.hero.startLearning}
+                  </Button>
+                </Link>
+                <Link href="/courses">
+                  <Button
+                    variant="secondary"
+                    className="rounded-full px-8 py-3 text-lg"
+                  >
+                    {t.home.hero.viewCourses}
+                  </Button>
+                </Link>
+              </motion.div>
+
+              {/* Stats Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="mt-16"
+              >
+                <div className="relative">
+                  {/* Decorative blur effect */}
+                  <div className="absolute inset-0 -z-10">
+                    <div className="bg-primary-600/20 absolute top-0 right-1/2 h-[200px] w-[200px] translate-x-1/2 -translate-y-1/2 transform rounded-full blur-[100px]" />
+                    <div className="absolute top-0 left-1/2 h-[150px] w-[150px] -translate-x-1/2 -translate-y-1/2 transform rounded-full bg-blue-600/20 blur-[100px]" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3 lg:grid-cols-4">
+                    {[
+                      {
+                        number: courses.length.toLocaleString(locale),
+                        label: t.home.stats.courses,
+                        description:
+                          dir === 'rtl' ? 'دوره منتشرشده' : 'Published courses',
+                      },
+                      {
+                        number: teachers.length.toLocaleString(locale),
+                        label: dir === 'rtl' ? 'مدرس' : 'Instructors',
+                        description:
+                          dir === 'rtl'
+                            ? 'مدرس معرفی‌شده'
+                            : 'Listed instructors',
+                      },
+                      {
+                        number: apiProducts.length.toLocaleString(locale),
+                        label: dir === 'rtl' ? 'محصول' : 'Products',
+                        description:
+                          dir === 'rtl'
+                            ? 'محصول فعال فروشگاه'
+                            : 'Store products',
+                      },
+                      {
+                        number: blogs.length.toLocaleString(locale),
+                        label: dir === 'rtl' ? 'مقاله' : 'Articles',
+                        description:
+                          dir === 'rtl'
+                            ? 'مقاله منتشرشده'
+                            : 'Published articles',
+                      },
+                    ].map((stat, index) => (
+                      <div key={index} className="group relative">
+                        <div className="relative space-y-2 text-center">
+                          <div className="text-primary-600 dark:text-primary-400 relative text-4xl font-bold sm:text-5xl">
+                            {stat.number}
+                            <div className="bg-primary-400 absolute top-0 -right-2 h-2 w-2 rounded-full" />
+                          </div>
+                          <div className="text-sm font-medium text-gray-800 sm:text-base dark:text-gray-300">
+                            {stat.label}
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            {stat.description}
+                          </p>
+                        </div>
+                        {/* Hover effect line */}
+                        <div className="bg-primary-500 absolute -bottom-4 left-1/2 h-1 w-0 -translate-x-1/2 transform rounded-full transition-all duration-300 group-hover:w-1/2" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
             </div>
-          ))}
+          </div>
         </div>
       </section>
 

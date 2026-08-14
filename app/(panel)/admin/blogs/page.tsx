@@ -152,7 +152,7 @@ export default function BlogsPage() {
         </div>
 
         {/* Summary Stats */}
-        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 [&>div]:min-h-36 [&>div]:rounded-2xl [&>div]:border [&>div]:border-gray-100 [&>div]:bg-gradient-to-br [&>div]:from-white [&>div]:to-violet-50/30 [&>div]:shadow-sm [&>div]:transition-all [&>div]:duration-300 [&>div:hover]:-translate-y-1 [&>div:hover]:shadow-xl dark:[&>div]:border-white/10 dark:[&>div]:from-gray-800 dark:[&>div]:to-violet-950/10">
           <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="p-5">
               <div className="flex items-center">
@@ -235,7 +235,7 @@ export default function BlogsPage() {
         </div>
 
         {/* Blogs Table */}
-        <div className="mt-6">
+        <div className="mt-6 overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-md dark:border-white/10 dark:bg-gray-800">
           <Table
             data={blogList}
             columns={columns}

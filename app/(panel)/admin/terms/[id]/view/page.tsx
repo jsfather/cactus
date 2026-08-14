@@ -112,17 +112,17 @@ const TermViewPage: React.FC<PageProps> = ({ params }) => {
   }
 
   return (
-    <div className="container mx-auto space-y-6 px-4 py-8">
+    <div className="container mx-auto max-w-7xl space-y-6 px-4 py-8">
       {/* Breadcrumbs */}
       <Breadcrumbs breadcrumbs={breadcrumbItems} />
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="relative flex flex-col gap-5 overflow-hidden rounded-3xl bg-gradient-to-l from-slate-900 via-violet-900 to-blue-700 p-7 text-white shadow-xl shadow-violet-500/15 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="mb-2 text-3xl font-extrabold text-white">
             {currentTerm.title}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-blue-100">
             جزئیات ترم و دانش‌پژوهان ثبت‌نام شده
           </p>
         </div>
@@ -141,7 +141,7 @@ const TermViewPage: React.FC<PageProps> = ({ params }) => {
       </div>
 
       {/* Term Information Cards */}
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4 [&>div]:min-h-32 [&>div]:border-gray-100 [&>div]:shadow-md [&>div]:transition-all [&>div]:duration-300 [&>div:hover]:-translate-y-1 [&>div:hover]:shadow-xl dark:[&>div]:border-white/10">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>

@@ -256,7 +256,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
   }
 
   return (
-    <div className="w-full space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-6 pb-10">
       {/* Breadcrumbs */}
       <Breadcrumbs
         breadcrumbs={[
@@ -274,7 +274,7 @@ const StudentFormPage: React.FC<PageProps> = ({ params }) => {
       </div>
 
       {/* Form */}
-      <div className="overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
+      <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-lg shadow-gray-200/40 dark:border-white/10 dark:bg-gray-800 dark:shadow-none">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
           {/* Personal Information */}
           <div>

@@ -268,8 +268,8 @@ export default function StudentsPage() {
       />
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="overflow-hidden rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 [&>div]:relative [&>div]:min-h-36 [&>div]:overflow-hidden [&>div]:rounded-2xl [&>div]:border [&>div]:border-gray-100 [&>div]:shadow-sm [&>div]:transition-all [&>div]:duration-300 [&>div:hover]:-translate-y-1 [&>div:hover]:shadow-xl dark:[&>div]:border-white/10">
+        <div className="bg-gradient-to-br from-white to-blue-50/50 p-6 dark:from-gray-800 dark:to-blue-950/20">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Users className="h-6 w-6 text-blue-600" />
@@ -287,7 +287,7 @@ export default function StudentsPage() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <div className="bg-gradient-to-br from-white to-emerald-50/50 p-6 dark:from-gray-800 dark:to-emerald-950/20">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <UserCheck className="h-6 w-6 text-green-600" />
@@ -305,7 +305,7 @@ export default function StudentsPage() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <div className="bg-gradient-to-br from-white to-rose-50/50 p-6 dark:from-gray-800 dark:to-rose-950/20">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Phone className="h-6 w-6 text-red-600" />
@@ -323,7 +323,7 @@ export default function StudentsPage() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-lg bg-white p-6 shadow dark:bg-gray-800">
+        <div className="bg-gradient-to-br from-white to-violet-50/50 p-6 dark:from-gray-800 dark:to-violet-950/20">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <GraduationCap className="h-6 w-6 text-purple-600" />

@@ -7,6 +7,7 @@ import Table, { Column } from '@/app/components/ui/Table';
 import { toast } from 'react-hot-toast';
 import ConfirmModal from '@/app/components/ui/ConfirmModal';
 import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
+import AdminStatCard from '@/app/components/admin/AdminStatCard';
 import { 
   Calendar, 
   Users, 
@@ -171,33 +172,9 @@ export default function Page() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={stat.name}
-                className="relative overflow-hidden rounded-lg bg-white px-4 py-5 shadow dark:bg-gray-800"
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-md ${stat.color}`}>
-                      <Icon className="h-5 w-5 text-white" aria-hidden="true" />
-                    </div>
-                  </div>
-                  <div className="mr-5 w-0 flex-1">
-                    <dl>
-                      <dt className="truncate text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {stat.name}
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                        {stat.value.toLocaleString('fa-IR')}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {stats.map((stat, index) => (
+            <AdminStatCard key={stat.name} label={stat.name} value={stat.value.toLocaleString('fa-IR')} icon={stat.icon} tone={(['blue', 'emerald', 'violet', 'amber'] as const)[index % 4]} />
+          ))}
         </div>
 
         {/* Table */}

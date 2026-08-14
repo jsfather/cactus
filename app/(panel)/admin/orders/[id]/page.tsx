@@ -160,7 +160,7 @@ export default function OrderDetailPage({
   const StatusIcon = currentStatusOption.icon;
 
   return (
-    <main>
+    <main className="mx-auto max-w-7xl space-y-6 pb-10">
       <Breadcrumbs
         breadcrumbs={[
           { label: 'پنل مدیریت', href: '/admin' },
@@ -175,7 +175,7 @@ export default function OrderDetailPage({
 
       <div className="mt-8">
         {/* Header */}
-        <div className="rounded-lg bg-white shadow dark:bg-gray-800">
+        <div className="overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-l from-slate-900 via-blue-900 to-indigo-800 text-white shadow-xl shadow-blue-500/15">
           <div className="px-6 py-4">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -197,10 +197,10 @@ export default function OrderDetailPage({
                     {currentStatusOption.label}
                   </span>
                 </div>
-                <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                <h1 className="text-2xl font-extrabold text-white">
                   سفارش #{order.id}
                 </h1>
-                <div className="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="mt-2 flex flex-wrap items-center gap-4 text-sm text-blue-100">
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
                     {`${order.user?.first_name || ''} ${order.user?.last_name || ''}`.trim() || order.user?.phone || 'کاربر نامشخص'}
@@ -230,7 +230,7 @@ export default function OrderDetailPage({
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3 [&>div]:rounded-2xl [&>div]:border [&>div]:border-gray-100 [&>div]:shadow-md dark:[&>div]:border-white/10">
           {/* Customer Info */}
           <div className="rounded-lg bg-white shadow dark:bg-gray-800">
             <div className="px-6 py-4">
