@@ -368,7 +368,7 @@ export const API_ENDPOINTS = {
     SHOP: {
       PRODUCTS: '/products',
       HOME_PRODUCTS: '/home/products',
-      PRODUCT_BY_ID: (id: string) => `/products/${id}`,
+      PRODUCT_BY_ID: (id: string) => `/home/products/${id}`,
       PRODUCT_COMMENTS: (id: string) => `/products/${id}/comments`,
       CATEGORIES: '/product-categories',
     },
