@@ -1,19 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/app/components/ui/Card';
-import { useTermStudent } from '@/app/lib/hooks/use-term-student';
 import { useTerm } from '@/app/lib/hooks/use-term';
 import {
   GraduationCap,
   Calendar,
   Clock,
-  Users,
-  BookOpen,
   Eye,
   Power,
 } from 'lucide-react';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Term } from '@/app/lib/types/term';
-import { TermStudent } from '@/app/lib/types/term_student';
 import { Button } from '@/app/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import { studentService } from '@/app/lib/services/student.service';
@@ -23,72 +19,37 @@ interface StudentActiveTermsProps {
   studentId: string;
 }
 
-interface TermWithDetails extends Term {
-  registration_date?: string;
-}
-
 const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
   studentId,
 }) => {
   const router = useRouter();
-  const {
-    studentActiveTerms,
-    loading: termStudentLoading,
-    fetchStudentActiveTerms,
-    clearStudentActiveTerms,
-  } = useTermStudent();
-
-  const { termList, loading: termLoading, fetchTermList } = useTerm();
-  const [termsWithDetails, setTermsWithDetails] = useState<TermWithDetails[]>(
-    []
-  );
+  const { termList, loading, fetchTermList } = useTerm();
   const [togglingTermId, setTogglingTermId] = useState<string | null>(null);
 
   useEffect(() => {
     if (studentId && studentId !== 'new') {
-      fetchStudentActiveTerms(studentId);
       fetchTermList();
     }
+  }, [studentId, fetchTermList]);
 
-    return () => {
-      clearStudentActiveTerms();
-    };
-  }, [
-    studentId,
-    fetchStudentActiveTerms,
-    clearStudentActiveTerms,
-    fetchTermList,
-  ]);
+  const termsWithDetails = useMemo(() => {
+    if (!termList?.length) return [];
 
-  useEffect(() => {
-    if (studentActiveTerms && termList) {
-      const enrichedTerms: TermWithDetails[] = studentActiveTerms
-        .map((termStudent) => {
-          const termDetails = termList.find(
-            (term) => term.id.toString() === termStudent.term_id.toString()
-          );
-          if (termDetails) {
-            return {
-              ...termDetails,
-              registration_date: termStudent.created_at,
-            };
-          }
-          return null;
-        })
-        .filter(Boolean) as TermWithDetails[];
-
-      setTermsWithDetails(enrichedTerms);
-    }
-  }, [studentActiveTerms, termList]);
-
-  const loading = termStudentLoading || termLoading;
+    return termList.filter((term) =>
+      term.students?.some(
+        (student) =>
+          student.user?.id?.toString() === studentId ||
+          student.user_id?.toString() === studentId
+      )
+    );
+  }, [termList, studentId]);
 
   const handleToggleTerm = async (termId: string) => {
     try {
       setTogglingTermId(termId);
       await studentService.toggleTerm(studentId, termId);
       toast.success('وضعیت ترم دانش‌پژوه تغییر کرد');
-      await fetchStudentActiveTerms(studentId);
+      await fetchTermList();
     } catch {
       toast.error('تغییر وضعیت ترم انجام نشد');
     } finally {
@@ -108,7 +69,7 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
   };
 
   const getTermStatus = (
-    term: TermWithDetails
+    term: Term
   ): { label: string; color: string } => {
     const now = new Date();
     const startDate = new Date(term.start_date);
@@ -229,20 +190,6 @@ const StudentActiveTerms: React.FC<StudentActiveTermsProps> = ({
                   </span>
                 </div>
               </div>
-
-              {term.registration_date && (
-                <div className="mt-3 border-t border-gray-200 pt-3 dark:border-gray-600">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                    <BookOpen className="h-4 w-4" />
-                    <span>
-                      تاریخ ثبت‌نام:{' '}
-                      {new Date(term.registration_date).toLocaleDateString(
-                        'fa-IR'
-                      )}
-                    </span>
-                  </div>
-                </div>
-              )}
 
               <div className="mt-3 flex justify-end gap-2">
                 <Button
