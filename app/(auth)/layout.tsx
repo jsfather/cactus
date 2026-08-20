@@ -6,6 +6,7 @@ import "../globals.css";
 export const metadata: Metadata = {
   title: "ورود | کاکتوس",
   description: "ورود به پنل مدرسه رباتیک کاکتوس",
+  icons: { icon: "/cactus-logo.svg" },
 };
 
 export default function AuthRootLayout({

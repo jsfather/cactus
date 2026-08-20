@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     template: "%s | پنل کاکتوس",
   },
   robots: { index: false, follow: false },
+  icons: { icon: "/cactus-logo.svg" },
 };
 
 export default function PanelRootLayout({

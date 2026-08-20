@@ -9,6 +9,9 @@ This is the multilingual website and role-based application panel for Cactus Rob
 - `/blog` and `/en/blog`: published bilingual blog posts
 - `/login`: shared login for administrators, teachers, and students
 - `/panel/admin`: protected administrator panel and blog publishing
+- `/panel/admin/admins`: administrator account CRUD
+- `/panel/admin/teachers`: teacher account CRUD
+- `/panel/admin/students`: student account CRUD
 - `/panel/teacher`: protected teacher workspace
 - `/panel/student`: protected student workspace
 
@@ -54,6 +57,12 @@ pnpm start
 - Every new database-backed feature must install useful starter content once. A seed marker must prevent deleted starter content from being recreated after an administrator intentionally empties the feature.
 - Forms backed by server actions must keep user-entered values after validation, uniqueness, or other recoverable errors. Use `usePreservedFields` from `components/forms/use-preserved-fields.ts` for text inputs, textareas, and selects.
 - Select indicators and other directional adornments must reserve logical inline space and use `start-*` or `end-*` positioning so they mirror correctly in RTL and LTR.
+- Panel pages must compose the shared primitives in `components/panel/ui.tsx` and `components/panel/form-controls.tsx`. This keeps page headers, surfaces, tables, column alignment, buttons, form fields, and empty states consistent across every feature.
+- Every managed feature must provide complete create, read/list, update, and delete flows unless its domain explicitly forbids an operation.
+
+## Theme modes
+
+The public website, login page, and every panel role expose the same theme selector with `system`, `light`, and `dark` modes. The choice is stored locally in the browser under `cactus-theme`; `system` continues to follow operating-system changes. The inline theme bootstrap applies the class before paint to avoid a light-theme flash.
 
 ## Deploy with Dokploy
 

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/(auth)/login/actions";
-import { ThemeSelect } from "@/components/theme/theme-select";
+import { CactusBrand } from "@/components/brand/cactus-brand";
+import { PreferencesMenu } from "@/components/preferences/preferences-menu";
 import type { CurrentUser } from "@/lib/auth/session";
 import { roleHome, roleLabels } from "@/lib/auth/roles";
 
@@ -23,28 +24,12 @@ export function PanelNav({ user }: { user: CurrentUser }) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex flex-col border-b border-zinc-200 bg-white px-5 py-5 lg:min-h-dvh lg:w-72 lg:border-b-0 lg:border-e lg:px-6 dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="flex items-center justify-between gap-4 lg:block">
+    <aside className="relative z-50 flex flex-col border-b border-zinc-200 bg-white px-5 py-5 lg:min-h-dvh lg:w-72 lg:border-b-0 lg:border-e lg:px-6 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="flex items-center justify-between gap-4">
         <Link href={roleHome[user.role]} className="inline-flex items-center gap-3">
-          <span className="grid size-10 place-items-center rounded-xl bg-emerald-700 text-lg font-black text-white dark:bg-emerald-500 dark:text-emerald-950">
-            ک
-          </span>
-          <span>
-            <span className="block font-bold text-zinc-950 dark:text-zinc-50">
-              پنل کاکتوس
-            </span>
-            <span className="block text-xs text-zinc-500 dark:text-zinc-400">
-              {roleLabels[user.role]}
-            </span>
-          </span>
+          <CactusBrand subtitle={`${roleLabels[user.role]} · پنل کاربری`} />
         </Link>
-
-        <Link
-          href="/"
-          className="text-sm text-zinc-500 transition hover:text-emerald-700 lg:hidden dark:text-zinc-400 dark:hover:text-emerald-400"
-        >
-          مشاهده سایت
-        </Link>
+        <PreferencesMenu locale="fa" alternateHref="/en" />
       </div>
 
       <nav className="mt-5 flex gap-2 overflow-x-auto lg:mt-10 lg:flex-col">
@@ -67,20 +52,21 @@ export function PanelNav({ user }: { user: CurrentUser }) {
       </nav>
 
       <div className="mt-5 border-t border-zinc-200 pt-5 lg:mt-auto lg:pt-6 dark:border-zinc-800">
-        <ThemeSelect />
-        <p className="mt-4 truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
+        <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
           {user.name}
         </p>
         <p className="nums-en mt-1 truncate text-xs text-zinc-500" dir="ltr">
           {user.email}
         </p>
         <div className="mt-4 flex gap-3 lg:flex-col">
-          <Link
+          {/* This route uses a different root layout, so it needs a document navigation. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a
             href="/"
-            className="hidden text-sm text-zinc-500 transition hover:text-emerald-700 lg:block dark:text-zinc-400 dark:hover:text-emerald-400"
+            className="text-sm text-zinc-500 transition hover:text-emerald-700 dark:text-zinc-400 dark:hover:text-emerald-400"
           >
             مشاهده سایت عمومی
-          </Link>
+          </a>
           <form action={logout}>
             <button
               type="submit"

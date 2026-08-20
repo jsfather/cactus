@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   },
   description:
     "Project-based robotics and programming education for children and teenagers.",
+  icons: { icon: "/cactus-logo.svg" },
 };
 
 export default function EnglishPublicLayout({

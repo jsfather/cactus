@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   },
   description:
     "مدرسه رباتیک کاکتوس؛ آموزش پروژه‌محور رباتیک و برنامه‌نویسی برای کودکان و نوجوانان.",
+  icons: { icon: "/cactus-logo.svg" },
 };
 
 export default function PersianPublicLayout({
