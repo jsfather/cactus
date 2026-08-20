@@ -33,6 +33,8 @@ export type CreatePostState = {
   fieldErrors?: Record<string, string[]>;
 };
 
+export type PostFormState = CreatePostState;
+
 function revalidateBlogPages() {
   revalidatePath("/");
   revalidatePath("/blog");
@@ -81,6 +83,85 @@ export async function createPost(
       publishedAt: data.status === "published" ? new Date() : null,
       authorId: admin.id,
     });
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "23505"
+    ) {
+      return { error: "این نشانی قبلاً برای نوشته دیگری استفاده شده است." };
+    }
+
+    throw error;
+  }
+
+  revalidateBlogPages();
+  redirect("/panel/admin/blog");
+}
+
+export async function updatePost(
+  postId: string,
+  _previousState: PostFormState,
+  formData: FormData,
+): Promise<PostFormState> {
+  await requireRole("admin");
+
+  const validPostId = z.uuid().safeParse(postId);
+  const parsed = postSchema.safeParse({
+    slug: formData.get("slug"),
+    titleFa: formData.get("titleFa"),
+    titleEn: formData.get("titleEn"),
+    excerptFa: formData.get("excerptFa"),
+    excerptEn: formData.get("excerptEn"),
+    contentFa: formData.get("contentFa"),
+    contentEn: formData.get("contentEn"),
+    coverImageUrl: formData.get("coverImageUrl"),
+    status: formData.get("status"),
+  });
+
+  if (!validPostId.success || !parsed.success) {
+    return {
+      error: "لطفاً اطلاعات نوشته را بررسی کنید.",
+      fieldErrors: parsed.success
+        ? undefined
+        : z.flattenError(parsed.error).fieldErrors,
+    };
+  }
+
+  const database = getDatabase();
+  const [existingPost] = await database
+    .select({ publishedAt: posts.publishedAt })
+    .from(posts)
+    .where(eq(posts.id, validPostId.data))
+    .limit(1);
+
+  if (!existingPost) {
+    return { error: "این نوشته دیگر وجود ندارد." };
+  }
+
+  const data = parsed.data;
+
+  try {
+    await database
+      .update(posts)
+      .set({
+        slug: data.slug,
+        titleFa: data.titleFa,
+        titleEn: data.titleEn || null,
+        excerptFa: data.excerptFa,
+        excerptEn: data.excerptEn || null,
+        contentFa: data.contentFa,
+        contentEn: data.contentEn || null,
+        coverImageUrl: data.coverImageUrl || null,
+        status: data.status,
+        publishedAt:
+          data.status === "published"
+            ? existingPost.publishedAt ?? new Date()
+            : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(posts.id, validPostId.data));
   } catch (error) {
     if (
       typeof error === "object" &&

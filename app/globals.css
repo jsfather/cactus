@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
@@ -16,22 +17,20 @@
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
-html {
+html:not(.dark) {
   color-scheme: light;
+}
+
+html {
   scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #34d399;
-    --primary-foreground: #022c22;
-  }
-
-  html {
-    color-scheme: dark;
-  }
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --primary: #34d399;
+  --primary-foreground: #022c22;
+  color-scheme: dark;
 }
 
 body {

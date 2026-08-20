@@ -1,4 +1,5 @@
 import path from "node:path";
+import { randomBytes } from "node:crypto";
 import { asc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
@@ -121,6 +122,53 @@ export async function setupDatabase() {
           });
         }
       });
+
+      const starterAccounts = [
+        {
+          key: "seed.users.teacher.v1",
+          role: "teacher" as const,
+          name: "مدرس نمونه کاکتوس",
+          email: "teacher.example@cactus.local",
+        },
+        {
+          key: "seed.users.student.v1",
+          role: "student" as const,
+          name: "دانش‌آموز نمونه کاکتوس",
+          email: "student.example@cactus.local",
+        },
+      ];
+
+      for (const starterAccount of starterAccounts) {
+        await database.transaction(async (transaction) => {
+          const [claimedSeed] = await transaction
+            .insert(appSettings)
+            .values({ key: starterAccount.key, value: "complete" })
+            .onConflictDoNothing()
+            .returning({ key: appSettings.key });
+
+          if (!claimedSeed) {
+            return;
+          }
+
+          const [existingUser] = await transaction
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.role, starterAccount.role))
+            .limit(1);
+
+          if (!existingUser) {
+            await transaction.insert(users).values({
+              name: starterAccount.name,
+              email: starterAccount.email,
+              passwordHash: await hashPassword(
+                randomBytes(32).toString("base64url"),
+              ),
+              role: starterAccount.role,
+              isActive: false,
+            });
+          }
+        });
+      }
     }
   } finally {
     await pool.end();

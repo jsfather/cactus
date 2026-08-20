@@ -3,25 +3,32 @@
 import { useActionState } from "react";
 import {
   createPost,
-  type CreatePostState,
+  type PostFormState,
+  updatePost,
 } from "@/app/(panel)/panel/admin/blog/actions";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
+import { FieldError, FormLabel, PanelSelect } from "@/components/panel/form-controls";
+import {
+  PanelFormSection,
+  panelInputClass,
+  primaryButtonClass,
+} from "@/components/panel/ui";
 
-const initialState: CreatePostState = {};
+const initialState: PostFormState = {};
 
-function FieldError({ errors }: { errors?: string[] }) {
-  return errors?.length ? (
-    <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors[0]}</p>
-  ) : null;
-}
+export type PostFormValues = {
+  slug: string;
+  titleFa: string;
+  titleEn: string;
+  coverImageUrl: string;
+  excerptFa: string;
+  contentFa: string;
+  excerptEn: string;
+  contentEn: string;
+  status: "draft" | "published";
+};
 
-const inputClass =
-  "w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-950 outline-none transition focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
-
-const selectClass =
-  "w-full appearance-none rounded-xl border border-zinc-300 bg-white py-3 ps-4 pe-10 text-zinc-950 outline-none transition focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
-
-const initialValues = {
+const emptyValues: PostFormValues = {
   slug: "",
   titleFa: "",
   titleEn: "",
@@ -33,135 +40,128 @@ const initialValues = {
   status: "draft",
 };
 
-export function PostForm() {
-  const [state, action, pending] = useActionState(createPost, initialState);
+export function PostForm({
+  mode = "create",
+  postId,
+  initialValues = emptyValues,
+}: {
+  mode?: "create" | "edit";
+  postId?: string;
+  initialValues?: PostFormValues;
+}) {
+  const formAction =
+    mode === "edit" && postId ? updatePost.bind(null, postId) : createPost;
+  const [state, action, pending] = useActionState(formAction, initialState);
   const { bind } = usePreservedFields(initialValues);
 
   return (
     <form action={action} className="space-y-8">
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-        <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">
-          اطلاعات پایه
-        </h2>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          <label className="block sm:col-span-2">
-            <span className="mb-2 block text-sm font-medium">نشانی نوشته</span>
+      <PanelFormSection title="اطلاعات پایه">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <FormLabel label="نشانی نوشته">
             <input
               {...bind("slug")}
               required
               dir="ltr"
               placeholder="robotics-for-children"
-              className={`${inputClass} nums-en text-start`}
+              className={`${panelInputClass} nums-en text-start`}
             />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.slug} />
-          </label>
+          </div>
 
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium">عنوان فارسی</span>
-            <input {...bind("titleFa")} required className={inputClass} />
+          <div>
+            <FormLabel label="عنوان فارسی">
+              <input {...bind("titleFa")} required className={panelInputClass} />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.titleFa} />
-          </label>
+          </div>
 
-          <label className="block" dir="ltr">
-            <span className="mb-2 block text-sm font-medium">English title</span>
-            <input
-              {...bind("titleEn")}
-              className={`${inputClass} nums-en text-start`}
-            />
+          <div dir="ltr">
+            <FormLabel label="English title">
+              <input
+                {...bind("titleEn")}
+                className={`${panelInputClass} nums-en text-start`}
+              />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.titleEn} />
-          </label>
+          </div>
 
-          <label className="block sm:col-span-2">
-            <span className="mb-2 block text-sm font-medium">نشانی تصویر کاور</span>
+          <div className="sm:col-span-2">
+            <FormLabel label="نشانی تصویر کاور">
             <input
               {...bind("coverImageUrl")}
               type="url"
               dir="ltr"
               placeholder="https://…"
-              className={`${inputClass} nums-en text-start`}
+              className={`${panelInputClass} nums-en text-start`}
             />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.coverImageUrl} />
-          </label>
+          </div>
         </div>
-      </section>
+      </PanelFormSection>
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-        <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">
-          محتوای فارسی
-        </h2>
-        <div className="mt-5 space-y-5">
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium">خلاصه</span>
+      <PanelFormSection title="محتوای فارسی">
+        <div className="space-y-5">
+          <div>
+            <FormLabel label="خلاصه">
             <textarea
               {...bind("excerptFa")}
               required
               rows={3}
-              className={inputClass}
+              className={panelInputClass}
             />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.excerptFa} />
-          </label>
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium">متن نوشته</span>
+          </div>
+          <div>
+            <FormLabel label="متن نوشته">
             <textarea
               {...bind("contentFa")}
               required
               rows={12}
-              className={inputClass}
+              className={panelInputClass}
             />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.contentFa} />
-          </label>
+          </div>
         </div>
-      </section>
+      </PanelFormSection>
 
-      <section
-        dir="ltr"
-        className="rounded-2xl border border-zinc-200 bg-white p-6 text-start dark:border-zinc-800 dark:bg-zinc-950"
-      >
-        <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">
-          English content (optional)
-        </h2>
-        <div className="mt-5 space-y-5">
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium">Excerpt</span>
+      <PanelFormSection title="English content (optional)" dir="ltr">
+        <div className="space-y-5">
+          <div>
+            <FormLabel label="Excerpt">
             <textarea
               {...bind("excerptEn")}
               rows={3}
-              className={`${inputClass} nums-en`}
+              className={`${panelInputClass} nums-en`}
             />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.excerptEn} />
-          </label>
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium">Post body</span>
+          </div>
+          <div>
+            <FormLabel label="Post body">
             <textarea
               {...bind("contentEn")}
               rows={12}
-              className={`${inputClass} nums-en`}
+              className={`${panelInputClass} nums-en`}
             />
+            </FormLabel>
             <FieldError errors={state.fieldErrors?.contentEn} />
-          </label>
+          </div>
         </div>
-      </section>
+      </PanelFormSection>
 
       <section className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 sm:flex-row sm:items-end sm:justify-between dark:border-zinc-800 dark:bg-zinc-950">
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium">وضعیت نوشته</span>
-          <span className="relative block">
-            <select {...bind("status")} className={selectClass}>
+        <FormLabel label="وضعیت نوشته">
+            <PanelSelect {...bind("status")}>
               <option value="draft">پیش‌نویس</option>
               <option value="published">انتشار عمومی</option>
-            </select>
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 20 20"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500"
-            >
-              <path d="m6 8 4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </span>
-        </label>
+            </PanelSelect>
+        </FormLabel>
 
         <div className="sm:text-end">
           {state.error ? (
@@ -172,9 +172,13 @@ export function PostForm() {
           <button
             type="submit"
             disabled={pending}
-            className="rounded-xl bg-emerald-700 px-6 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
+            className={primaryButtonClass}
           >
-            {pending ? "در حال ذخیره…" : "ذخیره نوشته"}
+            {pending
+              ? "در حال ذخیره…"
+              : mode === "edit"
+                ? "ذخیره تغییرات"
+                : "ذخیره نوشته"}
           </button>
         </div>
       </section>

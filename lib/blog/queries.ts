@@ -71,3 +71,13 @@ export async function getAdminPosts() {
     .innerJoin(users, eq(posts.authorId, users.id))
     .orderBy(desc(posts.updatedAt));
 }
+
+export async function getAdminPost(postId: string) {
+  const [post] = await getDatabase()
+    .select()
+    .from(posts)
+    .where(eq(posts.id, postId))
+    .limit(1);
+
+  return post ?? null;
+}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeSelect } from "@/components/theme/theme-select";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 
@@ -19,7 +20,7 @@ export function SiteHeader({
           <span className="grid size-11 place-items-center rounded-2xl bg-emerald-700 text-xl font-black text-white shadow-lg shadow-emerald-700/20 dark:bg-emerald-500 dark:text-emerald-950">
             ک
           </span>
-          <span className="font-bold text-zinc-950 dark:text-zinc-50">
+          <span className="hidden font-bold text-zinc-950 sm:inline dark:text-zinc-50">
             {dictionary.school}
           </span>
         </Link>
@@ -43,6 +44,7 @@ export function SiteHeader({
           >
             {dictionary.panel}
           </Link>
+          <ThemeSelect locale={locale} />
           <Link
             href={localizePath(alternateLocale, currentPath)}
             hrefLang={alternateLocale}
