@@ -8,16 +8,18 @@ This is the multilingual website and role-based application panel for Cactus Rob
 - `/en`: English public landing page (`en`, LTR)
 - `/blog` and `/en/blog`: published bilingual rich-text blog posts
 - `/shop` and `/en/shop`: public multilingual product catalog
-- `/login`: shared login for administrators, teachers, and students
+- `/login` and `/register`: shared login plus public member registration
 - `/panel/admin`: protected administrator panel
 - `/panel/admin/blog`: full blog CRUD, rich-text editing, and cover uploads
 - `/panel/admin/products`: full product CRUD, inventory, rich-text descriptions, and image uploads
 - `/panel/admin/admins`: administrator account CRUD
 - `/panel/admin/teachers`: teacher account CRUD
 - `/panel/admin/students`: student account CRUD
+- `/panel/admin/members`: regular member account CRUD
 - `/panel/teacher`: protected teacher workspace
 - `/panel/student`: protected student workspace
-- `/panel/profile`: personal profile, bilingual biography, and avatar upload
+- `/panel/member`: protected regular member workspace
+- `/panel/profile`: personal profile, editable email, bilingual biography, and avatar upload
 
 ## Local development
 
@@ -65,6 +67,9 @@ pnpm start
 - Select indicators and other directional adornments must reserve logical inline space and use `start-*` or `end-*` positioning so they mirror correctly in RTL and LTR.
 - Panel pages must compose the shared primitives in `components/panel/ui.tsx` and `components/panel/form-controls.tsx`. This keeps page headers, surfaces, tables, column alignment, buttons, form fields, and empty states consistent across every feature.
 - Every managed feature must provide complete create, read/list, update, and delete flows unless its domain explicitly forbids an operation.
+- Features added to teacher, student, or member workspaces must ship with corresponding admin CRUD controls. Administrators can move accounts between all four roles.
+- User names are stored as separate Persian and English first and last names and rendered through `getLocalizedUserName`.
+- Interactive controls and links use a pointer cursor; dropdowns close on selection, outside interaction, and Escape.
 
 ## Theme modes
 

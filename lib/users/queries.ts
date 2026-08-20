@@ -5,8 +5,10 @@ import { users, type UserRole } from "@/lib/db/schema";
 const managedUserSelection = {
   id: users.id,
   email: users.email,
-  nameFa: users.nameFa,
-  nameEn: users.nameEn,
+  firstNameFa: users.firstNameFa,
+  lastNameFa: users.lastNameFa,
+  firstNameEn: users.firstNameEn,
+  lastNameEn: users.lastNameEn,
   role: users.role,
   isActive: users.isActive,
   avatarUrl: users.avatarUrl,
@@ -19,7 +21,7 @@ export function getUsersByRole(role: UserRole) {
     .select(managedUserSelection)
     .from(users)
     .where(eq(users.role, role))
-    .orderBy(asc(users.nameFa), asc(users.createdAt));
+    .orderBy(asc(users.firstNameFa), asc(users.lastNameFa), asc(users.createdAt));
 }
 
 export async function getManagedUser(userId: string, role: UserRole) {

@@ -7,10 +7,14 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
+import { hasPostgresErrorCode } from "@/lib/db/errors";
 
 const profileSchema = z.object({
-  nameFa: z.string().trim().min(2).max(120),
-  nameEn: z.string().trim().min(2).max(120),
+  firstNameFa: z.string().trim().min(1).max(80),
+  lastNameFa: z.string().trim().min(1).max(80),
+  firstNameEn: z.string().trim().min(1).max(80),
+  lastNameEn: z.string().trim().min(1).max(80),
+  email: z.string().trim().email().max(320),
   avatarUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/avatar/")),
   bioFa: z.string().trim().max(1200),
   bioEn: z.string().trim().max(1200),
@@ -28,8 +32,11 @@ export async function updateProfile(
 ): Promise<ProfileFormState> {
   const user = await requireUser();
   const parsed = profileSchema.safeParse({
-    nameFa: formData.get("nameFa"),
-    nameEn: formData.get("nameEn"),
+    firstNameFa: formData.get("firstNameFa"),
+    lastNameFa: formData.get("lastNameFa"),
+    firstNameEn: formData.get("firstNameEn"),
+    lastNameEn: formData.get("lastNameEn"),
+    email: formData.get("email"),
     avatarUrl: formData.get("avatarUrl"),
     bioFa: formData.get("bioFa"),
     bioEn: formData.get("bioEn"),
@@ -44,17 +51,27 @@ export async function updateProfile(
     };
   }
 
-  await getDatabase()
-    .update(users)
-    .set({
-      nameFa: parsed.data.nameFa,
-      nameEn: parsed.data.nameEn,
-      avatarUrl: parsed.data.avatarUrl || null,
-      bioFa: parsed.data.bioFa || null,
-      bioEn: parsed.data.bioEn || null,
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, user.id));
+  try {
+    await getDatabase()
+      .update(users)
+      .set({
+        firstNameFa: parsed.data.firstNameFa,
+        lastNameFa: parsed.data.lastNameFa,
+        firstNameEn: parsed.data.firstNameEn,
+        lastNameEn: parsed.data.lastNameEn,
+        email: parsed.data.email.toLowerCase(),
+        avatarUrl: parsed.data.avatarUrl || null,
+        bioFa: parsed.data.bioFa || null,
+        bioEn: parsed.data.bioEn || null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id));
+  } catch (error) {
+    if (hasPostgresErrorCode(error, "23505")) {
+      return { error: parsed.data.locale === "en" ? "This email is already used by another account." : "این ایمیل قبلاً برای حساب دیگری ثبت شده است.", fieldErrors: { email: [parsed.data.locale === "en" ? "Choose another email address." : "ایمیل دیگری انتخاب کنید."] } };
+    }
+    throw error;
+  }
 
   revalidatePath("/panel", "layout");
   redirect("/panel/profile?updated=1");

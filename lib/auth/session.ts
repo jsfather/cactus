@@ -12,8 +12,10 @@ const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30;
 export type CurrentUser = {
   id: string;
   email: string;
-  nameFa: string;
-  nameEn: string;
+  firstNameFa: string;
+  lastNameFa: string;
+  firstNameEn: string;
+  lastNameEn: string;
   role: UserRole;
   avatarUrl: string | null;
 };
@@ -66,8 +68,10 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     .select({
       id: users.id,
       email: users.email,
-      nameFa: users.nameFa,
-      nameEn: users.nameEn,
+      firstNameFa: users.firstNameFa,
+      lastNameFa: users.lastNameFa,
+      firstNameEn: users.firstNameEn,
+      lastNameEn: users.lastNameEn,
       role: users.role,
       avatarUrl: users.avatarUrl,
     })

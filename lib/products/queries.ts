@@ -1,4 +1,4 @@
-import { and, desc, eq, isNotNull, lte } from "drizzle-orm";
+import { and, desc, eq, isNotNull, lte, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
 import { products, users } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
@@ -18,7 +18,9 @@ function publicProductSelection(locale: Locale) {
     coverImageUrl: products.coverImageUrl,
     isFeatured: products.isFeatured,
     publishedAt: products.publishedAt,
-    authorName: locale === "fa" ? users.nameFa : users.nameEn,
+    authorName: locale === "fa"
+      ? sql<string>`concat_ws(' ', ${users.firstNameFa}, ${users.lastNameFa})`
+      : sql<string>`concat_ws(' ', ${users.firstNameEn}, ${users.lastNameEn})`,
   };
 }
 

@@ -39,6 +39,12 @@ export default async function LoginPage() {
           </p>
         </div>
         <LoginForm locale={locale} />
+        <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
+          {dictionary.noAccount}{" "}
+          <a href="/register" className="font-semibold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300">
+            {dictionary.registerLink}
+          </a>
+        </p>
       </section>
     </main>
   );

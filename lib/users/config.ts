@@ -28,12 +28,19 @@ export const userSectionConfig: Record<
     plural: "دانش‌آموزان",
     description: "حساب‌های دانش‌آموزان و وضعیت دسترسی آن‌ها را مدیریت کنید.",
   },
+  member: {
+    path: "/panel/admin/members",
+    singular: "عضو عادی",
+    plural: "اعضای عادی",
+    description: "حساب اعضای ثبت‌نام‌شده و سطح دسترسی آن‌ها را مدیریت کنید.",
+  },
 };
 
 const englishLabels: Record<UserRole, { singular: string; plural: string; description: string }> = {
   admin: { singular: "Administrator", plural: "Administrators", description: "Manage accounts with full administrative access." },
   teacher: { singular: "Teacher", plural: "Teachers", description: "Manage school teacher accounts and their access status." },
   student: { singular: "Student", plural: "Students", description: "Manage student accounts and their access status." },
+  member: { singular: "Member", plural: "Members", description: "Manage registered member accounts and their access status." },
 };
 
 export function getUserSectionConfig(role: UserRole, locale: Locale) {

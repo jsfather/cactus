@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, count, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -9,13 +9,17 @@ import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
 import { users, userRole, type UserRole } from "@/lib/db/schema";
+import { roleHome } from "@/lib/auth/roles";
 import { userSectionConfig } from "@/lib/users/config";
 
 const roleSchema = z.enum(userRole.enumValues);
 const commonUserSchema = z.object({
-  nameFa: z.string().trim().min(2).max(120),
-  nameEn: z.string().trim().min(2).max(120),
+  firstNameFa: z.string().trim().min(1).max(80),
+  lastNameFa: z.string().trim().min(1).max(80),
+  firstNameEn: z.string().trim().min(1).max(80),
+  lastNameEn: z.string().trim().min(1).max(80),
   email: z.string().trim().email().max(320),
+  role: roleSchema,
   isActive: z.boolean(),
   avatarUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/avatar/")),
   locale: z.enum(["fa", "en"]),
@@ -39,9 +43,12 @@ export type DeleteUserState = {
 
 function readUserForm(formData: FormData) {
   return {
-    nameFa: formData.get("nameFa"),
-    nameEn: formData.get("nameEn"),
+    firstNameFa: formData.get("firstNameFa"),
+    lastNameFa: formData.get("lastNameFa"),
+    firstNameEn: formData.get("firstNameEn"),
+    lastNameEn: formData.get("lastNameEn"),
     email: formData.get("email"),
+    role: formData.get("role"),
     password: formData.get("password"),
     isActive: formData.get("isActive") === "on",
     avatarUrl: formData.get("avatarUrl"),
@@ -57,8 +64,10 @@ function isForeignKeyViolation(error: unknown) {
   return hasPostgresErrorCode(error, "23503");
 }
 
-function revalidateUserPages(role: UserRole) {
-  revalidatePath(userSectionConfig[role].path);
+function revalidateUserPages() {
+  for (const role of userRole.enumValues) {
+    revalidatePath(userSectionConfig[role].path);
+  }
   revalidatePath("/panel/admin");
 }
 
@@ -68,10 +77,10 @@ export async function createManagedUser(
   formData: FormData,
 ): Promise<UserFormState> {
   await requireRole("admin");
-  const validRole = roleSchema.safeParse(role);
+  const validSectionRole = roleSchema.safeParse(role);
   const parsed = createUserSchema.safeParse(readUserForm(formData));
 
-  if (!validRole.success || !parsed.success) {
+  if (!validSectionRole.success || !parsed.success) {
     return {
       error: formData.get("locale") === "en" ? "Please review the account information." : "لطفاً اطلاعات حساب را بررسی کنید.",
       fieldErrors: parsed.success
@@ -82,11 +91,13 @@ export async function createManagedUser(
 
   try {
     await getDatabase().insert(users).values({
-      nameFa: parsed.data.nameFa,
-      nameEn: parsed.data.nameEn,
+      firstNameFa: parsed.data.firstNameFa,
+      lastNameFa: parsed.data.lastNameFa,
+      firstNameEn: parsed.data.firstNameEn,
+      lastNameEn: parsed.data.lastNameEn,
       email: parsed.data.email.toLowerCase(),
       passwordHash: await hashPassword(parsed.data.password),
-      role: validRole.data,
+      role: parsed.data.role,
       isActive: parsed.data.isActive,
       avatarUrl: parsed.data.avatarUrl || null,
     });
@@ -98,8 +109,8 @@ export async function createManagedUser(
     throw error;
   }
 
-  revalidateUserPages(validRole.data);
-  redirect(`${userSectionConfig[validRole.data].path}?toast=created`);
+  revalidateUserPages();
+  redirect(`${userSectionConfig[parsed.data.role].path}?toast=created`);
 }
 
 export async function updateManagedUser(
@@ -109,11 +120,11 @@ export async function updateManagedUser(
   formData: FormData,
 ): Promise<UserFormState> {
   const currentAdmin = await requireRole("admin");
-  const validRole = roleSchema.safeParse(role);
+  const validOriginalRole = roleSchema.safeParse(role);
   const validUserId = z.uuid().safeParse(userId);
   const parsed = updateUserSchema.safeParse(readUserForm(formData));
 
-  if (!validRole.success || !validUserId.success || !parsed.success) {
+  if (!validOriginalRole.success || !validUserId.success || !parsed.success) {
     return {
       error: formData.get("locale") === "en" ? "Please review the account information." : "لطفاً اطلاعات حساب را بررسی کنید.",
       fieldErrors: parsed.success
@@ -126,12 +137,26 @@ export async function updateManagedUser(
     return { error: parsed.data.locale === "en" ? "You cannot deactivate your current administrator account." : "نمی‌توانید حساب مدیریتی فعال خودتان را غیرفعال کنید." };
   }
 
+  if (validOriginalRole.data === "admin" && (parsed.data.role !== "admin" || !parsed.data.isActive)) {
+    const [remainingAdmins] = await getDatabase()
+      .select({ value: count() })
+      .from(users)
+      .where(and(eq(users.role, "admin"), eq(users.isActive, true), ne(users.id, validUserId.data)));
+
+    if ((remainingAdmins?.value ?? 0) === 0) {
+      return { error: parsed.data.locale === "en" ? "At least one active administrator must remain." : "حداقل یک مدیر فعال باید در سامانه باقی بماند." };
+    }
+  }
+
   const changes: Partial<typeof users.$inferInsert> = {
-    nameFa: parsed.data.nameFa,
-    nameEn: parsed.data.nameEn,
+    firstNameFa: parsed.data.firstNameFa,
+    lastNameFa: parsed.data.lastNameFa,
+    firstNameEn: parsed.data.firstNameEn,
+    lastNameEn: parsed.data.lastNameEn,
     email: parsed.data.email.toLowerCase(),
     isActive: parsed.data.isActive,
     avatarUrl: parsed.data.avatarUrl || null,
+    role: parsed.data.role,
     updatedAt: new Date(),
   };
 
@@ -146,7 +171,7 @@ export async function updateManagedUser(
       .where(
         and(
           eq(users.id, validUserId.data),
-          eq(users.role, validRole.data),
+          eq(users.role, validOriginalRole.data),
         ),
       )
       .returning({ id: users.id });
@@ -162,8 +187,11 @@ export async function updateManagedUser(
     throw error;
   }
 
-  revalidateUserPages(validRole.data);
-  redirect(`${userSectionConfig[validRole.data].path}?toast=updated`);
+  revalidateUserPages();
+  if (currentAdmin.id === validUserId.data && parsed.data.role !== "admin") {
+    redirect(roleHome[parsed.data.role]);
+  }
+  redirect(`${userSectionConfig[parsed.data.role].path}?toast=updated`);
 }
 
 export async function deleteManagedUser(
@@ -202,6 +230,6 @@ export async function deleteManagedUser(
     throw error;
   }
 
-  revalidateUserPages(validRole.data);
+  revalidateUserPages();
   return { success: locale === "en" ? "Account deleted." : "حساب کاربری حذف شد." };
 }

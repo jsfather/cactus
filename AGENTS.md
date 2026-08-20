@@ -54,6 +54,7 @@ This repository is a production-oriented multilingual application for Cactus, a 
 - Confirmation dialogs must remain accessible: `role="dialog"`, `aria-modal`, Escape/backdrop cancel, initial focus, focus restoration, and background scroll locking.
 - Toasts must remain dismissible, time-limited, direction-safe, and announced through an appropriate live region.
 - Theme selection is shared across public, authentication, and panel routes and supports `system`, `light`, and `dark`. Keep system preference as the default, persist through the common `cactus-theme` localStorage/cookie key, synchronize browser tabs, and preserve the pre-paint theme bootstrap.
+- Selectable and actionable UI must show the pointer cursor. Dropdowns must close after a selection, on outside pointer interaction, and on Escape while preserving keyboard focus behavior.
 
 ## Forms and Server Actions
 
@@ -72,9 +73,10 @@ This repository is a production-oriented multilingual application for Cactus, a 
 
 ## Authentication and users
 
-- Roles are `admin`, `teacher`, and `student`. Route users to the correct role home and enforce role checks server-side.
-- Admins have dedicated CRUD sections for administrators, teachers, and students.
-- Users have required `nameFa` and `nameEn` values, plus avatars and Persian/English biographies. Always render the name matching the active locale via `getLocalizedUserName`; never show the Persian name on English pages as a fallback.
+- Roles are `admin`, `teacher`, `student`, and `member`. Public registration always creates an active `member`; route every user to the correct role home and enforce role checks server-side.
+- Admins have dedicated CRUD sections for administrators, teachers, students, and members, and may change any account's email and role. Keep at least one active administrator so the installation cannot lose administrative access.
+- Every feature introduced for teachers, students, or members must include corresponding full admin CRUD access in the panel. Treat this as part of the feature's definition of done, not a later enhancement.
+- Users have required `firstNameFa`, `lastNameFa`, `firstNameEn`, and `lastNameEn` values, plus avatars and Persian/English biographies. Always render the complete name matching the active locale via `getLocalizedUserName`; never show the Persian name on English pages as a fallback.
 - User create/edit and self-service profile forms must collect both Persian and English names regardless of the currently active interface language.
 - Never allow the current administrator to deactivate or delete their own active account.
 - Passwords are hashed and must be at least 12 characters when created or changed. Never log credentials or include them in client-visible state.

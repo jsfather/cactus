@@ -1,4 +1,4 @@
-import { and, desc, eq, isNotNull, lte } from "drizzle-orm";
+import { and, desc, eq, isNotNull, lte, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
 import { posts, users } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
@@ -15,7 +15,9 @@ function publicPostSelection(locale: Locale) {
     contentEn: posts.contentEn,
     coverImageUrl: posts.coverImageUrl,
     publishedAt: posts.publishedAt,
-    authorName: locale === "fa" ? users.nameFa : users.nameEn,
+    authorName: locale === "fa"
+      ? sql<string>`concat_ws(' ', ${users.firstNameFa}, ${users.lastNameFa})`
+      : sql<string>`concat_ws(' ', ${users.firstNameEn}, ${users.lastNameEn})`,
   };
 }
 
@@ -68,7 +70,9 @@ export async function getAdminPosts(locale: Locale) {
       status: posts.status,
       publishedAt: posts.publishedAt,
       updatedAt: posts.updatedAt,
-      authorName: locale === "fa" ? users.nameFa : users.nameEn,
+      authorName: locale === "fa"
+        ? sql<string>`concat_ws(' ', ${users.firstNameFa}, ${users.lastNameFa})`
+        : sql<string>`concat_ws(' ', ${users.firstNameEn}, ${users.lastNameEn})`,
     })
     .from(posts)
     .innerJoin(users, eq(posts.authorId, users.id))

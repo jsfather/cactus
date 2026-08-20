@@ -30,8 +30,8 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
   const alternateLocale = locale === "fa" ? "en" : "fa";
   const alternateHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(pathname)}`;
   const roleName = locale === "fa"
-    ? { admin: "مدیر", teacher: "مدرس", student: "دانش‌آموز" }[user.role]
-    : { admin: "Administrator", teacher: "Teacher", student: "Student" }[user.role];
+    ? { admin: "مدیر", teacher: "مدرس", student: "دانش‌آموز", member: "عضو عادی" }[user.role]
+    : { admin: "Administrator", teacher: "Teacher", student: "Student", member: "Member" }[user.role];
   const mainLinks: Array<{ href: string; label: string; icon: NavIcon }> = [
     { href: roleHome[user.role], label: dictionary.nav.overview, icon: "home" },
     ...(user.role === "admin"
@@ -40,13 +40,13 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
           { href: "/panel/admin/products", label: dictionary.nav.shop, icon: "shop" as const },
         ]
       : []),
-    { href: "/panel/profile", label: dictionary.nav.profile, icon: "profile" },
   ];
   const userLinks = user.role === "admin"
     ? [
         { href: "/panel/admin/admins", label: dictionary.nav.admins },
         { href: "/panel/admin/teachers", label: dictionary.nav.teachers },
         { href: "/panel/admin/students", label: dictionary.nav.students },
+        { href: "/panel/admin/members", label: dictionary.nav.members },
       ]
     : [];
   const isActive = (href: string) => pathname === href || (href !== roleHome[user.role] && pathname.startsWith(`${href}/`));

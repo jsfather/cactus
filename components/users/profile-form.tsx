@@ -17,14 +17,17 @@ export function ProfileForm({
   profile,
 }: {
   locale: Locale;
-  profile: { nameFa: string; nameEn: string; email: string; avatarUrl: string | null; bioFa: string | null; bioEn: string | null };
+  profile: { firstNameFa: string; lastNameFa: string; firstNameEn: string; lastNameEn: string; email: string; avatarUrl: string | null; bioFa: string | null; bioEn: string | null };
 }) {
   const dictionary = getPanelDictionary(locale);
   const [state, action, pending] = useActionState(updateProfile, initialState);
   useActionErrorToast(state);
   const { bind } = usePreservedFields({
-    nameFa: profile.nameFa,
-    nameEn: profile.nameEn,
+    firstNameFa: profile.firstNameFa,
+    lastNameFa: profile.lastNameFa,
+    firstNameEn: profile.firstNameEn,
+    lastNameEn: profile.lastNameEn,
+    email: profile.email,
     bioFa: profile.bioFa || "",
     bioEn: profile.bioEn || "",
   });
@@ -37,21 +40,34 @@ export function ProfileForm({
           <PanelFormSection title={dictionary.profile.personalInfo} description={dictionary.profile.namesDescription}>
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <FormLabel label={dictionary.profile.nameFa}>
-                  <PanelInput {...bind("nameFa")} required autoComplete="name" dir="rtl" />
+                <FormLabel label={dictionary.profile.firstNameFa}>
+                  <PanelInput {...bind("firstNameFa")} required autoComplete="given-name" dir="rtl" />
                 </FormLabel>
-                <FieldError errors={state.fieldErrors?.nameFa} />
+                <FieldError errors={state.fieldErrors?.firstNameFa} />
               </div>
               <div>
-                <FormLabel label={dictionary.profile.nameEn}>
-                  <PanelInput {...bind("nameEn")} required autoComplete="name" dir="ltr" className="nums-en" />
+                <FormLabel label={dictionary.profile.lastNameFa}>
+                  <PanelInput {...bind("lastNameFa")} required autoComplete="family-name" dir="rtl" />
                 </FormLabel>
-                <FieldError errors={state.fieldErrors?.nameEn} />
+                <FieldError errors={state.fieldErrors?.lastNameFa} />
+              </div>
+              <div>
+                <FormLabel label={dictionary.profile.firstNameEn}>
+                  <PanelInput {...bind("firstNameEn")} required autoComplete="given-name" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.firstNameEn} />
+              </div>
+              <div>
+                <FormLabel label={dictionary.profile.lastNameEn}>
+                  <PanelInput {...bind("lastNameEn")} required autoComplete="family-name" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.lastNameEn} />
               </div>
               <div className="sm:col-span-2">
                 <FormLabel label={dictionary.users.email} hint={dictionary.profile.emailHint}>
-                  <PanelInput value={profile.email} disabled dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("email")} type="email" required autoComplete="email" dir="ltr" className="nums-en" />
                 </FormLabel>
+                <FieldError errors={state.fieldErrors?.email} />
               </div>
             </div>
           </PanelFormSection>

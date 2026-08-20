@@ -10,6 +10,16 @@ import { appSettings, posts, products, users } from "./schema";
 const starterBlogSeedKey = "seed.blog.starter.v1";
 const starterProductSeedKey = "seed.shop.starter.v1";
 
+function splitName(value: string, fallbackFirst: string, fallbackLast: string) {
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length < 2) {
+    return { firstName: parts[0] || fallbackFirst, lastName: fallbackLast };
+  }
+
+  return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
+}
+
 export async function setupDatabase() {
   const connectionString = process.env.DATABASE_URL;
 
@@ -62,17 +72,24 @@ export async function setupDatabase() {
       if (existingUser) {
         adminId = existingUser.id;
       } else {
+        const adminNameFa = splitName(
+          process.env.ADMIN_NAME_FA?.trim() || process.env.ADMIN_NAME?.trim() || "مدیر کاکتوس",
+          "مدیر",
+          "کاکتوس",
+        );
+        const adminNameEn = splitName(
+          process.env.ADMIN_NAME_EN?.trim() || "Cactus Administrator",
+          "Cactus",
+          "Administrator",
+        );
         const [createdAdmin] = await database
           .insert(users)
           .values({
             email,
-            nameFa:
-              process.env.ADMIN_NAME_FA?.trim() ||
-              process.env.ADMIN_NAME?.trim() ||
-              "مدیر کاکتوس",
-            nameEn:
-              process.env.ADMIN_NAME_EN?.trim() ||
-              "Cactus Administrator",
+            firstNameFa: process.env.ADMIN_FIRST_NAME_FA?.trim() || adminNameFa.firstName,
+            lastNameFa: process.env.ADMIN_LAST_NAME_FA?.trim() || adminNameFa.lastName,
+            firstNameEn: process.env.ADMIN_FIRST_NAME_EN?.trim() || adminNameEn.firstName,
+            lastNameEn: process.env.ADMIN_LAST_NAME_EN?.trim() || adminNameEn.lastName,
             passwordHash: await hashPassword(password),
             role: "admin",
           })
@@ -171,16 +188,29 @@ export async function setupDatabase() {
         {
           key: "seed.users.teacher.v1",
           role: "teacher" as const,
-          nameFa: "مدرس نمونه کاکتوس",
-          nameEn: "Cactus Demo Teacher",
+          firstNameFa: "مدرس",
+          lastNameFa: "نمونه کاکتوس",
+          firstNameEn: "Cactus Demo",
+          lastNameEn: "Teacher",
           email: "teacher.example@cactus.local",
         },
         {
           key: "seed.users.student.v1",
           role: "student" as const,
-          nameFa: "دانش‌آموز نمونه کاکتوس",
-          nameEn: "Cactus Demo Student",
+          firstNameFa: "دانش‌آموز",
+          lastNameFa: "نمونه کاکتوس",
+          firstNameEn: "Cactus Demo",
+          lastNameEn: "Student",
           email: "student.example@cactus.local",
+        },
+        {
+          key: "seed.users.member.v1",
+          role: "member" as const,
+          firstNameFa: "عضو",
+          lastNameFa: "نمونه کاکتوس",
+          firstNameEn: "Cactus Demo",
+          lastNameEn: "Member",
+          email: "member.example@cactus.local",
         },
       ];
 
@@ -204,8 +234,10 @@ export async function setupDatabase() {
 
           if (!existingUser) {
             await transaction.insert(users).values({
-              nameFa: starterAccount.nameFa,
-              nameEn: starterAccount.nameEn,
+              firstNameFa: starterAccount.firstNameFa,
+              lastNameFa: starterAccount.lastNameFa,
+              firstNameEn: starterAccount.firstNameEn,
+              lastNameEn: starterAccount.lastNameEn,
               email: starterAccount.email,
               passwordHash: await hashPassword(
                 randomBytes(32).toString("base64url"),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LOCALE_COOKIE, type Locale } from "@/lib/i18n/config";
 
@@ -55,6 +55,7 @@ export function PreferencesMenu({
   alternateHref?: string;
 }) {
   const router = useRouter();
+  const menuRef = useRef<HTMLDetailsElement>(null);
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof document === "undefined") return "system";
 
@@ -81,6 +82,26 @@ export function PreferencesMenu({
         language: "Language",
         alternate: "فارسی",
       };
+
+  useEffect(() => {
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const menu = menuRef.current;
+      if (menu?.open && !menu.contains(event.target as Node)) menu.open = false;
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && menuRef.current?.open) {
+        menuRef.current.open = false;
+        menuRef.current.querySelector("summary")?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -147,7 +168,7 @@ export function PreferencesMenu({
     try {
       localStorage.setItem(localeStorageKey, nextLocale);
     } catch {}
-
+    if (menuRef.current) menuRef.current.open = false;
   };
 
   const selectTheme = (nextTheme: Theme) => {
@@ -157,6 +178,7 @@ export function PreferencesMenu({
 
     setTheme(nextTheme);
     applyTheme(nextTheme);
+    if (menuRef.current) menuRef.current.open = false;
   };
 
   const themeOptions: Array<{ value: Theme; label: string }> = [
@@ -166,7 +188,7 @@ export function PreferencesMenu({
   ];
 
   return (
-    <details className="group/preferences relative z-40">
+    <details ref={menuRef} className="group/preferences relative z-40">
       <summary
         aria-label={labels.menu}
         title={labels.menu}
@@ -190,7 +212,7 @@ export function PreferencesMenu({
               suppressHydrationWarning
               aria-pressed={theme === option.value}
               onClick={() => selectTheme(option.value)}
-              className="flex min-h-16 flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium text-zinc-600 transition hover:text-zinc-950 aria-pressed:bg-white aria-pressed:text-emerald-800 aria-pressed:shadow-sm dark:text-zinc-400 dark:hover:text-zinc-100 dark:aria-pressed:bg-zinc-700 dark:aria-pressed:text-emerald-300"
+              className="flex min-h-16 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-xs font-medium text-zinc-600 transition hover:text-zinc-950 aria-pressed:bg-white aria-pressed:text-emerald-800 aria-pressed:shadow-sm dark:text-zinc-400 dark:hover:text-zinc-100 dark:aria-pressed:bg-zinc-700 dark:aria-pressed:text-emerald-300"
             >
               <ThemeIcon theme={option.value} />
               <span>{option.label}</span>

@@ -1,0 +1,25 @@
+import { requireRole } from "@/lib/auth/session";
+import { PanelPage, PanelPageHeader, PanelSurface } from "@/components/panel/ui";
+import { getPanelDictionary } from "@/lib/i18n/panel";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
+import { getLocalizedUserName } from "@/lib/users/name";
+
+export default async function MemberDashboard() {
+  const [user, locale] = await Promise.all([requireRole("member"), getPanelLocale()]);
+  const dictionary = getPanelDictionary(locale);
+
+  return (
+    <PanelPage>
+      <PanelPageHeader
+        eyebrow={dictionary.dashboard.memberEyebrow}
+        title={`${dictionary.dashboard.hello}، ${getLocalizedUserName(user, locale)}`}
+        description={dictionary.dashboard.memberDescription}
+      />
+      <PanelSurface>
+        <div className="p-6 text-sm leading-7 text-zinc-600 dark:text-zinc-400">
+          {dictionary.dashboard.comingSoon}
+        </div>
+      </PanelSurface>
+    </PanelPage>
+  );
+}

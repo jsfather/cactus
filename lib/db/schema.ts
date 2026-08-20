@@ -16,6 +16,7 @@ export const userRole = pgEnum("user_role", [
   "admin",
   "teacher",
   "student",
+  "member",
 ]);
 
 export const postStatus = pgEnum("post_status", ["draft", "published"]);
@@ -43,10 +44,12 @@ export const users = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     email: varchar("email", { length: 320 }).notNull(),
-    nameFa: varchar("name_fa", { length: 120 }).notNull(),
-    nameEn: varchar("name_en", { length: 120 }).notNull(),
+    firstNameFa: varchar("first_name_fa", { length: 80 }).notNull(),
+    lastNameFa: varchar("last_name_fa", { length: 80 }).notNull(),
+    firstNameEn: varchar("first_name_en", { length: 80 }).notNull(),
+    lastNameEn: varchar("last_name_en", { length: 80 }).notNull(),
     passwordHash: text("password_hash").notNull(),
-    role: userRole("role").default("student").notNull(),
+    role: userRole("role").default("member").notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     avatarUrl: text("avatar_url"),
     bioFa: text("bio_fa"),
