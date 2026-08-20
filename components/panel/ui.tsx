@@ -2,7 +2,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 export const panelInputClass =
-  "w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:disabled:bg-zinc-900";
+  "w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-start text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:disabled:bg-zinc-900";
+
+export const panelTextareaClass =
+  "w-full resize-y rounded-xl border border-zinc-300 bg-white px-4 py-3 text-start text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:disabled:bg-zinc-900";
 
 export const panelSelectClass =
   "w-full appearance-none rounded-xl border border-zinc-300 bg-white py-3 ps-4 pe-10 text-zinc-950 outline-none transition focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
@@ -61,24 +64,42 @@ export function PanelFormSection({
   title,
   description,
   children,
-  dir,
 }: {
   title: string;
   description?: string;
   children: ReactNode;
-  dir?: "rtl" | "ltr";
 }) {
   return (
-    <section
-      dir={dir}
-      className="rounded-2xl border border-zinc-200 bg-white p-6 text-start dark:border-zinc-800 dark:bg-zinc-950"
-    >
-      <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">
-        {title}
-      </h2>
-      {description ? <p className="mt-1.5 text-sm leading-6 text-zinc-500 dark:text-zinc-400">{description}</p> : null}
-      <div className="mt-5">{children}</div>
+    <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white text-start dark:border-zinc-800 dark:bg-zinc-950">
+      <header className="border-b border-zinc-200 bg-zinc-50/70 px-5 py-4 sm:px-6 dark:border-zinc-800 dark:bg-zinc-900/50">
+        <h2 className="text-base font-semibold text-zinc-950 dark:text-zinc-50">
+          {title}
+        </h2>
+        {description ? <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500 dark:text-zinc-400">{description}</p> : null}
+      </header>
+      <div className="p-5 sm:p-6">{children}</div>
     </section>
+  );
+}
+
+export function PanelFormFooter({
+  message,
+  error,
+  children,
+}: {
+  message?: string;
+  error?: string;
+  children: ReactNode;
+}) {
+  return (
+    <footer className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5 dark:border-zinc-800 dark:bg-zinc-950">
+      {error ? (
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>
+      ) : (
+        <p className="max-w-2xl text-xs leading-5 text-zinc-500 dark:text-zinc-400">{message}</p>
+      )}
+      <div className="flex shrink-0 flex-wrap gap-3">{children}</div>
+    </footer>
   );
 }
 

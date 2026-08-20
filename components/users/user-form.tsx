@@ -7,7 +7,7 @@ import { usePreservedFields } from "@/components/forms/use-preserved-fields";
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
 import { ImageUploadField } from "@/components/media/image-upload-field";
 import { FieldError, FormLabel, PanelInput } from "@/components/panel/form-controls";
-import { PanelFormSection, primaryButtonClass, secondaryButtonClass } from "@/components/panel/ui";
+import { PanelFormFooter, PanelFormSection, primaryButtonClass, secondaryButtonClass } from "@/components/panel/ui";
 import type { UserRole } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 import { getPanelDictionary } from "@/lib/i18n/panel";
@@ -29,22 +29,76 @@ export function UserForm({ role, locale, mode = "create", userId, initialValues 
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="locale" value={locale} />
-      <PanelFormSection title={`${config.singular} · ${dictionary.profile.personalInfo}`}>
-        <div className="space-y-6">
-          <ImageUploadField name="avatarUrl" kind="avatar" locale={locale} initialValue={initialValues.avatarUrl} label={dictionary.users.avatar} aspect="square" />
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div dir="rtl"><FormLabel label={dictionary.users.fullNameFa}><PanelInput {...bind("nameFa")} required autoComplete="name" className="text-start" /></FormLabel><FieldError errors={state.fieldErrors?.nameFa} /></div>
-            <div dir="ltr"><FormLabel label={dictionary.users.fullNameEn}><PanelInput {...bind("nameEn")} required autoComplete="name" className="nums-en text-start" /></FormLabel><FieldError errors={state.fieldErrors?.nameEn} /></div>
-            <div dir="ltr"><FormLabel label={dictionary.users.email}><PanelInput {...bind("email")} type="email" required autoComplete="email" className="nums-en text-start" /></FormLabel><FieldError errors={state.fieldErrors?.email} /></div>
-            <div className="sm:col-span-2" dir="ltr"><FormLabel label={mode === "edit" ? dictionary.users.newPassword : dictionary.users.password} hint={mode === "edit" ? (isFa ? "برای حفظ رمز فعلی، این قسمت را خالی بگذارید. رمز جدید حداقل ۱۲ نویسه باشد." : "Leave blank to keep the current password. New passwords need at least 12 characters.") : (isFa ? "حداقل ۱۲ نویسه استفاده کنید." : "Use at least 12 characters.")}><PanelInput {...bind("password")} type="password" required={mode === "create"} minLength={mode === "create" ? 12 : undefined} autoComplete="new-password" className="nums-en text-start" /></FormLabel><FieldError errors={state.fieldErrors?.password} /></div>
-            <label className="flex items-start gap-3 rounded-xl border border-zinc-200 p-4 sm:col-span-2 dark:border-zinc-800"><input type="checkbox" name="isActive" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} className="mt-1 size-4 accent-emerald-700" /><span><span className="block text-sm font-medium">{dictionary.users.activeAccount}</span><span className="mt-1 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">{dictionary.users.activeHint}</span></span></label>
-          </div>
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <div className="min-w-0 space-y-6">
+          <PanelFormSection
+            title={dictionary.profile.personalInfo}
+            description={isFa ? `نام‌های نمایشی ${config.singular} را برای هر دو زبان وارد کنید.` : `Enter this ${config.singular.toLowerCase()}'s display name in both languages.`}
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <FormLabel label={dictionary.users.fullNameFa}>
+                  <PanelInput {...bind("nameFa")} required autoComplete="name" dir="rtl" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.nameFa} />
+              </div>
+              <div>
+                <FormLabel label={dictionary.users.fullNameEn}>
+                  <PanelInput {...bind("nameEn")} required autoComplete="name" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.nameEn} />
+              </div>
+            </div>
+          </PanelFormSection>
+
+          <PanelFormSection
+            title={isFa ? "اطلاعات ورود" : "Sign-in details"}
+            description={isFa ? "ایمیل و رمز عبور برای ورود به پنل استفاده می‌شوند." : "The email address and password are used to sign in to the panel."}
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <FormLabel label={dictionary.users.email}>
+                  <PanelInput {...bind("email")} type="email" required autoComplete="email" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.email} />
+              </div>
+              <div>
+                <FormLabel
+                  label={mode === "edit" ? dictionary.users.newPassword : dictionary.users.password}
+                  hint={mode === "edit" ? (isFa ? "برای حفظ رمز فعلی، خالی بگذارید." : "Leave blank to keep the current password.") : (isFa ? "حداقل ۱۲ نویسه استفاده کنید." : "Use at least 12 characters.")}
+                >
+                  <PanelInput {...bind("password")} type="password" required={mode === "create"} minLength={mode === "create" ? 12 : undefined} autoComplete="new-password" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.password} />
+              </div>
+            </div>
+          </PanelFormSection>
         </div>
-      </PanelFormSection>
-      <section className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800 dark:bg-zinc-950">
-        {state.error ? <p role="alert" className="text-sm text-red-600 dark:text-red-400">{state.error}</p> : <p className="text-sm text-zinc-500 dark:text-zinc-400">{config.description}</p>}
-        <div className="flex flex-wrap gap-3"><Link href={config.path} className={secondaryButtonClass}>{dictionary.common.cancel}</Link><button type="submit" disabled={pending} className={primaryButtonClass}>{pending ? dictionary.common.saving : mode === "edit" ? dictionary.common.save : `${dictionary.common.new} ${config.singular}`}</button></div>
-      </section>
+
+        <aside className="space-y-6 xl:sticky xl:top-6">
+          <PanelFormSection title={dictionary.users.avatar} description={dictionary.profile.avatarDescription}>
+            <ImageUploadField name="avatarUrl" kind="avatar" locale={locale} initialValue={initialValues.avatarUrl} label={dictionary.users.avatar} aspect="square" />
+          </PanelFormSection>
+
+          <PanelFormSection
+            title={isFa ? "دسترسی حساب" : "Account access"}
+            description={isFa ? "فعال یا غیرفعال بودن امکان ورود این حساب را تعیین می‌کند." : "Active status controls whether this account can sign in."}
+          >
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50/70 p-4 text-start transition hover:border-emerald-300 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-emerald-800">
+              <input type="checkbox" name="isActive" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} className="mt-0.5 size-4 shrink-0 accent-emerald-700" />
+              <span>
+                <span className="block text-sm font-medium text-zinc-900 dark:text-zinc-100">{dictionary.users.activeAccount}</span>
+                <span className="mt-1 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">{dictionary.users.activeHint}</span>
+              </span>
+            </label>
+          </PanelFormSection>
+        </aside>
+      </div>
+
+      <PanelFormFooter message={config.description} error={state.error}>
+        <Link href={config.path} className={secondaryButtonClass}>{dictionary.common.cancel}</Link>
+        <button type="submit" disabled={pending} className={primaryButtonClass}>{pending ? dictionary.common.saving : mode === "edit" ? dictionary.common.save : `${dictionary.common.new} ${config.singular}`}</button>
+      </PanelFormFooter>
     </form>
   );
 }

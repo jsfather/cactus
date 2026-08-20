@@ -13,6 +13,7 @@ export function ImageUploadField({
   label,
   hint,
   aspect = "video",
+  layout = "responsive",
 }: {
   name: string;
   kind: MediaKind;
@@ -21,6 +22,7 @@ export function ImageUploadField({
   label: string;
   hint?: string;
   aspect?: "square" | "video";
+  layout?: "responsive" | "stacked";
 }) {
   const [value, setValue] = useState(initialValue);
   const [busy, setBusy] = useState(false);
@@ -92,10 +94,10 @@ export function ImageUploadField({
           const file = event.dataTransfer.files?.[0];
           if (file && !busy) selectFile(file);
         }}
-        className={`grid gap-4 rounded-2xl border p-4 transition sm:items-center ${aspect === "square" ? "" : "sm:grid-cols-[13rem_minmax(0,1fr)]"} ${dragging ? "border-emerald-500 bg-emerald-50/80 ring-3 ring-emerald-500/10 dark:border-emerald-500 dark:bg-emerald-950/25" : "border-zinc-200 bg-zinc-50/70 dark:border-zinc-800 dark:bg-zinc-900/50"}`}
+        className={`grid gap-4 rounded-2xl border p-4 transition sm:items-center ${aspect === "video" && layout === "responsive" ? "sm:grid-cols-[13rem_minmax(0,1fr)]" : ""} ${dragging ? "border-emerald-500 bg-emerald-50/80 ring-3 ring-emerald-500/10 dark:border-emerald-500 dark:bg-emerald-950/25" : "border-zinc-200 bg-zinc-50/70 dark:border-zinc-800 dark:bg-zinc-900/50"}`}
       >
         <div
-          className={`${aspect === "square" ? "aspect-square w-32" : "aspect-video w-full sm:w-52"} relative mx-auto shrink-0 overflow-hidden rounded-xl border ${value ? "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-950" : "border-dashed border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950"}`}
+          className={`${aspect === "square" ? "aspect-square w-32" : `aspect-video w-full ${layout === "responsive" ? "sm:w-52" : ""}`} relative mx-auto shrink-0 overflow-hidden rounded-xl border ${value ? "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-950" : "border-dashed border-zinc-300 bg-white dark:border-zinc-700 dark:bg-zinc-950"}`}
         >
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element

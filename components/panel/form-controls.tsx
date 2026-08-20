@@ -1,6 +1,6 @@
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { SelectChevron } from "@/components/ui/select-chevron";
-import { panelInputClass, panelSelectClass } from "./ui";
+import { panelInputClass, panelSelectClass, panelTextareaClass } from "./ui";
 
 export function FieldError({ errors, id }: { errors?: string[]; id?: string }) {
   return errors?.length ? (
@@ -20,11 +20,11 @@ export function FormLabel({
   hint?: string;
 }) {
   return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-medium">{label}</span>
+    <label className="block text-start">
+      <span className="mb-2 block text-start text-sm font-medium text-zinc-900 dark:text-zinc-100">{label}</span>
       {children}
       {hint ? (
-        <span className="mt-1.5 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+        <span className="mt-1.5 block text-start text-xs leading-5 text-zinc-500 dark:text-zinc-400">
           {hint}
         </span>
       ) : null}
@@ -37,6 +37,13 @@ export function PanelInput({
   ...props
 }: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${panelInputClass} ${className}`} />;
+}
+
+export function PanelTextarea({
+  className = "",
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return <textarea {...props} className={`${panelTextareaClass} ${className}`} />;
 }
 
 export function PanelSelect({

@@ -7,8 +7,8 @@ import { RichTextEditor } from "@/components/content/rich-text-editor";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
 import { ImageUploadField } from "@/components/media/image-upload-field";
-import { FieldError, FormLabel, PanelInput, PanelSelect } from "@/components/panel/form-controls";
-import { PanelFormSection, primaryButtonClass, secondaryButtonClass } from "@/components/panel/ui";
+import { FieldError, FormLabel, PanelInput, PanelSelect, PanelTextarea } from "@/components/panel/form-controls";
+import { PanelFormFooter, PanelFormSection, primaryButtonClass, secondaryButtonClass } from "@/components/panel/ui";
 import type { Locale } from "@/lib/i18n/config";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 
@@ -36,33 +36,119 @@ export function ProductForm({ locale, mode = "create", productId, initialValues 
     status: initialValues.status,
   });
   const [featured, setFeatured] = useState(initialValues.isFeatured);
+  const isFa = locale === "fa";
 
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="locale" value={locale} />
-      <PanelFormSection title={dictionary.shop.baseInfo}>
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="sm:col-span-2"><FormLabel label={dictionary.shop.slug}><PanelInput {...bind("slug")} required dir="ltr" className="nums-en text-start" placeholder="starter-robotics-kit" /></FormLabel><FieldError errors={state.fieldErrors?.slug} /></div>
-          <div><FormLabel label={locale === "fa" ? "عنوان فارسی" : "Persian title"}><PanelInput {...bind("titleFa")} required dir="rtl" /></FormLabel><FieldError errors={state.fieldErrors?.titleFa} /></div>
-          <div dir="ltr"><FormLabel label={locale === "fa" ? "عنوان انگلیسی" : "English title"}><PanelInput {...bind("titleEn")} className="nums-en text-start" /></FormLabel><FieldError errors={state.fieldErrors?.titleEn} /></div>
-          <div><FormLabel label={dictionary.shop.price}><PanelInput {...bind("price")} required type="number" min="0" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.price} /></div>
-          <div><FormLabel label={dictionary.shop.inventory}><PanelInput {...bind("inventory")} required type="number" min="0" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.inventory} /></div>
-          <div className="sm:col-span-2"><ImageUploadField name="coverImageUrl" kind="product" locale={locale} initialValue={initialValues.coverImageUrl} label={dictionary.shop.cover} /></div>
-          <label className="flex items-start gap-3 rounded-xl border border-zinc-200 p-4 sm:col-span-2 dark:border-zinc-800"><input type="checkbox" name="isFeatured" checked={featured} onChange={(event) => setFeatured(event.target.checked)} className="mt-1 size-4 accent-emerald-700" /><span><span className="block text-sm font-medium">{dictionary.shop.featured}</span><span className="mt-1 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">{dictionary.shop.featuredHint}</span></span></label>
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <div className="min-w-0 space-y-6">
+          <PanelFormSection
+            title={dictionary.shop.baseInfo}
+            description={isFa ? "عنوان‌ها، نشانی، قیمت و موجودی محصول را وارد کنید." : "Add the product titles, URL, price, and inventory."}
+          >
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <FormLabel label={dictionary.shop.slug} hint={isFa ? "فقط از حروف انگلیسی، عدد و خط تیره استفاده کنید." : "Use English letters, numbers, and hyphens only."}>
+                  <PanelInput {...bind("slug")} required dir="ltr" className="nums-en" placeholder="starter-robotics-kit" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.slug} />
+              </div>
+              <div>
+                <FormLabel label={isFa ? "عنوان فارسی" : "Persian title"}>
+                  <PanelInput {...bind("titleFa")} required dir="rtl" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.titleFa} />
+              </div>
+              <div>
+                <FormLabel label={isFa ? "عنوان انگلیسی" : "English title"}>
+                  <PanelInput {...bind("titleEn")} dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.titleEn} />
+              </div>
+              <div>
+                <FormLabel label={dictionary.shop.price}>
+                  <PanelInput {...bind("price")} required type="number" min="0" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.price} />
+              </div>
+              <div>
+                <FormLabel label={dictionary.shop.inventory}>
+                  <PanelInput {...bind("inventory")} required type="number" min="0" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.inventory} />
+              </div>
+            </div>
+          </PanelFormSection>
+
+          <PanelFormSection
+            title={dictionary.shop.faContent}
+            description={isFa ? "معرفی اصلی فارسی محصول را تکمیل کنید." : "Complete the primary Persian product description."}
+          >
+            <div className="space-y-5">
+              <div>
+                <FormLabel label={dictionary.shop.summary}>
+                  <PanelTextarea {...bind("summaryFa")} required rows={3} dir="rtl" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.summaryFa} />
+              </div>
+              <div>
+                <p className="mb-2 text-start text-sm font-medium text-zinc-900 dark:text-zinc-100">{dictionary.shop.body}</p>
+                <RichTextEditor name="contentFa" initialValue={initialValues.contentFa} locale={locale} contentDirection="rtl" required />
+                <FieldError errors={state.fieldErrors?.contentFa} />
+              </div>
+            </div>
+          </PanelFormSection>
+
+          <PanelFormSection
+            title={dictionary.shop.enContent}
+            description={isFa ? "در صورت نیاز معرفی انگلیسی محصول را اضافه کنید." : "Optionally add the English product description."}
+          >
+            <div className="space-y-5">
+              <div>
+                <FormLabel label={isFa ? "خلاصه انگلیسی" : "English summary"}>
+                  <PanelTextarea {...bind("summaryEn")} rows={3} dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.summaryEn} />
+              </div>
+              <div>
+                <p className="mb-2 text-start text-sm font-medium text-zinc-900 dark:text-zinc-100">{isFa ? "توضیحات کامل انگلیسی" : "Full English description"}</p>
+                <RichTextEditor name="contentEn" initialValue={initialValues.contentEn} locale={locale} contentDirection="ltr" />
+                <FieldError errors={state.fieldErrors?.contentEn} />
+              </div>
+            </div>
+          </PanelFormSection>
         </div>
-      </PanelFormSection>
 
-      <PanelFormSection title={dictionary.shop.faContent} dir="rtl">
-        <div className="space-y-5"><div><FormLabel label={dictionary.shop.summary}><textarea {...bind("summaryFa")} required rows={3} className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 outline-none focus:border-emerald-600 dark:border-zinc-700 dark:bg-zinc-950" /></FormLabel><FieldError errors={state.fieldErrors?.summaryFa} /></div><div><span className="mb-2 block text-sm font-medium">{dictionary.shop.body}</span><RichTextEditor name="contentFa" initialValue={initialValues.contentFa} locale={locale} contentDirection="rtl" required /><FieldError errors={state.fieldErrors?.contentFa} /></div></div>
-      </PanelFormSection>
-      <PanelFormSection title={dictionary.shop.enContent} dir="ltr">
-        <div className="space-y-5 nums-en"><div><FormLabel label={locale === "fa" ? "خلاصه انگلیسی" : "Summary"}><textarea {...bind("summaryEn")} rows={3} className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 outline-none focus:border-emerald-600 dark:border-zinc-700 dark:bg-zinc-950" /></FormLabel><FieldError errors={state.fieldErrors?.summaryEn} /></div><div><span className="mb-2 block text-sm font-medium">{locale === "fa" ? "توضیحات کامل انگلیسی" : "Full description"}</span><RichTextEditor name="contentEn" initialValue={initialValues.contentEn} locale={locale} contentDirection="ltr" /><FieldError errors={state.fieldErrors?.contentEn} /></div></div>
-      </PanelFormSection>
+        <aside className="space-y-6 xl:sticky xl:top-6">
+          <PanelFormSection title={dictionary.shop.cover} description={isFa ? "تصویر افقی و واضح محصول را انتخاب کنید." : "Choose a clear landscape product image."}>
+            <ImageUploadField name="coverImageUrl" kind="product" locale={locale} initialValue={initialValues.coverImageUrl} label={dictionary.shop.cover} layout="stacked" />
+          </PanelFormSection>
 
-      <section className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5 sm:flex-row sm:items-end sm:justify-between dark:border-zinc-800 dark:bg-zinc-950">
-        <FormLabel label={dictionary.shop.productStatus}><PanelSelect {...bind("status")}><option value="draft">{dictionary.common.draft}</option><option value="published">{dictionary.common.published}</option></PanelSelect></FormLabel>
-        <div><div className="flex flex-wrap gap-3"><Link href="/panel/admin/products" className={secondaryButtonClass}>{dictionary.common.cancel}</Link><button type="submit" disabled={pending} className={primaryButtonClass}>{pending ? dictionary.common.saving : mode === "edit" ? dictionary.common.save : dictionary.shop.saveProduct}</button></div>{state.error ? <p role="alert" className="mt-3 text-sm text-red-600 dark:text-red-400">{state.error}</p> : null}</div>
-      </section>
+          <PanelFormSection title={isFa ? "انتشار و نمایش" : "Publishing and display"} description={isFa ? "وضعیت انتشار و جایگاه محصول را مشخص کنید." : "Set the product's publishing status and placement."}>
+            <div className="space-y-5">
+              <FormLabel label={dictionary.shop.productStatus}>
+                <PanelSelect {...bind("status")}>
+                  <option value="draft">{dictionary.common.draft}</option>
+                  <option value="published">{dictionary.common.published}</option>
+                </PanelSelect>
+              </FormLabel>
+              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50/70 p-4 text-start transition hover:border-emerald-300 dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-emerald-800">
+                <input type="checkbox" name="isFeatured" checked={featured} onChange={(event) => setFeatured(event.target.checked)} className="mt-0.5 size-4 shrink-0 accent-emerald-700" />
+                <span>
+                  <span className="block text-sm font-medium text-zinc-900 dark:text-zinc-100">{dictionary.shop.featured}</span>
+                  <span className="mt-1 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">{dictionary.shop.featuredHint}</span>
+                </span>
+              </label>
+            </div>
+          </PanelFormSection>
+        </aside>
+      </div>
+
+      <PanelFormFooter message={dictionary.shop.description} error={state.error}>
+        <Link href="/panel/admin/products" className={secondaryButtonClass}>{dictionary.common.cancel}</Link>
+        <button type="submit" disabled={pending} className={primaryButtonClass}>{pending ? dictionary.common.saving : mode === "edit" ? dictionary.common.save : dictionary.shop.saveProduct}</button>
+      </PanelFormFooter>
     </form>
   );
 }

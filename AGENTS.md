@@ -57,6 +57,9 @@ This repository is a production-oriented multilingual application for Cactus, a 
 
 ## Forms and Server Actions
 
+- Form labels, section headings, hints, and validation messages always inherit the active interface locale direction: right/start in Persian and left/start in English. Never put `dir="ltr"` or `dir="rtl"` on a field wrapper or `PanelFormSection` just to control its value.
+- Apply content direction only to the editable control itself: English names, emails, passwords, slugs, and English content use `dir="ltr"`; Persian content uses `dir="rtl"`. Use the shared `PanelInput`, `PanelTextarea`, `FormLabel`, `PanelFormSection`, and `PanelFormFooter` primitives.
+- Complex panel forms use a consistent responsive main/sidebar composition: primary information and multilingual content in the main column, media and publishing/access settings in the sidebar, and actions in the shared footer.
 - Authenticate and authorize inside every Server Action. Rendering a form only to admins is not a security boundary.
 - Validate all untrusted inputs with Zod before database work. Return small, explicit action-state objects; never return raw database errors or records.
 - Every recoverable error must keep all user input intact. Controlled text inputs, textareas, and selects should use `components/forms/use-preserved-fields.ts`.
