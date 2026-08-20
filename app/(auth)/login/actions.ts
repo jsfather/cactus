@@ -7,6 +7,9 @@ import { createSession, deleteSession } from "@/lib/auth/session";
 import { verifyPassword } from "@/lib/auth/password";
 import { getDatabase } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
+import { getAuthDictionary } from "@/lib/i18n/auth";
+import { isLocale, localizePath } from "@/lib/i18n/config";
+import { getPreferredLocale } from "@/lib/i18n/server";
 
 const loginSchema = z.object({
   email: z.string().trim().email(),
@@ -25,9 +28,13 @@ export async function login(
     email: formData.get("email"),
     password: formData.get("password"),
   });
+  const requestedLocale = formData.get("locale");
+  const localeValue = typeof requestedLocale === "string" ? requestedLocale : null;
+  const locale = isLocale(localeValue) ? localeValue : "fa";
+  const dictionary = getAuthDictionary(locale);
 
   if (!parsed.success) {
-    return { error: "ایمیل یا رمز عبور معتبر نیست." };
+    return { error: dictionary.invalidCredentials };
   }
 
   const [user] = await getDatabase()
@@ -45,7 +52,7 @@ export async function login(
     !user.isActive ||
     !(await verifyPassword(parsed.data.password, user.passwordHash))
   ) {
-    return { error: "ایمیل یا رمز عبور معتبر نیست." };
+    return { error: dictionary.invalidCredentials };
   }
 
   await createSession(user.id);
@@ -53,6 +60,7 @@ export async function login(
 }
 
 export async function logout() {
+  const locale = await getPreferredLocale();
   await deleteSession();
-  redirect("/");
+  redirect(localizePath(locale, "/"));
 }

@@ -4,19 +4,23 @@ import { useActionState } from "react";
 import { login, type LoginState } from "@/app/(auth)/login/actions";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
+import { getAuthDictionary } from "@/lib/i18n/auth";
+import type { Locale } from "@/lib/i18n/config";
 
 const initialState: LoginState = {};
 
-export function LoginForm() {
+export function LoginForm({ locale }: { locale: Locale }) {
   const [state, action, pending] = useActionState(login, initialState);
   useActionErrorToast(state);
   const { bind } = usePreservedFields({ email: "", password: "" });
+  const dictionary = getAuthDictionary(locale);
 
   return (
     <form action={action} className="space-y-5">
+      <input type="hidden" name="locale" value={locale} />
       <div className="space-y-2">
         <label htmlFor="email" className="block text-sm font-medium">
-          ایمیل
+          {dictionary.email}
         </label>
         <input
           {...bind("email")}
@@ -31,7 +35,7 @@ export function LoginForm() {
 
       <div className="space-y-2">
         <label htmlFor="password" className="block text-sm font-medium">
-          رمز عبور
+          {dictionary.password}
         </label>
         <input
           {...bind("password")}
@@ -55,7 +59,7 @@ export function LoginForm() {
         disabled={pending}
         className="w-full rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
       >
-        {pending ? "در حال ورود…" : "ورود به پنل"}
+        {pending ? dictionary.submitting : dictionary.submit}
       </button>
     </form>
   );

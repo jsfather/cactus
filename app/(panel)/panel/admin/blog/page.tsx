@@ -22,7 +22,8 @@ function formatDate(date: Date | null, locale: "fa" | "en") {
 }
 
 export default async function AdminBlogPage({ searchParams }: { searchParams: Promise<{ toast?: string }> }) {
-  const [posts, locale, query] = await Promise.all([getAdminPosts(), getPanelLocale(), searchParams]);
+  const [locale, query] = await Promise.all([getPanelLocale(), searchParams]);
+  const posts = await getAdminPosts(locale);
   const dictionary = getPanelDictionary(locale);
 
   return (

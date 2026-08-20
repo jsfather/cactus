@@ -3,26 +3,28 @@ import { getDatabase } from "@/lib/db/client";
 import { products, users } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 
-const publicProductSelection = {
-  id: products.id,
-  slug: products.slug,
-  titleFa: products.titleFa,
-  titleEn: products.titleEn,
-  summaryFa: products.summaryFa,
-  summaryEn: products.summaryEn,
-  contentFa: products.contentFa,
-  contentEn: products.contentEn,
-  price: products.price,
-  inventory: products.inventory,
-  coverImageUrl: products.coverImageUrl,
-  isFeatured: products.isFeatured,
-  publishedAt: products.publishedAt,
-  authorName: users.name,
-};
+function publicProductSelection(locale: Locale) {
+  return {
+    id: products.id,
+    slug: products.slug,
+    titleFa: products.titleFa,
+    titleEn: products.titleEn,
+    summaryFa: products.summaryFa,
+    summaryEn: products.summaryEn,
+    contentFa: products.contentFa,
+    contentEn: products.contentEn,
+    price: products.price,
+    inventory: products.inventory,
+    coverImageUrl: products.coverImageUrl,
+    isFeatured: products.isFeatured,
+    publishedAt: products.publishedAt,
+    authorName: locale === "fa" ? users.nameFa : users.nameEn,
+  };
+}
 
 export function getPublishedProducts(locale: Locale, limit?: number) {
   const query = getDatabase()
-    .select(publicProductSelection)
+    .select(publicProductSelection(locale))
     .from(products)
     .innerJoin(users, eq(products.authorId, users.id))
     .where(and(
@@ -39,7 +41,7 @@ export function getPublishedProducts(locale: Locale, limit?: number) {
 
 export async function getPublishedProduct(slug: string, locale: Locale) {
   const [product] = await getDatabase()
-    .select(publicProductSelection)
+    .select(publicProductSelection(locale))
     .from(products)
     .innerJoin(users, eq(products.authorId, users.id))
     .where(and(

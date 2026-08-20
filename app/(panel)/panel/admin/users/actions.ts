@@ -13,7 +13,8 @@ import { userSectionConfig } from "@/lib/users/config";
 
 const roleSchema = z.enum(userRole.enumValues);
 const commonUserSchema = z.object({
-  name: z.string().trim().min(2).max(120),
+  nameFa: z.string().trim().min(2).max(120),
+  nameEn: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(320),
   isActive: z.boolean(),
   avatarUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/avatar/")),
@@ -38,7 +39,8 @@ export type DeleteUserState = {
 
 function readUserForm(formData: FormData) {
   return {
-    name: formData.get("name"),
+    nameFa: formData.get("nameFa"),
+    nameEn: formData.get("nameEn"),
     email: formData.get("email"),
     password: formData.get("password"),
     isActive: formData.get("isActive") === "on",
@@ -80,7 +82,8 @@ export async function createManagedUser(
 
   try {
     await getDatabase().insert(users).values({
-      name: parsed.data.name,
+      nameFa: parsed.data.nameFa,
+      nameEn: parsed.data.nameEn,
       email: parsed.data.email.toLowerCase(),
       passwordHash: await hashPassword(parsed.data.password),
       role: validRole.data,
@@ -124,7 +127,8 @@ export async function updateManagedUser(
   }
 
   const changes: Partial<typeof users.$inferInsert> = {
-    name: parsed.data.name,
+    nameFa: parsed.data.nameFa,
+    nameEn: parsed.data.nameEn,
     email: parsed.data.email.toLowerCase(),
     isActive: parsed.data.isActive,
     avatarUrl: parsed.data.avatarUrl || null,

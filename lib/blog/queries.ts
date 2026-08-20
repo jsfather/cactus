@@ -3,23 +3,25 @@ import { getDatabase } from "@/lib/db/client";
 import { posts, users } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 
-const publicPostSelection = {
-  id: posts.id,
-  slug: posts.slug,
-  titleFa: posts.titleFa,
-  titleEn: posts.titleEn,
-  excerptFa: posts.excerptFa,
-  excerptEn: posts.excerptEn,
-  contentFa: posts.contentFa,
-  contentEn: posts.contentEn,
-  coverImageUrl: posts.coverImageUrl,
-  publishedAt: posts.publishedAt,
-  authorName: users.name,
-};
+function publicPostSelection(locale: Locale) {
+  return {
+    id: posts.id,
+    slug: posts.slug,
+    titleFa: posts.titleFa,
+    titleEn: posts.titleEn,
+    excerptFa: posts.excerptFa,
+    excerptEn: posts.excerptEn,
+    contentFa: posts.contentFa,
+    contentEn: posts.contentEn,
+    coverImageUrl: posts.coverImageUrl,
+    publishedAt: posts.publishedAt,
+    authorName: locale === "fa" ? users.nameFa : users.nameEn,
+  };
+}
 
 export async function getPublishedPosts(locale: Locale, limit?: number) {
   const query = getDatabase()
-    .select(publicPostSelection)
+    .select(publicPostSelection(locale))
     .from(posts)
     .innerJoin(users, eq(posts.authorId, users.id))
     .where(
@@ -38,7 +40,7 @@ export async function getPublishedPosts(locale: Locale, limit?: number) {
 
 export async function getPublishedPost(slug: string, locale: Locale) {
   const [post] = await getDatabase()
-    .select(publicPostSelection)
+    .select(publicPostSelection(locale))
     .from(posts)
     .innerJoin(users, eq(posts.authorId, users.id))
     .where(
@@ -56,7 +58,7 @@ export async function getPublishedPost(slug: string, locale: Locale) {
   return post ?? null;
 }
 
-export async function getAdminPosts() {
+export async function getAdminPosts(locale: Locale) {
   return getDatabase()
     .select({
       id: posts.id,
@@ -66,7 +68,7 @@ export async function getAdminPosts() {
       status: posts.status,
       publishedAt: posts.publishedAt,
       updatedAt: posts.updatedAt,
-      authorName: users.name,
+      authorName: locale === "fa" ? users.nameFa : users.nameEn,
     })
     .from(posts)
     .innerJoin(users, eq(posts.authorId, users.id))

@@ -61,8 +61,8 @@ function ToastIcon({ variant }: { variant: ToastVariant }) {
         : "M12 11v5m0-8h.01";
 
   return (
-    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-current/10">
-      <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-current/10">
+      <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
         {variant === "warning" ? <path strokeLinecap="round" strokeLinejoin="round" d="M10.3 4.4 2.8 17.2A2 2 0 0 0 4.5 20h15a2 2 0 0 0 1.7-2.8L13.7 4.4a2 2 0 0 0-3.4 0Z" /> : <circle cx="12" cy="12" r="9" />}
         <path strokeLinecap="round" strokeLinejoin="round" d={path} />
       </svg>
@@ -154,25 +154,27 @@ export function AppFeedbackProvider({ children, locale }: { children: ReactNode;
     ? { cancel: "انصراف", confirm: "تأیید", close: "بستن پیام" }
     : { cancel: "Cancel", confirm: "Confirm", close: "Dismiss notification" };
   const toastStyles: Record<ToastVariant, string> = {
-    success: "border-emerald-200 text-emerald-700 dark:border-emerald-900 dark:text-emerald-300",
-    error: "border-red-200 text-red-700 dark:border-red-900 dark:text-red-300",
-    warning: "border-amber-200 text-amber-700 dark:border-amber-900 dark:text-amber-300",
-    info: "border-sky-200 text-sky-700 dark:border-sky-900 dark:text-sky-300",
+    success: "text-emerald-600 dark:text-emerald-400",
+    error: "text-red-600 dark:text-red-400",
+    warning: "text-amber-600 dark:text-amber-400",
+    info: "text-sky-600 dark:text-sky-400",
   };
 
   return (
     <FeedbackContext.Provider value={value}>
       {children}
 
-      <section aria-label={locale === "fa" ? "پیام‌ها" : "Notifications"} aria-live="polite" aria-relevant="additions" className="pointer-events-none fixed inset-x-4 bottom-4 z-[100] flex flex-col items-end gap-3 sm:inset-x-auto sm:end-5 sm:w-[min(24rem,calc(100vw-2.5rem))]">
+      <section aria-label={locale === "fa" ? "پیام‌ها" : "Notifications"} aria-live="polite" aria-relevant="additions" className="pointer-events-none fixed inset-x-3 bottom-3 z-[100] flex flex-col gap-2 sm:inset-x-auto sm:bottom-5 sm:end-5 sm:w-[min(23rem,calc(100vw-2.5rem))]">
         {toasts.map((item) => (
-          <article key={item.id} role={item.variant === "error" ? "alert" : "status"} className={`pointer-events-auto flex w-full items-start gap-3 rounded-2xl border bg-white p-4 shadow-2xl shadow-zinc-950/15 animate-[cactus-toast-in_180ms_ease-out] dark:bg-zinc-900 ${toastStyles[item.variant]}`}>
-            <ToastIcon variant={item.variant} />
-            <div className="min-w-0 flex-1 text-start">
-              <p className="font-semibold text-zinc-950 dark:text-zinc-50">{item.title}</p>
-              {item.description ? <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{item.description}</p> : null}
+          <article key={item.id} role={item.variant === "error" ? "alert" : "status"} className="pointer-events-auto grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-3 overflow-hidden rounded-xl border border-zinc-200/90 bg-white/95 px-3.5 py-3 shadow-[0_12px_32px_-12px_rgb(0_0_0/0.28),0_2px_8px_rgb(0_0_0/0.08)] backdrop-blur-xl animate-[cactus-toast-in_180ms_ease-out] dark:border-zinc-700/90 dark:bg-zinc-900/95 dark:shadow-[0_14px_36px_-12px_rgb(0_0_0/0.75)]">
+            <span className={`pt-0.5 ${toastStyles[item.variant]}`}><ToastIcon variant={item.variant} /></span>
+            <div className="min-w-0 self-center text-start">
+              <p className="text-sm font-medium leading-5 text-zinc-950 dark:text-zinc-50">{item.title}</p>
+              {item.description ? <p className="mt-0.5 text-xs leading-5 text-zinc-500 dark:text-zinc-400">{item.description}</p> : null}
             </div>
-            <button type="button" aria-label={labels.close} onClick={() => dismiss(item.id)} className="grid size-8 shrink-0 place-items-center rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">×</button>
+            <button type="button" aria-label={labels.close} onClick={() => dismiss(item.id)} className="grid size-7 shrink-0 place-items-center rounded-md text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">
+              <svg viewBox="0 0 20 20" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path strokeLinecap="round" d="m6 6 8 8m0-8-8 8" /></svg>
+            </button>
           </article>
         ))}
       </section>

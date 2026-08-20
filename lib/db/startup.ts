@@ -66,7 +66,13 @@ export async function setupDatabase() {
           .insert(users)
           .values({
             email,
-            name: process.env.ADMIN_NAME?.trim() || "مدیر کاکتوس",
+            nameFa:
+              process.env.ADMIN_NAME_FA?.trim() ||
+              process.env.ADMIN_NAME?.trim() ||
+              "مدیر کاکتوس",
+            nameEn:
+              process.env.ADMIN_NAME_EN?.trim() ||
+              "Cactus Administrator",
             passwordHash: await hashPassword(password),
             role: "admin",
           })
@@ -165,13 +171,15 @@ export async function setupDatabase() {
         {
           key: "seed.users.teacher.v1",
           role: "teacher" as const,
-          name: "مدرس نمونه کاکتوس",
+          nameFa: "مدرس نمونه کاکتوس",
+          nameEn: "Cactus Demo Teacher",
           email: "teacher.example@cactus.local",
         },
         {
           key: "seed.users.student.v1",
           role: "student" as const,
-          name: "دانش‌آموز نمونه کاکتوس",
+          nameFa: "دانش‌آموز نمونه کاکتوس",
+          nameEn: "Cactus Demo Student",
           email: "student.example@cactus.local",
         },
       ];
@@ -196,7 +204,8 @@ export async function setupDatabase() {
 
           if (!existingUser) {
             await transaction.insert(users).values({
-              name: starterAccount.name,
+              nameFa: starterAccount.nameFa,
+              nameEn: starterAccount.nameEn,
               email: starterAccount.email,
               passwordHash: await hashPassword(
                 randomBytes(32).toString("base64url"),

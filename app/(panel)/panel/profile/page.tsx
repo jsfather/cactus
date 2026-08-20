@@ -13,7 +13,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
   const [currentUser, locale, query] = await Promise.all([requireUser(), getPanelLocale(), searchParams]);
   const dictionary = getPanelDictionary(locale);
   const [profile] = await getDatabase()
-    .select({ name: users.name, email: users.email, avatarUrl: users.avatarUrl, bioFa: users.bioFa, bioEn: users.bioEn })
+    .select({ nameFa: users.nameFa, nameEn: users.nameEn, email: users.email, avatarUrl: users.avatarUrl, bioFa: users.bioFa, bioEn: users.bioEn })
     .from(users)
     .where(eq(users.id, currentUser.id))
     .limit(1);

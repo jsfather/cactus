@@ -10,6 +10,7 @@ import { roleHome } from "@/lib/auth/roles";
 import type { CurrentUser } from "@/lib/auth/session";
 import type { Locale } from "@/lib/i18n/config";
 import { getPanelDictionary } from "@/lib/i18n/panel";
+import { getLocalizedUserName } from "@/lib/users/name";
 
 type NavIcon = "home" | "blog" | "shop" | "users" | "profile";
 
@@ -25,6 +26,7 @@ function Icon({ name }: { name: NavIcon }) {
 export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }) {
   const pathname = usePathname();
   const dictionary = getPanelDictionary(locale);
+  const userName = getLocalizedUserName(user, locale);
   const alternateLocale = locale === "fa" ? "en" : "fa";
   const alternateHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(pathname)}`;
   const roleName = locale === "fa"
@@ -57,7 +59,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/panel/profile" className="lg:hidden" aria-label={dictionary.nav.profile}>
-            <UserAvatar name={user.name} src={user.avatarUrl} className="size-10" />
+            <UserAvatar name={userName} src={user.avatarUrl} className="size-10" />
           </Link>
           <PreferencesMenu locale={locale} alternateHref={alternateHref} />
         </div>
@@ -94,9 +96,9 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
 
       <div className="hidden border-t border-zinc-200 pt-4 lg:block dark:border-zinc-800">
         <Link href="/panel/profile" className="flex items-center gap-3 rounded-2xl bg-zinc-50 p-3 transition hover:bg-emerald-50 dark:bg-zinc-900 dark:hover:bg-emerald-950/50">
-          <UserAvatar name={user.name} src={user.avatarUrl} className="size-11" />
+          <UserAvatar name={userName} src={user.avatarUrl} className="size-11" />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{user.name}</span>
+            <span className="block truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{userName}</span>
             <span className="nums-en mt-0.5 block truncate text-xs text-zinc-500" dir="ltr">{user.email}</span>
           </span>
         </Link>

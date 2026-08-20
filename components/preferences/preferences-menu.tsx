@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Locale } from "@/lib/i18n/config";
+import { useRouter } from "next/navigation";
+import { LOCALE_COOKIE, type Locale } from "@/lib/i18n/config";
 
 type Theme = "system" | "light" | "dark";
 
 const storageKey = "cactus-theme";
+const localeStorageKey = LOCALE_COOKIE;
 
 function isTheme(value: string | null): value is Theme {
   return value === "system" || value === "light" || value === "dark";
@@ -52,6 +54,7 @@ export function PreferencesMenu({
   locale?: Locale;
   alternateHref?: string;
 }) {
+  const router = useRouter();
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof document === "undefined") return "system";
 
@@ -88,6 +91,64 @@ export function PreferencesMenu({
     media.addEventListener("change", handleChange);
     return () => media.removeEventListener("change", handleChange);
   }, [theme]);
+
+  useEffect(() => {
+    document.cookie = `${storageKey}=${theme}; Path=/; Max-Age=31536000; SameSite=Lax${window.location.protocol === "https:" ? "; Secure" : ""}`;
+  }, [theme]);
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === storageKey && isTheme(event.newValue)) {
+        setTheme(event.newValue);
+        applyTheme(event.newValue);
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(localeStorageKey, locale);
+    } catch {}
+
+    const handleLocaleStorage = (event: StorageEvent) => {
+      if (
+        event.key !== localeStorageKey ||
+        (event.newValue !== "fa" && event.newValue !== "en") ||
+        event.newValue === locale
+      ) {
+        return;
+      }
+
+      const { pathname, search, hash } = window.location;
+      const isEnglishPublic = pathname === "/en" || pathname.startsWith("/en/");
+      const isPersianPublic = pathname === "/" ||
+        pathname.startsWith("/blog") ||
+        pathname.startsWith("/shop");
+      let nextPath = pathname;
+
+      if (isEnglishPublic && event.newValue === "fa") {
+        nextPath = pathname.slice(3) || "/";
+      } else if (isPersianPublic && event.newValue === "en") {
+        nextPath = pathname === "/" ? "/en" : `/en${pathname}`;
+      }
+
+      const returnTo = `${nextPath}${search}${hash}`;
+      router.push(`/api/preferences/locale?locale=${event.newValue}&returnTo=${encodeURIComponent(returnTo)}`);
+    };
+
+    window.addEventListener("storage", handleLocaleStorage);
+    return () => window.removeEventListener("storage", handleLocaleStorage);
+  }, [locale, router]);
+
+  const selectLocale = (nextLocale: Locale) => {
+    try {
+      localStorage.setItem(localeStorageKey, nextLocale);
+    } catch {}
+
+  };
 
   const selectTheme = (nextTheme: Theme) => {
     try {
@@ -145,6 +206,7 @@ export function PreferencesMenu({
             <a
               href={alternateHref}
               hrefLang={isFa ? "en" : "fa"}
+              onClick={() => selectLocale(isFa ? "en" : "fa")}
               className="nums-en rounded-lg bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 transition hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-950"
             >
               {labels.alternate}

@@ -29,7 +29,8 @@ This repository is a production-oriented multilingual application for Cactus, a 
 - Authentication: `app/(auth)`, currently `/login`.
 - Protected role panels: `app/(panel)`, with admin, teacher, and student workspaces plus `/panel/profile`.
 - Route groups use separate root layouts because each document needs its own `lang`, `dir`, typography, and metadata. Mount `AppFeedbackProvider` in every root layout.
-- The panel language is stored in the `cactus-panel-locale` HTTP-only cookie and read server-side through `lib/i18n/panel-server.ts`. Panel dictionaries live in `lib/i18n/panel.ts`; public dictionaries live in `lib/i18n/dictionaries.ts`.
+- Language is one application-wide preference stored in the `cactus-locale` cookie at path `/` and mirrored to localStorage for cross-tab synchronization. Public routes keep localized URLs, while auth and panel layouts read the shared preference through `lib/i18n/server.ts`. Never introduce route-specific language cookies.
+- Panel dictionaries live in `lib/i18n/panel.ts`, auth dictionaries in `lib/i18n/auth.ts`, and public dictionaries in `lib/i18n/dictionaries.ts`.
 - Public and panel header branding displays the short name `Cactus`. Do not restore the long school name in headers. The panel may display the signed-in role as a subtitle.
 
 ## Internationalization, RTL, and typography
@@ -52,7 +53,7 @@ This repository is a production-oriented multilingual application for Cactus, a 
 - For action errors, use `useActionErrorToast`. For a server-rendered redirect success message, render `ToastOnMount` from a validated query-state value.
 - Confirmation dialogs must remain accessible: `role="dialog"`, `aria-modal`, Escape/backdrop cancel, initial focus, focus restoration, and background scroll locking.
 - Toasts must remain dismissible, time-limited, direction-safe, and announced through an appropriate live region.
-- Theme selection is shared across the app and supports `system`, `light`, and `dark`. Keep system preference as the default and preserve the pre-paint theme bootstrap.
+- Theme selection is shared across public, authentication, and panel routes and supports `system`, `light`, and `dark`. Keep system preference as the default, persist through the common `cactus-theme` localStorage/cookie key, synchronize browser tabs, and preserve the pre-paint theme bootstrap.
 
 ## Forms and Server Actions
 
@@ -70,7 +71,8 @@ This repository is a production-oriented multilingual application for Cactus, a 
 
 - Roles are `admin`, `teacher`, and `student`. Route users to the correct role home and enforce role checks server-side.
 - Admins have dedicated CRUD sections for administrators, teachers, and students.
-- Users support avatars plus Persian and English biographies through `/panel/profile`.
+- Users have required `nameFa` and `nameEn` values, plus avatars and Persian/English biographies. Always render the name matching the active locale via `getLocalizedUserName`; never show the Persian name on English pages as a fallback.
+- User create/edit and self-service profile forms must collect both Persian and English names regardless of the currently active interface language.
 - Never allow the current administrator to deactivate or delete their own active account.
 - Passwords are hashed and must be at least 12 characters when created or changed. Never log credentials or include them in client-visible state.
 - Initial administrator variables are bootstrap-only. `ADMIN_EMAIL` and `ADMIN_PASSWORD` must be provided together; the password minimum is 12 characters.

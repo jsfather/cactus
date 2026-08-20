@@ -17,6 +17,7 @@ import type { Locale } from "@/lib/i18n/config";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { getUserSectionConfig } from "@/lib/users/config";
+import { getLocalizedUserName } from "@/lib/users/name";
 import { getUsersByRole } from "@/lib/users/queries";
 
 function formatDate(date: Date, locale: Locale) {
@@ -58,17 +59,19 @@ export async function UserListPage({ role, toastKey }: { role: UserRole; toastKe
               { label: dictionary.common.actions, className: "w-[15%]" },
             ]}
           >
-            {users.map((user) => (
-              <tr key={user.id}>
+            {users.map((user) => {
+              const userName = getLocalizedUserName(user, locale);
+
+              return <tr key={user.id}>
                 <PanelTableCell>
                   <div className="flex items-center gap-3">
-                    <UserAvatar name={user.name} src={user.avatarUrl} className="size-10 shrink-0" />
-                    <div className="min-w-0"><p className="truncate font-medium text-zinc-950 dark:text-zinc-50">{user.name}</p>{user.id === currentAdmin.id ? <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">{dictionary.users.currentAccount}</p> : null}</div>
+                    <UserAvatar name={userName} src={user.avatarUrl} className="size-10 shrink-0" />
+                    <div className="min-w-0"><p className="truncate font-medium text-zinc-950 dark:text-zinc-50">{userName}</p>{user.id === currentAdmin.id ? <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">{dictionary.users.currentAccount}</p> : null}</div>
                   </div>
                 </PanelTableCell>
                 <PanelTableCell>
-                  <span className="nums-en block truncate text-end" dir="ltr">
-                    {user.email}
+                  <span className="block truncate">
+                    <bdi className="nums-en" dir="ltr">{user.email}</bdi>
                   </span>
                 </PanelTableCell>
                 <PanelTableCell>
@@ -101,8 +104,8 @@ export async function UserListPage({ role, toastKey }: { role: UserRole; toastKe
                     />
                   </div>
                 </PanelTableCell>
-              </tr>
-            ))}
+              </tr>;
+            })}
           </PanelTable>
         ) : (
           <PanelEmptyState

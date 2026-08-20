@@ -9,7 +9,8 @@ import { getDatabase } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
 
 const profileSchema = z.object({
-  name: z.string().trim().min(2).max(120),
+  nameFa: z.string().trim().min(2).max(120),
+  nameEn: z.string().trim().min(2).max(120),
   avatarUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/avatar/")),
   bioFa: z.string().trim().max(1200),
   bioEn: z.string().trim().max(1200),
@@ -27,7 +28,8 @@ export async function updateProfile(
 ): Promise<ProfileFormState> {
   const user = await requireUser();
   const parsed = profileSchema.safeParse({
-    name: formData.get("name"),
+    nameFa: formData.get("nameFa"),
+    nameEn: formData.get("nameEn"),
     avatarUrl: formData.get("avatarUrl"),
     bioFa: formData.get("bioFa"),
     bioEn: formData.get("bioEn"),
@@ -45,7 +47,8 @@ export async function updateProfile(
   await getDatabase()
     .update(users)
     .set({
-      name: parsed.data.name,
+      nameFa: parsed.data.nameFa,
+      nameEn: parsed.data.nameEn,
       avatarUrl: parsed.data.avatarUrl || null,
       bioFa: parsed.data.bioFa || null,
       bioEn: parsed.data.bioEn || null,

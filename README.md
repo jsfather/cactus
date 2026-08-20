@@ -98,13 +98,14 @@ DATABASE_SSL=disable
 RUN_MIGRATIONS=true
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=<a strong password with at least 12 characters>
-ADMIN_NAME=مدیر کاکتوس
+ADMIN_NAME_FA=مدیر کاکتوس
+ADMIN_NAME_EN=Cactus Administrator
 UPLOAD_DIR=/app/uploads
 ```
 
 In the application service, add a persistent Docker volume mounted at `/app/uploads`. Without this volume, uploaded blog covers, product images, rich-text images, and avatars will be lost when Dokploy replaces the container. A named volume works with the image's non-root user automatically; for a host bind mount, make the directory writable by UID/GID `1001`.
 
-Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the initial administrator only when `ADMIN_EMAIL` does not exist. After the first successful login, you may remove `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_NAME` together; the existing account remains unchanged.
+Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the initial administrator only when `ADMIN_EMAIL` does not exist. After the first successful login, you may remove `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME_FA`, and `ADMIN_NAME_EN` together; the existing account remains unchanged. `ADMIN_NAME` is still accepted as a legacy Persian-name fallback during upgrades.
 
 The readiness endpoint is `/api/health`. It returns a successful response only when the app can reach PostgreSQL.
 

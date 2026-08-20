@@ -2,6 +2,7 @@ import { requireRole } from "@/lib/auth/session";
 import { PanelPage, PanelPageHeader, PanelSurface } from "@/components/panel/ui";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
+import { getLocalizedUserName } from "@/lib/users/name";
 
 export default async function TeacherDashboard() {
   const [user, locale] = await Promise.all([requireRole("teacher"), getPanelLocale()]);
@@ -11,7 +12,7 @@ export default async function TeacherDashboard() {
     <PanelPage>
       <PanelPageHeader
         eyebrow={dictionary.dashboard.teacherEyebrow}
-        title={`${dictionary.dashboard.hello}، ${user.name}`}
+        title={`${dictionary.dashboard.hello}، ${getLocalizedUserName(user, locale)}`}
         description={dictionary.dashboard.teacherDescription}
       />
       <PanelSurface>

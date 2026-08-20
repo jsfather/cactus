@@ -13,6 +13,8 @@ export function SiteHeader({
 }) {
   const dictionary = getDictionary(locale);
   const alternateLocale = locale === "fa" ? "en" : "fa";
+  const alternatePath = localizePath(alternateLocale, currentPath);
+  const languageHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(alternatePath)}`;
 
   return (
     <header className="relative z-50 border-b border-emerald-950/10 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85">
@@ -49,7 +51,7 @@ export function SiteHeader({
           </a>
           <PreferencesMenu
             locale={locale}
-            alternateHref={localizePath(alternateLocale, currentPath)}
+            alternateHref={languageHref}
           />
         </nav>
       </div>

@@ -59,10 +59,12 @@ export function PanelSurface({ children }: { children: ReactNode }) {
 
 export function PanelFormSection({
   title,
+  description,
   children,
   dir,
 }: {
   title: string;
+  description?: string;
   children: ReactNode;
   dir?: "rtl" | "ltr";
 }) {
@@ -74,6 +76,7 @@ export function PanelFormSection({
       <h2 className="text-lg font-bold text-zinc-950 dark:text-zinc-50">
         {title}
       </h2>
+      {description ? <p className="mt-1.5 text-sm leading-6 text-zinc-500 dark:text-zinc-400">{description}</p> : null}
       <div className="mt-5">{children}</div>
     </section>
   );

@@ -58,7 +58,8 @@ export async function EditUserPage({
         mode="edit"
         userId={user.id}
         initialValues={{
-          name: user.name,
+          nameFa: user.nameFa,
+          nameEn: user.nameEn,
           email: user.email,
           password: "",
           isActive: user.isActive,

@@ -6,6 +6,7 @@ import {
 import { requireRole } from "@/lib/auth/session";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
+import { getLocalizedUserName } from "@/lib/users/name";
 import { getUserSectionConfig } from "@/lib/users/config";
 
 export default async function AdminDashboard() {
@@ -19,7 +20,7 @@ export default async function AdminDashboard() {
     <PanelPage>
       <PanelPageHeader
         eyebrow={dictionary.dashboard.adminEyebrow}
-        title={`${dictionary.dashboard.hello}، ${user.name}`}
+        title={`${dictionary.dashboard.hello}، ${getLocalizedUserName(user, locale)}`}
         description={dictionary.dashboard.adminDescription}
       />
 

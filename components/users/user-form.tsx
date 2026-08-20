@@ -14,15 +14,15 @@ import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getUserSectionConfig } from "@/lib/users/config";
 
 const initialState: UserFormState = {};
-export type UserFormValues = { name: string; email: string; password: string; isActive: boolean; avatarUrl: string };
+export type UserFormValues = { nameFa: string; nameEn: string; email: string; password: string; isActive: boolean; avatarUrl: string };
 
-export function UserForm({ role, locale, mode = "create", userId, initialValues = { name: "", email: "", password: "", isActive: true, avatarUrl: "" } }: { role: UserRole; locale: Locale; mode?: "create" | "edit"; userId?: string; initialValues?: UserFormValues }) {
+export function UserForm({ role, locale, mode = "create", userId, initialValues = { nameFa: "", nameEn: "", email: "", password: "", isActive: true, avatarUrl: "" } }: { role: UserRole; locale: Locale; mode?: "create" | "edit"; userId?: string; initialValues?: UserFormValues }) {
   const config = getUserSectionConfig(role, locale);
   const dictionary = getPanelDictionary(locale);
   const formAction = mode === "edit" && userId ? updateManagedUser.bind(null, role, userId) : createManagedUser.bind(null, role);
   const [state, action, pending] = useActionState(formAction, initialState);
   useActionErrorToast(state);
-  const { bind } = usePreservedFields({ name: initialValues.name, email: initialValues.email, password: initialValues.password });
+  const { bind } = usePreservedFields({ nameFa: initialValues.nameFa, nameEn: initialValues.nameEn, email: initialValues.email, password: initialValues.password });
   const [isActive, setIsActive] = useState(initialValues.isActive);
   const isFa = locale === "fa";
 
@@ -33,7 +33,8 @@ export function UserForm({ role, locale, mode = "create", userId, initialValues 
         <div className="space-y-6">
           <ImageUploadField name="avatarUrl" kind="avatar" locale={locale} initialValue={initialValues.avatarUrl} label={dictionary.users.avatar} aspect="square" />
           <div className="grid gap-5 sm:grid-cols-2">
-            <div><FormLabel label={dictionary.users.fullName}><PanelInput {...bind("name")} required autoComplete="name" /></FormLabel><FieldError errors={state.fieldErrors?.name} /></div>
+            <div dir="rtl"><FormLabel label={dictionary.users.fullNameFa}><PanelInput {...bind("nameFa")} required autoComplete="name" className="text-start" /></FormLabel><FieldError errors={state.fieldErrors?.nameFa} /></div>
+            <div dir="ltr"><FormLabel label={dictionary.users.fullNameEn}><PanelInput {...bind("nameEn")} required autoComplete="name" className="nums-en text-start" /></FormLabel><FieldError errors={state.fieldErrors?.nameEn} /></div>
             <div dir="ltr"><FormLabel label={dictionary.users.email}><PanelInput {...bind("email")} type="email" required autoComplete="email" className="nums-en text-start" /></FormLabel><FieldError errors={state.fieldErrors?.email} /></div>
             <div className="sm:col-span-2" dir="ltr"><FormLabel label={mode === "edit" ? dictionary.users.newPassword : dictionary.users.password} hint={mode === "edit" ? (isFa ? "برای حفظ رمز فعلی، این قسمت را خالی بگذارید. رمز جدید حداقل ۱۲ نویسه باشد." : "Leave blank to keep the current password. New passwords need at least 12 characters.") : (isFa ? "حداقل ۱۲ نویسه استفاده کنید." : "Use at least 12 characters.")}><PanelInput {...bind("password")} type="password" required={mode === "create"} minLength={mode === "create" ? 12 : undefined} autoComplete="new-password" className="nums-en text-start" /></FormLabel><FieldError errors={state.fieldErrors?.password} /></div>
             <label className="flex items-start gap-3 rounded-xl border border-zinc-200 p-4 sm:col-span-2 dark:border-zinc-800"><input type="checkbox" name="isActive" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} className="mt-1 size-4 accent-emerald-700" /><span><span className="block text-sm font-medium">{dictionary.users.activeAccount}</span><span className="mt-1 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">{dictionary.users.activeHint}</span></span></label>

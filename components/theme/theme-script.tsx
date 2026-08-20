@@ -7,6 +7,14 @@ const themeScript = `
     const stored = localStorage.getItem(key);
     if (stored === "light" || stored === "dark" || stored === "system") {
       theme = stored;
+    } else {
+      const cookieTheme = document.cookie
+        .split("; ")
+        .find((entry) => entry.startsWith(key + "="))
+        ?.split("=")[1];
+      if (cookieTheme === "light" || cookieTheme === "dark" || cookieTheme === "system") {
+        theme = cookieTheme;
+      }
     }
   } catch {}
 
