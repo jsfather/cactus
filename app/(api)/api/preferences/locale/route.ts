@@ -7,16 +7,24 @@ import {
 export function GET(request: NextRequest) {
   const locale = request.nextUrl.searchParams.get("locale") === "en" ? "en" : "fa";
   const requestedReturn = request.nextUrl.searchParams.get("returnTo") || "/";
-  let returnUrl = new URL("/", request.url);
+  let returnPath = "/";
 
   try {
-    const candidate = new URL(requestedReturn, request.url);
-    if (candidate.origin === request.nextUrl.origin) {
-      returnUrl = candidate;
+    const safeOrigin = "https://cactus.local";
+    const candidate = new URL(requestedReturn, safeOrigin);
+
+    if (requestedReturn.startsWith("/") && candidate.origin === safeOrigin) {
+      returnPath = `${candidate.pathname}${candidate.search}${candidate.hash}`;
     }
   } catch {}
 
-  const response = NextResponse.redirect(returnUrl);
+  // Keep the redirect relative. In Docker, request.url can contain the
+  // container address (0.0.0.0:3000) even when a reverse proxy provides the
+  // public domain, which would otherwise leak that internal origin.
+  const response = new NextResponse(null, {
+    status: 307,
+    headers: { Location: returnPath },
+  });
 
   response.cookies.set(LOCALE_COOKIE, locale, {
     sameSite: "lax",
