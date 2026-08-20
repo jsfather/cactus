@@ -6,49 +6,22 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "format": "prettier --write ."
+    "lint": "eslint"
   },
   "dependencies": {
-    "@headlessui/react": "^2.2.4",
-    "@heroicons/react": "^2.2.0",
-    "@hookform/resolvers": "^5.0.1",
-    "@mdxeditor/editor": "^3.42.0",
-    "@swc/helpers": "^0.5.17",
-    "axios": "^1.11.0",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.14.0",
-    "jalali-moment": "^3.3.11",
-    "lucide-react": "^0.501.0",
-    "next": "15.3.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-hook-form": "^7.56.4",
-    "react-hot-toast": "^2.5.2",
-    "react-markdown": "^10.1.0",
-    "react-masonry-css": "^1.0.16",
-    "react-multi-date-picker": "^4.5.2",
-    "react-toastify": "^11.0.5",
-    "rehype-raw": "^7.0.0",
-    "remark-breaks": "^4.0.0",
-    "remark-gfm": "^4.0.1",
-    "use-debounce": "^10.0.4",
-    "zod": "^3.25.42",
-    "zustand": "^5.0.7"
+    "next": "16.3.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19.1.5",
+    "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "^15.3.1",
-    "eslint-config-prettier": "^10.1.2",
-    "eslint-plugin-prettier": "^5.2.6",
-    "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
+    "eslint-config-next": "16.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@11.4.0"
 }
