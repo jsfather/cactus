@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cactus
 
-## Getting Started
+This is a [Next.js](https://nextjs.org) application configured for local development and Docker deployment on Dokploy.
 
-First, run the development server:
+## Local development
+
+Install dependencies and run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm build
+pnpm start
+```
 
-## Learn More
+## Deploy with Dokploy
 
-To learn more about Next.js, take a look at the following resources:
+This repository includes a multi-stage `Dockerfile` that produces a small, non-root standalone Next.js image.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. In Dokploy, create an **Application** and connect this Git repository.
+2. Select the branch you want to deploy (for this version, `next`).
+3. Set the build type to **Dockerfile**, the Dockerfile path to `Dockerfile`, and the Docker context path to `.`.
+4. Leave **Docker Build Stage** empty so the final `runner` stage is used.
+5. Add the domain in Dokploy with container/target port `3000`, then deploy. You do not need to publish a host port when routing through a domain.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+No custom start command is required; the image starts the standalone Next.js server on `0.0.0.0:3000`.
 
-## Deploy on Vercel
+### Environment variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Add server-only environment variables in Dokploy's environment settings. Variables prefixed with `NEXT_PUBLIC_` are compiled into the browser bundle. If you add one, declare a matching `ARG`/`ENV` in the Dockerfile's `builder` stage and set it under Dokploy's **Build Time Arguments**; changing it requires a redeploy. Never pass secrets as public variables or build arguments.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Verify the image locally
+
+```bash
+docker build -t cactus .
+docker run --rm -p 3000:3000 cactus
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
