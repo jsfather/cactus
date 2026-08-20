@@ -1,14 +1,15 @@
 import { PanelNav } from "@/components/panel/panel-nav";
 import { requireUser } from "@/lib/auth/session";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
 
 export default async function PanelLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const user = await requireUser();
+  const [user, locale] = await Promise.all([requireUser(), getPanelLocale()]);
 
   return (
     <div className="min-h-dvh bg-zinc-50 lg:flex dark:bg-zinc-900">
-      <PanelNav user={user} />
+      <PanelNav user={user} locale={locale} />
       <main className="min-w-0 flex-1 px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
         {children}
       </main>

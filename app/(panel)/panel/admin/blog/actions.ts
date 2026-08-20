@@ -5,8 +5,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireRole } from "@/lib/auth/session";
+import { richTextLength, sanitizeRichText } from "@/lib/content/rich-text";
 import { getDatabase } from "@/lib/db/client";
+import { hasPostgresErrorCode } from "@/lib/db/errors";
 import { posts } from "@/lib/db/schema";
+import type { Locale } from "@/lib/i18n/config";
 
 const slugPattern = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
 
@@ -22,10 +25,11 @@ const postSchema = z.object({
   titleEn: z.string().trim().max(240),
   excerptFa: z.string().trim().min(10).max(600),
   excerptEn: z.string().trim().max(600),
-  contentFa: z.string().trim().min(20),
-  contentEn: z.string().trim(),
-  coverImageUrl: z.union([z.literal(""), z.url()]),
+  contentFa: z.string().transform(sanitizeRichText).refine((value) => richTextLength(value) >= 20),
+  contentEn: z.string().transform(sanitizeRichText),
+  coverImageUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/post/")),
   status: z.enum(["draft", "published"]),
+  locale: z.enum(["fa", "en"]),
 });
 
 export type CreatePostState = {
@@ -34,6 +38,7 @@ export type CreatePostState = {
 };
 
 export type PostFormState = CreatePostState;
+export type DeletePostState = { error?: string; success?: string };
 
 function revalidateBlogPages() {
   revalidatePath("/");
@@ -58,11 +63,12 @@ export async function createPost(
     contentEn: formData.get("contentEn"),
     coverImageUrl: formData.get("coverImageUrl"),
     status: formData.get("status"),
+    locale: formData.get("locale"),
   });
 
   if (!parsed.success) {
     return {
-      error: "لطفاً اطلاعات نوشته را بررسی کنید.",
+      error: formData.get("locale") === "en" ? "Please review the post information." : "لطفاً اطلاعات نوشته را بررسی کنید.",
       fieldErrors: z.flattenError(parsed.error).fieldErrors,
     };
   }
@@ -84,20 +90,15 @@ export async function createPost(
       authorId: admin.id,
     });
   } catch (error) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "23505"
-    ) {
-      return { error: "این نشانی قبلاً برای نوشته دیگری استفاده شده است." };
+    if (hasPostgresErrorCode(error, "23505")) {
+      return { error: data.locale === "en" ? "This post URL is already in use." : "این نشانی قبلاً برای نوشته دیگری استفاده شده است." };
     }
 
     throw error;
   }
 
   revalidateBlogPages();
-  redirect("/panel/admin/blog");
+  redirect("/panel/admin/blog?toast=created");
 }
 
 export async function updatePost(
@@ -118,11 +119,12 @@ export async function updatePost(
     contentEn: formData.get("contentEn"),
     coverImageUrl: formData.get("coverImageUrl"),
     status: formData.get("status"),
+    locale: formData.get("locale"),
   });
 
   if (!validPostId.success || !parsed.success) {
     return {
-      error: "لطفاً اطلاعات نوشته را بررسی کنید.",
+      error: formData.get("locale") === "en" ? "Please review the post information." : "لطفاً اطلاعات نوشته را بررسی کنید.",
       fieldErrors: parsed.success
         ? undefined
         : z.flattenError(parsed.error).fieldErrors,
@@ -137,7 +139,7 @@ export async function updatePost(
     .limit(1);
 
   if (!existingPost) {
-    return { error: "این نوشته دیگر وجود ندارد." };
+    return { error: formData.get("locale") === "en" ? "This post no longer exists." : "این نوشته دیگر وجود ندارد." };
   }
 
   const data = parsed.data;
@@ -163,31 +165,31 @@ export async function updatePost(
       })
       .where(eq(posts.id, validPostId.data));
   } catch (error) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "23505"
-    ) {
-      return { error: "این نشانی قبلاً برای نوشته دیگری استفاده شده است." };
+    if (hasPostgresErrorCode(error, "23505")) {
+      return { error: data.locale === "en" ? "This post URL is already in use." : "این نشانی قبلاً برای نوشته دیگری استفاده شده است." };
     }
 
     throw error;
   }
 
   revalidateBlogPages();
-  redirect("/panel/admin/blog");
+  redirect("/panel/admin/blog?toast=updated");
 }
 
-export async function deletePost(formData: FormData) {
+export async function deletePost(postIdValue: string, locale: Locale): Promise<DeletePostState> {
   await requireRole("admin");
 
-  const postId = z.uuid().safeParse(formData.get("postId"));
+  const postId = z.uuid().safeParse(postIdValue);
 
   if (!postId.success) {
-    return;
+    return { error: locale === "fa" ? "شناسه نوشته معتبر نیست." : "The post identifier is invalid." };
   }
 
-  await getDatabase().delete(posts).where(eq(posts.id, postId.data));
+  try {
+    await getDatabase().delete(posts).where(eq(posts.id, postId.data));
+  } catch {
+    return { error: locale === "fa" ? "حذف نوشته انجام نشد. دوباره تلاش کنید." : "The post could not be deleted. Please try again." };
+  }
   revalidateBlogPages();
+  return { success: locale === "fa" ? "نوشته حذف شد." : "Post deleted." };
 }

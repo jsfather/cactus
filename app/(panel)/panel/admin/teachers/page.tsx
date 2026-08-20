@@ -1,5 +1,6 @@
 import { UserListPage } from "@/components/users/user-list-page";
 
-export default function TeachersPage() {
-  return <UserListPage role="teacher" />;
+export default async function TeachersPage({ searchParams }: { searchParams: Promise<{ toast?: string }> }) {
+  const query = await searchParams;
+  return <UserListPage role="teacher" toastKey={query.toast} />;
 }

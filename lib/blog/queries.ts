@@ -62,6 +62,7 @@ export async function getAdminPosts() {
       id: posts.id,
       slug: posts.slug,
       titleFa: posts.titleFa,
+      titleEn: posts.titleEn,
       status: posts.status,
       publishedAt: posts.publishedAt,
       updatedAt: posts.updatedAt,

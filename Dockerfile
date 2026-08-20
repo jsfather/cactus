@@ -9,7 +9,8 @@ WORKDIR /app
 FROM base AS dependencies
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=cactus-pnpm,target=/pnpm/store \
+  pnpm install --frozen-lockfile --network-concurrency=4 --fetch-retries=5 --fetch-timeout=600000
 
 FROM base AS builder
 
@@ -29,14 +30,19 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME="0.0.0.0"
 ENV PORT=3000
 ENV RUN_MIGRATIONS="true"
+ENV UPLOAD_DIR="/app/uploads"
 
 RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 nextjs
+  && adduser --system --uid 1001 nextjs \
+  && mkdir -p /app/uploads \
+  && chown nextjs:nodejs /app/uploads
 
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/drizzle ./drizzle
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+VOLUME ["/app/uploads"]
 
 USER nextjs
 

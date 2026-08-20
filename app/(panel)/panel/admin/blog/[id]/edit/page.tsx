@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { PostForm, type PostFormValues } from "@/components/blog/post-form";
 import { PanelBackLink, PanelPage, PanelPageHeader } from "@/components/panel/ui";
 import { getAdminPost } from "@/lib/blog/queries";
+import { getPanelDictionary } from "@/lib/i18n/panel";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
 
 export default async function EditPostPage({
   params,
@@ -9,7 +11,7 @@ export default async function EditPostPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const post = await getAdminPost(id);
+  const [post, locale] = await Promise.all([getAdminPost(id), getPanelLocale()]);
 
   if (!post) {
     notFound();
@@ -26,20 +28,21 @@ export default async function EditPostPage({
     contentEn: post.contentEn ?? "",
     status: post.status,
   };
+  const dictionary = getPanelDictionary(locale);
 
   return (
     <PanelPage>
       <div>
         <PanelBackLink href="/panel/admin/blog">
-          بازگشت به نوشته‌ها
+          {dictionary.common.back}
         </PanelBackLink>
       </div>
       <PanelPageHeader
-        eyebrow="مدیریت وبلاگ"
-        title="ویرایش نوشته"
-        description="اطلاعات، ترجمه و وضعیت انتشار این نوشته را به‌روزرسانی کنید."
+        eyebrow={dictionary.blog.eyebrow}
+        title={locale === "fa" ? "ویرایش نوشته" : "Edit post"}
+        description={dictionary.blog.description}
       />
-      <PostForm mode="edit" postId={post.id} initialValues={initialValues} />
+      <PostForm locale={locale} mode="edit" postId={post.id} initialValues={initialValues} />
     </PanelPage>
   );
 }

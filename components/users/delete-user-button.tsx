@@ -1,60 +1,35 @@
 "use client";
 
-import { useActionState } from "react";
-import { useFormStatus } from "react-dom";
-import {
-  deleteManagedUser,
-  type DeleteUserState,
-} from "@/app/(panel)/panel/admin/users/actions";
+import { useTransition } from "react";
+import { deleteManagedUser } from "@/app/(panel)/panel/admin/users/actions";
+import { useFeedback } from "@/components/feedback/feedback-provider";
 import { dangerButtonClass } from "@/components/panel/ui";
 import type { UserRole } from "@/lib/db/schema";
+import type { Locale } from "@/lib/i18n/config";
 
-function SubmitButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus();
+export function DeleteUserButton({ role, userId, disabled = false, locale }: { role: UserRole; userId: string; disabled?: boolean; locale: Locale }) {
+  const [pending, startTransition] = useTransition();
+  const { confirm, toast } = useFeedback();
+  const isFa = locale === "fa";
 
-  return (
-    <button
-      type="submit"
-      disabled={disabled || pending}
-      className={dangerButtonClass}
-    >
-      {pending ? "در حال حذف…" : "حذف"}
-    </button>
-  );
-}
+  const remove = async () => {
+    const approved = await confirm({
+      title: isFa ? "حذف حساب کاربری؟" : "Delete account?",
+      description: isFa ? "این حساب برای همیشه حذف می‌شود. اگر به محتوایی متصل باشد، سامانه از حذف آن جلوگیری می‌کند." : "This account will be permanently deleted. The operation will be blocked if the account is connected to content.",
+      confirmLabel: isFa ? "حذف حساب" : "Delete account",
+    });
+    if (!approved) return;
 
-export function DeleteUserButton({
-  role,
-  userId,
-  disabled = false,
-}: {
-  role: UserRole;
-  userId: string;
-  disabled?: boolean;
-}) {
-  const actionWithIdentity = deleteManagedUser.bind(null, role, userId);
-  const [state, action] = useActionState<DeleteUserState, FormData>(
-    actionWithIdentity,
-    {},
-  );
+    startTransition(async () => {
+      try {
+        const result = await deleteManagedUser(role, userId, locale);
+        if (result.error) toast.error(result.error);
+        else if (result.success) toast.success(result.success);
+      } catch {
+        toast.error(isFa ? "حذف حساب انجام نشد." : "The account could not be deleted.");
+      }
+    });
+  };
 
-  return (
-    <div>
-      <form
-        action={action}
-        onSubmit={(event) => {
-          if (!window.confirm("این حساب حذف شود؟ این عملیات قابل بازگشت نیست.")) {
-            event.preventDefault();
-          }
-        }}
-      >
-        <SubmitButton disabled={disabled} />
-      </form>
-      {state.error ? (
-        <p className="mt-1 max-w-44 text-xs leading-5 text-red-600 dark:text-red-400">
-          {state.error}
-        </p>
-      ) : null}
-    </div>
-  );
+  return <button type="button" disabled={disabled || pending} onClick={remove} className={dangerButtonClass}>{pending ? (isFa ? "در حال حذف…" : "Deleting…") : (isFa ? "حذف" : "Delete")}</button>;
 }

@@ -28,7 +28,6 @@ export function CactusLogo({
 }
 
 export function CactusBrand({
-  locale = "fa",
   compact = false,
   subtitle,
 }: {
@@ -36,15 +35,13 @@ export function CactusBrand({
   compact?: boolean;
   subtitle?: string;
 }) {
-  const name = locale === "fa" ? "مدرسه رباتیک کاکتوس" : "Cactus Robotics School";
-
   return (
     <span className="inline-flex min-w-0 items-center gap-3">
       <CactusLogo className="size-10 shrink-0 sm:size-11" />
       {!compact ? (
         <span className="min-w-0 leading-tight">
           <span className="block truncate font-bold text-zinc-950 dark:text-zinc-50">
-            {name}
+            Cactus
           </span>
           {subtitle ? (
             <span className="mt-1 block truncate text-xs font-normal text-zinc-500 dark:text-zinc-400">

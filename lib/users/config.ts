@@ -1,4 +1,5 @@
 import type { UserRole } from "@/lib/db/schema";
+import type { Locale } from "@/lib/i18n/config";
 
 export const userSectionConfig: Record<
   UserRole,
@@ -28,3 +29,13 @@ export const userSectionConfig: Record<
     description: "حساب‌های دانش‌آموزان و وضعیت دسترسی آن‌ها را مدیریت کنید.",
   },
 };
+
+const englishLabels: Record<UserRole, { singular: string; plural: string; description: string }> = {
+  admin: { singular: "Administrator", plural: "Administrators", description: "Manage accounts with full administrative access." },
+  teacher: { singular: "Teacher", plural: "Teachers", description: "Manage school teacher accounts and their access status." },
+  student: { singular: "Student", plural: "Students", description: "Manage student accounts and their access status." },
+};
+
+export function getUserSectionConfig(role: UserRole, locale: Locale) {
+  return locale === "fa" ? userSectionConfig[role] : { ...englishLabels[role], path: userSectionConfig[role].path };
+}

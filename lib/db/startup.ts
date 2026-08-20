@@ -5,9 +5,10 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 import { hashPassword } from "@/lib/auth/password";
-import { appSettings, posts, users } from "./schema";
+import { appSettings, posts, products, users } from "./schema";
 
 const starterBlogSeedKey = "seed.blog.starter.v1";
+const starterProductSeedKey = "seed.shop.starter.v1";
 
 export async function setupDatabase() {
   const connectionString = process.env.DATABASE_URL;
@@ -118,6 +119,43 @@ export async function setupDatabase() {
               "At Cactus, learning starts with a question and continues through designing, building, and testing. This is our first blog post; soon we will share classroom stories, student projects, and practical learning guides.",
             status: "published",
             publishedAt,
+            authorId: adminId,
+          });
+        }
+      });
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterProductSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+
+        if (!claimedSeed) return;
+
+        const [existingProduct] = await transaction
+          .select({ id: products.id })
+          .from(products)
+          .limit(1);
+
+        if (!existingProduct) {
+          await transaction.insert(products).values({
+            slug: "starter-robotics-kit",
+            titleFa: "کیت شروع رباتیک کاکتوس",
+            titleEn: "Cactus Starter Robotics Kit",
+            summaryFa:
+              "یک مجموعه کامل و آموزشی برای ساخت نخستین پروژه‌های رباتیک در خانه یا کلاس.",
+            summaryEn:
+              "A complete learning kit for building first robotics projects at home or in class.",
+            contentFa:
+              "<h2>شروعی ساده برای ساختن</h2><p>این کیت قطعات اصلی، راهنمای پروژه‌محور و تمرین‌های گام‌به‌گام مورد نیاز هنرجویان تازه‌کار را در یک بسته فراهم می‌کند.</p><ul><li>مناسب کودکان و نوجوانان</li><li>راهنمای فارسی پروژه‌ها</li><li>قابل استفاده در خانه و کلاس</li></ul>",
+            contentEn:
+              "<h2>An easy way to start building</h2><p>This kit brings together essential parts, a project-based guide, and step-by-step exercises for new makers.</p><ul><li>Designed for young makers</li><li>Project-based instructions</li><li>Useful at home or in class</li></ul>",
+            price: 2450000,
+            inventory: 12,
+            status: "published",
+            isFeatured: true,
+            publishedAt: new Date(),
             authorId: adminId,
           });
         }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
@@ -28,7 +29,7 @@ export default function PersianPublicLayout({
         <ThemeScript />
       </head>
       <body className="min-h-full bg-white font-sans dark:bg-zinc-950">
-        {children}
+        <AppFeedbackProvider locale="fa">{children}</AppFeedbackProvider>
       </body>
     </html>
   );

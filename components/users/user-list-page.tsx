@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { DeleteUserButton } from "@/components/users/delete-user-button";
+import { UserAvatar } from "@/components/users/user-avatar";
+import { ToastOnMount } from "@/components/feedback/toast-effects";
 import {
   PanelEmptyState,
   PanelPage,
@@ -11,29 +13,36 @@ import {
 } from "@/components/panel/ui";
 import { requireRole } from "@/lib/auth/session";
 import type { UserRole } from "@/lib/db/schema";
-import { userSectionConfig } from "@/lib/users/config";
+import type { Locale } from "@/lib/i18n/config";
+import { getPanelDictionary } from "@/lib/i18n/panel";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
+import { getUserSectionConfig } from "@/lib/users/config";
 import { getUsersByRole } from "@/lib/users/queries";
 
-function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("fa-IR", { dateStyle: "medium" }).format(date);
+function formatDate(date: Date, locale: Locale) {
+  return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", { dateStyle: "medium" }).format(date);
 }
 
-export async function UserListPage({ role }: { role: UserRole }) {
-  const [currentAdmin, users] = await Promise.all([
+export async function UserListPage({ role, toastKey }: { role: UserRole; toastKey?: string }) {
+  const [currentAdmin, users, locale] = await Promise.all([
     requireRole("admin"),
     getUsersByRole(role),
+    getPanelLocale(),
   ]);
-  const config = userSectionConfig[role];
+  const dictionary = getPanelDictionary(locale);
+  const config = getUserSectionConfig(role, locale);
 
   return (
     <PanelPage>
+      {toastKey === "created" ? <ToastOnMount title={locale === "fa" ? "حساب کاربری ساخته شد." : "Account created."} /> : null}
+      {toastKey === "updated" ? <ToastOnMount title={locale === "fa" ? "حساب کاربری به‌روز شد." : "Account updated."} /> : null}
       <PanelPageHeader
-        eyebrow="مدیریت کاربران"
+        eyebrow={dictionary.users.eyebrow}
         title={config.plural}
         description={config.description}
         actions={
           <PanelPrimaryLink href={`${config.path}/new`}>
-            {config.singular} جدید
+            {locale === "fa" ? `${config.singular} جدید` : `New ${config.singular.toLowerCase()}`}
           </PanelPrimaryLink>
         }
       />
@@ -42,24 +51,20 @@ export async function UserListPage({ role }: { role: UserRole }) {
         {users.length ? (
           <PanelTable
             columns={[
-              { label: "نام", className: "w-[24%]" },
-              { label: "ایمیل", className: "w-[28%]" },
-              { label: "وضعیت", className: "w-[14%]" },
-              { label: "تاریخ ساخت", className: "w-[18%]" },
-              { label: "عملیات", className: "w-[16%]" },
+              { label: dictionary.users.name, className: "w-[28%]" },
+              { label: dictionary.users.email, className: "w-[27%]" },
+              { label: dictionary.users.accountStatus, className: "w-[13%]" },
+              { label: dictionary.common.createdAt, className: "w-[17%]" },
+              { label: dictionary.common.actions, className: "w-[15%]" },
             ]}
           >
             {users.map((user) => (
               <tr key={user.id}>
                 <PanelTableCell>
-                  <p className="font-medium text-zinc-950 dark:text-zinc-50">
-                    {user.name}
-                  </p>
-                  {user.id === currentAdmin.id ? (
-                    <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">
-                      حساب فعلی شما
-                    </p>
-                  ) : null}
+                  <div className="flex items-center gap-3">
+                    <UserAvatar name={user.name} src={user.avatarUrl} className="size-10 shrink-0" />
+                    <div className="min-w-0"><p className="truncate font-medium text-zinc-950 dark:text-zinc-50">{user.name}</p>{user.id === currentAdmin.id ? <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">{dictionary.users.currentAccount}</p> : null}</div>
+                  </div>
                 </PanelTableCell>
                 <PanelTableCell>
                   <span className="nums-en block truncate text-end" dir="ltr">
@@ -74,11 +79,11 @@ export async function UserListPage({ role }: { role: UserRole }) {
                         : "rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
                     }
                   >
-                    {user.isActive ? "فعال" : "غیرفعال"}
+                    {user.isActive ? dictionary.common.active : dictionary.common.inactive}
                   </span>
                 </PanelTableCell>
                 <PanelTableCell className="text-zinc-600 dark:text-zinc-400">
-                  {formatDate(user.createdAt)}
+                  {formatDate(user.createdAt, locale)}
                 </PanelTableCell>
                 <PanelTableCell>
                   <div className="flex items-start gap-1">
@@ -86,11 +91,12 @@ export async function UserListPage({ role }: { role: UserRole }) {
                       href={`${config.path}/${user.id}/edit`}
                       className="rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
                     >
-                      ویرایش
+                      {dictionary.common.edit}
                     </Link>
                     <DeleteUserButton
                       role={role}
                       userId={user.id}
+                      locale={locale}
                       disabled={user.id === currentAdmin.id}
                     />
                   </div>
@@ -100,11 +106,11 @@ export async function UserListPage({ role }: { role: UserRole }) {
           </PanelTable>
         ) : (
           <PanelEmptyState
-            title={`${config.singular}ی وجود ندارد`}
-            description={`اولین حساب ${config.singular} را برای شروع این بخش بسازید.`}
+            title={locale === "fa" ? `${config.singular}ی وجود ندارد` : `No ${config.plural.toLowerCase()} yet`}
+            description={locale === "fa" ? `اولین حساب ${config.singular} را برای شروع این بخش بسازید.` : `Create the first ${config.singular.toLowerCase()} account to get started.`}
             action={
               <PanelPrimaryLink href={`${config.path}/new`}>
-                ساخت اولین {config.singular}
+                {locale === "fa" ? `ساخت اولین ${config.singular}` : `Create first ${config.singular.toLowerCase()}`}
               </PanelPrimaryLink>
             }
           />

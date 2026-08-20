@@ -3,11 +3,13 @@
 import { useActionState } from "react";
 import { login, type LoginState } from "@/app/(auth)/login/actions";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
+import { useActionErrorToast } from "@/components/feedback/toast-effects";
 
 const initialState: LoginState = {};
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, initialState);
+  useActionErrorToast(state);
   const { bind } = usePreservedFields({ email: "", password: "" });
 
   return (

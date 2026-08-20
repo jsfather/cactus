@@ -8,6 +8,7 @@ const managedUserSelection = {
   name: users.name,
   role: users.role,
   isActive: users.isActive,
+  avatarUrl: users.avatarUrl,
   createdAt: users.createdAt,
   updatedAt: users.updatedAt,
 };

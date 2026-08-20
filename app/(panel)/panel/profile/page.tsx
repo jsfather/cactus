@@ -1,0 +1,30 @@
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
+import { ProfileForm } from "@/components/users/profile-form";
+import { PanelPage, PanelPageHeader } from "@/components/panel/ui";
+import { requireUser } from "@/lib/auth/session";
+import { getDatabase } from "@/lib/db/client";
+import { users } from "@/lib/db/schema";
+import { getPanelDictionary } from "@/lib/i18n/panel";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
+import { ToastOnMount } from "@/components/feedback/toast-effects";
+
+export default async function ProfilePage({ searchParams }: { searchParams: Promise<{ updated?: string }> }) {
+  const [currentUser, locale, query] = await Promise.all([requireUser(), getPanelLocale(), searchParams]);
+  const dictionary = getPanelDictionary(locale);
+  const [profile] = await getDatabase()
+    .select({ name: users.name, email: users.email, avatarUrl: users.avatarUrl, bioFa: users.bioFa, bioEn: users.bioEn })
+    .from(users)
+    .where(eq(users.id, currentUser.id))
+    .limit(1);
+
+  if (!profile) notFound();
+
+  return (
+    <PanelPage>
+      <PanelPageHeader eyebrow={dictionary.profile.eyebrow} title={dictionary.profile.title} description={dictionary.profile.description} />
+      {query.updated === "1" ? <ToastOnMount title={dictionary.profile.saved} /> : null}
+      <ProfileForm locale={locale} profile={profile} />
+    </PanelPage>
+  );
+}

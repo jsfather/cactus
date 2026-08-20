@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
@@ -24,7 +25,7 @@ export default function AuthRootLayout({
         <ThemeScript />
       </head>
       <body className="min-h-full bg-zinc-50 font-sans text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
-        {children}
+        <AppFeedbackProvider locale="fa">{children}</AppFeedbackProvider>
       </body>
     </html>
   );

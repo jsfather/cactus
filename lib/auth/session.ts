@@ -14,6 +14,7 @@ export type CurrentUser = {
   email: string;
   name: string;
   role: UserRole;
+  avatarUrl: string | null;
 };
 
 function hashToken(token: string) {
@@ -66,6 +67,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
       email: users.email,
       name: users.name,
       role: users.role,
+      avatarUrl: users.avatarUrl,
     })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))

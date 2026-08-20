@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
+import { localeConfig } from "@/lib/i18n/config";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
 
@@ -12,13 +15,16 @@ export const metadata: Metadata = {
   icons: { icon: "/cactus-logo.svg" },
 };
 
-export default function PanelRootLayout({
+export default async function PanelRootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getPanelLocale();
+  const config = localeConfig[locale];
+
   return (
     <html
-      lang="fa"
-      dir="rtl"
+      lang={config.lang}
+      dir={config.dir}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
       className={`${vazirmatn.variable} h-full antialiased`}
@@ -26,8 +32,8 @@ export default function PanelRootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className="min-h-full bg-zinc-50 font-sans text-zinc-950 dark:bg-zinc-900 dark:text-zinc-50">
-        {children}
+      <body className={`${locale === "en" ? "nums-en" : ""} min-h-full bg-zinc-50 font-sans text-zinc-950 dark:bg-zinc-900 dark:text-zinc-50`}>
+        <AppFeedbackProvider locale={locale}>{children}</AppFeedbackProvider>
       </body>
     </html>
   );

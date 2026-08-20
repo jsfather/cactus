@@ -1,6 +1,8 @@
 import {
+  bigint,
   boolean,
   index,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -17,6 +19,13 @@ export const userRole = pgEnum("user_role", [
 ]);
 
 export const postStatus = pgEnum("post_status", ["draft", "published"]);
+export const productStatus = pgEnum("product_status", ["draft", "published"]);
+export const mediaKind = pgEnum("media_kind", [
+  "avatar",
+  "post",
+  "product",
+  "content",
+]);
 
 export const appSettings = pgTable("app_settings", {
   key: varchar("key", { length: 120 }).primaryKey(),
@@ -38,6 +47,9 @@ export const users = pgTable(
     passwordHash: text("password_hash").notNull(),
     role: userRole("role").default("student").notNull(),
     isActive: boolean("is_active").default(true).notNull(),
+    avatarUrl: text("avatar_url"),
+    bioFa: text("bio_fa"),
+    bioEn: text("bio_en"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -102,5 +114,69 @@ export const posts = pgTable(
   ],
 );
 
+export const products = pgTable(
+  "products",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: varchar("slug", { length: 180 }).notNull(),
+    titleFa: varchar("title_fa", { length: 240 }).notNull(),
+    titleEn: varchar("title_en", { length: 240 }),
+    summaryFa: text("summary_fa").notNull(),
+    summaryEn: text("summary_en"),
+    contentFa: text("content_fa").notNull(),
+    contentEn: text("content_en"),
+    price: bigint("price", { mode: "number" }).notNull(),
+    inventory: integer("inventory").default(0).notNull(),
+    coverImageUrl: text("cover_image_url"),
+    status: productStatus("status").default("draft").notNull(),
+    isFeatured: boolean("is_featured").default(false).notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    authorId: uuid("author_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("products_slug_unique").on(table.slug),
+    index("products_status_published_at_index").on(
+      table.status,
+      table.publishedAt,
+    ),
+    index("products_author_id_index").on(table.authorId),
+  ],
+);
+
+export const mediaAssets = pgTable(
+  "media_assets",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    url: text("url").notNull(),
+    pathname: text("pathname").notNull(),
+    originalName: varchar("original_name", { length: 255 }).notNull(),
+    mimeType: varchar("mime_type", { length: 100 }).notNull(),
+    size: integer("size").notNull(),
+    kind: mediaKind("kind").notNull(),
+    uploaderId: uuid("uploader_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("media_assets_url_unique").on(table.url),
+    uniqueIndex("media_assets_pathname_unique").on(table.pathname),
+    index("media_assets_uploader_id_index").on(table.uploaderId),
+    index("media_assets_kind_created_at_index").on(table.kind, table.createdAt),
+  ],
+);
+
 export type UserRole = (typeof userRole.enumValues)[number];
 export type Post = typeof posts.$inferSelect;
+export type Product = typeof products.$inferSelect;
+export type MediaKind = (typeof mediaKind.enumValues)[number];

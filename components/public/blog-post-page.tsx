@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { RichContent } from "@/components/content/rich-content";
 import { getPublishedPost } from "@/lib/blog/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
@@ -61,10 +62,17 @@ export async function BlogPostPage({
             </div>
           </header>
 
-          <div className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
-            <div className="whitespace-pre-wrap text-lg leading-9 text-zinc-700 dark:text-zinc-300">
-              {content}
+          {post.coverImageUrl ? (
+            <div className="mx-auto -mt-1 w-full max-w-5xl px-5 pt-10 sm:px-8">
+              <div className="aspect-[16/7] overflow-hidden rounded-[2rem] bg-zinc-100 shadow-2xl shadow-emerald-950/10 dark:bg-zinc-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={post.coverImageUrl} alt="" className="size-full object-cover" />
+              </div>
             </div>
+          ) : null}
+
+          <div className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
+            <RichContent html={content} className="text-lg leading-9 text-zinc-700 dark:text-zinc-300" />
           </div>
         </article>
       </main>

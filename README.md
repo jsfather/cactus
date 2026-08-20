@@ -6,14 +6,18 @@ This is the multilingual website and role-based application panel for Cactus Rob
 
 - `/`: Persian public landing page (`fa`, RTL)
 - `/en`: English public landing page (`en`, LTR)
-- `/blog` and `/en/blog`: published bilingual blog posts
+- `/blog` and `/en/blog`: published bilingual rich-text blog posts
+- `/shop` and `/en/shop`: public multilingual product catalog
 - `/login`: shared login for administrators, teachers, and students
-- `/panel/admin`: protected administrator panel and blog publishing
+- `/panel/admin`: protected administrator panel
+- `/panel/admin/blog`: full blog CRUD, rich-text editing, and cover uploads
+- `/panel/admin/products`: full product CRUD, inventory, rich-text descriptions, and image uploads
 - `/panel/admin/admins`: administrator account CRUD
 - `/panel/admin/teachers`: teacher account CRUD
 - `/panel/admin/students`: student account CRUD
 - `/panel/teacher`: protected teacher workspace
 - `/panel/student`: protected student workspace
+- `/panel/profile`: personal profile, bilingual biography, and avatar upload
 
 ## Local development
 
@@ -56,6 +60,8 @@ pnpm start
 
 - Every new database-backed feature must install useful starter content once. A seed marker must prevent deleted starter content from being recreated after an administrator intentionally empties the feature.
 - Forms backed by server actions must keep user-entered values after validation, uniqueness, or other recoverable errors. Use `usePreservedFields` from `components/forms/use-preserved-fields.ts` for text inputs, textareas, and selects.
+- Blog and product bodies are stored as sanitized HTML and edited with the shared TipTap rich-text editor. Uploaded inline images use the same authenticated media pipeline as covers and avatars.
+- Uploaded files are validated by size, declared MIME type, and file signature. Do not expose the upload directory through a generic static file server; the `/media/*` route serves validated paths with safe response headers.
 - Select indicators and other directional adornments must reserve logical inline space and use `start-*` or `end-*` positioning so they mirror correctly in RTL and LTR.
 - Panel pages must compose the shared primitives in `components/panel/ui.tsx` and `components/panel/form-controls.tsx`. This keeps page headers, surfaces, tables, column alignment, buttons, form fields, and empty states consistent across every feature.
 - Every managed feature must provide complete create, read/list, update, and delete flows unless its domain explicitly forbids an operation.
@@ -93,7 +99,10 @@ RUN_MIGRATIONS=true
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=<a strong password with at least 12 characters>
 ADMIN_NAME=مدیر کاکتوس
+UPLOAD_DIR=/app/uploads
 ```
+
+In the application service, add a persistent Docker volume mounted at `/app/uploads`. Without this volume, uploaded blog covers, product images, rich-text images, and avatars will be lost when Dokploy replaces the container. A named volume works with the image's non-root user automatically; for a host bind mount, make the directory writable by UID/GID `1001`.
 
 Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the initial administrator only when `ADMIN_EMAIL` does not exist. After the first successful login, you may remove `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_NAME` together; the existing account remains unchanged.
 
@@ -111,7 +120,8 @@ Add server-only environment variables in Dokploy's environment settings. Variabl
 
 ```bash
 docker build -t cactus .
-docker run --rm -p 3000:3000 --env-file .env cactus
+docker volume create cactus-uploads
+docker run --rm -p 3000:3000 --env-file .env -v cactus-uploads:/app/uploads cactus
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).

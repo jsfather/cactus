@@ -1,20 +1,24 @@
 import { PostForm } from "@/components/blog/post-form";
 import { PanelBackLink, PanelPage, PanelPageHeader } from "@/components/panel/ui";
+import { getPanelDictionary } from "@/lib/i18n/panel";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
 
-export default function NewPostPage() {
+export default async function NewPostPage() {
+  const locale = await getPanelLocale();
+  const dictionary = getPanelDictionary(locale);
   return (
     <PanelPage>
       <div>
         <PanelBackLink href="/panel/admin/blog">
-          بازگشت به نوشته‌ها
+          {dictionary.common.back}
         </PanelBackLink>
       </div>
       <PanelPageHeader
-        eyebrow="مدیریت وبلاگ"
-        title="نوشته جدید"
-        description="نسخه فارسی ضروری است و ترجمه انگلیسی را می‌توانید هم‌زمان اضافه کنید."
+        eyebrow={dictionary.blog.eyebrow}
+        title={dictionary.blog.newPost}
+        description={dictionary.blog.description}
       />
-      <PostForm />
+      <PostForm locale={locale} />
     </PanelPage>
   );
 }

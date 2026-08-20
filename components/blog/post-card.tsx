@@ -17,8 +17,14 @@ export function PostCard({ post, locale }: { post: PostSummary; locale: Locale }
     : null;
 
   return (
-    <article className="group flex h-full flex-col rounded-3xl border border-zinc-200 bg-white p-6 transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-950/5 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-800">
-      <div className="mb-6 h-1.5 w-14 rounded-full bg-emerald-600 transition-all group-hover:w-20 dark:bg-emerald-400" />
+    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white transition hover:-translate-y-1 hover:border-emerald-300 hover:shadow-xl hover:shadow-emerald-950/5 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-800">
+      {post.coverImageUrl ? (
+        <Link href={localizePath(locale, `/blog/${post.slug}`)} className="block aspect-[16/9] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={post.coverImageUrl} alt="" className="size-full object-cover transition duration-500 group-hover:scale-105" />
+        </Link>
+      ) : <div className="h-2 bg-gradient-to-e from-emerald-700 via-emerald-400 to-amber-300" />}
+      <div className="flex flex-1 flex-col p-6">
       <h3 className="text-xl font-bold leading-8 text-zinc-950 dark:text-zinc-50">
         {title}
       </h3>
@@ -33,6 +39,7 @@ export function PostCard({ post, locale }: { post: PostSummary; locale: Locale }
         >
           {dictionary.readMore}
         </Link>
+      </div>
       </div>
     </article>
   );

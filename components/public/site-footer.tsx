@@ -19,6 +19,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
         <div className="flex gap-5">
           <Link href={localizePath(locale, "/")}>{dictionary.home}</Link>
           <Link href={localizePath(locale, "/blog")}>{dictionary.blog}</Link>
+          <Link href={localizePath(locale, "/shop")}>{dictionary.shop}</Link>
         </div>
       </div>
     </footer>

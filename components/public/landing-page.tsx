@@ -1,16 +1,21 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { PostCard } from "@/components/blog/post-card";
+import { ProductCard } from "@/components/products/product-card";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getPublishedPosts } from "@/lib/blog/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n/config";
+import { getPublishedProducts } from "@/lib/products/queries";
 
 export async function LandingPage({ locale }: { locale: Locale }) {
   await connection();
   const dictionary = getDictionary(locale);
-  const posts = await getPublishedPosts(locale, 3);
+  const [posts, products] = await Promise.all([
+    getPublishedPosts(locale, 3),
+    getPublishedProducts(locale, 3),
+  ]);
 
   return (
     <div className="min-h-dvh bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
@@ -42,6 +47,12 @@ export async function LandingPage({ locale }: { locale: Locale }) {
                   className="rounded-xl border border-emerald-700/20 bg-white px-6 py-3.5 font-semibold text-emerald-800 transition hover:bg-emerald-100 dark:border-emerald-400/20 dark:bg-zinc-900 dark:text-emerald-300 dark:hover:bg-emerald-950"
                 >
                   {dictionary.blogAction}
+                </Link>
+                <Link
+                  href={localizePath(locale, "/shop")}
+                  className="rounded-xl border border-emerald-700/20 bg-white/70 px-6 py-3.5 font-semibold text-emerald-800 transition hover:bg-white dark:border-emerald-400/20 dark:bg-zinc-900/70 dark:text-emerald-300 dark:hover:bg-zinc-900"
+                >
+                  {dictionary.shopAction}
                 </Link>
               </div>
             </div>
@@ -85,6 +96,21 @@ export async function LandingPage({ locale }: { locale: Locale }) {
                 </p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="relative overflow-hidden bg-emerald-950 text-white">
+          <div className="absolute -start-32 top-0 size-96 rounded-full bg-emerald-500/15 blur-3xl" />
+          <div className="relative mx-auto w-full max-w-7xl px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm font-bold text-emerald-300">Cactus makers shop</p>
+                <h2 className="mt-3 text-3xl font-black sm:text-4xl">{dictionary.featuredProducts}</h2>
+                <p className="mt-3 max-w-2xl leading-7 text-emerald-100/70">{dictionary.featuredProductsDescription}</p>
+              </div>
+              <Link href={localizePath(locale, "/shop")} className="font-semibold text-emerald-300">{dictionary.allProducts}</Link>
+            </div>
+            {products.length ? <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">{products.map((product) => <ProductCard key={product.id} product={product} locale={locale} />)}</div> : <p className="mt-10 rounded-2xl border border-dashed border-emerald-700 p-8 text-emerald-100/70">{dictionary.emptyProducts}</p>}
           </div>
         </section>
 

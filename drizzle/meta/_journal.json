@@ -15,6 +15,13 @@
       "when": 1787226095413,
       "tag": "0001_clean_mandrill",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787229287587,
+      "tag": "0002_bizarre_sharon_ventura",
+      "breakpoints": true
     }
   ]
 }
