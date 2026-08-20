@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { and, desc, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { mediaAssets, mediaKind, type MediaKind } from "@/lib/db/schema";
@@ -18,6 +21,45 @@ function errorResponse(message: string, status: number) {
   return Response.json({ error: message }, { status });
 }
 
+const metadataSchema = z.object({
+  kind: z.enum(mediaKind.enumValues),
+  originalName: z.string().trim().max(255),
+  altFa: z.string().trim().max(240),
+  altEn: z.string().trim().max(240),
+});
+
+export async function GET(request: Request) {
+  const user = await getCurrentUser();
+  if (!user) return errorResponse("Authentication required.", 401);
+
+  const requestedKind = new URL(request.url).searchParams.get("kind");
+  const kind = mediaKind.enumValues.includes(requestedKind as MediaKind)
+    ? (requestedKind as MediaKind)
+    : null;
+  const filters = user.role === "admin"
+    ? kind ? eq(mediaAssets.kind, kind) : undefined
+    : and(eq(mediaAssets.uploaderId, user.id), eq(mediaAssets.kind, "avatar"));
+
+  const assets = await getDatabase()
+    .select({
+      id: mediaAssets.id,
+      url: mediaAssets.url,
+      originalName: mediaAssets.originalName,
+      mimeType: mediaAssets.mimeType,
+      size: mediaAssets.size,
+      kind: mediaAssets.kind,
+      altFa: mediaAssets.altFa,
+      altEn: mediaAssets.altEn,
+      createdAt: mediaAssets.createdAt,
+    })
+    .from(mediaAssets)
+    .where(filters)
+    .orderBy(desc(mediaAssets.createdAt))
+    .limit(100);
+
+  return Response.json({ assets });
+}
+
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return errorResponse("Authentication required.", 401);
@@ -29,14 +71,18 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const file = formData.get("file");
-  const requestedKind = formData.get("kind");
-  const kind = mediaKind.enumValues.includes(requestedKind as MediaKind)
-    ? (requestedKind as MediaKind)
-    : null;
+  const metadata = metadataSchema.safeParse({
+    kind: formData.get("kind"),
+    originalName: formData.get("originalName") || "",
+    altFa: formData.get("altFa") || "",
+    altEn: formData.get("altEn") || "",
+  });
 
-  if (!(file instanceof File) || !kind) {
+  if (!(file instanceof File) || !metadata.success) {
     return errorResponse("A valid image and upload kind are required.", 400);
   }
+
+  const { kind, originalName, altFa, altEn } = metadata.data;
 
   if (kind !== "avatar" && user.role !== "admin") {
     return errorResponse("You do not have permission to upload this image.", 403);
@@ -62,7 +108,7 @@ export async function POST(request: Request) {
     String(now.getUTCFullYear()),
     String(now.getUTCMonth() + 1).padStart(2, "0"),
   ];
-  const filename = `${randomUUID()}.${imageTypes[mime]}`;
+  const filename = `${randomUUID()}-${now.getTime()}.${imageTypes[mime]}`;
   const pathname = [...relativeParts, filename].join("/");
   const directory = path.join(getUploadRoot(), ...relativeParts);
   const absolutePath = path.join(directory, filename);
@@ -77,13 +123,18 @@ export async function POST(request: Request) {
       .values({
         url,
         pathname,
-        originalName: file.name.slice(0, 255) || filename,
+        originalName: originalName || file.name.trim().slice(0, 255) || filename,
         mimeType: mime,
         size: file.size,
         kind,
+        altFa: altFa || null,
+        altEn: altEn || null,
         uploaderId: user.id,
       })
-      .returning({ id: mediaAssets.id, url: mediaAssets.url });
+      .returning({ id: mediaAssets.id, url: mediaAssets.url, originalName: mediaAssets.originalName, altFa: mediaAssets.altFa, altEn: mediaAssets.altEn });
+
+    revalidatePath("/panel/admin/media");
+    revalidatePath("/panel/admin");
 
     return Response.json(asset, { status: 201 });
   } catch (error) {

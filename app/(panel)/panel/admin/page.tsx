@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
           <MetricCard href="/panel/admin/members" label={dictionary.dashboard.totalUsers} value={number(analytics.users.total)} detail={`${number(analytics.users.active)} ${dictionary.dashboard.activeUsers}`} />
           <MetricCard href="/panel/admin/blog" label={dictionary.dashboard.publishedPosts} value={number(analytics.posts.published)} detail={`${number(analytics.posts.total)} ${dictionary.dashboard.totalPosts}`} />
           <MetricCard href="/panel/admin/products" label={dictionary.dashboard.publishedProducts} value={number(analytics.products.published)} detail={`${number(analytics.products.lowStock)} ${dictionary.dashboard.lowStock}`} />
-          <MetricCard href="/panel/admin/products" label={dictionary.dashboard.uploadedMedia} value={number(analytics.media)} detail={`${number(analytics.products.total)} ${dictionary.dashboard.totalProducts}`} />
+          <MetricCard href="/panel/admin/media" label={dictionary.dashboard.uploadedMedia} value={number(analytics.media)} detail={dictionary.media.description} />
         </div>
       </section>
 

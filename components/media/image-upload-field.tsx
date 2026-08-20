@@ -1,7 +1,9 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useCallback, useId, useRef, useState } from "react";
 import { useFeedback } from "@/components/feedback/feedback-provider";
+import { MediaPickerDialog, type MediaSelection } from "@/components/media/media-picker-dialog";
+import { PanelInput } from "@/components/panel/form-controls";
 import type { Locale } from "@/lib/i18n/config";
 import type { MediaKind } from "@/lib/db/schema";
 
@@ -27,11 +29,20 @@ export function ImageUploadField({
   const [value, setValue] = useState(initialValue);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [mediaName, setMediaName] = useState("");
   const [dragging, setDragging] = useState(false);
+  const [picker, setPicker] = useState<{ open: boolean; tab: "library" | "link" }>({ open: false, tab: "library" });
   const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
+  const mediaNameId = useId();
   const { toast } = useFeedback();
   const isFa = locale === "fa";
+  const closePicker = useCallback(() => setPicker((current) => ({ ...current, open: false })), []);
+  const selectMedia = useCallback((selection: MediaSelection) => {
+    setValue(selection.url);
+    if (selection.originalName) setMediaName(selection.originalName);
+    setError("");
+  }, []);
 
   const invalidFileMessage = isFa
     ? "فایل باید JPEG، PNG، WebP یا GIF و حداکثر ۵ مگابایت باشد."
@@ -43,12 +54,14 @@ export function ImageUploadField({
     const data = new FormData();
     data.set("file", file);
     data.set("kind", kind);
+    data.set("originalName", mediaName);
 
     try {
       const response = await fetch("/api/uploads", { method: "POST", body: data });
-      const result = (await response.json()) as { url?: string; error?: string };
+      const result = (await response.json()) as { url?: string; originalName?: string; error?: string };
       if (!response.ok || !result.url) throw new Error(result.error || "Upload failed");
       setValue(result.url);
+      if (result.originalName) setMediaName(result.originalName);
       toast.success(isFa ? "تصویر بارگذاری شد." : "Image uploaded.");
     } catch {
       const message = isFa
@@ -75,6 +88,7 @@ export function ImageUploadField({
   };
 
   return (
+    <>
     <div className="space-y-2.5">
       <input type="hidden" name={name} value={value} />
       <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
@@ -141,6 +155,20 @@ export function ImageUploadField({
               ? isFa ? "با انتخاب تصویر دیگر می‌توانید آن را جایگزین کنید." : "Choose another image whenever you need to replace it."
               : isFa ? "یا از دکمه زیر برای انتخاب فایل استفاده کنید." : "Or use the button below to browse your files."}
           </p>
+          <label htmlFor={mediaNameId} className="mt-3 block text-xs font-medium text-zinc-700 dark:text-zinc-300">
+            {isFa ? "نام نمایشی در کتابخانه (اختیاری)" : "Media library display name (optional)"}
+          </label>
+          <PanelInput
+            id={mediaNameId}
+            value={mediaName}
+            onChange={(event) => setMediaName(event.target.value)}
+            maxLength={255}
+            className="mt-1.5 py-2.5 text-sm"
+            placeholder={isFa ? "نام تکراری هم مجاز است" : "Duplicate names are allowed"}
+          />
+          <p className="mt-1 text-[11px] leading-5 text-zinc-500 dark:text-zinc-400">
+            {isFa ? "فقط برای بارگذاری جدید استفاده می‌شود؛ نام فایل روی دیسک تصادفی و زمان‌دار است." : "Used only for new uploads; the stored filename is random and timestamped."}
+          </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               type="button"
@@ -154,6 +182,22 @@ export function ImageUploadField({
                 : value
                   ? isFa ? "تغییر تصویر" : "Replace image"
                   : isFa ? "انتخاب تصویر" : "Choose image"}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setPicker({ open: true, tab: "library" })}
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-medium text-zinc-700 transition hover:border-emerald-300 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300"
+            >
+              {isFa ? "انتخاب از کتابخانه" : "Choose from library"}
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => setPicker({ open: true, tab: "link" })}
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-medium text-zinc-700 transition hover:border-sky-300 hover:text-sky-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-sky-700 dark:hover:text-sky-300"
+            >
+              {isFa ? "استفاده از لینک" : "Use link"}
             </button>
             {value ? (
               <button
@@ -171,5 +215,7 @@ export function ImageUploadField({
         </div>
       </div>
     </div>
+    <MediaPickerDialog open={picker.open} initialTab={picker.tab} locale={locale} kind={kind} onClose={closePicker} onSelect={selectMedia} />
+    </>
   );
 }

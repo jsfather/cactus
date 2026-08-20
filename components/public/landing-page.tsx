@@ -104,7 +104,7 @@ export async function LandingPage({ locale }: { locale: Locale }) {
           <div className="relative mx-auto w-full max-w-7xl px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-bold text-emerald-300">Cactus makers shop</p>
+                <p className="text-sm font-bold text-emerald-300">{locale === "fa" ? "فروشگاه سازندگان کاکتوس" : "Cactus makers shop"}</p>
                 <h2 className="mt-3 text-3xl font-black sm:text-4xl">{dictionary.featuredProducts}</h2>
                 <p className="mt-3 max-w-2xl leading-7 text-emerald-100/70">{dictionary.featuredProductsDescription}</p>
               </div>

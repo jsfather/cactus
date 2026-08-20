@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { deleteProduct } from "@/app/(panel)/panel/admin/products/actions";
 import { useFeedback } from "@/components/feedback/feedback-provider";
-import { dangerButtonClass } from "@/components/panel/ui";
+import { PanelActionSpinner, PanelDeleteIcon, PanelTableActionButton } from "@/components/panel/ui";
 import type { Locale } from "@/lib/i18n/config";
 
 export function DeleteProductButton({ productId, locale }: { productId: string; locale: Locale }) {
@@ -30,5 +30,6 @@ export function DeleteProductButton({ productId, locale }: { productId: string; 
     });
   };
 
-  return <button type="button" disabled={pending} onClick={remove} className={dangerButtonClass}>{pending ? (isFa ? "در حال حذف…" : "Deleting…") : (isFa ? "حذف" : "Delete")}</button>;
+  const label = pending ? (isFa ? "در حال حذف…" : "Deleting…") : (isFa ? "حذف محصول" : "Delete product");
+  return <PanelTableActionButton label={label} tone="danger" disabled={pending} onClick={remove}>{pending ? <PanelActionSpinner /> : <PanelDeleteIcon />}</PanelTableActionButton>;
 }

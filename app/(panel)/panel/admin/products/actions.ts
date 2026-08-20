@@ -10,6 +10,7 @@ import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
 import { products } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
+import { isAllowedImageReference } from "@/lib/media/reference";
 
 const slugPattern = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
 const productSchema = z.object({
@@ -20,7 +21,7 @@ const productSchema = z.object({
   summaryEn: z.string().trim().max(600),
   contentFa: z.string().transform(sanitizeRichText).refine((value) => richTextLength(value) >= 20),
   contentEn: z.string().transform(sanitizeRichText),
-  coverImageUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/product/")),
+  coverImageUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
   price: z.coerce.number().int().min(0).max(999_999_999_999),
   inventory: z.coerce.number().int().min(0).max(10_000_000),
   status: z.enum(["draft", "published"]),

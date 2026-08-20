@@ -1,14 +1,21 @@
 import path from "node:path";
 import { randomBytes } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
 import { asc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 import { hashPassword } from "@/lib/auth/password";
-import { appSettings, posts, products, users } from "./schema";
+import { appSettings, mediaAssets, posts, products, users } from "./schema";
 
 const starterBlogSeedKey = "seed.blog.starter.v1";
 const starterProductSeedKey = "seed.shop.starter.v1";
+const starterMediaSeedKey = "seed.media.starter.v1";
+const starterMediaPathname = "content/starter/cactus-placeholder.png";
+const starterMediaPng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Zl1sAAAAASUVORK5CYII=",
+  "base64",
+);
 
 function splitName(value: string, fallbackFirst: string, fallbackLast: string) {
   const parts = value.trim().split(/\s+/).filter(Boolean);
@@ -180,6 +187,42 @@ export async function setupDatabase() {
             isFeatured: true,
             publishedAt: new Date(),
             authorId: adminId,
+          });
+        }
+      });
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterMediaSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+
+        if (!claimedSeed) return;
+
+        const [existingAsset] = await transaction
+          .select({ id: mediaAssets.id })
+          .from(mediaAssets)
+          .limit(1);
+
+        if (!existingAsset) {
+          const uploadRoot = path.resolve(
+            process.env.UPLOAD_DIR?.trim() || path.join(process.cwd(), ".data", "uploads"),
+          );
+          const absolutePath = path.join(uploadRoot, ...starterMediaPathname.split("/"));
+          await mkdir(path.dirname(absolutePath), { recursive: true });
+          await writeFile(absolutePath, starterMediaPng);
+
+          await transaction.insert(mediaAssets).values({
+            url: `/media/${starterMediaPathname}`,
+            pathname: starterMediaPathname,
+            originalName: "cactus-placeholder.png",
+            mimeType: "image/png",
+            size: starterMediaPng.byteLength,
+            kind: "content",
+            uploaderId: adminId,
+            altFa: "تصویر نمونه کتابخانه کاکتوس",
+            altEn: "Cactus media library placeholder",
           });
         }
       });

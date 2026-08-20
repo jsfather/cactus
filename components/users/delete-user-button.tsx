@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { deleteManagedUser } from "@/app/(panel)/panel/admin/users/actions";
 import { useFeedback } from "@/components/feedback/feedback-provider";
-import { dangerButtonClass } from "@/components/panel/ui";
+import { PanelActionSpinner, PanelDeleteIcon, PanelTableActionButton } from "@/components/panel/ui";
 import type { UserRole } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -31,5 +31,6 @@ export function DeleteUserButton({ role, userId, disabled = false, locale }: { r
     });
   };
 
-  return <button type="button" disabled={disabled || pending} onClick={remove} className={dangerButtonClass}>{pending ? (isFa ? "در حال حذف…" : "Deleting…") : (isFa ? "حذف" : "Delete")}</button>;
+  const label = pending ? (isFa ? "در حال حذف…" : "Deleting…") : (isFa ? "حذف حساب" : "Delete account");
+  return <PanelTableActionButton label={label} tone="danger" disabled={disabled || pending} onClick={remove}>{pending ? <PanelActionSpinner /> : <PanelDeleteIcon />}</PanelTableActionButton>;
 }

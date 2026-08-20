@@ -12,6 +12,7 @@ This is the multilingual website and role-based application panel for Cactus Rob
 - `/panel/admin`: protected administrator panel
 - `/panel/admin/blog`: full blog CRUD, rich-text editing, and cover uploads
 - `/panel/admin/products`: full product CRUD, inventory, rich-text descriptions, and image uploads
+- `/panel/admin/media`: shared media-library CRUD, metadata, reusable URLs, and guarded deletion
 - `/panel/admin/admins`: administrator account CRUD
 - `/panel/admin/teachers`: teacher account CRUD
 - `/panel/admin/students`: student account CRUD
@@ -62,8 +63,10 @@ pnpm start
 
 - Every new database-backed feature must install useful starter content once. A seed marker must prevent deleted starter content from being recreated after an administrator intentionally empties the feature.
 - Forms backed by server actions must keep user-entered values after validation, uniqueness, or other recoverable errors. Use `usePreservedFields` from `components/forms/use-preserved-fields.ts` for text inputs, textareas, and selects.
-- Blog and product bodies are stored as sanitized HTML and edited with the shared TipTap rich-text editor. Uploaded inline images use the same authenticated media pipeline as covers and avatars.
+- Blog and product bodies are stored as sanitized HTML and edited with the shared TipTap rich-text editor. Inline images, covers, product images, and avatars share one picker that supports instant upload, reuse from the media library, and validated HTTP(S) image links.
 - Uploaded files are validated by size, declared MIME type, and file signature. Do not expose the upload directory through a generic static file server; the `/media/*` route serves validated paths with safe response headers.
+- Administrators manage all stored uploads at `/panel/admin/media`. Deletion is blocked while an asset is referenced by a profile, post, product, or rich-text document.
+- Physical upload filenames are opaque (`random UUID + upload timestamp + validated extension`). The separate media display name is user-editable and intentionally allows duplicates.
 - Select indicators and other directional adornments must reserve logical inline space and use `start-*` or `end-*` positioning so they mirror correctly in RTL and LTR.
 - Panel pages must compose the shared primitives in `components/panel/ui.tsx` and `components/panel/form-controls.tsx`. This keeps page headers, surfaces, tables, column alignment, buttons, form fields, and empty states consistent across every feature.
 - Every managed feature must provide complete create, read/list, update, and delete flows unless its domain explicitly forbids an operation.

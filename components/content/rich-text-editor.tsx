@@ -1,11 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useFeedback } from "@/components/feedback/feedback-provider";
+import { MediaPickerDialog, type MediaSelection } from "@/components/media/media-picker-dialog";
+import { PanelInput } from "@/components/panel/form-controls";
 import type { Locale } from "@/lib/i18n/config";
 
 function ToolbarButton({
@@ -50,10 +52,12 @@ export function RichTextEditor({
   required?: boolean;
 }) {
   const [value, setValue] = useState(initialValue);
-  const [uploading, setUploading] = useState(false);
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkValue, setLinkValue] = useState("");
   const { toast } = useFeedback();
-  const imageInput = useRef<HTMLInputElement>(null);
   const isFa = locale === "fa";
+  const closeMedia = useCallback(() => setMediaOpen(false), []);
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -77,34 +81,26 @@ export function RichTextEditor({
     onUpdate: ({ editor: currentEditor }) => setValue(currentEditor.getHTML()),
   });
 
-  const addLink = () => {
+  const beginLink = () => {
     if (!editor) return;
     const previous = editor.getAttributes("link").href as string | undefined;
-    const href = window.prompt(isFa ? "نشانی پیوند" : "Link URL", previous || "https://");
-    if (href === null) return;
-    if (!href.trim()) editor.chain().focus().extendMarkRange("link").unsetLink().run();
-    else editor.chain().focus().extendMarkRange("link").setLink({ href: href.trim() }).run();
+    setLinkValue(previous || "https://");
+    setLinkOpen(true);
   };
 
-  const uploadImage = async (file: File) => {
+  const applyLink = () => {
     if (!editor) return;
-    setUploading(true);
-    const data = new FormData();
-    data.set("file", file);
-    data.set("kind", "content");
+    const href = linkValue.trim();
+    if (!href) editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    else editor.chain().focus().extendMarkRange("link").setLink({ href }).run();
+    setLinkOpen(false);
+  };
 
-    try {
-      const response = await fetch("/api/uploads", { method: "POST", body: data });
-      const result = (await response.json()) as { url?: string };
-      if (!response.ok || !result.url) throw new Error("Upload failed");
-      editor.chain().focus().setImage({ src: result.url }).run();
-      toast.success(isFa ? "تصویر به محتوا اضافه شد." : "Image added to the content.");
-    } catch {
-      toast.error(isFa ? "بارگذاری تصویر انجام نشد." : "The image upload failed.");
-    } finally {
-      setUploading(false);
-      if (imageInput.current) imageInput.current.value = "";
-    }
+  const selectImage = (selection: MediaSelection) => {
+    if (!editor) return;
+    const alt = contentDirection === "rtl" ? selection.altFa || "" : selection.altEn || "";
+    editor.chain().focus().setImage({ src: selection.url, alt }).run();
+    toast.success(isFa ? "تصویر به محتوا اضافه شد." : "Image added to the content.");
   };
 
   if (!editor) {
@@ -112,18 +108,9 @@ export function RichTextEditor({
   }
 
   return (
+    <>
     <div className="overflow-hidden rounded-2xl border border-zinc-300 bg-white focus-within:border-emerald-600 focus-within:ring-3 focus-within:ring-emerald-600/15 dark:border-zinc-700 dark:bg-zinc-950">
       <input type="hidden" name={name} value={value} required={required} />
-      <input
-        ref={imageInput}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        className="sr-only"
-        onChange={(event) => {
-          const file = event.target.files?.[0];
-          if (file) void uploadImage(file);
-        }}
-      />
       <div className="flex flex-wrap items-center gap-1 border-b border-zinc-200 bg-zinc-50 p-2 dark:border-zinc-800 dark:bg-zinc-900">
         <ToolbarButton label={isFa ? "پررنگ" : "Bold"} active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}><strong>B</strong></ToolbarButton>
         <ToolbarButton label={isFa ? "مورب" : "Italic"} active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}><em>I</em></ToolbarButton>
@@ -131,13 +118,16 @@ export function RichTextEditor({
         <ToolbarButton label={isFa ? "فهرست نقطه‌ای" : "Bullet list"} active={editor.isActive("bulletList")} onClick={() => editor.chain().focus().toggleBulletList().run()}>• ≡</ToolbarButton>
         <ToolbarButton label={isFa ? "فهرست شماره‌ای" : "Numbered list"} active={editor.isActive("orderedList")} onClick={() => editor.chain().focus().toggleOrderedList().run()}>1.</ToolbarButton>
         <ToolbarButton label={isFa ? "نقل قول" : "Quote"} active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>“”</ToolbarButton>
-        <ToolbarButton label={isFa ? "پیوند" : "Link"} active={editor.isActive("link")} onClick={addLink}>↗</ToolbarButton>
-        <ToolbarButton label={isFa ? "تصویر" : "Image"} disabled={uploading} onClick={() => imageInput.current?.click()}>{uploading ? "…" : "▧"}</ToolbarButton>
+        <ToolbarButton label={isFa ? "پیوند" : "Link"} active={editor.isActive("link")} onClick={beginLink}>↗</ToolbarButton>
+        <ToolbarButton label={isFa ? "تصویر" : "Image"} onClick={() => setMediaOpen(true)}>▧</ToolbarButton>
         <span className="mx-1 h-6 w-px bg-zinc-200 dark:bg-zinc-700" />
         <ToolbarButton label={isFa ? "بازگشت" : "Undo"} disabled={!editor.can().undo()} onClick={() => editor.chain().focus().undo().run()}>↶</ToolbarButton>
         <ToolbarButton label={isFa ? "تکرار" : "Redo"} disabled={!editor.can().redo()} onClick={() => editor.chain().focus().redo().run()}>↷</ToolbarButton>
       </div>
+      {linkOpen ? <div className="flex flex-col gap-2 border-b border-zinc-200 bg-white p-3 sm:flex-row dark:border-zinc-800 dark:bg-zinc-950"><PanelInput value={linkValue} onChange={(event) => setLinkValue(event.target.value)} dir="ltr" className="nums-en" aria-label={isFa ? "نشانی پیوند" : "Link URL"} /><button type="button" onClick={applyLink} className="shrink-0 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 dark:bg-emerald-500 dark:text-emerald-950">{isFa ? "اعمال پیوند" : "Apply link"}</button><button type="button" onClick={() => setLinkOpen(false)} className="shrink-0 rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium dark:border-zinc-700">{isFa ? "انصراف" : "Cancel"}</button></div> : null}
       <EditorContent editor={editor} />
     </div>
+    <MediaPickerDialog open={mediaOpen} locale={locale} kind="content" onClose={closeMedia} onSelect={selectImage} />
+    </>
   );
 }

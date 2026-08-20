@@ -16,7 +16,7 @@ export async function ShopIndexPage({ locale }: { locale: Locale }) {
         <header className="relative isolate overflow-hidden border-b border-emerald-950/10 bg-emerald-950 text-white dark:border-white/10">
           <div className="absolute inset-0 -z-10 opacity-40 [background-image:radial-gradient(circle_at_1px_1px,rgb(52_211_153_/_0.35)_1px,transparent_0)] [background-size:28px_28px]" />
           <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
-            <span className="inline-flex rounded-full border border-emerald-400/30 bg-emerald-900/70 px-4 py-2 text-sm text-emerald-200">Cactus makers shop</span>
+            <span className="inline-flex rounded-full border border-emerald-400/30 bg-emerald-900/70 px-4 py-2 text-sm text-emerald-200">{locale === "fa" ? "فروشگاه سازندگان کاکتوس" : "Cactus makers shop"}</span>
             <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight sm:text-6xl">{dictionary.shopTitle}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-emerald-100/80">{dictionary.shopDescription}</p>
           </div>

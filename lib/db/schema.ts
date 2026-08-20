@@ -165,10 +165,15 @@ export const mediaAssets = pgTable(
     mimeType: varchar("mime_type", { length: 100 }).notNull(),
     size: integer("size").notNull(),
     kind: mediaKind("kind").notNull(),
+    altFa: varchar("alt_fa", { length: 240 }),
+    altEn: varchar("alt_en", { length: 240 }),
     uploaderId: uuid("uploader_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
   },

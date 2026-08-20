@@ -12,13 +12,14 @@ import type { Locale } from "@/lib/i18n/config";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getLocalizedUserName } from "@/lib/users/name";
 
-type NavIcon = "home" | "blog" | "shop" | "users" | "profile";
+type NavIcon = "home" | "blog" | "shop" | "media" | "users" | "profile";
 
 function Icon({ name }: { name: NavIcon }) {
   const common = { viewBox: "0 0 24 24", className: "size-5", fill: "none", stroke: "currentColor", strokeWidth: 1.8 };
   if (name === "home") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-9Z" /></svg>;
   if (name === "blog") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 3h9l3 3v15H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" /><path strokeLinecap="round" d="M8 10h6M8 14h6M8 18h4M15 3v4h4" /></svg>;
   if (name === "shop") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M4 9h16l-1 12H5L4 9ZM8 9V7a4 4 0 0 1 8 0v2" /></svg>;
+  if (name === "media") return <svg {...common} aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="9" cy="10" r="2" /><path strokeLinecap="round" strokeLinejoin="round" d="m5 18 4.5-4 3 2.5 2.5-2 4 3.5" /></svg>;
   if (name === "users") return <svg {...common} aria-hidden="true"><circle cx="9" cy="8" r="3" /><path strokeLinecap="round" d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M16.5 15a5 5 0 0 1 4 5" /></svg>;
   return <svg {...common} aria-hidden="true"><circle cx="12" cy="8" r="4" /><path strokeLinecap="round" d="M4 21a8 8 0 0 1 16 0" /></svg>;
 }
@@ -38,6 +39,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
       ? [
           { href: "/panel/admin/blog", label: dictionary.nav.blog, icon: "blog" as const },
           { href: "/panel/admin/products", label: dictionary.nav.shop, icon: "shop" as const },
+          { href: "/panel/admin/media", label: dictionary.nav.media, icon: "media" as const },
         ]
       : []),
   ];
@@ -54,7 +56,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
   return (
     <aside className="relative z-50 flex flex-col border-b border-zinc-200 bg-white/95 px-4 py-4 backdrop-blur-xl lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:border-b-0 lg:border-e lg:px-5 lg:py-5 dark:border-zinc-800 dark:bg-zinc-950/95">
       <div className="flex items-center justify-between gap-4 border-b border-zinc-200 pb-4 dark:border-zinc-800">
-        <Link href={roleHome[user.role]} aria-label="Cactus panel">
+        <Link href={roleHome[user.role]} aria-label={locale === "fa" ? "پنل کاکتوس" : "Cactus panel"}>
           <CactusBrand locale={locale} subtitle={roleName} />
         </Link>
         <div className="flex items-center gap-2">

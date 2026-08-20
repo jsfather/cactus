@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { DeletePostButton } from "@/components/blog/delete-post-button";
 import {
   PanelEmptyState,
@@ -7,7 +6,10 @@ import {
   PanelPrimaryLink,
   PanelSurface,
   PanelTable,
+  PanelTableActions,
+  PanelTableActionLink,
   PanelTableCell,
+  PanelEditIcon,
 } from "@/components/panel/ui";
 import { getAdminPosts } from "@/lib/blog/queries";
 import { getPanelDictionary } from "@/lib/i18n/panel";
@@ -83,15 +85,15 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
                       {formatDate(post.publishedAt, locale)}
                     </PanelTableCell>
                     <PanelTableCell>
-                      <div className="flex items-center gap-1">
-                        <Link
+                      <PanelTableActions>
+                        <PanelTableActionLink
                           href={`/panel/admin/blog/${post.id}/edit`}
-                          className="rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+                          label={dictionary.common.edit}
                         >
-                          {dictionary.common.edit}
-                        </Link>
+                          <PanelEditIcon />
+                        </PanelTableActionLink>
                         <DeletePostButton postId={post.id} locale={locale} />
-                      </div>
+                      </PanelTableActions>
                     </PanelTableCell>
                   </tr>
                 ))}

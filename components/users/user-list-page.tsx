@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { DeleteUserButton } from "@/components/users/delete-user-button";
 import { UserAvatar } from "@/components/users/user-avatar";
 import { ToastOnMount } from "@/components/feedback/toast-effects";
@@ -9,7 +8,10 @@ import {
   PanelPrimaryLink,
   PanelSurface,
   PanelTable,
+  PanelTableActions,
+  PanelTableActionLink,
   PanelTableCell,
+  PanelEditIcon,
 } from "@/components/panel/ui";
 import { requireRole } from "@/lib/auth/session";
 import type { UserRole } from "@/lib/db/schema";
@@ -89,20 +91,20 @@ export async function UserListPage({ role, toastKey }: { role: UserRole; toastKe
                   {formatDate(user.createdAt, locale)}
                 </PanelTableCell>
                 <PanelTableCell>
-                  <div className="flex items-start gap-1">
-                    <Link
+                  <PanelTableActions>
+                    <PanelTableActionLink
                       href={`${config.path}/${user.id}/edit`}
-                      className="rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+                      label={dictionary.common.edit}
                     >
-                      {dictionary.common.edit}
-                    </Link>
+                      <PanelEditIcon />
+                    </PanelTableActionLink>
                     <DeleteUserButton
                       role={role}
                       userId={user.id}
                       locale={locale}
                       disabled={user.id === currentAdmin.id}
                     />
-                  </div>
+                  </PanelTableActions>
                 </PanelTableCell>
               </tr>;
             })}

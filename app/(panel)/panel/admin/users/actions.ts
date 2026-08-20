@@ -11,6 +11,7 @@ import { hasPostgresErrorCode } from "@/lib/db/errors";
 import { users, userRole, type UserRole } from "@/lib/db/schema";
 import { roleHome } from "@/lib/auth/roles";
 import { userSectionConfig } from "@/lib/users/config";
+import { isAllowedImageReference } from "@/lib/media/reference";
 
 const roleSchema = z.enum(userRole.enumValues);
 const commonUserSchema = z.object({
@@ -21,7 +22,7 @@ const commonUserSchema = z.object({
   email: z.string().trim().email().max(320),
   role: roleSchema,
   isActive: z.boolean(),
-  avatarUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/avatar/")),
+  avatarUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
   locale: z.enum(["fa", "en"]),
 });
 const createUserSchema = commonUserSchema.extend({

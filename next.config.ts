@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/*": ["./drizzle/**/*"],
   },
+  // Runtime media belongs to the persistent Dokploy volume, never the image.
+  outputFileTracingExcludes: {
+    "/*": ["./.data/uploads/**/*"],
+  },
 };
 
 export default nextConfig;

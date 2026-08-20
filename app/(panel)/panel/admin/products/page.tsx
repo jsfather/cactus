@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { DeleteProductButton } from "@/components/products/delete-product-button";
-import { PanelEmptyState, PanelPage, PanelPageHeader, PanelPrimaryLink, PanelSurface, PanelTable, PanelTableCell } from "@/components/panel/ui";
+import { PanelEditIcon, PanelEmptyState, PanelPage, PanelPageHeader, PanelPrimaryLink, PanelSurface, PanelTable, PanelTableActions, PanelTableActionLink, PanelTableCell } from "@/components/panel/ui";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { localeConfig } from "@/lib/i18n/config";
@@ -25,7 +24,7 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                 <PanelTableCell><span className="font-medium">{number.format(product.price)}</span></PanelTableCell>
                 <PanelTableCell>{number.format(product.inventory)}</PanelTableCell>
                 <PanelTableCell><span className={product.status === "published" ? "rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300"}>{product.status === "published" ? dictionary.common.published : dictionary.common.draft}</span>{product.isFeatured ? <span className="ms-1 rounded-full bg-violet-100 px-2 py-1 text-[10px] text-violet-700 dark:bg-violet-950 dark:text-violet-300">★</span> : null}</PanelTableCell>
-                <PanelTableCell><div className="flex items-center gap-1"><Link href={`/panel/admin/products/${product.id}/edit`} className="rounded-lg px-3 py-2 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40">{dictionary.common.edit}</Link><DeleteProductButton productId={product.id} locale={locale} /></div></PanelTableCell>
+                <PanelTableCell><PanelTableActions><PanelTableActionLink href={`/panel/admin/products/${product.id}/edit`} label={dictionary.common.edit}><PanelEditIcon /></PanelTableActionLink><DeleteProductButton productId={product.id} locale={locale} /></PanelTableActions></PanelTableCell>
               </tr>
             ))}
           </PanelTable>

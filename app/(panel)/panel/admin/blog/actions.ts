@@ -10,6 +10,7 @@ import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
 import { posts } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
+import { isAllowedImageReference } from "@/lib/media/reference";
 
 const slugPattern = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
 
@@ -27,7 +28,7 @@ const postSchema = z.object({
   excerptEn: z.string().trim().max(600),
   contentFa: z.string().transform(sanitizeRichText).refine((value) => richTextLength(value) >= 20),
   contentEn: z.string().transform(sanitizeRichText),
-  coverImageUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/post/")),
+  coverImageUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
   status: z.enum(["draft", "published"]),
   locale: z.enum(["fa", "en"]),
 });

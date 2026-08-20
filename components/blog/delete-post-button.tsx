@@ -3,7 +3,7 @@
 import { useTransition } from "react";
 import { deletePost } from "@/app/(panel)/panel/admin/blog/actions";
 import { useFeedback } from "@/components/feedback/feedback-provider";
-import { dangerButtonClass } from "@/components/panel/ui";
+import { PanelActionSpinner, PanelDeleteIcon, PanelTableActionButton } from "@/components/panel/ui";
 import type { Locale } from "@/lib/i18n/config";
 
 export function DeletePostButton({ postId, locale }: { postId: string; locale: Locale }) {
@@ -30,5 +30,6 @@ export function DeletePostButton({ postId, locale }: { postId: string; locale: L
     });
   };
 
-  return <button type="button" disabled={pending} onClick={remove} className={dangerButtonClass}>{pending ? (isFa ? "در حال حذف…" : "Deleting…") : (isFa ? "حذف" : "Delete")}</button>;
+  const label = pending ? (isFa ? "در حال حذف…" : "Deleting…") : (isFa ? "حذف نوشته" : "Delete post");
+  return <PanelTableActionButton label={label} tone="danger" disabled={pending} onClick={remove}>{pending ? <PanelActionSpinner /> : <PanelDeleteIcon />}</PanelTableActionButton>;
 }

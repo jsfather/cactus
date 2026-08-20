@@ -31,7 +31,7 @@ This repository is a production-oriented multilingual application for Cactus, a 
 - Route groups use separate root layouts because each document needs its own `lang`, `dir`, typography, and metadata. Mount `AppFeedbackProvider` in every root layout.
 - Language is one application-wide preference stored in the `cactus-locale` cookie at path `/` and mirrored to localStorage for cross-tab synchronization. Public routes keep localized URLs, while auth and panel layouts read the shared preference through `lib/i18n/server.ts`. Never introduce route-specific language cookies.
 - Panel dictionaries live in `lib/i18n/panel.ts`, auth dictionaries in `lib/i18n/auth.ts`, and public dictionaries in `lib/i18n/dictionaries.ts`.
-- Public and panel header branding displays the short name `Cactus`. Do not restore the long school name in headers. The panel may display the signed-in role as a subtitle.
+- Public, authentication, and panel header branding displays the localized short name: `کاکتوس` in Persian and `Cactus` in English. Do not restore the long school name in headers. The panel may display the signed-in role as a subtitle.
 
 ## Internationalization, RTL, and typography
 
@@ -47,6 +47,7 @@ This repository is a production-oriented multilingual application for Cactus, a 
 
 - Panel pages must compose the shared primitives in `components/panel/ui.tsx` and `components/panel/form-controls.tsx`. Improve shared primitives instead of patching one page when the change should apply everywhere.
 - Keep tables `table-fixed`, define explicit column widths, and use the shared header/cell padding and alignment so data remains directly under its heading.
+- Render table row actions through the shared accessible icon-button primitives in `components/panel/ui.tsx`; keep localized `aria-label` and `title` text, and do not place large textual edit/delete/copy actions inside table cells.
 - Global feedback lives in `components/feedback/feedback-provider.tsx`. Use `useFeedback()` for confirmation dialogs and toasts.
 - Never use `window.confirm`, `window.alert`, or browser-native destructive confirmation. Call the global promise-based `confirm()` API with localized title, description, and action labels.
 - Use localized toasts for operation-level success and failure. Keep field-level validation errors inline as well; toasts complement accessible form errors rather than replacing them.
@@ -94,9 +95,11 @@ This repository is a production-oriented multilingual application for Cactus, a 
 ## Media uploads
 
 - Use the authenticated `/api/uploads` route and the reusable `ImageUploadField`; do not reintroduce manual image URL fields.
+- Admins manage the complete media library under `/panel/admin/media` with create, list, metadata editing, URL copying, and guarded deletion. Shared image selectors must offer the existing library, instant upload, and a validated direct HTTP(S) link.
 - Supported media categories are avatar, post, product, and rich-content images. Authorization differs by kind: content management requires admin, while a signed-in user may upload their own avatar.
 - Validate file size, declared MIME type, and binary signature. Current supported types are JPEG, PNG, WebP, and GIF up to 5 MB.
 - Store media metadata in `media_assets`; serve files through `/media/[...path]` with safe path resolution, MIME headers, immutable caching, and `nosniff` behavior.
+- New storage filenames must be collision-resistant and opaque using `random UUID + upload timestamp + validated extension`. Keep the user-editable media display name in `media_assets.originalName`; display names are intentionally non-unique and may be duplicated.
 - Never trust a client-provided filesystem path, and never serve the upload directory as an unrestricted static directory.
 - Uploaded files require persistent storage in production. Changes to media storage must remain compatible with Dokploy volume replacement and the non-root UID/GID `1001`.
 
@@ -107,6 +110,7 @@ This repository is a production-oriented multilingual application for Cactus, a 
 - Sanitize rich HTML on the server before storage and again through the shared renderer in `components/content/rich-content.tsx`.
 - The sanitizer allowlist in `lib/content/rich-text.ts` is the security boundary. Expand it deliberately and never render unsanitized user HTML.
 - Inline editor images must use the authenticated media pipeline, not base64 data URLs or arbitrary filesystem writes.
+- Rich-text image insertion uses the shared media picker so editors can reuse library assets, upload immediately, or insert a validated remote image URL.
 
 ## Current public features
 

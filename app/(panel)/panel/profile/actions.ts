@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
+import { isAllowedImageReference } from "@/lib/media/reference";
 
 const profileSchema = z.object({
   firstNameFa: z.string().trim().min(1).max(80),
@@ -15,7 +16,7 @@ const profileSchema = z.object({
   firstNameEn: z.string().trim().min(1).max(80),
   lastNameEn: z.string().trim().min(1).max(80),
   email: z.string().trim().email().max(320),
-  avatarUrl: z.string().trim().refine((value) => !value || value.startsWith("/media/avatar/")),
+  avatarUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
   bioFa: z.string().trim().max(1200),
   bioEn: z.string().trim().max(1200),
   locale: z.enum(["fa", "en"]),
