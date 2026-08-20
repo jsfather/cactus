@@ -3,24 +3,62 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #047857;
+  --primary-foreground: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: Arial, Helvetica, sans-serif;
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --font-sans: var(--font-vazirmatn), Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+html {
+  color-scheme: light;
+  scroll-behavior: smooth;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #34d399;
+    --primary-foreground: #022c22;
+  }
+
+  html {
+    color-scheme: dark;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-feature-settings: "ss01" 1;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 25%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/*
+ * Numeric glyph utilities
+ *
+ * Persian digits are the global default. These utilities only change the
+ * displayed glyphs; they do not mutate the underlying value.
+ */
+.nums-fa {
+  font-feature-settings: "ss01" 1;
+}
+
+.nums-en {
+  font-feature-settings: "ss01" 0;
 }

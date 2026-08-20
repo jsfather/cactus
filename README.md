@@ -1,17 +1,38 @@
 # Cactus
 
-This is a [Next.js](https://nextjs.org) application configured for local development and Docker deployment on Dokploy.
+This is the multilingual website and role-based application panel for Cactus Robotics School. It uses Next.js App Router, PostgreSQL, Drizzle ORM, server actions, and Docker deployment on Dokploy.
+
+## Application areas
+
+- `/`: Persian public landing page (`fa`, RTL)
+- `/en`: English public landing page (`en`, LTR)
+- `/blog` and `/en/blog`: published bilingual blog posts
+- `/login`: shared login for administrators, teachers, and students
+- `/panel/admin`: protected administrator panel and blog publishing
+- `/panel/teacher`: protected teacher workspace
+- `/panel/student`: protected student workspace
 
 ## Local development
 
-Install dependencies and run the development server:
+Create a PostgreSQL database, copy the example environment file, and update `DATABASE_URL` and the initial admin credentials:
 
 ```bash
 pnpm install
+cp .env.example .env
+pnpm db:setup
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+Useful database commands:
+
+```bash
+pnpm db:generate # generate a migration after changing lib/db/schema.ts
+pnpm db:migrate  # apply pending migrations
+pnpm db:setup    # migrate and bootstrap the initial admin
+pnpm db:studio   # open Drizzle Studio
+```
 
 ## Production build
 
@@ -20,15 +41,56 @@ pnpm build
 pnpm start
 ```
 
+## Language, direction, and typography
+
+- Persian public, authentication, and panel documents use `lang="fa"` and `dir="rtl"`. English public pages use `lang="en"` and `dir="ltr"` at the document root.
+- Vazirmatn is self-hosted through `next/font/local`; no font CDN is required at build time or runtime.
+- Persian digit glyphs are enabled globally. Add `className="nums-en"` where Latin digit glyphs are required. Use `nums-fa` when an explicit local Persian-digit override improves clarity.
+- Set both `lang` and `dir` on localized subtrees, for example `<section lang="en" dir="ltr">`.
+- Use direction-safe CSS and Tailwind utilities: `text-start`/`text-end`, `ms-*`/`me-*`, `ps-*`/`pe-*`, `start-*`/`end-*`, and logical properties such as `margin-inline-start`. Avoid directional `left`/`right`, `ml-*`/`mr-*`, and `pl-*`/`pr-*` unless the design is intentionally physical rather than language-relative.
+
+## Feature and form conventions
+
+- Every new database-backed feature must install useful starter content once. A seed marker must prevent deleted starter content from being recreated after an administrator intentionally empties the feature.
+- Forms backed by server actions must keep user-entered values after validation, uniqueness, or other recoverable errors. Use `usePreservedFields` from `components/forms/use-preserved-fields.ts` for text inputs, textareas, and selects.
+- Select indicators and other directional adornments must reserve logical inline space and use `start-*` or `end-*` positioning so they mirror correctly in RTL and LTR.
+
 ## Deploy with Dokploy
 
 This repository includes a multi-stage `Dockerfile` that produces a small, non-root standalone Next.js image.
 
-1. In Dokploy, create an **Application** and connect this Git repository.
+### 1. Create PostgreSQL as a separate service
+
+1. In the same Dokploy project and environment, create a **PostgreSQL Database** service named `cactus-postgres`.
+2. Choose a dedicated database name, user, and strong password, then deploy the database.
+3. In the database **Connection** tab, copy its **Internal Connection URL**. Keep PostgreSQL private; the app does not require an external database port.
+4. Configure database backups before production traffic.
+
+### 2. Create the Next.js application
+
+1. Create an **Application** and connect this Git repository.
 2. Select the branch you want to deploy (for this version, `next`).
 3. Set the build type to **Dockerfile**, the Dockerfile path to `Dockerfile`, and the Docker context path to `.`.
 4. Leave **Docker Build Stage** empty so the final `runner` stage is used.
-5. Add the domain in Dokploy with container/target port `3000`, then deploy. You do not need to publish a host port when routing through a domain.
+5. Add the domain with container/target port `3000`. You do not need to publish a host port when routing through a domain.
+
+Add these application environment variables:
+
+```dotenv
+DATABASE_URL=<the PostgreSQL Internal Connection URL>
+DATABASE_POOL_MAX=10
+DATABASE_SSL=disable
+RUN_MIGRATIONS=true
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=<a strong password with at least 12 characters>
+ADMIN_NAME=مدیر کاکتوس
+```
+
+Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the initial administrator only when `ADMIN_EMAIL` does not exist. After the first successful login, you may remove `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_NAME` together; the existing account remains unchanged.
+
+The readiness endpoint is `/api/health`. It returns a successful response only when the app can reach PostgreSQL.
+
+> Keep one migration-enabled replica. If the application is later scaled horizontally, run migrations as a dedicated deployment job and set `RUN_MIGRATIONS=false` on normal replicas.
 
 No custom start command is required; the image starts the standalone Next.js server on `0.0.0.0:3000`.
 
@@ -40,7 +102,7 @@ Add server-only environment variables in Dokploy's environment settings. Variabl
 
 ```bash
 docker build -t cactus .
-docker run --rm -p 3000:3000 cactus
+docker run --rm -p 3000:3000 --env-file .env cactus
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
