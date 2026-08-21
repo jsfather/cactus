@@ -1,20 +1,64 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-export const panelInputClass =
-  "w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-start text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:disabled:bg-zinc-900";
+export type PanelControlSize = "compact" | "default";
+
+const panelFieldBaseClass =
+  "w-full border border-zinc-300 bg-white text-start text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:disabled:bg-zinc-900";
+
+const panelInputSizeClass: Record<PanelControlSize, string> = {
+  compact: "h-9 rounded-lg px-3 text-sm",
+  default: "rounded-xl px-4 py-3",
+};
+
+export function getPanelInputClass(size: PanelControlSize = "default") {
+  return `${panelFieldBaseClass} ${panelInputSizeClass[size]}`;
+}
+
+export const panelInputClass = getPanelInputClass();
 
 export const panelTextareaClass =
   "w-full resize-y rounded-xl border border-zinc-300 bg-white px-4 py-3 text-start text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50 dark:disabled:bg-zinc-900";
 
-export const panelSelectClass =
-  "w-full cursor-pointer appearance-none rounded-xl border border-zinc-300 bg-white py-3 ps-4 pe-10 text-zinc-950 outline-none transition focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
+const panelSelectBaseClass =
+  "w-full cursor-pointer appearance-none border border-zinc-300 bg-white text-zinc-950 outline-none transition focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
 
-export const primaryButtonClass =
-  "inline-flex cursor-pointer items-center justify-center rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400";
+const panelSelectSizeClass: Record<PanelControlSize, string> = {
+  compact: "h-9 rounded-lg py-0 ps-3 pe-8 text-sm",
+  default: "rounded-xl py-3 ps-4 pe-10",
+};
 
-export const secondaryButtonClass =
-  "inline-flex cursor-pointer items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition hover:border-emerald-300 hover:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300";
+export function getPanelSelectClass(size: PanelControlSize = "default") {
+  return `${panelSelectBaseClass} ${panelSelectSizeClass[size]}`;
+}
+
+export const panelSelectClass = getPanelSelectClass();
+
+type PanelButtonTone = "primary" | "secondary";
+
+const panelButtonBaseClass =
+  "inline-flex cursor-pointer items-center justify-center font-medium transition disabled:cursor-not-allowed disabled:opacity-60";
+
+const panelButtonToneClass: Record<PanelButtonTone, string> = {
+  primary: "bg-emerald-700 text-white hover:bg-emerald-800 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400",
+  secondary: "border border-zinc-200 bg-white text-zinc-700 hover:border-emerald-300 hover:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300",
+};
+
+const panelButtonSizeClass: Record<PanelControlSize, string> = {
+  compact: "h-9 gap-1.5 rounded-lg px-3 text-sm",
+  default: "rounded-xl px-5 py-3 text-sm font-semibold",
+};
+
+export function getPanelButtonClass(
+  tone: PanelButtonTone,
+  size: PanelControlSize = "default",
+) {
+  return `${panelButtonBaseClass} ${panelButtonToneClass[tone]} ${panelButtonSizeClass[size]}`;
+}
+
+export const primaryButtonClass = getPanelButtonClass("primary");
+
+export const secondaryButtonClass = getPanelButtonClass("secondary");
 
 const tableActionBaseClass =
   "inline-flex size-9 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-45";
@@ -139,13 +183,15 @@ export function PanelFormFooter({
 
 export function PanelPrimaryLink({
   href,
+  size = "default",
   children,
 }: {
   href: string;
+  size?: PanelControlSize;
   children: ReactNode;
 }) {
   return (
-    <Link href={href} className={primaryButtonClass}>
+    <Link href={href} className={getPanelButtonClass("primary", size)}>
       {children}
     </Link>
   );

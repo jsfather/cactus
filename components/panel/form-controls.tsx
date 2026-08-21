@@ -1,6 +1,6 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { SelectChevron } from "@/components/ui/select-chevron";
-import { panelInputClass, panelSelectClass, panelTextareaClass } from "./ui";
+import { getPanelInputClass, getPanelSelectClass, panelTextareaClass, type PanelControlSize } from "./ui";
 
 export function FieldError({ errors, id }: { errors?: string[]; id?: string }) {
   return errors?.length ? (
@@ -34,9 +34,10 @@ export function FormLabel({
 
 export function PanelInput({
   className = "",
+  controlSize = "default",
   ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} className={`${panelInputClass} ${className}`} />;
+}: InputHTMLAttributes<HTMLInputElement> & { controlSize?: PanelControlSize }) {
+  return <input {...props} className={`${getPanelInputClass(controlSize)} ${className}`} />;
 }
 
 export function PanelTextarea({
@@ -49,11 +50,12 @@ export function PanelTextarea({
 export function PanelSelect({
   className = "",
   children,
+  controlSize = "default",
   ...props
-}: SelectHTMLAttributes<HTMLSelectElement>) {
+}: SelectHTMLAttributes<HTMLSelectElement> & { controlSize?: PanelControlSize }) {
   return (
     <span className="relative block">
-      <select {...props} className={`${panelSelectClass} ${className}`}>
+      <select {...props} className={`${getPanelSelectClass(controlSize)} ${className}`}>
         {children}
       </select>
       <SelectChevron />
