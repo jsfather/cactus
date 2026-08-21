@@ -14,6 +14,16 @@ import { isAllowedImageReference } from "@/lib/media/reference";
 
 const slugPattern = /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u;
 
+function isOptionalHttpUrl(value: string) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 const postSchema = z.object({
   slug: z
     .string()
@@ -29,6 +39,24 @@ const postSchema = z.object({
   contentFa: z.string().transform(sanitizeRichText).refine((value) => richTextLength(value) >= 20),
   contentEn: z.string().transform(sanitizeRichText),
   coverImageUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
+  tags: z
+    .string()
+    .trim()
+    .max(600)
+    .transform((value) => [...new Set(value.split(/[,،]/).map((tag) => tag.trim()).filter(Boolean))])
+    .refine((tags) => tags.length <= 12 && tags.every((tag) => tag.length <= 50)),
+  publishedAt: z
+    .string()
+    .trim()
+    .max(40)
+    .refine((value) => !value || !Number.isNaN(Date.parse(value))),
+  seoTitleFa: z.string().trim().max(70),
+  seoTitleEn: z.string().trim().max(70),
+  seoDescriptionFa: z.string().trim().max(170),
+  seoDescriptionEn: z.string().trim().max(170),
+  seoImageUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
+  canonicalUrl: z.string().trim().max(2048).refine(isOptionalHttpUrl),
+  noIndex: z.boolean(),
   status: z.enum(["draft", "published"]),
   locale: z.enum(["fa", "en"]),
 });
@@ -63,6 +91,15 @@ export async function createPost(
     contentFa: formData.get("contentFa"),
     contentEn: formData.get("contentEn"),
     coverImageUrl: formData.get("coverImageUrl"),
+    tags: formData.get("tags"),
+    publishedAt: formData.get("publishedAt"),
+    seoTitleFa: formData.get("seoTitleFa"),
+    seoTitleEn: formData.get("seoTitleEn"),
+    seoDescriptionFa: formData.get("seoDescriptionFa"),
+    seoDescriptionEn: formData.get("seoDescriptionEn"),
+    seoImageUrl: formData.get("seoImageUrl"),
+    canonicalUrl: formData.get("canonicalUrl"),
+    noIndex: formData.get("noIndex") === "on",
     status: formData.get("status"),
     locale: formData.get("locale"),
   });
@@ -86,8 +123,16 @@ export async function createPost(
       contentFa: data.contentFa,
       contentEn: data.contentEn || null,
       coverImageUrl: data.coverImageUrl || null,
+      tags: data.tags,
+      seoTitleFa: data.seoTitleFa || null,
+      seoTitleEn: data.seoTitleEn || null,
+      seoDescriptionFa: data.seoDescriptionFa || null,
+      seoDescriptionEn: data.seoDescriptionEn || null,
+      seoImageUrl: data.seoImageUrl || null,
+      canonicalUrl: data.canonicalUrl || null,
+      noIndex: data.noIndex,
       status: data.status,
-      publishedAt: data.status === "published" ? new Date() : null,
+      publishedAt: data.status === "published" ? (data.publishedAt ? new Date(data.publishedAt) : new Date()) : null,
       authorId: admin.id,
     });
   } catch (error) {
@@ -119,6 +164,15 @@ export async function updatePost(
     contentFa: formData.get("contentFa"),
     contentEn: formData.get("contentEn"),
     coverImageUrl: formData.get("coverImageUrl"),
+    tags: formData.get("tags"),
+    publishedAt: formData.get("publishedAt"),
+    seoTitleFa: formData.get("seoTitleFa"),
+    seoTitleEn: formData.get("seoTitleEn"),
+    seoDescriptionFa: formData.get("seoDescriptionFa"),
+    seoDescriptionEn: formData.get("seoDescriptionEn"),
+    seoImageUrl: formData.get("seoImageUrl"),
+    canonicalUrl: formData.get("canonicalUrl"),
+    noIndex: formData.get("noIndex") === "on",
     status: formData.get("status"),
     locale: formData.get("locale"),
   });
@@ -157,10 +211,20 @@ export async function updatePost(
         contentFa: data.contentFa,
         contentEn: data.contentEn || null,
         coverImageUrl: data.coverImageUrl || null,
+        tags: data.tags,
+        seoTitleFa: data.seoTitleFa || null,
+        seoTitleEn: data.seoTitleEn || null,
+        seoDescriptionFa: data.seoDescriptionFa || null,
+        seoDescriptionEn: data.seoDescriptionEn || null,
+        seoImageUrl: data.seoImageUrl || null,
+        canonicalUrl: data.canonicalUrl || null,
+        noIndex: data.noIndex,
         status: data.status,
         publishedAt:
           data.status === "published"
-            ? existingPost.publishedAt ?? new Date()
+            ? data.publishedAt
+              ? new Date(data.publishedAt)
+              : existingPost.publishedAt ?? new Date()
             : null,
         updatedAt: new Date(),
       })

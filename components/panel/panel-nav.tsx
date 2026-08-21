@@ -31,7 +31,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
   const alternateLocale = locale === "fa" ? "en" : "fa";
   const alternateHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(pathname)}`;
   const roleName = locale === "fa"
-    ? { admin: "مدیر", teacher: "مدرس", student: "دانش‌آموز", member: "عضو عادی" }[user.role]
+    ? { admin: "همکار", teacher: "مدرس", student: "دانش پژوه", member: "عضو عادی" }[user.role]
     : { admin: "Administrator", teacher: "Teacher", student: "Student", member: "Member" }[user.role];
   const mainLinks: Array<{ href: string; label: string; icon: NavIcon }> = [
     { href: roleHome[user.role], label: dictionary.nav.overview, icon: "home" },

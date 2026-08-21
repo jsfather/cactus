@@ -7,6 +7,7 @@ import { RichContent } from "@/components/content/rich-content";
 import { getPublishedPost } from "@/lib/blog/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
+import { absoluteUrl } from "@/lib/seo/site";
 
 export async function BlogPostPage({
   locale,
@@ -33,12 +34,36 @@ export async function BlogPostPage({
         dateStyle: "long",
       }).format(post.publishedAt)
     : null;
+  const pathname = `${locale === "en" ? "/en" : ""}/blog/${post.slug}`;
+  const seoDescription = locale === "en"
+    ? post.seoDescriptionEn || post.excerptEn || post.seoDescriptionFa || post.excerptFa
+    : post.seoDescriptionFa || post.excerptFa;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description: seoDescription,
+    image: post.seoImageUrl || post.coverImageUrl || undefined,
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    author: { "@type": "Person", name: post.authorName },
+    publisher: { "@type": "Organization", name: locale === "fa" ? "کاکتوس" : "Cactus", url: absoluteUrl(locale === "en" ? "/en" : "/") },
+    keywords: post.tags.join(", "),
+    inLanguage: locale === "fa" ? "fa-IR" : "en-US",
+    mainEntityOfPage: post.canonicalUrl || absoluteUrl(pathname),
+  };
 
   return (
     <div className="min-h-dvh bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
       <SiteHeader locale={locale} currentPath={`/blog/${post.slug}`} />
       <main>
         <article>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+            }}
+          />
           <header className="border-b border-emerald-950/10 bg-emerald-50 dark:border-white/10 dark:bg-emerald-950/25">
             <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-24">
               <Link
@@ -59,6 +84,13 @@ export async function BlogPostPage({
                   {dictionary.publishedOn}: {date}
                 </span>
               </div>
+              {post.tags.length ? (
+                <ul className="mt-6 flex flex-wrap gap-2" aria-label={locale === "fa" ? "برچسب‌ها" : "Tags"}>
+                  {post.tags.map((tag) => (
+                    <li key={tag} className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{tag}</li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </header>
 

@@ -1,9 +1,9 @@
 import type { UserRole } from "@/lib/db/schema";
 
 export const roleLabels: Record<UserRole, string> = {
-  admin: "مدیر",
+  admin: "همکار",
   teacher: "مدرس",
-  student: "دانش‌آموز",
+  student: "دانش پژوه",
   member: "عضو عادی",
 };
 

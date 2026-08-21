@@ -11,6 +11,7 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const userRole = pgEnum("user_role", [
   "admin",
@@ -96,6 +97,17 @@ export const posts = pgTable(
     contentFa: text("content_fa").notNull(),
     contentEn: text("content_en"),
     coverImageUrl: text("cover_image_url"),
+    tags: text("tags")
+      .array()
+      .default(sql`ARRAY[]::text[]`)
+      .notNull(),
+    seoTitleFa: varchar("seo_title_fa", { length: 70 }),
+    seoTitleEn: varchar("seo_title_en", { length: 70 }),
+    seoDescriptionFa: varchar("seo_description_fa", { length: 170 }),
+    seoDescriptionEn: varchar("seo_description_en", { length: 170 }),
+    seoImageUrl: text("seo_image_url"),
+    canonicalUrl: text("canonical_url"),
+    noIndex: boolean("no_index").default(false).notNull(),
     status: postStatus("status").default("draft").notNull(),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     authorId: uuid("author_id")

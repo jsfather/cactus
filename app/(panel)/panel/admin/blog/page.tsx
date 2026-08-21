@@ -16,6 +16,9 @@ import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { localeConfig } from "@/lib/i18n/config";
 import { ToastOnMount } from "@/components/feedback/toast-effects";
+import { PanelListControls, PanelPagination } from "@/components/panel/list-controls";
+import { getSearchParam, parseAdminListQuery, type AdminListSearchParams } from "@/lib/panel/pagination";
+import type { PostStatusFilter } from "@/lib/blog/queries";
 
 function formatDate(date: Date | null, locale: "fa" | "en") {
   return date
@@ -23,9 +26,12 @@ function formatDate(date: Date | null, locale: "fa" | "en") {
     : "—";
 }
 
-export default async function AdminBlogPage({ searchParams }: { searchParams: Promise<{ toast?: string }> }) {
+export default async function AdminBlogPage({ searchParams }: { searchParams: Promise<AdminListSearchParams> }) {
   const [locale, query] = await Promise.all([getPanelLocale(), searchParams]);
-  const posts = await getAdminPosts(locale);
+  const listQuery = parseAdminListQuery(query);
+  const statusValue = getSearchParam(query, "status");
+  const status: PostStatusFilter = statusValue === "draft" || statusValue === "published" || statusValue === "scheduled" ? statusValue : "all";
+  const posts = await getAdminPosts(locale, { ...listQuery, status });
   const dictionary = getPanelDictionary(locale);
 
   return (
@@ -44,7 +50,24 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
       />
 
       <PanelSurface>
-        {posts.length ? (
+        <PanelListControls
+          action="/panel/admin/blog"
+          locale={locale}
+          query={listQuery.q}
+          searchPlaceholder={locale === "fa" ? "جست‌وجوی عنوان، نشانی، برچسب یا نویسنده…" : "Search title, URL, tag, or author…"}
+          filters={[{
+            name: "status",
+            label: dictionary.common.status,
+            value: status,
+            options: [
+              { value: "all", label: locale === "fa" ? "همه وضعیت‌ها" : "All statuses" },
+              { value: "draft", label: dictionary.common.draft },
+              { value: "published", label: dictionary.common.published },
+              { value: "scheduled", label: locale === "fa" ? "زمان‌بندی‌شده" : "Scheduled" },
+            ],
+          }]}
+        />
+        {posts.items.length ? (
           <PanelTable
             columns={[
               { label: dictionary.common.title, className: "w-[34%]" },
@@ -54,7 +77,9 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
               { label: dictionary.common.actions, className: "w-[16%]" },
             ]}
           >
-                {posts.map((post) => (
+                {posts.items.map((post) => {
+                  const isScheduled = post.status === "published" && post.publishedAt && post.publishedAt > new Date();
+                  return (
                   <tr key={post.id}>
                     <PanelTableCell>
                       <p className="font-medium text-zinc-950 dark:text-zinc-50">
@@ -75,7 +100,7 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
                             : "rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300"
                         }
                       >
-                        {post.status === "published" ? dictionary.common.published : dictionary.common.draft}
+                        {isScheduled ? (locale === "fa" ? "زمان‌بندی‌شده" : "Scheduled") : post.status === "published" ? dictionary.common.published : dictionary.common.draft}
                       </span>
                     </PanelTableCell>
                     <PanelTableCell className="text-zinc-600 dark:text-zinc-400">
@@ -96,19 +121,21 @@ export default async function AdminBlogPage({ searchParams }: { searchParams: Pr
                       </PanelTableActions>
                     </PanelTableCell>
                   </tr>
-                ))}
+                  );
+                })}
           </PanelTable>
         ) : (
           <PanelEmptyState
-            title={dictionary.blog.emptyTitle}
-            description={dictionary.blog.emptyDescription}
-            action={
+            title={listQuery.q || status !== "all" ? (locale === "fa" ? "نوشته‌ای پیدا نشد" : "No matching posts") : dictionary.blog.emptyTitle}
+            description={listQuery.q || status !== "all" ? (locale === "fa" ? "عبارت جست‌وجو یا فیلترها را تغییر دهید." : "Try changing the search term or filters.") : dictionary.blog.emptyDescription}
+            action={!listQuery.q && status === "all" ?
               <PanelPrimaryLink href="/panel/admin/blog/new">
                 {dictionary.blog.newPost}
               </PanelPrimaryLink>
-            }
+            : undefined}
           />
         )}
+        <PanelPagination action="/panel/admin/blog" locale={locale} pagination={posts} query={{ ...(listQuery.q ? { q: listQuery.q } : {}), ...(status !== "all" ? { status } : {}) }} />
       </PanelSurface>
     </PanelPage>
   );

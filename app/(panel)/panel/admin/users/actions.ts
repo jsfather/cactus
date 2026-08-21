@@ -135,7 +135,7 @@ export async function updateManagedUser(
   }
 
   if (currentAdmin.id === validUserId.data && !parsed.data.isActive) {
-    return { error: parsed.data.locale === "en" ? "You cannot deactivate your current administrator account." : "نمی‌توانید حساب مدیریتی فعال خودتان را غیرفعال کنید." };
+    return { error: parsed.data.locale === "en" ? "You cannot deactivate your current administrator account." : "نمی‌توانید حساب همکاری فعال خودتان را غیرفعال کنید." };
   }
 
   if (validOriginalRole.data === "admin" && (parsed.data.role !== "admin" || !parsed.data.isActive)) {
@@ -145,7 +145,7 @@ export async function updateManagedUser(
       .where(and(eq(users.role, "admin"), eq(users.isActive, true), ne(users.id, validUserId.data)));
 
     if ((remainingAdmins?.value ?? 0) === 0) {
-      return { error: parsed.data.locale === "en" ? "At least one active administrator must remain." : "حداقل یک مدیر فعال باید در سامانه باقی بماند." };
+      return { error: parsed.data.locale === "en" ? "At least one active administrator must remain." : "حداقل یک همکار فعال باید در سامانه باقی بماند." };
     }
   }
 

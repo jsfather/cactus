@@ -1,12 +1,55 @@
 import "server-only";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
 import { mediaAssets, users } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
+import type { MediaKind } from "@/lib/db/schema";
+import {
+  ADMIN_PAGE_SIZE,
+  escapeLikePattern,
+  normalizePage,
+  type AdminListQuery,
+  type PaginatedResult,
+} from "@/lib/panel/pagination";
 
-export function getAdminMediaAssets(locale: Locale) {
-  return getDatabase()
+export async function getAdminMediaAssets(
+  locale: Locale,
+  query: AdminListQuery & { kind: "all" | MediaKind },
+): Promise<PaginatedResult<{
+  id: string;
+  url: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+  kind: MediaKind;
+  altFa: string | null;
+  altEn: string | null;
+  createdAt: Date;
+  uploaderName: string;
+}>> {
+  const database = getDatabase();
+  const pattern = `%${escapeLikePattern(query.q)}%`;
+  const where = and(
+    query.kind === "all" ? undefined : eq(mediaAssets.kind, query.kind),
+    query.q
+      ? or(
+          ilike(mediaAssets.originalName, pattern),
+          ilike(mediaAssets.mimeType, pattern),
+          ilike(mediaAssets.altFa, pattern),
+          ilike(mediaAssets.altEn, pattern),
+          sql`concat_ws(' ', ${users.firstNameFa}, ${users.lastNameFa}) ILIKE ${pattern}`,
+          sql`concat_ws(' ', ${users.firstNameEn}, ${users.lastNameEn}) ILIKE ${pattern}`,
+        )
+      : undefined,
+  );
+  const [{ total }] = await database
+    .select({ total: sql<number>`count(*)::int` })
+    .from(mediaAssets)
+    .innerJoin(users, eq(mediaAssets.uploaderId, users.id))
+    .where(where);
+  const { page, pageCount } = normalizePage(query.page, total);
+  const items = await database
     .select({
       id: mediaAssets.id,
       url: mediaAssets.url,
@@ -23,7 +66,12 @@ export function getAdminMediaAssets(locale: Locale) {
     })
     .from(mediaAssets)
     .innerJoin(users, eq(mediaAssets.uploaderId, users.id))
-    .orderBy(desc(mediaAssets.createdAt));
+    .where(where)
+    .orderBy(desc(mediaAssets.createdAt))
+    .limit(ADMIN_PAGE_SIZE)
+    .offset((page - 1) * ADMIN_PAGE_SIZE);
+
+  return { items, page, pageCount, pageSize: ADMIN_PAGE_SIZE, total };
 }
 
 export async function getAdminMediaAsset(id: string) {

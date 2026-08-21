@@ -3,8 +3,10 @@ import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
+import { getSiteUrl } from "@/lib/seo/site";
 
 export const metadata: Metadata = {
+  metadataBase: getSiteUrl(),
   title: {
     default: "Cactus Robotics School",
     template: "%s | Cactus",

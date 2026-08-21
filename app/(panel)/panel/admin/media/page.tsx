@@ -9,6 +9,9 @@ import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { getAdminMediaAssets } from "@/lib/media/queries";
 import { getMediaKindLabel } from "@/lib/media/labels";
+import { PanelListControls, PanelPagination } from "@/components/panel/list-controls";
+import { getSearchParam, parseAdminListQuery, type AdminListSearchParams } from "@/lib/panel/pagination";
+import type { MediaKind } from "@/lib/db/schema";
 
 function formatSize(bytes: number, locale: Locale) {
   const value = bytes >= 1024 * 1024 ? bytes / (1024 * 1024) : bytes / 1024;
@@ -16,9 +19,13 @@ function formatSize(bytes: number, locale: Locale) {
   return `${new Intl.NumberFormat(locale === "fa" ? "fa-IR" : "en-US", { maximumFractionDigits: 1 }).format(value)} ${unit}`;
 }
 
-export default async function MediaPage({ searchParams }: { searchParams: Promise<{ toast?: string }> }) {
+export default async function MediaPage({ searchParams }: { searchParams: Promise<AdminListSearchParams> }) {
   const locale = await getPanelLocale();
-  const [, assets, query] = await Promise.all([requireRole("admin"), getAdminMediaAssets(locale), searchParams]);
+  const query = await searchParams;
+  const listQuery = parseAdminListQuery(query);
+  const kindValue = getSearchParam(query, "kind");
+  const kind: "all" | MediaKind = (["avatar", "post", "product", "content"] as const).includes(kindValue as MediaKind) ? kindValue as MediaKind : "all";
+  const [, assets] = await Promise.all([requireRole("admin"), getAdminMediaAssets(locale, { ...listQuery, kind })]);
   const dictionary = getPanelDictionary(locale);
 
   return (
@@ -28,7 +35,16 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
       {query.toast === "deleted" ? <ToastOnMount title={locale === "fa" ? "رسانه حذف شد." : "Media deleted."} /> : null}
       <PanelPageHeader eyebrow={dictionary.media.eyebrow} title={dictionary.media.title} description={dictionary.media.description} actions={<PanelPrimaryLink href="/panel/admin/media/new">{dictionary.media.newAsset}</PanelPrimaryLink>} />
       <PanelSurface>
-        {assets.length ? (
+        <PanelListControls action="/panel/admin/media" locale={locale} query={listQuery.q} searchPlaceholder={locale === "fa" ? "جست‌وجوی نام، نوع فایل، متن جایگزین یا بارگذار…" : "Search name, MIME type, alt text, or uploader…"} filters={[{
+          name: "kind",
+          label: dictionary.media.kind,
+          value: kind,
+          options: [
+            { value: "all", label: locale === "fa" ? "همه کاربردها" : "All purposes" },
+            ...(["avatar", "post", "product", "content"] as MediaKind[]).map((value) => ({ value, label: getMediaKindLabel(value, locale) })),
+          ],
+        }]} />
+        {assets.items.length ? (
           <PanelTable columns={[
             { label: dictionary.media.file, className: "w-[31%]" },
             { label: dictionary.media.kind, className: "w-[12%]" },
@@ -37,7 +53,7 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
             { label: dictionary.common.createdAt, className: "w-[13%]" },
             { label: dictionary.common.actions, className: "w-[15%]" },
           ]}>
-            {assets.map((asset) => (
+            {assets.items.map((asset) => (
               <tr key={asset.id}>
                 <PanelTableCell><div className="flex items-center gap-3"><div className="size-12 shrink-0 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900"><img src={asset.url} alt={locale === "fa" ? asset.altFa || "" : asset.altEn || ""} className="size-full object-cover" /></div><div className="min-w-0"><p className="truncate font-medium text-zinc-950 dark:text-zinc-50">{asset.originalName}</p><p className="nums-en mt-1 truncate text-xs text-zinc-500" dir="ltr">{asset.mimeType}</p></div></div></PanelTableCell>
                 <PanelTableCell>{getMediaKindLabel(asset.kind, locale)}</PanelTableCell>
@@ -48,7 +64,8 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
               </tr>
             ))}
           </PanelTable>
-        ) : <PanelEmptyState title={dictionary.media.emptyTitle} description={dictionary.media.emptyDescription} action={<PanelPrimaryLink href="/panel/admin/media/new">{dictionary.media.newAsset}</PanelPrimaryLink>} />}
+        ) : <PanelEmptyState title={listQuery.q || kind !== "all" ? (locale === "fa" ? "رسانه‌ای پیدا نشد" : "No matching media") : dictionary.media.emptyTitle} description={listQuery.q || kind !== "all" ? (locale === "fa" ? "عبارت جست‌وجو یا فیلترها را تغییر دهید." : "Try changing the search term or filters.") : dictionary.media.emptyDescription} action={!listQuery.q && kind === "all" ? <PanelPrimaryLink href="/panel/admin/media/new">{dictionary.media.newAsset}</PanelPrimaryLink> : undefined} />}
+        <PanelPagination action="/panel/admin/media" locale={locale} pagination={assets} query={{ ...(listQuery.q ? { q: listQuery.q } : {}), ...(kind !== "all" ? { kind } : {}) }} />
       </PanelSurface>
     </PanelPage>
   );

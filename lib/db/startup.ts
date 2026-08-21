@@ -80,8 +80,8 @@ export async function setupDatabase() {
         adminId = existingUser.id;
       } else {
         const adminNameFa = splitName(
-          process.env.ADMIN_NAME_FA?.trim() || process.env.ADMIN_NAME?.trim() || "مدیر کاکتوس",
-          "مدیر",
+          process.env.ADMIN_NAME_FA?.trim() || process.env.ADMIN_NAME?.trim() || "همکار کاکتوس",
+          "همکار",
           "کاکتوس",
         );
         const adminNameEn = splitName(
@@ -144,7 +144,7 @@ export async function setupDatabase() {
             excerptEn:
               "Children and teenagers learn robotics and programming here by building real projects.",
             contentFa:
-              "در کاکتوس، یادگیری از پرسیدن یک سؤال شروع می‌شود و با طراحی، ساخت و آزمودن ادامه پیدا می‌کند. این نخستین نوشته وبلاگ ماست؛ به‌زودی تجربه‌های کلاس‌ها، پروژه‌های هنرجویان و راهنماهای آموزشی بیشتری منتشر می‌کنیم.",
+              "در کاکتوس، یادگیری از پرسیدن یک سؤال شروع می‌شود و با طراحی، ساخت و آزمودن ادامه پیدا می‌کند. این نخستین نوشته وبلاگ ماست؛ به‌زودی تجربه‌های کلاس‌ها، پروژه‌های دانش پژوهان و راهنماهای آموزشی بیشتری منتشر می‌کنیم.",
             contentEn:
               "At Cactus, learning starts with a question and continues through designing, building, and testing. This is our first blog post; soon we will share classroom stories, student projects, and practical learning guides.",
             status: "published",
@@ -178,7 +178,7 @@ export async function setupDatabase() {
             summaryEn:
               "A complete learning kit for building first robotics projects at home or in class.",
             contentFa:
-              "<h2>شروعی ساده برای ساختن</h2><p>این کیت قطعات اصلی، راهنمای پروژه‌محور و تمرین‌های گام‌به‌گام مورد نیاز هنرجویان تازه‌کار را در یک بسته فراهم می‌کند.</p><ul><li>مناسب کودکان و نوجوانان</li><li>راهنمای فارسی پروژه‌ها</li><li>قابل استفاده در خانه و کلاس</li></ul>",
+              "<h2>شروعی ساده برای ساختن</h2><p>این کیت قطعات اصلی، راهنمای پروژه‌محور و تمرین‌های گام‌به‌گام مورد نیاز دانش پژوهان تازه‌کار را در یک بسته فراهم می‌کند.</p><ul><li>مناسب کودکان و نوجوانان</li><li>راهنمای فارسی پروژه‌ها</li><li>قابل استفاده در خانه و کلاس</li></ul>",
             contentEn:
               "<h2>An easy way to start building</h2><p>This kit brings together essential parts, a project-based guide, and step-by-step exercises for new makers.</p><ul><li>Designed for young makers</li><li>Project-based instructions</li><li>Useful at home or in class</li></ul>",
             price: 2450000,
@@ -240,7 +240,7 @@ export async function setupDatabase() {
         {
           key: "seed.users.student.v1",
           role: "student" as const,
-          firstNameFa: "دانش‌آموز",
+          firstNameFa: "دانش پژوه",
           lastNameFa: "نمونه کاکتوس",
           firstNameEn: "Cactus Demo",
           lastNameEn: "Student",

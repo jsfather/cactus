@@ -13,6 +13,7 @@ import {
   PanelTableCell,
   PanelEditIcon,
 } from "@/components/panel/ui";
+import { PanelListControls, PanelPagination } from "@/components/panel/list-controls";
 import { requireRole } from "@/lib/auth/session";
 import type { UserRole } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
@@ -20,16 +21,20 @@ import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { getUserSectionConfig } from "@/lib/users/config";
 import { getLocalizedUserName } from "@/lib/users/name";
-import { getUsersByRole } from "@/lib/users/queries";
+import { getUsersByRole, type UserStatusFilter } from "@/lib/users/queries";
+import { getSearchParam, parseAdminListQuery, type AdminListSearchParams } from "@/lib/panel/pagination";
 
 function formatDate(date: Date, locale: Locale) {
   return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", { dateStyle: "medium" }).format(date);
 }
 
-export async function UserListPage({ role, toastKey }: { role: UserRole; toastKey?: string }) {
-  const [currentAdmin, users, locale] = await Promise.all([
+export async function UserListPage({ role, searchParams }: { role: UserRole; searchParams: AdminListSearchParams }) {
+  const listQuery = parseAdminListQuery(searchParams);
+  const statusValue = getSearchParam(searchParams, "status");
+  const status: UserStatusFilter = statusValue === "active" || statusValue === "inactive" ? statusValue : "all";
+  const [currentAdmin, usersPage, locale] = await Promise.all([
     requireRole("admin"),
-    getUsersByRole(role),
+    getUsersByRole(role, { ...listQuery, status }),
     getPanelLocale(),
   ]);
   const dictionary = getPanelDictionary(locale);
@@ -37,8 +42,8 @@ export async function UserListPage({ role, toastKey }: { role: UserRole; toastKe
 
   return (
     <PanelPage>
-      {toastKey === "created" ? <ToastOnMount title={locale === "fa" ? "حساب کاربری ساخته شد." : "Account created."} /> : null}
-      {toastKey === "updated" ? <ToastOnMount title={locale === "fa" ? "حساب کاربری به‌روز شد." : "Account updated."} /> : null}
+      {getSearchParam(searchParams, "toast") === "created" ? <ToastOnMount title={locale === "fa" ? "حساب کاربری ساخته شد." : "Account created."} /> : null}
+      {getSearchParam(searchParams, "toast") === "updated" ? <ToastOnMount title={locale === "fa" ? "حساب کاربری به‌روز شد." : "Account updated."} /> : null}
       <PanelPageHeader
         eyebrow={dictionary.users.eyebrow}
         title={config.plural}
@@ -51,7 +56,23 @@ export async function UserListPage({ role, toastKey }: { role: UserRole; toastKe
       />
 
       <PanelSurface>
-        {users.length ? (
+        <PanelListControls
+          action={config.path}
+          locale={locale}
+          query={listQuery.q}
+          searchPlaceholder={locale === "fa" ? "جست‌وجوی نام یا ایمیل…" : "Search name or email…"}
+          filters={[{
+            name: "status",
+            label: dictionary.users.accountStatus,
+            value: status,
+            options: [
+              { value: "all", label: locale === "fa" ? "همه وضعیت‌ها" : "All statuses" },
+              { value: "active", label: dictionary.common.active },
+              { value: "inactive", label: dictionary.common.inactive },
+            ],
+          }]}
+        />
+        {usersPage.items.length ? (
           <PanelTable
             columns={[
               { label: dictionary.users.name, className: "w-[28%]" },
@@ -61,7 +82,7 @@ export async function UserListPage({ role, toastKey }: { role: UserRole; toastKe
               { label: dictionary.common.actions, className: "w-[15%]" },
             ]}
           >
-            {users.map((user) => {
+            {usersPage.items.map((user) => {
               const userName = getLocalizedUserName(user, locale);
 
               return <tr key={user.id}>
@@ -111,15 +132,16 @@ export async function UserListPage({ role, toastKey }: { role: UserRole; toastKe
           </PanelTable>
         ) : (
           <PanelEmptyState
-            title={locale === "fa" ? `${config.singular}ی وجود ندارد` : `No ${config.plural.toLowerCase()} yet`}
-            description={locale === "fa" ? `اولین حساب ${config.singular} را برای شروع این بخش بسازید.` : `Create the first ${config.singular.toLowerCase()} account to get started.`}
-            action={
+            title={listQuery.q || status !== "all" ? (locale === "fa" ? "نتیجه‌ای پیدا نشد" : "No matching accounts") : (locale === "fa" ? `${config.singular}ی وجود ندارد` : `No ${config.plural.toLowerCase()} yet`)}
+            description={listQuery.q || status !== "all" ? (locale === "fa" ? "عبارت جست‌وجو یا فیلترها را تغییر دهید." : "Try changing the search term or filters.") : (locale === "fa" ? `اولین حساب ${config.singular} را برای شروع این بخش بسازید.` : `Create the first ${config.singular.toLowerCase()} account to get started.`)}
+            action={!listQuery.q && status === "all" ?
               <PanelPrimaryLink href={`${config.path}/new`}>
                 {locale === "fa" ? `ساخت اولین ${config.singular}` : `Create first ${config.singular.toLowerCase()}`}
               </PanelPrimaryLink>
-            }
+            : undefined}
           />
         )}
+        <PanelPagination action={config.path} locale={locale} pagination={usersPage} query={{ ...(listQuery.q ? { q: listQuery.q } : {}), ...(status !== "all" ? { status } : {}) }} />
       </PanelSurface>
     </PanelPage>
   );

@@ -12,21 +12,21 @@ export const userSectionConfig: Record<
 > = {
   admin: {
     path: "/panel/admin/admins",
-    singular: "مدیر",
-    plural: "مدیران",
-    description: "حساب‌های مدیریتی و سطح دسترسی کامل سامانه را مدیریت کنید.",
+    singular: "همکار",
+    plural: "همکاران",
+    description: "حساب‌های همکاران و سطح دسترسی کامل سامانه را مدیریت کنید.",
   },
   teacher: {
     path: "/panel/admin/teachers",
     singular: "مدرس",
-    plural: "مدرسان",
-    description: "حساب‌های مدرسان مدرسه و وضعیت دسترسی آن‌ها را مدیریت کنید.",
+    plural: "مدرسین",
+    description: "حساب‌های مدرسین مدرسه و وضعیت دسترسی آن‌ها را مدیریت کنید.",
   },
   student: {
     path: "/panel/admin/students",
-    singular: "دانش‌آموز",
-    plural: "دانش‌آموزان",
-    description: "حساب‌های دانش‌آموزان و وضعیت دسترسی آن‌ها را مدیریت کنید.",
+    singular: "دانش پژوه",
+    plural: "دانش پژوهان",
+    description: "حساب‌های دانش پژوهان و وضعیت دسترسی آن‌ها را مدیریت کنید.",
   },
   member: {
     path: "/panel/admin/members",

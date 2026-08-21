@@ -43,6 +43,13 @@
       "when": 1787259156060,
       "tag": "0005_safe_domino",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1787297929658,
+      "tag": "0006_youthful_kree",
+      "breakpoints": true
     }
   ]
 }

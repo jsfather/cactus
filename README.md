@@ -106,10 +106,13 @@ DATABASE_SSL=disable
 RUN_MIGRATIONS=true
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=<a strong password with at least 12 characters>
-ADMIN_NAME_FA=مدیر کاکتوس
+ADMIN_NAME_FA=همکار کاکتوس
 ADMIN_NAME_EN=Cactus Administrator
+SITE_URL=https://example.com
 UPLOAD_DIR=/app/uploads
 ```
+
+Set `SITE_URL` to the public HTTPS origin of the deployed site. It is used for canonical links, Open Graph metadata, `robots.txt`, and sitemap URLs.
 
 In the application service, add a persistent Docker volume mounted at `/app/uploads`. Without this volume, uploaded blog covers, product images, rich-text images, and avatars will be lost when Dokploy replaces the container. A named volume works with the image's non-root user automatically; for a host bind mount, make the directory writable by UID/GID `1001`.
 

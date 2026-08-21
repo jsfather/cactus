@@ -27,6 +27,15 @@ export default async function EditPostPage({
     excerptEn: post.excerptEn ?? "",
     contentEn: post.contentEn ?? "",
     status: post.status,
+    publishedAt: post.publishedAt?.toISOString() ?? "",
+    tags: post.tags.join(", "),
+    seoTitleFa: post.seoTitleFa ?? "",
+    seoTitleEn: post.seoTitleEn ?? "",
+    seoDescriptionFa: post.seoDescriptionFa ?? "",
+    seoDescriptionEn: post.seoDescriptionEn ?? "",
+    seoImageUrl: post.seoImageUrl ?? "",
+    canonicalUrl: post.canonicalUrl ?? "",
+    noIndex: post.noIndex,
   };
   const dictionary = getPanelDictionary(locale);
 

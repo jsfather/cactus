@@ -1,6 +1,6 @@
 import { UserListPage } from "@/components/users/user-list-page";
+import type { AdminListSearchParams } from "@/lib/panel/pagination";
 
-export default async function StudentsPage({ searchParams }: { searchParams: Promise<{ toast?: string }> }) {
-  const query = await searchParams;
-  return <UserListPage role="student" toastKey={query.toast} />;
+export default async function StudentsPage({ searchParams }: { searchParams: Promise<AdminListSearchParams> }) {
+  return <UserListPage role="student" searchParams={await searchParams} />;
 }
