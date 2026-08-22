@@ -116,7 +116,7 @@ Set `SITE_URL` to the public HTTPS origin of the deployed site. It is used for c
 
 In the application service, add a persistent Docker volume mounted at `/app/uploads`. Without this volume, uploaded blog covers, product images, rich-text images, and avatars will be lost when Dokploy replaces the container. A named volume works with the image's non-root user automatically; for a host bind mount, make the directory writable by UID/GID `1001`.
 
-Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the initial administrator only when `ADMIN_EMAIL` does not exist. After the first successful login, you may remove `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME_FA`, and `ADMIN_NAME_EN` together; the existing account remains unchanged. `ADMIN_NAME` is still accepted as a legacy Persian-name fallback during upgrades.
+Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the configured initial administrator only when no administrator account exists. If one or more administrators already exist, all `ADMIN_*` bootstrap variables are ignored. After the first successful login, you may remove `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME_FA`, and `ADMIN_NAME_EN` together; the existing account remains unchanged. `ADMIN_NAME` is still accepted as a legacy Persian-name fallback during upgrades.
 
 The readiness endpoint is `/api/health`. It returns a successful response only when the app can reach PostgreSQL.
 

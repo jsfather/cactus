@@ -1,7 +1,7 @@
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
@@ -12,6 +12,7 @@ const starterBlogSeedKey = "seed.blog.starter.v1";
 const starterProductSeedKey = "seed.shop.starter.v1";
 const starterMediaSeedKey = "seed.media.starter.v1";
 const starterMediaPathname = "content/starter/cactus-placeholder.png";
+const adminBootstrapLockId = 1128352836;
 const starterMediaPng = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Zl1sAAAAASUVORK5CYII=",
   "base64",
@@ -49,71 +50,74 @@ export async function setupDatabase() {
       migrationsFolder: path.join(process.cwd(), "drizzle"),
     });
 
-    const email = process.env.ADMIN_EMAIL?.trim().toLowerCase() || null;
-    const password = process.env.ADMIN_PASSWORD || null;
+    const adminId = await database.transaction(async (transaction) => {
+      // Serialize bootstrap across replicas so only one can observe an admin-free database.
+      await transaction.execute(sql`select pg_advisory_xact_lock(${adminBootstrapLockId})`);
 
-    if (
-      (email && (!password || password.length < 8)) ||
-      (!email && password)
-    ) {
-      throw new Error(
-        "ADMIN_EMAIL and ADMIN_PASSWORD (minimum 8 characters) must be provided together.",
-      );
-    }
-
-    let adminId: string | null = null;
-
-    if (email && password) {
-      const [existingUser] = await database
-        .select({ id: users.id, role: users.role })
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
-
-      if (existingUser && existingUser.role !== "admin") {
-        throw new Error(
-          "ADMIN_EMAIL already belongs to a non-administrator account.",
-        );
-      }
-
-      if (existingUser) {
-        adminId = existingUser.id;
-      } else {
-        const adminNameFa = splitName(
-          process.env.ADMIN_NAME_FA?.trim() || process.env.ADMIN_NAME?.trim() || "همکار کاکتوس",
-          "همکار",
-          "کاکتوس",
-        );
-        const adminNameEn = splitName(
-          process.env.ADMIN_NAME_EN?.trim() || "Cactus Administrator",
-          "Cactus",
-          "Administrator",
-        );
-        const [createdAdmin] = await database
-          .insert(users)
-          .values({
-            email,
-            firstNameFa: process.env.ADMIN_FIRST_NAME_FA?.trim() || adminNameFa.firstName,
-            lastNameFa: process.env.ADMIN_LAST_NAME_FA?.trim() || adminNameFa.lastName,
-            firstNameEn: process.env.ADMIN_FIRST_NAME_EN?.trim() || adminNameEn.firstName,
-            lastNameEn: process.env.ADMIN_LAST_NAME_EN?.trim() || adminNameEn.lastName,
-            passwordHash: await hashPassword(password),
-            role: "admin",
-          })
-          .returning({ id: users.id });
-
-        adminId = createdAdmin.id;
-      }
-    } else {
-      const [existingAdmin] = await database
+      const [existingAdmin] = await transaction
         .select({ id: users.id })
         .from(users)
         .where(eq(users.role, "admin"))
         .orderBy(asc(users.createdAt))
         .limit(1);
 
-      adminId = existingAdmin?.id ?? null;
-    }
+      if (existingAdmin) {
+        return existingAdmin.id;
+      }
+
+      const email = process.env.ADMIN_EMAIL?.trim().toLowerCase() || null;
+      const password = process.env.ADMIN_PASSWORD || null;
+
+      if (
+        (email && (!password || password.length < 8)) ||
+        (!email && password)
+      ) {
+        throw new Error(
+          "ADMIN_EMAIL and ADMIN_PASSWORD (minimum 8 characters) must be provided together.",
+        );
+      }
+
+      if (!email || !password) {
+        return null;
+      }
+
+      const [existingUser] = await transaction
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      if (existingUser) {
+        throw new Error(
+          "ADMIN_EMAIL already belongs to a non-administrator account.",
+        );
+      }
+
+      const adminNameFa = splitName(
+        process.env.ADMIN_NAME_FA?.trim() || process.env.ADMIN_NAME?.trim() || "همکار کاکتوس",
+        "همکار",
+        "کاکتوس",
+      );
+      const adminNameEn = splitName(
+        process.env.ADMIN_NAME_EN?.trim() || "Cactus Administrator",
+        "Cactus",
+        "Administrator",
+      );
+      const [createdAdmin] = await transaction
+        .insert(users)
+        .values({
+          email,
+          firstNameFa: process.env.ADMIN_FIRST_NAME_FA?.trim() || adminNameFa.firstName,
+          lastNameFa: process.env.ADMIN_LAST_NAME_FA?.trim() || adminNameFa.lastName,
+          firstNameEn: process.env.ADMIN_FIRST_NAME_EN?.trim() || adminNameEn.firstName,
+          lastNameEn: process.env.ADMIN_LAST_NAME_EN?.trim() || adminNameEn.lastName,
+          passwordHash: await hashPassword(password),
+          role: "admin",
+        })
+        .returning({ id: users.id });
+
+      return createdAdmin.id;
+    });
 
     if (adminId) {
       await database.transaction(async (transaction) => {
