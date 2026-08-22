@@ -239,7 +239,9 @@ export async function createExam(
   }
 
   revalidateExamPages(createdExam.id);
-  redirect(`/panel/admin/exams/${createdExam.id}/edit?toast=created`);
+  redirect(
+    `/panel/admin/exams/${createdExam.id}/questions/new?toast=exam-created`,
+  );
 }
 
 export async function updateExam(

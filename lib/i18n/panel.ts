@@ -144,7 +144,7 @@ export const panelDictionaries = {
       multipleChoice: "چندگزینه‌ای",
       trueFalse: "درست / نادرست",
       shortAnswer: "پاسخ کوتاه",
-      saveExam: "ذخیره آزمون",
+      saveExam: "ساخت آزمون و افزودن اولین سؤال",
       saveQuestion: "ذخیره سؤال",
     },
     media: {
@@ -356,7 +356,7 @@ export const panelDictionaries = {
       multipleChoice: "Multiple choice",
       trueFalse: "True / false",
       shortAnswer: "Short answer",
-      saveExam: "Save exam",
+      saveExam: "Create exam and add first question",
       saveQuestion: "Save question",
     },
     media: {
