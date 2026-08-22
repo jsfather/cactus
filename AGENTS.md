@@ -80,8 +80,8 @@ This repository is a production-oriented multilingual application for Cactus, a 
 - Users have required `firstNameFa`, `lastNameFa`, `firstNameEn`, and `lastNameEn` values, plus avatars and Persian/English biographies. Always render the complete name matching the active locale via `getLocalizedUserName`; never show the Persian name on English pages as a fallback.
 - User create/edit and self-service profile forms must collect both Persian and English names regardless of the currently active interface language.
 - Never allow the current administrator to deactivate or delete their own active account.
-- Passwords are hashed and must be at least 12 characters when created or changed. Never log credentials or include them in client-visible state.
-- Initial administrator variables are bootstrap-only. `ADMIN_EMAIL` and `ADMIN_PASSWORD` must be provided together; the password minimum is 12 characters.
+- Passwords are hashed and must be at least 8 characters when created or changed. Never log credentials or include them in client-visible state.
+- Initial administrator variables are bootstrap-only. `ADMIN_EMAIL` and `ADMIN_PASSWORD` must be provided together; the password minimum is 8 characters.
 
 ## Database, migrations, and starter content
 

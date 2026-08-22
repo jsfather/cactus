@@ -16,7 +16,7 @@ const registerSchema = z.object({
   firstNameEn: z.string().trim().min(1).max(80),
   lastNameEn: z.string().trim().min(1).max(80),
   email: z.string().trim().email().max(320),
-  password: z.string().min(12).max(256),
+  password: z.string().min(8).max(256),
   confirmPassword: z.string().min(1).max(256),
   locale: z.enum(["fa", "en"]),
 }).superRefine((value, context) => {

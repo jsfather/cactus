@@ -53,11 +53,11 @@ export async function setupDatabase() {
     const password = process.env.ADMIN_PASSWORD || null;
 
     if (
-      (email && (!password || password.length < 12)) ||
+      (email && (!password || password.length < 8)) ||
       (!email && password)
     ) {
       throw new Error(
-        "ADMIN_EMAIL and ADMIN_PASSWORD (minimum 12 characters) must be provided together.",
+        "ADMIN_EMAIL and ADMIN_PASSWORD (minimum 8 characters) must be provided together.",
       );
     }
 

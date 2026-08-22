@@ -26,10 +26,10 @@ const commonUserSchema = z.object({
   locale: z.enum(["fa", "en"]),
 });
 const createUserSchema = commonUserSchema.extend({
-  password: z.string().min(12).max(256),
+  password: z.string().min(8).max(256),
 });
 const updateUserSchema = commonUserSchema.extend({
-  password: z.union([z.literal(""), z.string().min(12).max(256)]),
+  password: z.union([z.literal(""), z.string().min(8).max(256)]),
 });
 
 export type UserFormState = {

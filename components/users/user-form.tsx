@@ -77,9 +77,9 @@ export function UserForm({ role, locale, mode = "create", userId, initialValues 
               <div>
                 <FormLabel
                   label={mode === "edit" ? dictionary.users.newPassword : dictionary.users.password}
-                  hint={mode === "edit" ? (isFa ? "برای حفظ رمز فعلی، خالی بگذارید." : "Leave blank to keep the current password.") : (isFa ? "حداقل ۱۲ نویسه استفاده کنید." : "Use at least 12 characters.")}
+                  hint={mode === "edit" ? (isFa ? "برای حفظ رمز فعلی، خالی بگذارید؛ در غیر این صورت حداقل ۸ نویسه استفاده کنید." : "Leave blank to keep the current password; otherwise use at least 8 characters.") : (isFa ? "حداقل ۸ نویسه استفاده کنید." : "Use at least 8 characters.")}
                 >
-                  <PanelInput {...bind("password")} type="password" required={mode === "create"} minLength={mode === "create" ? 12 : undefined} autoComplete="new-password" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("password")} type="password" required={mode === "create"} minLength={8} autoComplete="new-password" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.password} />
               </div>

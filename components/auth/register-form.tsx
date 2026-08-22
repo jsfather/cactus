@@ -27,8 +27,8 @@ export function RegisterForm({ locale }: { locale: Locale }) {
       </div>
       <div><FormLabel label={dictionary.email}><PanelInput {...bind("email")} type="email" required autoComplete="email" dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.email} /></div>
       <div className="grid gap-5 sm:grid-cols-2">
-        <div><FormLabel label={dictionary.password} hint={locale === "fa" ? "حداقل ۱۲ نویسه" : "At least 12 characters"}><PanelInput {...bind("password")} type="password" required minLength={12} autoComplete="new-password" dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.password} /></div>
-        <div><FormLabel label={dictionary.confirmPassword}><PanelInput {...bind("confirmPassword")} type="password" required minLength={12} autoComplete="new-password" dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.confirmPassword} /></div>
+        <div><FormLabel label={dictionary.password} hint={locale === "fa" ? "حداقل ۸ نویسه" : "At least 8 characters"}><PanelInput {...bind("password")} type="password" required minLength={8} autoComplete="new-password" dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.password} /></div>
+        <div><FormLabel label={dictionary.confirmPassword}><PanelInput {...bind("confirmPassword")} type="password" required minLength={8} autoComplete="new-password" dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.confirmPassword} /></div>
       </div>
       {state.error ? <p role="alert" className="text-sm text-red-600 dark:text-red-400">{state.error}</p> : null}
       <button type="submit" disabled={pending} className="w-full cursor-pointer rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400">
