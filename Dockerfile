@@ -1,12 +1,18 @@
 # syntax=docker/dockerfile:1
 FROM node:22-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
 
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json package-lock.json* ./
-RUN --mount=type=cache,target=/root/.npm \
-  npm ci --no-audit --no-fund
+COPY pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN --mount=type=cache,id=cactus-pnpm,target=/pnpm/store \
+  pnpm fetch --frozen-lockfile --network-concurrency=8
+COPY package.json ./
+RUN --mount=type=cache,id=cactus-pnpm,target=/pnpm/store \
+  pnpm install --offline --frozen-lockfile --child-concurrency=2
 
 FROM base AS builder
 WORKDIR /app
@@ -17,9 +23,9 @@ ARG NEXT_PUBLIC_HOME_HERO_VIDEO_URL=https://la.ecactus.co/site_videos/robocup-20
 ARG NEXT_PUBLIC_HOME_VIDEO_1_URL=https://la.ecactus.co/site_videos/intro-1.mp4
 ARG NEXT_PUBLIC_HOME_VIDEO_2_URL=https://la.ecactus.co/site_videos/intro-2.mp4
 ARG NEXT_PUBLIC_HOME_VIDEO_3_URL=https://la.ecactus.co/site_videos/intro-3.mp4
-# The Node 22 Alpine build needs more than 384 MiB for this bundle. Keep a
-# bounded heap so a small VPS fails predictably instead of swapping indefinitely.
-ARG NEXT_BUILD_MAX_OLD_SPACE_SIZE=768
+# This bundle fails at 384 MiB but builds at 512 MiB. Keep the heap bounded so
+# a small VPS fails predictably instead of swapping indefinitely.
+ARG NEXT_BUILD_MAX_OLD_SPACE_SIZE=512
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_STATIC_BASE_URL=$NEXT_PUBLIC_STATIC_BASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
@@ -28,11 +34,12 @@ ENV NEXT_PUBLIC_HOME_VIDEO_1_URL=$NEXT_PUBLIC_HOME_VIDEO_1_URL
 ENV NEXT_PUBLIC_HOME_VIDEO_2_URL=$NEXT_PUBLIC_HOME_VIDEO_2_URL
 ENV NEXT_PUBLIC_HOME_VIDEO_3_URL=$NEXT_PUBLIC_HOME_VIDEO_3_URL
 ENV NODE_OPTIONS="--max-old-space-size=${NEXT_BUILD_MAX_OLD_SPACE_SIZE}"
+ENV RAYON_NUM_THREADS=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV CI=1
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+RUN pnpm run build
 
 FROM base AS runner
 WORKDIR /app
