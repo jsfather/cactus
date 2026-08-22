@@ -5,7 +5,8 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm \
+  npm ci --no-audit --no-fund
 
 FROM base AS builder
 WORKDIR /app
@@ -16,6 +17,7 @@ ARG NEXT_PUBLIC_HOME_HERO_VIDEO_URL=https://la.ecactus.co/site_videos/robocup-20
 ARG NEXT_PUBLIC_HOME_VIDEO_1_URL=https://la.ecactus.co/site_videos/intro-1.mp4
 ARG NEXT_PUBLIC_HOME_VIDEO_2_URL=https://la.ecactus.co/site_videos/intro-2.mp4
 ARG NEXT_PUBLIC_HOME_VIDEO_3_URL=https://la.ecactus.co/site_videos/intro-3.mp4
+ARG NEXT_BUILD_MAX_OLD_SPACE_SIZE=384
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_STATIC_BASE_URL=$NEXT_PUBLIC_STATIC_BASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
@@ -23,8 +25,10 @@ ENV NEXT_PUBLIC_HOME_HERO_VIDEO_URL=$NEXT_PUBLIC_HOME_HERO_VIDEO_URL
 ENV NEXT_PUBLIC_HOME_VIDEO_1_URL=$NEXT_PUBLIC_HOME_VIDEO_1_URL
 ENV NEXT_PUBLIC_HOME_VIDEO_2_URL=$NEXT_PUBLIC_HOME_VIDEO_2_URL
 ENV NEXT_PUBLIC_HOME_VIDEO_3_URL=$NEXT_PUBLIC_HOME_VIDEO_3_URL
+ENV NODE_OPTIONS="--max-old-space-size=${NEXT_BUILD_MAX_OLD_SPACE_SIZE}"
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ENV CI=1
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

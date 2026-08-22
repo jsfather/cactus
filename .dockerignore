@@ -6,9 +6,11 @@ README.md
 .next
 .git
 .gitignore
-.env*.local
+.env*
+!.env.example
 .vscode
 .idea
 *.md
+*.log
 coverage
 .DS_Store

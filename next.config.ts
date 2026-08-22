@@ -2,6 +2,15 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  experimental: {
+    // Production images are built on a small VPS. Keeping the worker count low
+    // prevents `next build` from exhausting RAM and spending hours swapping.
+    cpus: 1,
+    // Available since Next.js 15; trades a little build speed for a lower peak
+    // Webpack heap, which is preferable for constrained Docker builders.
+    webpackMemoryOptimizations: true,
+    webpackBuildWorker: true,
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

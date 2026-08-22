@@ -7,6 +7,7 @@ services:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-https://la.ecactus.co/api}
         NEXT_PUBLIC_STATIC_BASE_URL: ${NEXT_PUBLIC_STATIC_BASE_URL:-https://la.ecactus.co}
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://la.ecactus.co}
+        NEXT_BUILD_MAX_OLD_SPACE_SIZE: ${NEXT_BUILD_MAX_OLD_SPACE_SIZE:-384}
     restart: unless-stopped
     expose:
       - '3000'
