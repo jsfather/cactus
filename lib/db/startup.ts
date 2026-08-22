@@ -6,11 +6,21 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 import { hashPassword } from "@/lib/auth/password";
-import { appSettings, mediaAssets, posts, products, users } from "./schema";
+import {
+  appSettings,
+  examQuestionOptions,
+  examQuestions,
+  exams,
+  mediaAssets,
+  posts,
+  products,
+  users,
+} from "./schema";
 
 const starterBlogSeedKey = "seed.blog.starter.v1";
 const starterProductSeedKey = "seed.shop.starter.v1";
 const starterMediaSeedKey = "seed.media.starter.v1";
+const starterExamSeedKey = "seed.exams.starter.v1";
 const starterMediaPathname = "content/starter/cactus-placeholder.png";
 const adminBootstrapLockId = 1128352836;
 const starterMediaPng = Buffer.from(
@@ -154,6 +164,91 @@ export async function setupDatabase() {
             status: "published",
             publishedAt,
             authorId: adminId,
+          });
+        }
+      });
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterExamSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+
+        if (!claimedSeed) return;
+
+        const [existingExam] = await transaction
+          .select({ id: exams.id })
+          .from(exams)
+          .limit(1);
+
+        if (!existingExam) {
+          const [exam] = await transaction
+            .insert(exams)
+            .values({
+              titleFa: "آزمون مقدماتی رباتیک",
+              titleEn: "Robotics Fundamentals Quiz",
+              descriptionFa: "یک آزمون نمونه برای سنجش مفاهیم پایه مدار و رباتیک.",
+              descriptionEn: "A starter quiz covering basic circuits and robotics concepts.",
+              instructionsFa: "هر سؤال را با دقت بخوانید و بهترین پاسخ را انتخاب کنید.",
+              instructionsEn: "Read each question carefully and choose the best answer.",
+              status: "draft",
+              durationMinutes: 15,
+              passingScore: 60,
+              shuffleQuestions: true,
+              shuffleOptions: true,
+              creatorId: adminId,
+            })
+            .returning({ id: exams.id });
+
+          const [choiceQuestion] = await transaction
+            .insert(examQuestions)
+            .values({
+              examId: exam.id,
+              type: "single_choice",
+              promptFa: "کدام قطعه جریان الکتریکی را محدود می‌کند؟",
+              promptEn: "Which component limits electric current?",
+              explanationFa: "مقاومت برای محدود کردن جریان در مدار استفاده می‌شود.",
+              explanationEn: "A resistor is used to limit current in a circuit.",
+              points: 2,
+              sortOrder: 1,
+            })
+            .returning({ id: examQuestions.id });
+
+          await transaction.insert(examQuestionOptions).values([
+            {
+              questionId: choiceQuestion.id,
+              labelFa: "مقاومت",
+              labelEn: "Resistor",
+              isCorrect: true,
+              sortOrder: 1,
+            },
+            {
+              questionId: choiceQuestion.id,
+              labelFa: "موتور",
+              labelEn: "Motor",
+              isCorrect: false,
+              sortOrder: 2,
+            },
+            {
+              questionId: choiceQuestion.id,
+              labelFa: "باتری",
+              labelEn: "Battery",
+              isCorrect: false,
+              sortOrder: 3,
+            },
+          ]);
+
+          await transaction.insert(examQuestions).values({
+            examId: exam.id,
+            type: "true_false",
+            promptFa: "حسگرها به ربات کمک می‌کنند محیط اطراف خود را تشخیص دهد.",
+            promptEn: "Sensors help a robot perceive its environment.",
+            explanationFa: "حسگرها اطلاعات محیط را به کنترل‌گر ربات می‌رسانند.",
+            explanationEn: "Sensors provide environmental input to the robot controller.",
+            points: 1,
+            sortOrder: 2,
+            correctBoolean: true,
           });
         }
       });
