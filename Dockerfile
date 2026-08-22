@@ -23,9 +23,9 @@ ARG NEXT_PUBLIC_HOME_HERO_VIDEO_URL=https://la.ecactus.co/site_videos/robocup-20
 ARG NEXT_PUBLIC_HOME_VIDEO_1_URL=https://la.ecactus.co/site_videos/intro-1.mp4
 ARG NEXT_PUBLIC_HOME_VIDEO_2_URL=https://la.ecactus.co/site_videos/intro-2.mp4
 ARG NEXT_PUBLIC_HOME_VIDEO_3_URL=https://la.ecactus.co/site_videos/intro-3.mp4
-# This bundle fails at 384 MiB but builds at 512 MiB. Keep the heap bounded so
-# a small VPS fails predictably instead of swapping indefinitely.
-ARG NEXT_BUILD_MAX_OLD_SPACE_SIZE=512
+# A cold Docker build needs more than 512 MiB; 768 MiB leaves enough headroom
+# while still bounding memory use on a small VPS.
+ARG NEXT_BUILD_MAX_OLD_SPACE_SIZE=768
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_STATIC_BASE_URL=$NEXT_PUBLIC_STATIC_BASE_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
@@ -39,7 +39,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV CI=1
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm run build
+RUN --mount=type=cache,id=cactus-next,target=/app/.next/cache \
+  pnpm run build
 
 FROM base AS runner
 WORKDIR /app
