@@ -1,0 +1,6 @@
+import { AboutForm } from "@/components/about/about-form";
+import { PanelPage, PanelPageHeader } from "@/components/panel/ui";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
+import { getSiteContent } from "@/lib/site-content/queries";
+
+export default async function AdminAboutPage() { const [locale, content] = await Promise.all([getPanelLocale(), getSiteContent()]); return <PanelPage><PanelPageHeader eyebrow={locale === "fa" ? "محتوای عمومی" : "Public content"} title={locale === "fa" ? "درباره ما و اطلاعات تماس" : "About and contact content"} description={locale === "fa" ? "محتوای صفحه درباره ما، اطلاعات تماس و متن کپی‌رایت فوتر را مدیریت کنید." : "Manage the About page, contact information, and footer copyright text."} /><AboutForm locale={locale} initialValues={{ contactNumber: content.contactNumber || "", email: content.email || "", addressFa: content.addressFa || "", addressEn: content.addressEn || "", aboutUsFa: content.aboutUsFa, aboutUsEn: content.aboutUsEn || "", missionFa: content.missionFa, missionEn: content.missionEn || "", visionFa: content.visionFa, visionEn: content.visionEn || "", footerTextFa: content.footerTextFa, footerTextEn: content.footerTextEn || "" }} /></PanelPage>; }

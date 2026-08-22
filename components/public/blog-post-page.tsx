@@ -4,7 +4,10 @@ import { connection } from "next/server";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { RichContent } from "@/components/content/rich-content";
+import { CommentsSection } from "@/components/comments/comments-section";
+import { getCurrentUser } from "@/lib/auth/session";
 import { getPublishedPost } from "@/lib/blog/queries";
+import { getContentComments } from "@/lib/comments/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
 import { absoluteUrl } from "@/lib/seo/site";
@@ -22,6 +25,9 @@ export async function BlogPostPage({
   if (!post) {
     notFound();
   }
+
+  const user = await getCurrentUser();
+  const comments = await getContentComments({ postId: post.id }, user?.id);
 
   const dictionary = getDictionary(locale);
   const title = locale === "en" ? post.titleEn || post.titleFa : post.titleFa;
@@ -107,6 +113,14 @@ export async function BlogPostPage({
             <RichContent html={content} className="text-lg leading-9 text-zinc-700 dark:text-zinc-300" />
           </div>
         </article>
+        <CommentsSection
+          locale={locale}
+          targetType="post"
+          targetId={post.id}
+          slug={post.slug}
+          comments={comments}
+          user={user}
+        />
       </main>
       <SiteFooter locale={locale} />
     </div>

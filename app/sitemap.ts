@@ -41,6 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...localizedEntry("/", "/en", { changeFrequency: "weekly", priority: 1 }),
     ...localizedEntry("/blog", "/en/blog", { changeFrequency: "daily", priority: 0.8 }),
     ...localizedEntry("/shop", "/en/shop", { changeFrequency: "daily", priority: 0.8 }),
+    ...localizedEntry("/about", "/en/about", { changeFrequency: "monthly", priority: 0.7 }),
     ...publishedPosts.flatMap((post) => localizedEntry(
       `/blog/${post.slug}`,
       `/en/blog/${post.slug}`,

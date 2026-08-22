@@ -1,6 +1,12 @@
-import { and, desc, eq, gt, ilike, lt, lte, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, ilike, lt, lte, or, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
-import { products, users } from "@/lib/db/schema";
+import {
+  productCategories,
+  productCategoryAssignments,
+  products,
+  productVariants,
+  users,
+} from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 import {
   ADMIN_PAGE_SIZE,
@@ -31,7 +37,7 @@ function publicProductSelection(locale: Locale) {
   };
 }
 
-export function getPublishedProducts(locale: Locale, limit?: number) {
+export function getPublishedProducts(locale: Locale, limit?: number, categorySlug?: string) {
   const query = getDatabase()
     .select(publicProductSelection(locale))
     .from(products)
@@ -39,6 +45,16 @@ export function getPublishedProducts(locale: Locale, limit?: number) {
     .where(and(
       eq(products.status, "published"),
       lte(products.publishedAt, new Date()),
+      categorySlug
+        ? sql`exists (
+            select 1
+            from ${productCategoryAssignments}
+            inner join ${productCategories}
+              on ${productCategories.id} = ${productCategoryAssignments.categoryId}
+            where ${productCategoryAssignments.productId} = ${products.id}
+              and ${productCategories.slug} = ${categorySlug}
+          )`
+        : undefined,
     ))
     .orderBy(desc(products.isFeatured), desc(products.publishedAt));
 
@@ -46,7 +62,8 @@ export function getPublishedProducts(locale: Locale, limit?: number) {
 }
 
 export async function getPublishedProduct(slug: string, locale: Locale) {
-  const [product] = await getDatabase()
+  const database = getDatabase();
+  const [product] = await database
     .select(publicProductSelection(locale))
     .from(products)
     .innerJoin(users, eq(products.authorId, users.id))
@@ -56,7 +73,34 @@ export async function getPublishedProduct(slug: string, locale: Locale) {
       lte(products.publishedAt, new Date()),
     ))
     .limit(1);
-  return product ?? null;
+  if (!product) return null;
+  const [variants, categories] = await Promise.all([
+    database
+      .select()
+      .from(productVariants)
+      .where(
+        and(
+          eq(productVariants.productId, product.id),
+          eq(productVariants.isActive, true),
+        ),
+      )
+      .orderBy(asc(productVariants.sortOrder)),
+    database
+      .select({
+        id: productCategories.id,
+        slug: productCategories.slug,
+        titleFa: productCategories.titleFa,
+        titleEn: productCategories.titleEn,
+      })
+      .from(productCategoryAssignments)
+      .innerJoin(
+        productCategories,
+        eq(productCategoryAssignments.categoryId, productCategories.id),
+      )
+      .where(eq(productCategoryAssignments.productId, product.id))
+      .orderBy(asc(productCategories.titleFa)),
+  ]);
+  return { ...product, variants, categories };
 }
 
 export type ProductStatusFilter = "all" | "draft" | "published";

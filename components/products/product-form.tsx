@@ -17,10 +17,11 @@ export type ProductFormValues = {
   slug: string; titleFa: string; titleEn: string; summaryFa: string; summaryEn: string;
   contentFa: string; contentEn: string; coverImageUrl: string; price: string; inventory: string;
   status: "draft" | "published"; isFeatured: boolean;
+  categoryIds: string[];
 };
-const emptyValues: ProductFormValues = { slug: "", titleFa: "", titleEn: "", summaryFa: "", summaryEn: "", contentFa: "", contentEn: "", coverImageUrl: "", price: "", inventory: "0", status: "draft", isFeatured: false };
+const emptyValues: ProductFormValues = { slug: "", titleFa: "", titleEn: "", summaryFa: "", summaryEn: "", contentFa: "", contentEn: "", coverImageUrl: "", price: "", inventory: "0", status: "draft", isFeatured: false, categoryIds: [] };
 
-export function ProductForm({ locale, mode = "create", productId, initialValues = emptyValues }: { locale: Locale; mode?: "create" | "edit"; productId?: string; initialValues?: ProductFormValues }) {
+export function ProductForm({ locale, mode = "create", productId, initialValues = emptyValues, categories = [] }: { locale: Locale; mode?: "create" | "edit"; productId?: string; initialValues?: ProductFormValues; categories?: Array<{ id: string; titleFa: string; titleEn: string | null }> }) {
   const dictionary = getPanelDictionary(locale);
   const formAction = mode === "edit" && productId ? updateProduct.bind(null, productId) : createProduct;
   const [state, action, pending] = useActionState(formAction, initialState);
@@ -36,11 +37,13 @@ export function ProductForm({ locale, mode = "create", productId, initialValues 
     status: initialValues.status,
   });
   const [featured, setFeatured] = useState(initialValues.isFeatured);
+  const [categoryIds, setCategoryIds] = useState(initialValues.categoryIds);
   const isFa = locale === "fa";
 
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="categoryIds" value={JSON.stringify(categoryIds)} />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
         <div className="min-w-0 space-y-6">
           <PanelFormSection
@@ -141,6 +144,26 @@ export function ProductForm({ locale, mode = "create", productId, initialValues 
                 </span>
               </label>
             </div>
+          </PanelFormSection>
+
+          <PanelFormSection title={isFa ? "دسته‌بندی‌ها" : "Categories"} description={isFa ? "محصول می‌تواند در چند دسته قرار بگیرد." : "A product can belong to multiple categories."}>
+            {categories.length ? (
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <label key={category.id} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 p-3 text-start transition hover:border-emerald-300 dark:border-zinc-800 dark:hover:border-emerald-800">
+                    <input
+                      type="checkbox"
+                      checked={categoryIds.includes(category.id)}
+                      onChange={(event) => setCategoryIds((current) => event.target.checked ? [...current, category.id] : current.filter((id) => id !== category.id))}
+                      className="size-4 accent-emerald-700"
+                    />
+                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{locale === "en" ? category.titleEn || category.titleFa : category.titleFa}</span>
+                  </label>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm leading-6 text-zinc-500">{isFa ? "هنوز دسته‌ای ساخته نشده است." : "No categories have been created yet."}</p>
+            )}
           </PanelFormSection>
         </aside>
       </div>

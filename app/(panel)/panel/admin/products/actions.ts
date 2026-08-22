@@ -8,7 +8,7 @@ import { requireRole } from "@/lib/auth/session";
 import { richTextLength, sanitizeRichText } from "@/lib/content/rich-text";
 import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
-import { products } from "@/lib/db/schema";
+import { productCategoryAssignments, products } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 import { isAllowedImageReference } from "@/lib/media/reference";
 
@@ -26,6 +26,7 @@ const productSchema = z.object({
   inventory: z.coerce.number().int().min(0).max(10_000_000),
   status: z.enum(["draft", "published"]),
   isFeatured: z.boolean(),
+  categoryIds: z.array(z.uuid()).max(12).transform((ids) => [...new Set(ids)]),
   locale: z.enum(["fa", "en"]),
 });
 
@@ -33,12 +34,19 @@ export type ProductFormState = { error?: string; fieldErrors?: Record<string, st
 export type DeleteProductState = { error?: string; success?: string };
 
 function readProductForm(formData: FormData) {
+  let categoryIds: unknown = [];
+  try {
+    const value = formData.get("categoryIds");
+    categoryIds = typeof value === "string" ? JSON.parse(value) : [];
+  } catch {
+    categoryIds = [];
+  }
   return {
     slug: formData.get("slug"), titleFa: formData.get("titleFa"), titleEn: formData.get("titleEn"),
     summaryFa: formData.get("summaryFa"), summaryEn: formData.get("summaryEn"),
     contentFa: formData.get("contentFa"), contentEn: formData.get("contentEn"),
     coverImageUrl: formData.get("coverImageUrl"), price: formData.get("price"), inventory: formData.get("inventory"),
-    status: formData.get("status"), isFeatured: formData.get("isFeatured") === "on", locale: formData.get("locale"),
+    status: formData.get("status"), isFeatured: formData.get("isFeatured") === "on", categoryIds, locale: formData.get("locale"),
   };
 }
 
@@ -55,23 +63,36 @@ export async function createProduct(_state: ProductFormState, formData: FormData
   const parsed = productSchema.safeParse(readProductForm(formData));
   if (!parsed.success) return { error: formError(formData.get("locale")), fieldErrors: z.flattenError(parsed.error).fieldErrors };
   const data = parsed.data;
+  let createdId: string;
   try {
-    await getDatabase().insert(products).values({
-      slug: data.slug, titleFa: data.titleFa, titleEn: data.titleEn || null,
-      summaryFa: data.summaryFa, summaryEn: data.summaryEn || null,
-      contentFa: data.contentFa, contentEn: data.contentEn || null,
-      coverImageUrl: data.coverImageUrl || null, price: data.price, inventory: data.inventory,
-      status: data.status, isFeatured: data.isFeatured,
-      publishedAt: data.status === "published" ? new Date() : null, authorId: admin.id,
+    const [created] = await getDatabase().transaction(async (transaction) => {
+      const rows = await transaction.insert(products).values({
+        slug: data.slug, titleFa: data.titleFa, titleEn: data.titleEn || null,
+        summaryFa: data.summaryFa, summaryEn: data.summaryEn || null,
+        contentFa: data.contentFa, contentEn: data.contentEn || null,
+        coverImageUrl: data.coverImageUrl || null, price: data.price, inventory: data.inventory,
+        status: data.status, isFeatured: data.isFeatured,
+        publishedAt: data.status === "published" ? new Date() : null, authorId: admin.id,
+      }).returning({ id: products.id });
+      if (data.categoryIds.length) {
+        await transaction.insert(productCategoryAssignments).values(
+          data.categoryIds.map((categoryId) => ({ productId: rows[0].id, categoryId })),
+        );
+      }
+      return rows;
     });
+    createdId = created.id;
   } catch (error) {
     if (hasPostgresErrorCode(error, "23505")) {
       return { error: data.locale === "en" ? "This product URL is already in use." : "این نشانی قبلاً برای محصول دیگری استفاده شده است." };
     }
-    throw error;
+    if (hasPostgresErrorCode(error, "23503")) {
+      return { error: data.locale === "en" ? "One of the selected categories is no longer available." : "یکی از دسته‌های انتخاب‌شده دیگر موجود نیست." };
+    }
+    return { error: data.locale === "en" ? "The product could not be saved." : "ذخیره محصول انجام نشد." };
   }
   revalidateShop();
-  redirect("/panel/admin/products?toast=created");
+  redirect(`/panel/admin/products/${createdId}/edit?toast=created`);
 }
 
 export async function updateProduct(productId: string, _state: ProductFormState, formData: FormData): Promise<ProductFormState> {
@@ -84,18 +105,27 @@ export async function updateProduct(productId: string, _state: ProductFormState,
   if (!existing) return { error: parsed.data.locale === "en" ? "This product no longer exists." : "این محصول دیگر وجود ندارد." };
   const data = parsed.data;
   try {
-    await database.update(products).set({
-      slug: data.slug, titleFa: data.titleFa, titleEn: data.titleEn || null,
-      summaryFa: data.summaryFa, summaryEn: data.summaryEn || null,
-      contentFa: data.contentFa, contentEn: data.contentEn || null,
-      coverImageUrl: data.coverImageUrl || null, price: data.price, inventory: data.inventory,
-      status: data.status, isFeatured: data.isFeatured,
-      publishedAt: data.status === "published" ? existing.publishedAt ?? new Date() : null,
-      updatedAt: new Date(),
-    }).where(eq(products.id, validId.data));
+    await database.transaction(async (transaction) => {
+      await transaction.update(products).set({
+        slug: data.slug, titleFa: data.titleFa, titleEn: data.titleEn || null,
+        summaryFa: data.summaryFa, summaryEn: data.summaryEn || null,
+        contentFa: data.contentFa, contentEn: data.contentEn || null,
+        coverImageUrl: data.coverImageUrl || null, price: data.price, inventory: data.inventory,
+        status: data.status, isFeatured: data.isFeatured,
+        publishedAt: data.status === "published" ? existing.publishedAt ?? new Date() : null,
+        updatedAt: new Date(),
+      }).where(eq(products.id, validId.data));
+      await transaction.delete(productCategoryAssignments).where(eq(productCategoryAssignments.productId, validId.data));
+      if (data.categoryIds.length) {
+        await transaction.insert(productCategoryAssignments).values(
+          data.categoryIds.map((categoryId) => ({ productId: validId.data, categoryId })),
+        );
+      }
+    });
   } catch (error) {
     if (hasPostgresErrorCode(error, "23505")) return { error: data.locale === "en" ? "This product URL is already in use." : "این نشانی قبلاً برای محصول دیگری استفاده شده است." };
-    throw error;
+    if (hasPostgresErrorCode(error, "23503")) return { error: data.locale === "en" ? "One of the selected categories is no longer available." : "یکی از دسته‌های انتخاب‌شده دیگر موجود نیست." };
+    return { error: data.locale === "en" ? "The product could not be updated." : "به‌روزرسانی محصول انجام نشد." };
   }
   revalidateShop();
   redirect("/panel/admin/products?toast=updated");

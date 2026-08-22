@@ -40,7 +40,10 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
       ? [
           { href: "/panel/admin/blog", label: dictionary.nav.blog, icon: "blog" as const },
           { href: "/panel/admin/products", label: dictionary.nav.shop, icon: "shop" as const },
+          { href: "/panel/admin/product-categories", label: dictionary.nav.categories, icon: "shop" as const },
           { href: "/panel/admin/exams", label: dictionary.nav.exams, icon: "exams" as const },
+          { href: "/panel/admin/comments", label: dictionary.nav.comments, icon: "blog" as const },
+          { href: "/panel/admin/about", label: dictionary.nav.about, icon: "profile" as const },
           { href: "/panel/admin/media", label: dictionary.nav.media, icon: "media" as const },
         ]
       : []),

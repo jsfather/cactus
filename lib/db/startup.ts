@@ -8,12 +8,17 @@ import { Pool } from "pg";
 import { hashPassword } from "@/lib/auth/password";
 import {
   appSettings,
+  comments,
   examQuestionOptions,
   examQuestions,
   exams,
   mediaAssets,
   posts,
+  productCategories,
+  productCategoryAssignments,
   products,
+  productVariants,
+  siteContent,
   users,
 } from "./schema";
 
@@ -21,6 +26,9 @@ const starterBlogSeedKey = "seed.blog.starter.v1";
 const starterProductSeedKey = "seed.shop.starter.v1";
 const starterMediaSeedKey = "seed.media.starter.v1";
 const starterExamSeedKey = "seed.exams.starter.v1";
+const starterCatalogSeedKey = "seed.catalog.taxonomy-variants.v1";
+const starterSiteContentSeedKey = "seed.site-content.about.v1";
+const starterCommentSeedKey = "seed.comments.starter.v1";
 const starterMediaPathname = "content/starter/cactus-placeholder.png";
 const adminBootstrapLockId = 1128352836;
 const starterMediaPng = Buffer.from(
@@ -171,6 +179,127 @@ export async function setupDatabase() {
       await database.transaction(async (transaction) => {
         const [claimedSeed] = await transaction
           .insert(appSettings)
+          .values({ key: starterCommentSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+        if (!claimedSeed) return;
+
+        const [post] = await transaction
+          .select({ id: posts.id })
+          .from(posts)
+          .orderBy(asc(posts.createdAt))
+          .limit(1);
+        const [admin] = await transaction
+          .select({
+            firstNameFa: users.firstNameFa,
+            lastNameFa: users.lastNameFa,
+            firstNameEn: users.firstNameEn,
+            lastNameEn: users.lastNameEn,
+          })
+          .from(users)
+          .where(eq(users.id, adminId))
+          .limit(1);
+        if (post && admin) {
+          await transaction.insert(comments).values({
+            postId: post.id,
+            authorId: adminId,
+            authorNameFa: `${admin.firstNameFa} ${admin.lastNameFa}`,
+            authorNameEn: `${admin.firstNameEn} ${admin.lastNameEn}`,
+            body: "به کاکتوس خوش آمدید! پرسش‌ها و تجربه‌های خود را با ما در میان بگذارید.",
+            status: "approved",
+            moderatedById: adminId,
+            moderatedAt: new Date(),
+          });
+        }
+      });
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterCatalogSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+        if (!claimedSeed) return;
+
+        let [category] = await transaction
+          .select({ id: productCategories.id })
+          .from(productCategories)
+          .limit(1);
+        if (!category) {
+          [category] = await transaction
+            .insert(productCategories)
+            .values({
+              slug: "robotics-kits",
+              titleFa: "کیت‌های رباتیک",
+              titleEn: "Robotics Kits",
+              descriptionFa: "کیت‌ها و ابزارهای آموزشی برای ساخت پروژه‌های رباتیک.",
+              descriptionEn: "Educational kits and tools for building robotics projects.",
+            })
+            .returning({ id: productCategories.id });
+        }
+
+        const [product] = await transaction
+          .select({ id: products.id, price: products.price, inventory: products.inventory })
+          .from(products)
+          .orderBy(asc(products.createdAt))
+          .limit(1);
+        if (product) {
+          await transaction
+            .insert(productCategoryAssignments)
+            .values({ productId: product.id, categoryId: category.id })
+            .onConflictDoNothing();
+          const [existingVariant] = await transaction
+            .select({ id: productVariants.id })
+            .from(productVariants)
+            .where(eq(productVariants.productId, product.id))
+            .limit(1);
+          if (!existingVariant) {
+            await transaction.insert(productVariants).values({
+              productId: product.id,
+              sku: "CACTUS-STARTER-01",
+              titleFa: "نسخه استاندارد",
+              titleEn: "Standard Edition",
+              price: product.price,
+              inventory: product.inventory,
+              isActive: true,
+              sortOrder: 1,
+            });
+          }
+        }
+      });
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterSiteContentSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+        if (!claimedSeed) return;
+
+        await transaction
+          .insert(siteContent)
+          .values({
+            key: "about",
+            contactNumber: "+98 21 0000 0000",
+            email: "hello@cactus.local",
+            addressFa: "تهران، ایران",
+            addressEn: "Tehran, Iran",
+            aboutUsFa: "<p>کاکتوس یک مدرسه رباتیک پروژه‌محور برای پرورش سازندگان آینده است.</p>",
+            aboutUsEn: "<p>Cactus is a project-based robotics school for tomorrow’s makers.</p>",
+            missionFa: "<p>ماموریت ما تبدیل کنجکاوی کودکان و نوجوانان به مهارت ساختن و حل مسئله است.</p>",
+            missionEn: "<p>Our mission is to turn young people’s curiosity into making and problem-solving skills.</p>",
+            visionFa: "<p>چشم‌انداز ما نسلی خلاق، مسئول و توانمند در استفاده از فناوری است.</p>",
+            visionEn: "<p>We envision a creative, responsible generation empowered by technology.</p>",
+            footerTextFa: "همه حقوق برای مدرسه رباتیک کاکتوس محفوظ است.",
+            footerTextEn: "All rights reserved by Cactus Robotics School.",
+            updatedById: adminId,
+          })
+          .onConflictDoNothing();
+      });
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
           .values({ key: starterExamSeedKey, value: "complete" })
           .onConflictDoNothing()
           .returning({ key: appSettings.key });
@@ -268,7 +397,7 @@ export async function setupDatabase() {
           .limit(1);
 
         if (!existingProduct) {
-          await transaction.insert(products).values({
+          const [createdProduct] = await transaction.insert(products).values({
             slug: "starter-robotics-kit",
             titleFa: "کیت شروع رباتیک کاکتوس",
             titleEn: "Cactus Starter Robotics Kit",
@@ -286,6 +415,31 @@ export async function setupDatabase() {
             isFeatured: true,
             publishedAt: new Date(),
             authorId: adminId,
+          }).returning({
+            id: products.id,
+            price: products.price,
+            inventory: products.inventory,
+          });
+
+          const [category] = await transaction
+            .select({ id: productCategories.id })
+            .from(productCategories)
+            .limit(1);
+          if (category) {
+            await transaction.insert(productCategoryAssignments).values({
+              productId: createdProduct.id,
+              categoryId: category.id,
+            });
+          }
+          await transaction.insert(productVariants).values({
+            productId: createdProduct.id,
+            sku: "CACTUS-STARTER-01",
+            titleFa: "نسخه استاندارد",
+            titleEn: "Standard Edition",
+            price: createdProduct.price,
+            inventory: createdProduct.inventory,
+            isActive: true,
+            sortOrder: 1,
           });
         }
       });

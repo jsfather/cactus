@@ -40,6 +40,11 @@ export const examQuestionType = pgEnum("exam_question_type", [
   "true_false",
   "short_answer",
 ]);
+export const commentStatus = pgEnum("comment_status", [
+  "pending",
+  "approved",
+  "rejected",
+]);
 
 export const appSettings = pgTable("app_settings", {
   key: varchar("key", { length: 120 }).primaryKey(),
@@ -178,6 +183,154 @@ export const products = pgTable(
     index("products_author_id_index").on(table.authorId),
   ],
 );
+
+export const productCategories = pgTable(
+  "product_categories",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: varchar("slug", { length: 180 }).notNull(),
+    titleFa: varchar("title_fa", { length: 160 }).notNull(),
+    titleEn: varchar("title_en", { length: 160 }),
+    descriptionFa: text("description_fa"),
+    descriptionEn: text("description_en"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [uniqueIndex("product_categories_slug_unique").on(table.slug)],
+);
+
+export const productCategoryAssignments = pgTable(
+  "product_category_assignments",
+  {
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => productCategories.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("product_category_assignments_unique").on(
+      table.productId,
+      table.categoryId,
+    ),
+    index("product_category_assignments_category_index").on(table.categoryId),
+  ],
+);
+
+export const productVariants = pgTable(
+  "product_variants",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    sku: varchar("sku", { length: 120 }).notNull(),
+    titleFa: varchar("title_fa", { length: 180 }).notNull(),
+    titleEn: varchar("title_en", { length: 180 }),
+    price: bigint("price", { mode: "number" }),
+    inventory: integer("inventory").default(0).notNull(),
+    isActive: boolean("is_active").default(true).notNull(),
+    sortOrder: integer("sort_order").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("product_variants_sku_unique").on(table.sku),
+    uniqueIndex("product_variants_product_sort_unique").on(
+      table.productId,
+      table.sortOrder,
+    ),
+    index("product_variants_product_index").on(table.productId),
+    check(
+      "product_variants_price_check",
+      sql`${table.price} is null or ${table.price} >= 0`,
+    ),
+    check("product_variants_inventory_check", sql`${table.inventory} >= 0`),
+    check("product_variants_sort_order_check", sql`${table.sortOrder} > 0`),
+  ],
+);
+
+export const comments = pgTable(
+  "comments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    postId: uuid("post_id").references(() => posts.id, { onDelete: "cascade" }),
+    productId: uuid("product_id").references(() => products.id, {
+      onDelete: "cascade",
+    }),
+    authorId: uuid("author_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    authorNameFa: varchar("author_name_fa", { length: 180 }).notNull(),
+    authorNameEn: varchar("author_name_en", { length: 180 }).notNull(),
+    body: text("body").notNull(),
+    status: commentStatus("status").default("pending").notNull(),
+    moderatedById: uuid("moderated_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    moderatedAt: timestamp("moderated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "comments_exactly_one_target_check",
+      sql`((${table.postId} is not null)::int + (${table.productId} is not null)::int) = 1`,
+    ),
+    index("comments_post_status_created_index").on(
+      table.postId,
+      table.status,
+      table.createdAt,
+    ),
+    index("comments_product_status_created_index").on(
+      table.productId,
+      table.status,
+      table.createdAt,
+    ),
+    index("comments_author_index").on(table.authorId),
+  ],
+);
+
+export const siteContent = pgTable("site_content", {
+  key: varchar("key", { length: 80 }).primaryKey(),
+  contactNumber: varchar("contact_number", { length: 80 }),
+  email: varchar("email", { length: 320 }),
+  addressFa: text("address_fa"),
+  addressEn: text("address_en"),
+  aboutUsFa: text("about_us_fa").notNull(),
+  aboutUsEn: text("about_us_en"),
+  missionFa: text("mission_fa").notNull(),
+  missionEn: text("mission_en"),
+  visionFa: text("vision_fa").notNull(),
+  visionEn: text("vision_en"),
+  footerTextFa: varchar("footer_text_fa", { length: 500 }).notNull(),
+  footerTextEn: varchar("footer_text_en", { length: 500 }),
+  updatedById: uuid("updated_by_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
 
 export const mediaAssets = pgTable(
   "media_assets",
@@ -323,3 +476,6 @@ export type MediaKind = (typeof mediaKind.enumValues)[number];
 export type Exam = typeof exams.$inferSelect;
 export type ExamStatus = (typeof examStatus.enumValues)[number];
 export type ExamQuestionType = (typeof examQuestionType.enumValues)[number];
+export type CommentStatus = (typeof commentStatus.enumValues)[number];
+export type ProductCategory = typeof productCategories.$inferSelect;
+export type ProductVariant = typeof productVariants.$inferSelect;

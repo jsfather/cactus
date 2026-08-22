@@ -43,6 +43,12 @@ export function SiteHeader({
           >
             {dictionary.shop}
           </Link>
+          <Link
+            href={localizePath(locale, "/about")}
+            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 lg:block dark:text-zinc-300 dark:hover:text-emerald-400"
+          >
+            {dictionary.about}
+          </Link>
           <a
             href="/login"
             className="rounded-xl border border-emerald-700/20 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100 sm:px-4 dark:border-emerald-400/20 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-950"

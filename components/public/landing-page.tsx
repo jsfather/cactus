@@ -36,12 +36,12 @@ export async function LandingPage({ locale }: { locale: Locale }) {
                 {dictionary.heroDescription}
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
-                <a
-                  href="#about"
+                <Link
+                  href={localizePath(locale, "/about")}
                   className="rounded-xl bg-emerald-700 px-6 py-3.5 font-semibold text-white shadow-lg shadow-emerald-700/20 transition hover:bg-emerald-800 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400"
                 >
                   {dictionary.heroAction}
-                </a>
+                </Link>
                 <Link
                   href={localizePath(locale, "/blog")}
                   className="rounded-xl border border-emerald-700/20 bg-white px-6 py-3.5 font-semibold text-emerald-800 transition hover:bg-emerald-100 dark:border-emerald-400/20 dark:bg-zinc-900 dark:text-emerald-300 dark:hover:bg-emerald-950"

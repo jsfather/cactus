@@ -2,21 +2,26 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { RichContent } from "@/components/content/rich-content";
+import { CommentsSection } from "@/components/comments/comments-section";
+import { PublicVariantPicker } from "@/components/products/public-variant-picker";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { getCurrentUser } from "@/lib/auth/session";
+import { getContentComments } from "@/lib/comments/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
+import { localizePath, type Locale } from "@/lib/i18n/config";
 import { getPublishedProduct } from "@/lib/products/queries";
 
 export async function ProductPage({ locale, slug }: { locale: Locale; slug: string }) {
   await connection();
   const product = await getPublishedProduct(slug, locale);
   if (!product) notFound();
+  const user = await getCurrentUser();
+  const comments = await getContentComments({ productId: product.id }, user?.id);
   const dictionary = getDictionary(locale);
   const title = locale === "en" ? product.titleEn || product.titleFa : product.titleFa;
   const summary = locale === "en" ? product.summaryEn || product.summaryFa : product.summaryFa;
   const content = locale === "en" ? product.contentEn || product.contentFa : product.contentFa;
-  const price = new Intl.NumberFormat(localeConfig[locale].dateLocale).format(product.price);
   return (
     <div className="min-h-dvh bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
       <SiteHeader locale={locale} currentPath={`/shop/${product.slug}`} />
@@ -32,15 +37,22 @@ export async function ProductPage({ locale, slug }: { locale: Locale; slug: stri
             <div className="self-center">
               <Link href={localizePath(locale, "/shop")} className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">{dictionary.backToShop}</Link>
               <h1 className="mt-5 text-4xl font-black leading-tight sm:text-5xl">{title}</h1>
+              {product.categories.length ? (
+                <ul className="mt-4 flex flex-wrap gap-2" aria-label={locale === "fa" ? "دسته‌بندی‌ها" : "Categories"}>
+                  {product.categories.map((category) => (
+                    <li key={category.id} className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                      {locale === "en" ? category.titleEn || category.titleFa : category.titleFa}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
               <p className="mt-5 text-lg leading-8 text-zinc-600 dark:text-zinc-300">{summary}</p>
-              <div className="mt-8 flex flex-wrap items-end justify-between gap-5 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-950">
-                <p><span className="block text-sm text-zinc-500">{dictionary.price}</span><strong className="mt-1 block text-2xl text-emerald-800 dark:text-emerald-300">{price} <span className="text-sm">{dictionary.toman}</span></strong></p>
-                <span className={product.inventory > 0 ? "rounded-full bg-emerald-100 px-3 py-1.5 text-sm font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "rounded-full bg-red-100 px-3 py-1.5 text-sm font-semibold text-red-700 dark:bg-red-950 dark:text-red-300"}>{product.inventory > 0 ? dictionary.inStock : dictionary.outOfStock}</span>
-              </div>
+              <PublicVariantPicker locale={locale} basePrice={product.price} baseInventory={product.inventory} variants={product.variants} />
             </div>
           </div>
         </section>
         <article className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20"><RichContent html={content} className="text-lg leading-9 text-zinc-700 dark:text-zinc-300" /></article>
+        <CommentsSection locale={locale} targetType="product" targetId={product.id} slug={product.slug} comments={comments} user={user} />
       </main>
       <SiteFooter locale={locale} />
     </div>
