@@ -10,12 +10,12 @@ const nextConfig: NextConfig = {
     // Webpack heap, which is preferable for constrained Docker builders.
     webpackMemoryOptimizations: true,
     webpackBuildWorker: true,
+    // Avoid an extra TypeScript CLI subprocess when build-time type checking
+    // is intentionally disabled below.
+    useTypeScriptCli: false,
   },
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   images: {
     remotePatterns: [
