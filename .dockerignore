@@ -2,6 +2,9 @@
 .gitignore
 .next
 node_modules
+.data
+compose*.yaml
+docker/postgres
 
 .env*
 !.env.example

@@ -33,7 +33,7 @@ ENV RUN_MIGRATIONS="true"
 ENV UPLOAD_DIR="/app/uploads"
 
 RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 nextjs \
+  && adduser --system --uid 1001 --ingroup nodejs nextjs \
   && mkdir -p /app/uploads \
   && chown nextjs:nodejs /app/uploads
 

@@ -11,6 +11,7 @@ import {
 
 const managedUserSelection = {
   id: users.id,
+  mobile: users.mobile,
   email: users.email,
   firstNameFa: users.firstNameFa,
   lastNameFa: users.lastNameFa,
@@ -30,7 +31,8 @@ export async function getUsersByRole(
   query: AdminListQuery & { status: UserStatusFilter },
 ): Promise<PaginatedResult<{
   id: string;
-  email: string;
+  mobile: string;
+  email: string | null;
   firstNameFa: string;
   lastNameFa: string;
   firstNameEn: string;
@@ -52,6 +54,7 @@ export async function getUsersByRole(
         : undefined,
     query.q
       ? or(
+          ilike(users.mobile, pattern),
           ilike(users.email, pattern),
           ilike(users.firstNameFa, pattern),
           ilike(users.lastNameFa, pattern),

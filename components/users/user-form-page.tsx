@@ -50,7 +50,7 @@ export async function EditUserPage({
       <PanelPageHeader
         eyebrow={dictionary.users.eyebrow}
         title={locale === "fa" ? `ویرایش ${config.singular}` : `Edit ${config.singular.toLowerCase()}`}
-        description={locale === "fa" ? "نام، ایمیل، رمز عبور یا وضعیت دسترسی این حساب را تغییر دهید." : "Update this account's name, email, password, image, or access status."}
+        description={locale === "fa" ? "نام، شماره موبایل، رمز عبور یا وضعیت دسترسی این حساب را تغییر دهید." : "Update this account's name, mobile, password, image, or access status."}
       />
       <UserForm
         role={role}
@@ -62,7 +62,8 @@ export async function EditUserPage({
           lastNameFa: user.lastNameFa,
           firstNameEn: user.firstNameEn,
           lastNameEn: user.lastNameEn,
-          email: user.email,
+          mobile: user.mobile,
+          email: user.email ?? "",
           password: "",
           role: user.role,
           isActive: user.isActive,

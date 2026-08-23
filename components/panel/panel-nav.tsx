@@ -106,7 +106,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
           <UserAvatar name={userName} src={user.avatarUrl} className="size-11" />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold text-zinc-950 dark:text-zinc-50">{userName}</span>
-            <span className="nums-en mt-0.5 block truncate text-xs text-zinc-500" dir="ltr">{user.email}</span>
+            <span className="nums-en mt-0.5 block truncate text-xs text-zinc-500" dir="ltr">{user.mobile}</span>
           </span>
         </Link>
         <div className="mt-3 flex items-center justify-between gap-3 px-2 text-xs">

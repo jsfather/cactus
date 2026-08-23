@@ -177,6 +177,7 @@ export const panelDictionaries = {
     users: {
       eyebrow: "مدیریت کاربران",
       name: "نام",
+      mobile: "شماره موبایل",
       email: "ایمیل",
       accountStatus: "وضعیت",
       currentAccount: "حساب فعلی شما",
@@ -208,7 +209,7 @@ export const panelDictionaries = {
       lastNameFa: "نام خانوادگی فارسی",
       firstNameEn: "نام انگلیسی",
       lastNameEn: "نام خانوادگی انگلیسی",
-      emailHint: "ایمیل جدید برای ورودهای بعدی شما استفاده می‌شود.",
+      emailHint: "اختیاری؛ برای ارتباط با شما استفاده می‌شود.",
       bioFa: "معرفی فارسی",
       bioEn: "معرفی انگلیسی",
       bioDescription: "برای معرفی حرفه‌ای خود، متن کوتاهی در هر دو زبان بنویسید.",
@@ -392,6 +393,7 @@ export const panelDictionaries = {
     users: {
       eyebrow: "User management",
       name: "Name",
+      mobile: "Mobile",
       email: "Email",
       accountStatus: "Status",
       currentAccount: "Your current account",
@@ -423,7 +425,7 @@ export const panelDictionaries = {
       lastNameFa: "Persian last name",
       firstNameEn: "English first name",
       lastNameEn: "English last name",
-      emailHint: "Your new email will be used for future sign-ins.",
+      emailHint: "Optional; used as a contact address.",
       bioFa: "Persian bio",
       bioEn: "English bio",
       bioDescription: "Write a short professional introduction in both available languages.",

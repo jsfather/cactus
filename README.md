@@ -8,7 +8,7 @@ This is the multilingual website and role-based application panel for Cactus Rob
 - `/en`: English public landing page (`en`, LTR)
 - `/blog` and `/en/blog`: published bilingual rich-text blog posts
 - `/shop` and `/en/shop`: public multilingual product catalog
-- `/login` and `/register`: shared login plus public member registration
+- `/login` and `/register`: mobile OTP login and member registration, with optional password login
 - `/panel/admin`: protected administrator panel
 - `/panel/admin/blog`: full blog CRUD, rich-text editing, and cover uploads
 - `/panel/admin/products`: full product CRUD, inventory, rich-text descriptions, and image uploads
@@ -20,7 +20,7 @@ This is the multilingual website and role-based application panel for Cactus Rob
 - `/panel/teacher`: protected teacher workspace
 - `/panel/student`: protected student workspace
 - `/panel/member`: protected regular member workspace
-- `/panel/profile`: personal profile, editable email, bilingual biography, and avatar upload
+- `/panel/profile`: first-login profile completion, optional password, contact email, bilingual biography, and avatar upload
 
 ## Local development
 
@@ -32,6 +32,14 @@ cp .env.example .env
 pnpm db:setup
 pnpm dev
 ```
+
+To run the repository-managed PostgreSQL 18 data directory with automatic restart:
+
+```bash
+docker compose -f compose.local.yaml up -d postgres
+```
+
+The service binds only to `127.0.0.1:5432`, reuses `.data/postgres`, and uses `restart: unless-stopped`.
 
 Open [http://localhost:3000](http://localhost:3000).
 
@@ -82,9 +90,11 @@ The public website, login page, and every panel role expose the same theme selec
 
 This repository includes a multi-stage `Dockerfile` that produces a small, non-root standalone Next.js image.
 
+> `compose.local.yaml` is only for the developer machine. In Dokploy, keep the application build type set to **Dockerfile**. Do not deploy the local Compose file and do not create a PostgreSQL container inside the application service.
+
 ### 1. Create PostgreSQL as a separate service
 
-1. In the same Dokploy project and environment, create a **PostgreSQL Database** service named `cactus-postgres`.
+1. In the same Dokploy project and environment, create a **PostgreSQL Database** service named `cactus-postgres`, or reuse the existing PostgreSQL service for this application.
 2. Choose a dedicated database name, user, and strong password, then deploy the database.
 3. In the database **Connection** tab, copy its **Internal Connection URL**. Keep PostgreSQL private; the app does not require an external database port.
 4. Configure database backups before production traffic.
@@ -104,10 +114,15 @@ DATABASE_URL=<the PostgreSQL Internal Connection URL>
 DATABASE_POOL_MAX=10
 DATABASE_SSL=disable
 RUN_MIGRATIONS=true
+ADMIN_MOBILE=09121234567
 ADMIN_EMAIL=admin@example.com
 ADMIN_PASSWORD=<a strong password with at least 8 characters>
 ADMIN_NAME_FA=همکار کاکتوس
 ADMIN_NAME_EN=Cactus Administrator
+SMS_PROVIDER=kavenegar
+KAVENEGAR_API_KEY=<server-only API key>
+KAVENEGAR_VERIFY_TEMPLATE=<approved verification template name>
+AUTH_OTP_SECRET=<a long random server-only secret>
 SITE_URL=https://example.com
 UPLOAD_DIR=/app/uploads
 ```
@@ -116,7 +131,9 @@ Set `SITE_URL` to the public HTTPS origin of the deployed site. It is used for c
 
 In the application service, add a persistent Docker volume mounted at `/app/uploads`. Without this volume, uploaded blog covers, product images, rich-text images, and avatars will be lost when Dokploy replaces the container. A named volume works with the image's non-root user automatically; for a host bind mount, make the directory writable by UID/GID `1001`.
 
-Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the configured initial administrator only when no administrator account exists. If one or more administrators already exist, all `ADMIN_*` bootstrap variables are ignored. After the first successful login, you may remove `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_NAME_FA`, and `ADMIN_NAME_EN` together; the existing account remains unchanged. `ADMIN_NAME` is still accepted as a legacy Persian-name fallback during upgrades.
+Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the configured initial administrator only when no administrator account exists. If an administrator already exists, name, email, and password bootstrap values are ignored; `ADMIN_MOBILE` is used once only when that administrator still has a migration placeholder. After the first successful mobile login, you may remove the `ADMIN_*` bootstrap variables together; the existing account remains unchanged. `ADMIN_NAME` is still accepted as a legacy Persian-name fallback during upgrades.
+
+Before the first deployment of the mobile-authentication upgrade, take a PostgreSQL backup and set `ADMIN_MOBILE` to the mobile number that should be assigned to the existing administrator. The migration preserves all existing users and data; legacy accounts receive temporary internal mobile placeholders until an administrator assigns their real numbers. Startup intentionally fails instead of deploying an administrator account that still has a placeholder mobile.
 
 The readiness endpoint is `/api/health`. It returns a successful response only when the app can reach PostgreSQL.
 

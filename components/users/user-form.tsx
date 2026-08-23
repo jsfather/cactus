@@ -14,15 +14,15 @@ import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getUserSectionConfig } from "@/lib/users/config";
 
 const initialState: UserFormState = {};
-export type UserFormValues = { firstNameFa: string; lastNameFa: string; firstNameEn: string; lastNameEn: string; email: string; password: string; role: UserRole; isActive: boolean; avatarUrl: string };
+export type UserFormValues = { firstNameFa: string; lastNameFa: string; firstNameEn: string; lastNameEn: string; mobile: string; email: string; password: string; role: UserRole; isActive: boolean; avatarUrl: string };
 
-export function UserForm({ role, locale, mode = "create", userId, initialValues = { firstNameFa: "", lastNameFa: "", firstNameEn: "", lastNameEn: "", email: "", password: "", role, isActive: true, avatarUrl: "" } }: { role: UserRole; locale: Locale; mode?: "create" | "edit"; userId?: string; initialValues?: UserFormValues }) {
+export function UserForm({ role, locale, mode = "create", userId, initialValues = { firstNameFa: "", lastNameFa: "", firstNameEn: "", lastNameEn: "", mobile: "", email: "", password: "", role, isActive: true, avatarUrl: "" } }: { role: UserRole; locale: Locale; mode?: "create" | "edit"; userId?: string; initialValues?: UserFormValues }) {
   const config = getUserSectionConfig(role, locale);
   const dictionary = getPanelDictionary(locale);
   const formAction = mode === "edit" && userId ? updateManagedUser.bind(null, role, userId) : createManagedUser.bind(null, role);
   const [state, action, pending] = useActionState(formAction, initialState);
   useActionErrorToast(state);
-  const { bind } = usePreservedFields({ firstNameFa: initialValues.firstNameFa, lastNameFa: initialValues.lastNameFa, firstNameEn: initialValues.firstNameEn, lastNameEn: initialValues.lastNameEn, email: initialValues.email, password: initialValues.password, role: initialValues.role });
+  const { bind } = usePreservedFields({ firstNameFa: initialValues.firstNameFa, lastNameFa: initialValues.lastNameFa, firstNameEn: initialValues.firstNameEn, lastNameEn: initialValues.lastNameEn, mobile: initialValues.mobile, email: initialValues.email, password: initialValues.password, role: initialValues.role });
   const [isActive, setIsActive] = useState(initialValues.isActive);
   const isFa = locale === "fa";
 
@@ -50,13 +50,13 @@ export function UserForm({ role, locale, mode = "create", userId, initialValues 
               </div>
               <div>
                 <FormLabel label={dictionary.users.firstNameEn}>
-                  <PanelInput {...bind("firstNameEn")} required autoComplete="given-name" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("firstNameEn")} autoComplete="given-name" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.firstNameEn} />
               </div>
               <div>
                 <FormLabel label={dictionary.users.lastNameEn}>
-                  <PanelInput {...bind("lastNameEn")} required autoComplete="family-name" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("lastNameEn")} autoComplete="family-name" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.lastNameEn} />
               </div>
@@ -65,21 +65,27 @@ export function UserForm({ role, locale, mode = "create", userId, initialValues 
 
           <PanelFormSection
             title={isFa ? "اطلاعات ورود" : "Sign-in details"}
-            description={isFa ? "ایمیل و رمز عبور برای ورود به پنل استفاده می‌شوند." : "The email address and password are used to sign in to the panel."}
+            description={isFa ? "شماره موبایل شناسه اصلی ورود است؛ ایمیل و رمز عبور اختیاری هستند." : "The mobile number is the primary sign-in identifier; email and password are optional."}
           >
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
+                <FormLabel label={dictionary.users.mobile}>
+                  <PanelInput {...bind("mobile")} type="tel" required autoComplete="tel-national" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.mobile} />
+              </div>
+              <div>
                 <FormLabel label={dictionary.users.email}>
-                  <PanelInput {...bind("email")} type="email" required autoComplete="email" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("email")} type="email" autoComplete="email" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.email} />
               </div>
               <div>
                 <FormLabel
                   label={mode === "edit" ? dictionary.users.newPassword : dictionary.users.password}
-                  hint={mode === "edit" ? (isFa ? "برای حفظ رمز فعلی، خالی بگذارید؛ در غیر این صورت حداقل ۸ نویسه استفاده کنید." : "Leave blank to keep the current password; otherwise use at least 8 characters.") : (isFa ? "حداقل ۸ نویسه استفاده کنید." : "Use at least 8 characters.")}
+                  hint={mode === "edit" ? (isFa ? "برای حفظ رمز فعلی، خالی بگذارید؛ در غیر این صورت حداقل ۸ نویسه استفاده کنید." : "Leave blank to keep the current password; otherwise use at least 8 characters.") : (isFa ? "اختیاری؛ در صورت استفاده حداقل ۸ نویسه." : "Optional; use at least 8 characters if set.")}
                 >
-                  <PanelInput {...bind("password")} type="password" required={mode === "create"} minLength={8} autoComplete="new-password" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("password")} type="password" minLength={8} autoComplete="new-password" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.password} />
               </div>

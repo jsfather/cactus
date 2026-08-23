@@ -12,21 +12,24 @@ import { users, userRole, type UserRole } from "@/lib/db/schema";
 import { roleHome } from "@/lib/auth/roles";
 import { userSectionConfig } from "@/lib/users/config";
 import { isAllowedImageReference } from "@/lib/media/reference";
+import { normalizeIranianMobile } from "@/lib/auth/mobile";
 
 const roleSchema = z.enum(userRole.enumValues);
+const mobileSchema = z.string().trim().refine((value) => normalizeIranianMobile(value) !== null).transform((value) => normalizeIranianMobile(value)!);
 const commonUserSchema = z.object({
   firstNameFa: z.string().trim().min(1).max(80),
   lastNameFa: z.string().trim().min(1).max(80),
-  firstNameEn: z.string().trim().min(1).max(80),
-  lastNameEn: z.string().trim().min(1).max(80),
-  email: z.string().trim().email().max(320),
+  firstNameEn: z.string().trim().max(80),
+  lastNameEn: z.string().trim().max(80),
+  mobile: mobileSchema,
+  email: z.union([z.literal(""), z.string().trim().email().max(320)]),
   role: roleSchema,
   isActive: z.boolean(),
   avatarUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
   locale: z.enum(["fa", "en"]),
 });
 const createUserSchema = commonUserSchema.extend({
-  password: z.string().min(8).max(256),
+  password: z.union([z.literal(""), z.string().min(8).max(256)]),
 });
 const updateUserSchema = commonUserSchema.extend({
   password: z.union([z.literal(""), z.string().min(8).max(256)]),
@@ -49,6 +52,7 @@ function readUserForm(formData: FormData) {
     firstNameEn: formData.get("firstNameEn"),
     lastNameEn: formData.get("lastNameEn"),
     email: formData.get("email"),
+    mobile: formData.get("mobile"),
     role: formData.get("role"),
     password: formData.get("password"),
     isActive: formData.get("isActive") === "on",
@@ -96,15 +100,16 @@ export async function createManagedUser(
       lastNameFa: parsed.data.lastNameFa,
       firstNameEn: parsed.data.firstNameEn,
       lastNameEn: parsed.data.lastNameEn,
-      email: parsed.data.email.toLowerCase(),
-      passwordHash: await hashPassword(parsed.data.password),
+      mobile: parsed.data.mobile,
+      email: parsed.data.email ? parsed.data.email.toLowerCase() : null,
+      passwordHash: parsed.data.password ? await hashPassword(parsed.data.password) : null,
       role: parsed.data.role,
       isActive: parsed.data.isActive,
       avatarUrl: parsed.data.avatarUrl || null,
     });
   } catch (error) {
     if (isUniqueViolation(error)) {
-      return { error: parsed.data.locale === "en" ? "This email is already used by another account." : "این ایمیل قبلاً برای حساب دیگری ثبت شده است." };
+      return { error: parsed.data.locale === "en" ? "This mobile number or email is already used by another account." : "این شماره موبایل یا ایمیل قبلاً برای حساب دیگری ثبت شده است." };
     }
 
     throw error;
@@ -154,7 +159,8 @@ export async function updateManagedUser(
     lastNameFa: parsed.data.lastNameFa,
     firstNameEn: parsed.data.firstNameEn,
     lastNameEn: parsed.data.lastNameEn,
-    email: parsed.data.email.toLowerCase(),
+    mobile: parsed.data.mobile,
+    email: parsed.data.email ? parsed.data.email.toLowerCase() : null,
     isActive: parsed.data.isActive,
     avatarUrl: parsed.data.avatarUrl || null,
     role: parsed.data.role,
@@ -163,6 +169,8 @@ export async function updateManagedUser(
 
   if (parsed.data.password) {
     changes.passwordHash = await hashPassword(parsed.data.password);
+    changes.passwordFailedAttempts = 0;
+    changes.passwordLockedUntil = null;
   }
 
   try {
@@ -182,7 +190,7 @@ export async function updateManagedUser(
     }
   } catch (error) {
     if (isUniqueViolation(error)) {
-      return { error: parsed.data.locale === "en" ? "This email is already used by another account." : "این ایمیل قبلاً برای حساب دیگری ثبت شده است." };
+      return { error: parsed.data.locale === "en" ? "This mobile number or email is already used by another account." : "این شماره موبایل یا ایمیل قبلاً برای حساب دیگری ثبت شده است." };
     }
 
     throw error;

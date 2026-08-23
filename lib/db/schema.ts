@@ -45,6 +45,7 @@ export const commentStatus = pgEnum("comment_status", [
   "approved",
   "rejected",
 ]);
+export const otpPurpose = pgEnum("otp_purpose", ["login", "register"]);
 
 export const appSettings = pgTable("app_settings", {
   key: varchar("key", { length: 120 }).primaryKey(),
@@ -61,12 +62,15 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    email: varchar("email", { length: 320 }).notNull(),
+    mobile: varchar("mobile", { length: 64 }).notNull(),
+    email: varchar("email", { length: 320 }),
     firstNameFa: varchar("first_name_fa", { length: 80 }).notNull(),
     lastNameFa: varchar("last_name_fa", { length: 80 }).notNull(),
     firstNameEn: varchar("first_name_en", { length: 80 }).notNull(),
     lastNameEn: varchar("last_name_en", { length: 80 }).notNull(),
-    passwordHash: text("password_hash").notNull(),
+    passwordHash: text("password_hash"),
+    passwordFailedAttempts: integer("password_failed_attempts").default(0).notNull(),
+    passwordLockedUntil: timestamp("password_locked_until", { withTimezone: true }),
     role: userRole("role").default("member").notNull(),
     isActive: boolean("is_active").default(true).notNull(),
     avatarUrl: text("avatar_url"),
@@ -79,7 +83,34 @@ export const users = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (table) => [uniqueIndex("users_email_unique").on(table.email)],
+  (table) => [
+    uniqueIndex("users_mobile_unique").on(table.mobile),
+    uniqueIndex("users_email_unique").on(table.email),
+  ],
+);
+
+export const otpChallenges = pgTable(
+  "otp_challenges",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    mobile: varchar("mobile", { length: 11 }).notNull(),
+    purpose: otpPurpose("purpose").notNull(),
+    codeHash: varchar("code_hash", { length: 64 }).notNull(),
+    attempts: integer("attempts").default(0).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("otp_challenges_mobile_purpose_created_index").on(
+      table.mobile,
+      table.purpose,
+      table.createdAt,
+    ),
+    index("otp_challenges_expires_at_index").on(table.expiresAt),
+  ],
 );
 
 export const sessions = pgTable(
@@ -470,6 +501,7 @@ export const examQuestionOptions = pgTable(
 );
 
 export type UserRole = (typeof userRole.enumValues)[number];
+export type OtpPurpose = (typeof otpPurpose.enumValues)[number];
 export type Post = typeof posts.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type MediaKind = (typeof mediaKind.enumValues)[number];

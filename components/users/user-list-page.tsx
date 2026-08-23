@@ -60,7 +60,7 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
           action={config.path}
           locale={locale}
           query={listQuery.q}
-          searchPlaceholder={locale === "fa" ? "جست‌وجوی نام یا ایمیل…" : "Search name or email…"}
+          searchPlaceholder={locale === "fa" ? "جست‌وجوی نام، موبایل یا ایمیل…" : "Search name, mobile, or email…"}
           filters={[{
             name: "status",
             label: dictionary.users.accountStatus,
@@ -76,14 +76,14 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
           <PanelTable
             columns={[
               { label: dictionary.users.name, className: "w-[28%]" },
-              { label: dictionary.users.email, className: "w-[27%]" },
+              { label: dictionary.users.mobile, className: "w-[27%]" },
               { label: dictionary.users.accountStatus, className: "w-[13%]" },
               { label: dictionary.common.createdAt, className: "w-[17%]" },
               { label: dictionary.common.actions, className: "w-[15%]" },
             ]}
           >
             {usersPage.items.map((user) => {
-              const userName = getLocalizedUserName(user, locale);
+              const userName = getLocalizedUserName(user, locale) || user.mobile;
 
               return <tr key={user.id}>
                 <PanelTableCell>
@@ -94,7 +94,7 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
                 </PanelTableCell>
                 <PanelTableCell>
                   <span className="block truncate">
-                    <bdi className="nums-en" dir="ltr">{user.email}</bdi>
+                    <bdi className="nums-en" dir="ltr">{user.mobile}</bdi>
                   </span>
                 </PanelTableCell>
                 <PanelTableCell>

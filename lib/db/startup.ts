@@ -1,11 +1,12 @@
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
-import { asc, eq, sql } from "drizzle-orm";
+import { asc, eq, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
 import { hashPassword } from "@/lib/auth/password";
+import { normalizeIranianMobile } from "@/lib/auth/mobile";
 import {
   appSettings,
   comments,
@@ -72,42 +73,56 @@ export async function setupDatabase() {
       // Serialize bootstrap across replicas so only one can observe an admin-free database.
       await transaction.execute(sql`select pg_advisory_xact_lock(${adminBootstrapLockId})`);
 
+      const rawMobile = process.env.ADMIN_MOBILE?.trim() || "";
+      const mobile = normalizeIranianMobile(rawMobile);
+
       const [existingAdmin] = await transaction
-        .select({ id: users.id })
+        .select({ id: users.id, mobile: users.mobile })
         .from(users)
         .where(eq(users.role, "admin"))
         .orderBy(asc(users.createdAt))
         .limit(1);
 
       if (existingAdmin) {
+        if (existingAdmin.mobile.startsWith("legacy:")) {
+          if (process.env.NODE_ENV === "production" && !mobile) {
+            throw new Error(
+              "ADMIN_MOBILE is required once to migrate the existing administrator to mobile authentication.",
+            );
+          }
+
+          if (!mobile) return existingAdmin.id;
+
+          await transaction
+            .update(users)
+            .set({ mobile, updatedAt: new Date() })
+            .where(eq(users.id, existingAdmin.id));
+        }
         return existingAdmin.id;
       }
 
       const email = process.env.ADMIN_EMAIL?.trim().toLowerCase() || null;
       const password = process.env.ADMIN_PASSWORD || null;
 
-      if (
-        (email && (!password || password.length < 8)) ||
-        (!email && password)
-      ) {
+      if ((rawMobile || password) && (!mobile || !password || password.length < 8)) {
         throw new Error(
-          "ADMIN_EMAIL and ADMIN_PASSWORD (minimum 8 characters) must be provided together.",
+          "ADMIN_MOBILE and ADMIN_PASSWORD (minimum 8 characters) must be provided together.",
         );
       }
 
-      if (!email || !password) {
+      if (!mobile || !password) {
         return null;
       }
 
       const [existingUser] = await transaction
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.email, email))
+        .where(email ? or(eq(users.mobile, mobile), eq(users.email, email)) : eq(users.mobile, mobile))
         .limit(1);
 
       if (existingUser) {
         throw new Error(
-          "ADMIN_EMAIL already belongs to a non-administrator account.",
+          "ADMIN_MOBILE or ADMIN_EMAIL already belongs to a non-administrator account.",
         );
       }
 
@@ -124,6 +139,7 @@ export async function setupDatabase() {
       const [createdAdmin] = await transaction
         .insert(users)
         .values({
+          mobile,
           email,
           firstNameFa: process.env.ADMIN_FIRST_NAME_FA?.trim() || adminNameFa.firstName,
           lastNameFa: process.env.ADMIN_LAST_NAME_FA?.trim() || adminNameFa.lastName,
@@ -489,6 +505,7 @@ export async function setupDatabase() {
           firstNameEn: "Cactus Demo",
           lastNameEn: "Teacher",
           email: "teacher.example@cactus.local",
+          mobile: "seed:teacher",
         },
         {
           key: "seed.users.student.v1",
@@ -498,6 +515,7 @@ export async function setupDatabase() {
           firstNameEn: "Cactus Demo",
           lastNameEn: "Student",
           email: "student.example@cactus.local",
+          mobile: "seed:student",
         },
         {
           key: "seed.users.member.v1",
@@ -507,6 +525,7 @@ export async function setupDatabase() {
           firstNameEn: "Cactus Demo",
           lastNameEn: "Member",
           email: "member.example@cactus.local",
+          mobile: "seed:member",
         },
       ];
 
@@ -534,6 +553,7 @@ export async function setupDatabase() {
               lastNameFa: starterAccount.lastNameFa,
               firstNameEn: starterAccount.firstNameEn,
               lastNameEn: starterAccount.lastNameEn,
+              mobile: starterAccount.mobile,
               email: starterAccount.email,
               passwordHash: await hashPassword(
                 randomBytes(32).toString("base64url"),

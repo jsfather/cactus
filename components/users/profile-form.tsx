@@ -15,9 +15,11 @@ const initialState: ProfileFormState = {};
 export function ProfileForm({
   locale,
   profile,
+  onboarding = false,
 }: {
   locale: Locale;
-  profile: { firstNameFa: string; lastNameFa: string; firstNameEn: string; lastNameEn: string; email: string; avatarUrl: string | null; bioFa: string | null; bioEn: string | null };
+  profile: { mobile: string; firstNameFa: string; lastNameFa: string; firstNameEn: string; lastNameEn: string; email: string | null; avatarUrl: string | null; bioFa: string | null; bioEn: string | null };
+  onboarding?: boolean;
 }) {
   const dictionary = getPanelDictionary(locale);
   const [state, action, pending] = useActionState(updateProfile, initialState);
@@ -27,7 +29,9 @@ export function ProfileForm({
     lastNameFa: profile.lastNameFa,
     firstNameEn: profile.firstNameEn,
     lastNameEn: profile.lastNameEn,
-    email: profile.email,
+    email: profile.email || "",
+    password: "",
+    confirmPassword: "",
     bioFa: profile.bioFa || "",
     bioEn: profile.bioEn || "",
   });
@@ -35,6 +39,7 @@ export function ProfileForm({
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="onboarding" value={onboarding ? "1" : "0"} />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
         <div className="min-w-0 space-y-6">
           <PanelFormSection title={dictionary.profile.personalInfo} description={dictionary.profile.namesDescription}>
@@ -53,21 +58,43 @@ export function ProfileForm({
               </div>
               <div>
                 <FormLabel label={dictionary.profile.firstNameEn}>
-                  <PanelInput {...bind("firstNameEn")} required autoComplete="given-name" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("firstNameEn")} autoComplete="given-name" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.firstNameEn} />
               </div>
               <div>
                 <FormLabel label={dictionary.profile.lastNameEn}>
-                  <PanelInput {...bind("lastNameEn")} required autoComplete="family-name" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("lastNameEn")} autoComplete="family-name" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.lastNameEn} />
               </div>
-              <div className="sm:col-span-2">
+              <div>
+                <FormLabel label={dictionary.users.mobile}>
+                  <PanelInput value={profile.mobile} readOnly disabled dir="ltr" className="nums-en" />
+                </FormLabel>
+              </div>
+              <div>
                 <FormLabel label={dictionary.users.email} hint={dictionary.profile.emailHint}>
-                  <PanelInput {...bind("email")} type="email" required autoComplete="email" dir="ltr" className="nums-en" />
+                  <PanelInput {...bind("email")} type="email" autoComplete="email" dir="ltr" className="nums-en" />
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.email} />
+              </div>
+            </div>
+          </PanelFormSection>
+
+          <PanelFormSection title={locale === "fa" ? "رمز عبور" : "Password"} description={locale === "fa" ? "اختیاری است. با ساخت رمز عبور، بعداً می‌توانید بدون انتظار برای پیامک وارد شوید." : "Optional. Create one to sign in later without waiting for an SMS."}>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <FormLabel label={locale === "fa" ? "رمز عبور جدید" : "New password"} hint={locale === "fa" ? "حداقل ۸ نویسه" : "At least 8 characters"}>
+                  <PanelInput {...bind("password")} type="password" minLength={8} autoComplete="new-password" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.password} />
+              </div>
+              <div>
+                <FormLabel label={locale === "fa" ? "تکرار رمز عبور" : "Confirm password"}>
+                  <PanelInput {...bind("confirmPassword")} type="password" minLength={8} autoComplete="new-password" dir="ltr" className="nums-en" />
+                </FormLabel>
+                <FieldError errors={state.fieldErrors?.confirmPassword} />
               </div>
             </div>
           </PanelFormSection>
@@ -97,7 +124,7 @@ export function ProfileForm({
         </aside>
       </div>
 
-      <PanelFormFooter message={dictionary.profile.saveHint} error={state.error}>
+      <PanelFormFooter message={onboarding ? (locale === "fa" ? "نام و نام خانوادگی فارسی برای ادامه الزامی است." : "Your Persian first and last name are required to continue.") : dictionary.profile.saveHint} error={state.error}>
         <button type="submit" disabled={pending} className={primaryButtonClass}>{pending ? dictionary.common.saving : dictionary.common.save}</button>
       </PanelFormFooter>
     </form>

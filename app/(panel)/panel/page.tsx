@@ -4,5 +4,6 @@ import { requireUser } from "@/lib/auth/session";
 
 export default async function PanelPage() {
   const user = await requireUser();
+  if (!user.profileComplete) redirect("/panel/profile?onboarding=1");
   redirect(roleHome[user.role]);
 }
