@@ -12,6 +12,7 @@ This is the multilingual website and role-based application panel for Cactus Rob
 - `/panel/admin`: protected administrator panel
 - `/panel/admin/blog`: full blog CRUD, rich-text editing, and cover uploads
 - `/panel/admin/products`: full product CRUD, inventory, rich-text descriptions, and image uploads
+- `/panel/student/information`: bilingual student onboarding with private documents and admin approval/rejection
 - `/panel/admin/media`: shared media-library CRUD, metadata, reusable URLs, and guarded deletion
 - `/panel/admin/admins`: administrator account CRUD
 - `/panel/admin/teachers`: teacher account CRUD
@@ -129,7 +130,7 @@ UPLOAD_DIR=/app/uploads
 
 Set `SITE_URL` to the public HTTPS origin of the deployed site. It is used for canonical links, Open Graph metadata, `robots.txt`, and sitemap URLs.
 
-In the application service, add a persistent Docker volume mounted at `/app/uploads`. Without this volume, uploaded blog covers, product images, rich-text images, and avatars will be lost when Dokploy replaces the container. A named volume works with the image's non-root user automatically; for a host bind mount, make the directory writable by UID/GID `1001`.
+In the application service, add a persistent Docker volume mounted at `/app/uploads`. Without this volume, uploaded blog covers, product images, rich-text images, avatars, and private student documents will be lost when Dokploy replaces the container. Student identity and education documents are stored below `/app/uploads/private/student-documents` and are served only through authenticated, authorized routes; never expose that directory as a static volume. A named volume works with the image's non-root user automatically; for a host bind mount, make the directory writable by UID/GID `1001`.
 
 Deploy the application. The container applies committed Drizzle migrations before accepting traffic and creates the configured initial administrator only when no administrator account exists. If an administrator already exists, name, email, and password bootstrap values are ignored; `ADMIN_MOBILE` is used once only when that administrator still has a migration placeholder. After the first successful mobile login, you may remove the `ADMIN_*` bootstrap variables together; the existing account remains unchanged. `ADMIN_NAME` is still accepted as a legacy Persian-name fallback during upgrades.
 

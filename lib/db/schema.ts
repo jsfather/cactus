@@ -2,6 +2,7 @@ import {
   bigint,
   boolean,
   check,
+  date,
   index,
   integer,
   pgEnum,
@@ -46,6 +47,20 @@ export const commentStatus = pgEnum("comment_status", [
   "rejected",
 ]);
 export const otpPurpose = pgEnum("otp_purpose", ["login", "register"]);
+export const studentInformationStatus = pgEnum("student_information_status", [
+  "draft",
+  "pending",
+  "approved",
+  "rejected",
+]);
+export const studentAllergyStatus = pgEnum("student_allergy_status", [
+  "none",
+  "has_allergy",
+]);
+export const studentDocumentKind = pgEnum("student_document_kind", [
+  "national_card",
+  "education_certificate",
+]);
 
 export const appSettings = pgTable("app_settings", {
   key: varchar("key", { length: 120 }).primaryKey(),
@@ -130,6 +145,95 @@ export const sessions = pgTable(
     uniqueIndex("sessions_token_hash_unique").on(table.tokenHash),
     index("sessions_user_id_index").on(table.userId),
     index("sessions_expires_at_index").on(table.expiresAt),
+  ],
+);
+
+export const studentInformation = pgTable(
+  "student_information",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    username: varchar("username", { length: 32 }).notNull(),
+    nationalCode: varchar("national_code", { length: 10 }),
+    birthDate: date("birth_date").notNull(),
+    educationLevelFa: varchar("education_level_fa", { length: 120 }).notNull(),
+    educationLevelEn: varchar("education_level_en", { length: 120 }),
+    fatherNameFa: varchar("father_name_fa", { length: 160 }).notNull(),
+    fatherNameEn: varchar("father_name_en", { length: 160 }),
+    motherNameFa: varchar("mother_name_fa", { length: 160 }).notNull(),
+    motherNameEn: varchar("mother_name_en", { length: 160 }),
+    fatherOccupationFa: varchar("father_occupation_fa", { length: 180 }).notNull(),
+    fatherOccupationEn: varchar("father_occupation_en", { length: 180 }),
+    motherOccupationFa: varchar("mother_occupation_fa", { length: 180 }).notNull(),
+    motherOccupationEn: varchar("mother_occupation_en", { length: 180 }),
+    allergyStatus: studentAllergyStatus("allergy_status").notNull(),
+    allergyDescriptionFa: varchar("allergy_description_fa", { length: 500 }),
+    allergyDescriptionEn: varchar("allergy_description_en", { length: 500 }),
+    interestLevel: integer("interest_level").notNull(),
+    focusLevel: integer("focus_level").notNull(),
+    status: studentInformationStatus("status").default("draft").notNull(),
+    rejectionReason: text("rejection_reason"),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedById: uuid("reviewed_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("student_information_user_unique").on(table.userId),
+    uniqueIndex("student_information_username_unique").on(table.username),
+    uniqueIndex("student_information_national_code_unique").on(table.nationalCode),
+    index("student_information_status_submitted_index").on(
+      table.status,
+      table.submittedAt,
+    ),
+    index("student_information_reviewer_index").on(table.reviewedById),
+    check(
+      "student_information_interest_level_check",
+      sql`${table.interestLevel} between 1 and 100`,
+    ),
+    check(
+      "student_information_focus_level_check",
+      sql`${table.focusLevel} between 1 and 100`,
+    ),
+    check(
+      "student_information_allergy_description_check",
+      sql`${table.allergyStatus} = 'none' or nullif(btrim(${table.allergyDescriptionFa}), '') is not null`,
+    ),
+  ],
+);
+
+export const studentDocuments = pgTable(
+  "student_documents",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    kind: studentDocumentKind("kind").notNull(),
+    pathname: text("pathname").notNull(),
+    originalName: varchar("original_name", { length: 255 }).notNull(),
+    mimeType: varchar("mime_type", { length: 100 }).notNull(),
+    size: integer("size").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("student_documents_user_kind_unique").on(table.userId, table.kind),
+    uniqueIndex("student_documents_pathname_unique").on(table.pathname),
+    index("student_documents_user_index").on(table.userId),
   ],
 );
 
@@ -502,6 +606,9 @@ export const examQuestionOptions = pgTable(
 
 export type UserRole = (typeof userRole.enumValues)[number];
 export type OtpPurpose = (typeof otpPurpose.enumValues)[number];
+export type StudentInformationStatus = (typeof studentInformationStatus.enumValues)[number];
+export type StudentAllergyStatus = (typeof studentAllergyStatus.enumValues)[number];
+export type StudentDocumentKind = (typeof studentDocumentKind.enumValues)[number];
 export type Post = typeof posts.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type MediaKind = (typeof mediaKind.enumValues)[number];

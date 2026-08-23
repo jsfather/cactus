@@ -12,6 +12,7 @@ import {
   PanelTableActionLink,
   PanelTableCell,
   PanelEditIcon,
+  PanelReviewIcon,
 } from "@/components/panel/ui";
 import { PanelListControls, PanelPagination } from "@/components/panel/list-controls";
 import { requireRole } from "@/lib/auth/session";
@@ -39,6 +40,10 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
   ]);
   const dictionary = getPanelDictionary(locale);
   const config = getUserSectionConfig(role, locale);
+  const studentStatusLabel = (status: "draft" | "pending" | "approved" | "rejected" | null) => {
+    if (locale === "fa") return status ? { draft: "تکمیل‌نشده", pending: "در انتظار بررسی", approved: "تأییدشده", rejected: "نیازمند اصلاح" }[status] : "ارسال‌نشده";
+    return status ? { draft: "Incomplete", pending: "Awaiting review", approved: "Approved", rejected: "Needs changes" }[status] : "Not submitted";
+  };
 
   return (
     <PanelPage>
@@ -74,7 +79,14 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
         />
         {usersPage.items.length ? (
           <PanelTable
-            columns={[
+            columns={role === "student" ? [
+              { label: dictionary.users.name, className: "w-[25%]" },
+              { label: dictionary.users.mobile, className: "w-[18%]" },
+              { label: locale === "fa" ? "وضعیت پرونده" : "Submission", className: "w-[17%]" },
+              { label: dictionary.users.accountStatus, className: "w-[11%]" },
+              { label: dictionary.common.createdAt, className: "w-[12%]" },
+              { label: dictionary.common.actions, className: "w-[17%]" },
+            ] : [
               { label: dictionary.users.name, className: "w-[28%]" },
               { label: dictionary.users.mobile, className: "w-[27%]" },
               { label: dictionary.users.accountStatus, className: "w-[13%]" },
@@ -97,6 +109,9 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
                     <bdi className="nums-en" dir="ltr">{user.mobile}</bdi>
                   </span>
                 </PanelTableCell>
+                {role === "student" ? <PanelTableCell>
+                  <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${user.studentInformationStatus === "approved" ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : user.studentInformationStatus === "pending" ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300" : user.studentInformationStatus === "rejected" ? "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"}`}>{studentStatusLabel(user.studentInformationStatus)}</span>
+                </PanelTableCell> : null}
                 <PanelTableCell>
                   <span
                     className={
@@ -113,6 +128,7 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
                 </PanelTableCell>
                 <PanelTableCell>
                   <PanelTableActions>
+                    {role === "student" ? <PanelTableActionLink href={`${config.path}/${user.id}/information`} label={locale === "fa" ? "بررسی اطلاعات دانش پژوه" : "Review student information"} tone="copy"><PanelReviewIcon /></PanelTableActionLink> : null}
                     <PanelTableActionLink
                       href={`${config.path}/${user.id}/edit`}
                       label={dictionary.common.edit}

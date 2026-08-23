@@ -85,6 +85,13 @@
       "when": 1787477415095,
       "tag": "0011_military_amazoness",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1787485185996,
+      "tag": "0012_magenta_flatman",
+      "breakpoints": true
     }
   ]
 }

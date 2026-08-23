@@ -1,6 +1,6 @@
 import { asc, and, eq, ilike, or, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
-import { users, type UserRole } from "@/lib/db/schema";
+import { studentInformation, users, type StudentInformationStatus, type UserRole } from "@/lib/db/schema";
 import {
   ADMIN_PAGE_SIZE,
   escapeLikePattern,
@@ -22,6 +22,7 @@ const managedUserSelection = {
   avatarUrl: users.avatarUrl,
   createdAt: users.createdAt,
   updatedAt: users.updatedAt,
+  studentInformationStatus: studentInformation.status,
 };
 
 export type UserStatusFilter = "all" | "active" | "inactive";
@@ -42,6 +43,7 @@ export async function getUsersByRole(
   avatarUrl: string | null;
   createdAt: Date;
   updatedAt: Date;
+  studentInformationStatus: StudentInformationStatus | null;
 }>> {
   const database = getDatabase();
   const pattern = `%${escapeLikePattern(query.q)}%`;
@@ -73,6 +75,7 @@ export async function getUsersByRole(
   const items = await database
     .select(managedUserSelection)
     .from(users)
+    .leftJoin(studentInformation, eq(studentInformation.userId, users.id))
     .where(where)
     .orderBy(asc(users.firstNameFa), asc(users.lastNameFa), asc(users.createdAt))
     .limit(ADMIN_PAGE_SIZE)
@@ -85,6 +88,7 @@ export async function getManagedUser(userId: string, role: UserRole) {
   const [user] = await getDatabase()
     .select(managedUserSelection)
     .from(users)
+    .leftJoin(studentInformation, eq(studentInformation.userId, users.id))
     .where(and(eq(users.id, userId), eq(users.role, role)))
     .limit(1);
 

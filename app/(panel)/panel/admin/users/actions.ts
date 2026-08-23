@@ -1,5 +1,6 @@
 "use server";
 
+import { unlink } from "node:fs/promises";
 import { and, count, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -8,11 +9,12 @@ import { hashPassword } from "@/lib/auth/password";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
-import { users, userRole, type UserRole } from "@/lib/db/schema";
+import { studentDocuments, users, userRole, type UserRole } from "@/lib/db/schema";
 import { roleHome } from "@/lib/auth/roles";
 import { userSectionConfig } from "@/lib/users/config";
 import { isAllowedImageReference } from "@/lib/media/reference";
 import { normalizeIranianMobile } from "@/lib/auth/mobile";
+import { resolveStudentDocumentPath } from "@/lib/student-information/document-storage";
 
 const roleSchema = z.enum(userRole.enumValues);
 const mobileSchema = z.string().trim().refine((value) => normalizeIranianMobile(value) !== null).transform((value) => normalizeIranianMobile(value)!);
@@ -221,6 +223,11 @@ export async function deleteManagedUser(
   }
 
   try {
+    const documentPaths = validRole.data === "student"
+      ? await getDatabase().select({ pathname: studentDocuments.pathname })
+          .from(studentDocuments)
+          .where(eq(studentDocuments.userId, validUserId.data))
+      : [];
     await getDatabase()
       .delete(users)
       .where(
@@ -229,6 +236,10 @@ export async function deleteManagedUser(
           eq(users.role, validRole.data),
         ),
       );
+    await Promise.all(documentPaths.map(async ({ pathname }) => {
+      const absolutePath = resolveStudentDocumentPath(pathname);
+      if (absolutePath) await unlink(absolutePath).catch(() => undefined);
+    }));
   } catch (error) {
     if (isForeignKeyViolation(error)) {
       return {

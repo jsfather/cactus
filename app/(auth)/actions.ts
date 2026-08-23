@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "node:crypto";
 import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -21,6 +22,7 @@ export type MobileAuthState = {
   developmentCode?: string;
   error?: string;
   fieldErrors?: Record<string, string[]>;
+  attemptId?: string;
 };
 
 function readLocale(formData: FormData): Locale {
@@ -58,18 +60,21 @@ export async function requestAuthenticationOtp(
   const purpose: OtpPurpose = user ? "login" : "register";
   const result = await requestOtp(mobile, purpose);
   if (!result.ok) {
+    const keepVerification = previousState.step === "verify" &&
+      previousState.mobile === mobile &&
+      previousState.purpose === purpose;
+    const stayOnVerification = result.reason === "rate_limited" || keepVerification;
     return {
-      step: result.reason === "rate_limited" ? "verify" : undefined,
+      step: stayOnVerification ? "verify" : undefined,
       error: result.reason === "rate_limited" ? dictionary.rateLimited : dictionary.smsFailed,
       mobile,
       purpose,
       hasPassword: purpose === "login" && Boolean(user?.passwordHash),
       developmentCode:
-        result.reason === "rate_limited" &&
-        previousState.mobile === mobile &&
-        previousState.purpose === purpose
+        stayOnVerification
           ? previousState.developmentCode
           : undefined,
+      attemptId: stayOnVerification ? randomUUID() : undefined,
     };
   }
 
@@ -79,6 +84,7 @@ export async function requestAuthenticationOtp(
     purpose,
     hasPassword: purpose === "login" && Boolean(user?.passwordHash),
     developmentCode: result.developmentCode,
+    attemptId: randomUUID(),
   };
 }
 

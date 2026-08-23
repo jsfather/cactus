@@ -74,6 +74,27 @@ label[for] {
   outline-offset: 3px;
 }
 
+/* These controls render a custom ring on their field boundary. */
+.auth-mobile-input:focus-visible,
+.auth-otp-input:focus-visible {
+  outline: none;
+  outline-offset: 0;
+}
+
+.auth-card:has([data-auth-step="verify"]) {
+  padding: 1.25rem;
+}
+
+.auth-card:has([data-auth-step="verify"]) .auth-card-intro {
+  margin-bottom: 0.75rem;
+}
+
+.auth-card:has([data-auth-step="verify"]) .auth-card-logo,
+.auth-card:has([data-auth-step="verify"]) .auth-card-description,
+.auth-card:has([data-auth-step="verify"]) .auth-card-footer {
+  display: none;
+}
+
 /*
  * Numeric glyph utilities
  *

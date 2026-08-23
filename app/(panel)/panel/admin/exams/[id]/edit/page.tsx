@@ -106,7 +106,6 @@ export default async function EditExamPage({
         </header>
         {questions.length ? (
           <PanelTable
-            minWidth="min-w-3xl"
             columns={[
               { label: "#", className: "w-[8%]" },
               { label: dictionary.exams.prompt, className: "w-[39%]" },

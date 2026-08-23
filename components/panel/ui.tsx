@@ -61,7 +61,7 @@ export const primaryButtonClass = getPanelButtonClass("primary");
 export const secondaryButtonClass = getPanelButtonClass("secondary");
 
 const tableActionBaseClass =
-  "inline-flex size-9 shrink-0 items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-45";
+  "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl border transition disabled:cursor-not-allowed disabled:opacity-45";
 
 const tableActionTone = {
   edit: "border-zinc-200 bg-white text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-emerald-400 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50",
@@ -70,7 +70,7 @@ const tableActionTone = {
 } as const;
 
 export function PanelTableActions({ children }: { children: ReactNode }) {
-  return <div className="flex items-center gap-1.5">{children}</div>;
+  return <div className="flex max-w-full flex-wrap items-center gap-1">{children}</div>;
 }
 
 export function PanelTableActionLink({ href, label, tone = "edit", children }: { href: string; label: string; tone?: keyof typeof tableActionTone; children: ReactNode }) {
@@ -91,6 +91,10 @@ export function PanelDeleteIcon() {
 
 export function PanelCopyIcon() {
   return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="6.5" y="6.5" width="9" height="9" rx="2" /><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6.5V5A1.5 1.5 0 0 0 12 3.5H5A1.5 1.5 0 0 0 3.5 5v7A1.5 1.5 0 0 0 5 13.5h1.5" /></svg>;
+}
+
+export function PanelReviewIcon() {
+  return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="M3.5 10s2.3-4 6.5-4 6.5 4 6.5 4-2.3 4-6.5 4-6.5-4-6.5-4Z" /><circle cx="10" cy="10" r="2" /></svg>;
 }
 
 export function PanelActionSpinner() {
@@ -211,22 +215,20 @@ export function PanelBackLink({ href, children }: { href: string; children: Reac
 export function PanelTable({
   columns,
   children,
-  minWidth = "min-w-4xl",
 }: {
   columns: Array<{ label: string; className?: string }>;
   children: ReactNode;
-  minWidth?: string;
 }) {
   return (
-    <div className="overflow-x-auto">
-      <table className={`w-full table-fixed text-sm ${minWidth}`}>
+    <div className="w-full min-w-0 overflow-hidden">
+      <table className="w-full min-w-0 table-fixed text-xs sm:text-sm">
         <thead className="bg-zinc-50 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.label}
                 scope="col"
-                className={`px-5 py-4 text-start align-middle font-medium ${column.className ?? ""}`}
+                className={`overflow-hidden px-2.5 py-3 text-start align-middle font-medium [overflow-wrap:anywhere] sm:px-3 sm:py-4 lg:px-4 ${column.className ?? ""}`}
               >
                 {column.label}
               </th>
@@ -249,7 +251,7 @@ export function PanelTableCell({
   className?: string;
 }) {
   return (
-    <td className={`px-5 py-4 text-start align-middle ${className}`}>
+    <td className={`overflow-hidden px-2.5 py-3 text-start align-middle [overflow-wrap:anywhere] sm:px-3 sm:py-4 lg:px-4 ${className}`}>
       {children}
     </td>
   );
