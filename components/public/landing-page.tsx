@@ -4,17 +4,23 @@ import { PostCard } from "@/components/blog/post-card";
 import { ProductCard } from "@/components/products/product-card";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { PublicTeacherCard } from "@/components/teacher-profiles/public-teacher-card";
+import { HonorCard } from "@/components/honors/honor-card";
 import { getPublishedPosts } from "@/lib/blog/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 import { getPublishedProducts } from "@/lib/products/queries";
+import { getPublicTeachers } from "@/lib/teacher-profiles/queries";
+import { getPublishedHonors } from "@/lib/honors/queries";
 
 export async function LandingPage({ locale }: { locale: Locale }) {
   await connection();
   const dictionary = getDictionary(locale);
-  const [posts, products] = await Promise.all([
+  const [posts, products, teachers, honors] = await Promise.all([
     getPublishedPosts(locale, 3),
     getPublishedProducts(locale, 3),
+    getPublicTeachers(3),
+    getPublishedHonors(3),
   ]);
 
   return (
@@ -96,6 +102,34 @@ export async function LandingPage({ locale }: { locale: Locale }) {
                 </p>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section className="border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/60">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+              <div className="text-start">
+                <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{locale === "fa" ? "تیم آموزشی" : "Teaching team"}</p>
+                <h2 className="mt-3 text-3xl font-black sm:text-4xl">{dictionary.teachersTitle}</h2>
+                <p className="mt-3 max-w-2xl leading-7 text-zinc-600 dark:text-zinc-400">{dictionary.teachersDescription}</p>
+              </div>
+              <Link href={localizePath(locale, "/teachers")} className="font-semibold text-emerald-700 dark:text-emerald-400">{dictionary.allTeachers}</Link>
+            </div>
+            {teachers.length ? <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">{teachers.map((teacher) => <PublicTeacherCard key={teacher.id} teacher={teacher} locale={locale} />)}</div> : <p className="mt-10 rounded-2xl border border-dashed border-zinc-300 p-8 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">{dictionary.emptyTeachers}</p>}
+          </div>
+        </section>
+
+        <section className="bg-white dark:bg-zinc-950">
+          <div className="mx-auto w-full max-w-7xl px-5 py-20 sm:px-8 lg:px-10 lg:py-28">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+              <div className="text-start">
+                <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{locale === "fa" ? "مسیر افتخار" : "A journey of recognition"}</p>
+                <h2 className="mt-3 text-3xl font-black sm:text-4xl">{dictionary.honorsTitle}</h2>
+                <p className="mt-3 max-w-2xl leading-7 text-zinc-600 dark:text-zinc-400">{dictionary.honorsDescription}</p>
+              </div>
+              <Link href={localizePath(locale, "/honors")} className="font-semibold text-emerald-700 dark:text-emerald-400">{dictionary.allHonors}</Link>
+            </div>
+            {honors.length ? <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">{honors.map((honor) => <HonorCard key={honor.id} honor={honor} locale={locale} />)}</div> : <p className="mt-10 rounded-2xl border border-dashed border-zinc-300 p-8 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">{dictionary.emptyHonors}</p>}
           </div>
         </section>
 

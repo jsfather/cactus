@@ -38,14 +38,26 @@ export function SiteHeader({
             {dictionary.blog}
           </Link>
           <Link
-            href={localizePath(locale, "/shop")}
+            href={localizePath(locale, "/teachers")}
             className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 md:block dark:text-zinc-300 dark:hover:text-emerald-400"
+          >
+            {dictionary.teachers}
+          </Link>
+          <Link
+            href={localizePath(locale, "/honors")}
+            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 lg:block dark:text-zinc-300 dark:hover:text-emerald-400"
+          >
+            {dictionary.honors}
+          </Link>
+          <Link
+            href={localizePath(locale, "/shop")}
+            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 xl:block dark:text-zinc-300 dark:hover:text-emerald-400"
           >
             {dictionary.shop}
           </Link>
           <Link
             href={localizePath(locale, "/about")}
-            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 lg:block dark:text-zinc-300 dark:hover:text-emerald-400"
+            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 2xl:block dark:text-zinc-300 dark:hover:text-emerald-400"
           >
             {dictionary.about}
           </Link>

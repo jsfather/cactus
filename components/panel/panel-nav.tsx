@@ -24,7 +24,9 @@ type NavIcon =
   | "about"
   | "users"
   | "profile"
-  | "studentInfo";
+  | "studentInfo"
+  | "teacherProfile"
+  | "honors";
 
 type NavItem = { href: string; label: string; icon: NavIcon };
 type NavGroup = { id: string; label: string; icon: NavIcon; items: NavItem[] };
@@ -41,6 +43,8 @@ function Icon({ name, className = "size-5" }: { name: NavIcon; className?: strin
   if (name === "about") return <svg {...common} aria-hidden="true"><circle cx="12" cy="12" r="9" /><path strokeLinecap="round" d="M12 11v6M12 7.5v.25" /></svg>;
   if (name === "users") return <svg {...common} aria-hidden="true"><circle cx="9" cy="8" r="3" /><path strokeLinecap="round" d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M16.5 15a5 5 0 0 1 4 5" /></svg>;
   if (name === "studentInfo") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 3.5h14v17H5zM8 8h8M8 12h8M8 16h5" /></svg>;
+  if (name === "teacherProfile") return <svg {...common} aria-hidden="true"><circle cx="12" cy="7" r="3" /><path strokeLinecap="round" strokeLinejoin="round" d="M5 20a7 7 0 0 1 14 0M4 4h3M17 4h3M18.5 2.5v3" /></svg>;
+  if (name === "honors") return <svg {...common} aria-hidden="true"><circle cx="12" cy="9" r="5" /><path strokeLinecap="round" strokeLinejoin="round" d="m8.5 13-1 8 4.5-2.5 4.5 2.5-1-8M12 6.5v5M9.5 9H14.5" /></svg>;
   return <svg {...common} aria-hidden="true"><circle cx="12" cy="8" r="4" /><path strokeLinecap="round" d="M4 21a8 8 0 0 1 16 0" /></svg>;
 }
 
@@ -71,7 +75,9 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
   const overview: NavItem = { href: roleHome[user.role], label: dictionary.nav.overview, icon: "home" };
   const directLinks: NavItem[] = user.role === "student"
     ? [{ href: "/panel/student/information", label: dictionary.nav.studentInformation, icon: "studentInfo" }]
-    : [];
+    : user.role === "teacher"
+      ? [{ href: "/panel/teacher/profile", label: dictionary.nav.teacherProfile, icon: "teacherProfile" }]
+      : [];
   const groups: NavGroup[] = user.role === "admin"
     ? [
         {
@@ -97,6 +103,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
           icon: "blog",
           items: [
             { href: "/panel/admin/blog", label: dictionary.nav.blog, icon: "blog" },
+            { href: "/panel/admin/honors", label: dictionary.nav.honors, icon: "honors" },
             { href: "/panel/admin/media", label: dictionary.nav.media, icon: "media" },
             { href: "/panel/admin/comments", label: dictionary.nav.comments, icon: "comments" },
             { href: "/panel/admin/about", label: dictionary.nav.about, icon: "about" },

@@ -237,6 +237,122 @@ export const studentDocuments = pgTable(
   ],
 );
 
+export const teacherProfiles = pgTable(
+  "teacher_profiles",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    username: varchar("username", { length: 32 }).notNull(),
+    nationalCode: varchar("national_code", { length: 10 }).notNull(),
+    cityFa: varchar("city_fa", { length: 120 }).notNull(),
+    cityEn: varchar("city_en", { length: 120 }),
+    biographyFa: text("biography_fa").notNull(),
+    biographyEn: text("biography_en"),
+    aboutFa: text("about_fa").notNull(),
+    aboutEn: text("about_en"),
+    achievementsFa: text("achievements_fa"),
+    achievementsEn: text("achievements_en"),
+    memberSince: date("member_since").notNull(),
+    isPublic: boolean("is_public").default(false).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("teacher_profiles_user_unique").on(table.userId),
+    uniqueIndex("teacher_profiles_username_unique").on(table.username),
+    uniqueIndex("teacher_profiles_national_code_unique").on(table.nationalCode),
+    index("teacher_profiles_public_updated_index").on(
+      table.isPublic,
+      table.updatedAt,
+    ),
+  ],
+);
+
+export const teacherSkills = pgTable(
+  "teacher_skills",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    teacherProfileId: uuid("teacher_profile_id")
+      .notNull()
+      .references(() => teacherProfiles.id, { onDelete: "cascade" }),
+    nameFa: varchar("name_fa", { length: 120 }).notNull(),
+    nameEn: varchar("name_en", { length: 120 }),
+    score: integer("score").notNull(),
+    sortOrder: integer("sort_order").notNull(),
+  },
+  (table) => [
+    uniqueIndex("teacher_skills_profile_sort_unique").on(
+      table.teacherProfileId,
+      table.sortOrder,
+    ),
+    index("teacher_skills_profile_index").on(table.teacherProfileId),
+    check("teacher_skills_score_check", sql`${table.score} between 0 and 100`),
+    check("teacher_skills_sort_order_check", sql`${table.sortOrder} > 0`),
+  ],
+);
+
+export const teacherWorkExperiences = pgTable(
+  "teacher_work_experiences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    teacherProfileId: uuid("teacher_profile_id")
+      .notNull()
+      .references(() => teacherProfiles.id, { onDelete: "cascade" }),
+    companyFa: varchar("company_fa", { length: 180 }).notNull(),
+    companyEn: varchar("company_en", { length: 180 }),
+    positionFa: varchar("position_fa", { length: 180 }).notNull(),
+    positionEn: varchar("position_en", { length: 180 }),
+    periodFa: varchar("period_fa", { length: 120 }).notNull(),
+    periodEn: varchar("period_en", { length: 120 }),
+    descriptionFa: text("description_fa"),
+    descriptionEn: text("description_en"),
+    sortOrder: integer("sort_order").notNull(),
+  },
+  (table) => [
+    uniqueIndex("teacher_work_experiences_profile_sort_unique").on(
+      table.teacherProfileId,
+      table.sortOrder,
+    ),
+    index("teacher_work_experiences_profile_index").on(table.teacherProfileId),
+    check("teacher_work_experiences_sort_order_check", sql`${table.sortOrder} > 0`),
+  ],
+);
+
+export const teacherEducations = pgTable(
+  "teacher_educations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    teacherProfileId: uuid("teacher_profile_id")
+      .notNull()
+      .references(() => teacherProfiles.id, { onDelete: "cascade" }),
+    institutionFa: varchar("institution_fa", { length: 180 }).notNull(),
+    institutionEn: varchar("institution_en", { length: 180 }),
+    degreeFa: varchar("degree_fa", { length: 160 }).notNull(),
+    degreeEn: varchar("degree_en", { length: 160 }),
+    fieldFa: varchar("field_fa", { length: 180 }).notNull(),
+    fieldEn: varchar("field_en", { length: 180 }),
+    periodFa: varchar("period_fa", { length: 120 }).notNull(),
+    periodEn: varchar("period_en", { length: 120 }),
+    descriptionFa: text("description_fa"),
+    descriptionEn: text("description_en"),
+    sortOrder: integer("sort_order").notNull(),
+  },
+  (table) => [
+    uniqueIndex("teacher_educations_profile_sort_unique").on(
+      table.teacherProfileId,
+      table.sortOrder,
+    ),
+    index("teacher_educations_profile_index").on(table.teacherProfileId),
+    check("teacher_educations_sort_order_check", sql`${table.sortOrder} > 0`),
+  ],
+);
+
 export const posts = pgTable(
   "posts",
   {
@@ -279,6 +395,52 @@ export const posts = pgTable(
       table.publishedAt,
     ),
     index("posts_author_id_index").on(table.authorId),
+  ],
+);
+
+export const honors = pgTable(
+  "honors",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    slug: varchar("slug", { length: 180 }).notNull(),
+    titleFa: varchar("title_fa", { length: 240 }).notNull(),
+    titleEn: varchar("title_en", { length: 240 }),
+    descriptionFa: text("description_fa").notNull(),
+    descriptionEn: text("description_en"),
+    organizationFa: varchar("organization_fa", { length: 200 }).notNull(),
+    organizationEn: varchar("organization_en", { length: 200 }),
+    locationFa: varchar("location_fa", { length: 160 }).notNull(),
+    locationEn: varchar("location_en", { length: 160 }),
+    categoriesFa: text("categories_fa")
+      .array()
+      .default(sql`ARRAY[]::text[]`)
+      .notNull(),
+    categoriesEn: text("categories_en")
+      .array()
+      .default(sql`ARRAY[]::text[]`)
+      .notNull(),
+    certificateImageUrl: text("certificate_image_url").notNull(),
+    issuedAt: date("issued_at").notNull(),
+    status: postStatus("status").default("draft").notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("honors_slug_unique").on(table.slug),
+    index("honors_status_issued_at_index").on(table.status, table.issuedAt),
+    index("honors_creator_id_index").on(table.creatorId),
+    check(
+      "honors_categories_fa_not_empty_check",
+      sql`cardinality(${table.categoriesFa}) > 0`,
+    ),
   ],
 );
 
@@ -609,7 +771,12 @@ export type OtpPurpose = (typeof otpPurpose.enumValues)[number];
 export type StudentInformationStatus = (typeof studentInformationStatus.enumValues)[number];
 export type StudentAllergyStatus = (typeof studentAllergyStatus.enumValues)[number];
 export type StudentDocumentKind = (typeof studentDocumentKind.enumValues)[number];
+export type TeacherProfile = typeof teacherProfiles.$inferSelect;
+export type TeacherSkill = typeof teacherSkills.$inferSelect;
+export type TeacherWorkExperience = typeof teacherWorkExperiences.$inferSelect;
+export type TeacherEducation = typeof teacherEducations.$inferSelect;
 export type Post = typeof posts.$inferSelect;
+export type Honor = typeof honors.$inferSelect;
 export type Product = typeof products.$inferSelect;
 export type MediaKind = (typeof mediaKind.enumValues)[number];
 export type Exam = typeof exams.$inferSelect;

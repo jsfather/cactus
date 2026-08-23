@@ -86,6 +86,13 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
               { label: dictionary.users.accountStatus, className: "w-[11%]" },
               { label: dictionary.common.createdAt, className: "w-[12%]" },
               { label: dictionary.common.actions, className: "w-[17%]" },
+            ] : role === "teacher" ? [
+              { label: dictionary.users.name, className: "w-[24%]" },
+              { label: dictionary.users.mobile, className: "w-[20%]" },
+              { label: locale === "fa" ? "نمایش عمومی" : "Public profile", className: "w-[15%]" },
+              { label: dictionary.users.accountStatus, className: "w-[12%]" },
+              { label: dictionary.common.createdAt, className: "w-[13%]" },
+              { label: dictionary.common.actions, className: "w-[16%]" },
             ] : [
               { label: dictionary.users.name, className: "w-[28%]" },
               { label: dictionary.users.mobile, className: "w-[27%]" },
@@ -112,6 +119,9 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
                 {role === "student" ? <PanelTableCell>
                   <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${user.studentInformationStatus === "approved" ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : user.studentInformationStatus === "pending" ? "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300" : user.studentInformationStatus === "rejected" ? "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"}`}>{studentStatusLabel(user.studentInformationStatus)}</span>
                 </PanelTableCell> : null}
+                {role === "teacher" ? <PanelTableCell>
+                  <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${user.teacherProfileIsPublic ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"}`}>{user.teacherProfileIsPublic ? (locale === "fa" ? "عمومی" : "Public") : (locale === "fa" ? "نمایش داده نمی‌شود" : "Hidden")}</span>
+                </PanelTableCell> : null}
                 <PanelTableCell>
                   <span
                     className={
@@ -129,6 +139,7 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
                 <PanelTableCell>
                   <PanelTableActions>
                     {role === "student" ? <PanelTableActionLink href={`${config.path}/${user.id}/information`} label={locale === "fa" ? "بررسی اطلاعات دانش پژوه" : "Review student information"} tone="copy"><PanelReviewIcon /></PanelTableActionLink> : null}
+                    {role === "teacher" ? <PanelTableActionLink href={`${config.path}/${user.id}/profile`} label={locale === "fa" ? "پروفایل حرفه‌ای مدرس" : "Teacher professional profile"} tone="copy"><PanelReviewIcon /></PanelTableActionLink> : null}
                     <PanelTableActionLink
                       href={`${config.path}/${user.id}/edit`}
                       label={dictionary.common.edit}

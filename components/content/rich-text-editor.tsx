@@ -44,12 +44,14 @@ export function RichTextEditor({
   locale,
   contentDirection,
   required = false,
+  compact = false,
 }: {
   name: string;
   initialValue: string;
   locale: Locale;
   contentDirection: "rtl" | "ltr";
   required?: boolean;
+  compact?: boolean;
 }) {
   const [value, setValue] = useState(initialValue);
   const [mediaOpen, setMediaOpen] = useState(false);
@@ -74,7 +76,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "rich-editor-content min-h-72 px-5 py-4 text-base leading-8 text-zinc-800 outline-none dark:text-zinc-200",
+          `rich-editor-content ${compact ? "min-h-44" : "min-h-72"} px-5 py-4 text-base leading-8 text-zinc-800 outline-none dark:text-zinc-200`,
         dir: contentDirection,
       },
     },

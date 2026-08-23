@@ -13,6 +13,7 @@ import {
   examQuestionOptions,
   examQuestions,
   exams,
+  honors,
   mediaAssets,
   posts,
   productCategories,
@@ -20,6 +21,10 @@ import {
   products,
   productVariants,
   siteContent,
+  teacherEducations,
+  teacherProfiles,
+  teacherSkills,
+  teacherWorkExperiences,
   users,
 } from "./schema";
 
@@ -30,7 +35,10 @@ const starterExamSeedKey = "seed.exams.starter.v1";
 const starterCatalogSeedKey = "seed.catalog.taxonomy-variants.v1";
 const starterSiteContentSeedKey = "seed.site-content.about.v1";
 const starterCommentSeedKey = "seed.comments.starter.v1";
+const starterTeacherProfileSeedKey = "seed.teacher-profile.starter.v1";
+const starterHonorSeedKey = "seed.honors.starter.v1";
 const starterMediaPathname = "content/starter/cactus-placeholder.png";
+const starterHonorMediaPathname = "content/starter/cactus-honor-placeholder.png";
 const adminBootstrapLockId = 1128352836;
 const starterMediaPng = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Zl1sAAAAASUVORK5CYII=",
@@ -190,6 +198,53 @@ export async function setupDatabase() {
             authorId: adminId,
           });
         }
+      });
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterHonorSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+        if (!claimedSeed) return;
+        const [existingHonor] = await transaction.select({ id: honors.id }).from(honors).limit(1);
+        if (existingHonor) return;
+        const honorImageUrl = `/media/${starterHonorMediaPathname}`;
+        const [existingHonorImage] = await transaction.select({ id: mediaAssets.id }).from(mediaAssets).where(eq(mediaAssets.url, honorImageUrl)).limit(1);
+        if (!existingHonorImage) {
+          const uploadRoot = path.resolve(process.env.UPLOAD_DIR?.trim() || path.join(process.cwd(), ".data", "uploads"));
+          const absolutePath = path.join(uploadRoot, ...starterHonorMediaPathname.split("/"));
+          await mkdir(path.dirname(absolutePath), { recursive: true });
+          await writeFile(absolutePath, starterMediaPng);
+          await transaction.insert(mediaAssets).values({
+            url: honorImageUrl,
+            pathname: starterHonorMediaPathname,
+            originalName: "cactus-honor-placeholder.png",
+            mimeType: "image/png",
+            size: starterMediaPng.byteLength,
+            kind: "content",
+            uploaderId: adminId,
+            altFa: "تصویر نمونه گواهینامه کاکتوس",
+            altEn: "Cactus certificate placeholder",
+          });
+        }
+        await transaction.insert(honors).values({
+          slug: "cactus-learning-achievement",
+          titleFa: "گواهینامه نمونه مسیر یادگیری کاکتوس",
+          titleEn: "Cactus Learning Journey Certificate",
+          descriptionFa: "این مورد نمونه، ساختار ثبت و نمایش افتخارات و گواهینامه‌های کاکتوس را نشان می‌دهد.",
+          descriptionEn: "This starter item demonstrates how Cactus honors and certificates are managed and presented.",
+          organizationFa: "مدرسه رباتیک کاکتوس",
+          organizationEn: "Cactus Robotics School",
+          locationFa: "تهران، ایران",
+          locationEn: "Tehran, Iran",
+          categoriesFa: ["آموزش", "رباتیک"],
+          categoriesEn: ["Education", "Robotics"],
+          certificateImageUrl: honorImageUrl,
+          issuedAt: "2025-01-01",
+          status: "draft",
+          creatorId: adminId,
+        });
       });
 
       await database.transaction(async (transaction) => {
@@ -564,6 +619,86 @@ export async function setupDatabase() {
           }
         });
       }
+
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterTeacherProfileSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+        if (!claimedSeed) return;
+
+        let [demoTeacher] = await transaction
+          .select({ id: users.id })
+          .from(users)
+          .where(or(eq(users.mobile, "seed:teacher"), eq(users.mobile, "seed:teacher-profile")))
+          .limit(1);
+        if (!demoTeacher) {
+          [demoTeacher] = await transaction
+            .insert(users)
+            .values({
+              firstNameFa: "مدرس",
+              lastNameFa: "نمونه کاکتوس",
+              firstNameEn: "Cactus Demo",
+              lastNameEn: "Teacher",
+              mobile: "seed:teacher-profile",
+              email: "teacher.profile.example@cactus.local",
+              passwordHash: await hashPassword(randomBytes(32).toString("base64url")),
+              role: "teacher",
+              isActive: false,
+            })
+            .returning({ id: users.id });
+        }
+
+        const [profile] = await transaction
+          .insert(teacherProfiles)
+          .values({
+            userId: demoTeacher.id,
+            username: "cactus_demo_teacher",
+            // Reserved seed value; real profiles can only save validated Iranian IDs.
+            nationalCode: "seed-demo1",
+            cityFa: "تهران",
+            cityEn: "Tehran",
+            biographyFa: "<p>مدرس نمونه کاکتوس با تمرکز بر آموزش پروژه‌محور رباتیک و برنامه‌نویسی.</p>",
+            biographyEn: "<p>A Cactus demo teacher focused on project-based robotics and programming education.</p>",
+            aboutFa: "<p>این پروفایل نمونه، ساختار معرفی مدرس را نشان می‌دهد و پیش از انتشار می‌تواند توسط مدیر ویرایش شود.</p>",
+            aboutEn: "<p>This starter profile demonstrates the teacher profile structure and can be edited before publishing.</p>",
+            achievementsFa: "<p>طراحی مسیرهای آموزشی عملی برای سازندگان جوان.</p>",
+            achievementsEn: "<p>Designed practical learning paths for young makers.</p>",
+            memberSince: "2025-01-01",
+            isPublic: false,
+          })
+          .returning({ id: teacherProfiles.id });
+
+        await transaction.insert(teacherSkills).values([
+          { teacherProfileId: profile.id, nameFa: "رباتیک", nameEn: "Robotics", score: 90, sortOrder: 1 },
+          { teacherProfileId: profile.id, nameFa: "برنامه‌نویسی", nameEn: "Programming", score: 85, sortOrder: 2 },
+        ]);
+        await transaction.insert(teacherWorkExperiences).values({
+          teacherProfileId: profile.id,
+          companyFa: "مدرسه رباتیک کاکتوس",
+          companyEn: "Cactus Robotics School",
+          positionFa: "مدرس رباتیک",
+          positionEn: "Robotics Teacher",
+          periodFa: "۱۴۰۳ تا امروز",
+          periodEn: "2025–Present",
+          descriptionFa: "آموزش پروژه‌محور الکترونیک، برنامه‌نویسی و ساخت ربات.",
+          descriptionEn: "Project-based teaching in electronics, programming, and robot building.",
+          sortOrder: 1,
+        });
+        await transaction.insert(teacherEducations).values({
+          teacherProfileId: profile.id,
+          institutionFa: "دانشگاه نمونه",
+          institutionEn: "Example University",
+          degreeFa: "کارشناسی",
+          degreeEn: "Bachelor's degree",
+          fieldFa: "مهندسی برق",
+          fieldEn: "Electrical Engineering",
+          periodFa: "۱۳۹۸ تا ۱۴۰۲",
+          periodEn: "2019–2023",
+          sortOrder: 1,
+        });
+      });
     }
   } finally {
     await pool.end();

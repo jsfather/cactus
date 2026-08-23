@@ -26,6 +26,8 @@ export const panelDictionaries = {
       people: "کاربران و دسترسی‌ها",
       currentSection: "بخش فعلی",
       studentInformation: "اطلاعات دانش پژوهی",
+      teacherProfile: "پروفایل حرفه‌ای",
+      honors: "افتخارات و گواهینامه‌ها",
     },
     common: {
       new: "جدید",
@@ -248,6 +250,8 @@ export const panelDictionaries = {
       people: "People & access",
       currentSection: "Current section",
       studentInformation: "Student information",
+      teacherProfile: "Professional profile",
+      honors: "Honors & certificates",
     },
     common: {
       new: "New",

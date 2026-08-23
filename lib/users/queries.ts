@@ -1,6 +1,6 @@
 import { asc, and, eq, ilike, or, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
-import { studentInformation, users, type StudentInformationStatus, type UserRole } from "@/lib/db/schema";
+import { studentInformation, teacherProfiles, users, type StudentInformationStatus, type UserRole } from "@/lib/db/schema";
 import {
   ADMIN_PAGE_SIZE,
   escapeLikePattern,
@@ -23,6 +23,7 @@ const managedUserSelection = {
   createdAt: users.createdAt,
   updatedAt: users.updatedAt,
   studentInformationStatus: studentInformation.status,
+  teacherProfileIsPublic: teacherProfiles.isPublic,
 };
 
 export type UserStatusFilter = "all" | "active" | "inactive";
@@ -44,6 +45,7 @@ export async function getUsersByRole(
   createdAt: Date;
   updatedAt: Date;
   studentInformationStatus: StudentInformationStatus | null;
+  teacherProfileIsPublic: boolean | null;
 }>> {
   const database = getDatabase();
   const pattern = `%${escapeLikePattern(query.q)}%`;
@@ -76,6 +78,7 @@ export async function getUsersByRole(
     .select(managedUserSelection)
     .from(users)
     .leftJoin(studentInformation, eq(studentInformation.userId, users.id))
+    .leftJoin(teacherProfiles, eq(teacherProfiles.userId, users.id))
     .where(where)
     .orderBy(asc(users.firstNameFa), asc(users.lastNameFa), asc(users.createdAt))
     .limit(ADMIN_PAGE_SIZE)
@@ -89,6 +92,7 @@ export async function getManagedUser(userId: string, role: UserRole) {
     .select(managedUserSelection)
     .from(users)
     .leftJoin(studentInformation, eq(studentInformation.userId, users.id))
+    .leftJoin(teacherProfiles, eq(teacherProfiles.userId, users.id))
     .where(and(eq(users.id, userId), eq(users.role, role)))
     .limit(1);
 

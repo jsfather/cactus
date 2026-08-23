@@ -67,3 +67,9 @@ export function richTextLength(value: string) {
     .replaceAll(/\s+/g, " ")
     .trim().length;
 }
+
+export function richTextToPlainText(value: string) {
+  return sanitizeHtml(value, { allowedTags: [], allowedAttributes: {} })
+    .replaceAll(/\s+/g, " ")
+    .trim();
+}
