@@ -129,10 +129,17 @@ export function PanelDatePicker({
   const titleId = useId();
   const number = useMemo(() => new Intl.NumberFormat(isFa ? "fa-IR" : "en-US", { useGrouping: false }), [isFa]);
   const dateFormatter = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }), [isFa]);
-  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { year: "numeric", month: "long", timeZone: "UTC" }), [isFa]);
+  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { month: "long", timeZone: "UTC" }), [isFa]);
   const weekdays = isFa ? ["ش", "ی", "د", "س", "چ", "پ", "ج"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const minDate = min ? parseDate(min) : null;
   const maxDate = max ? parseDate(max) : null;
+  const minimumYear = Math.min(minDate ? toCalendar(minDate, calendar).year : current.year - 100, visibleMonth.year);
+  const maximumYear = Math.max(maxDate ? toCalendar(maxDate, calendar).year : current.year + 20, visibleMonth.year);
+  const years = Array.from({ length: maximumYear - minimumYear + 1 }, (_, index) => maximumYear - index);
+  const months = Array.from({ length: calendar.getMonthsInYear(visibleMonth) }, (_, index) => {
+    const month = index + 1;
+    return { month, label: monthFormatter.format(dateForIntl(new CalendarDate(calendar, visibleMonth.year, month, 1))) };
+  });
   const monthStart = startOfMonth(visibleMonth);
   const offset = getDayOfWeek(monthStart, isFa ? "fa-IR" : "en-US", isFa ? "sat" : "sun");
   const gridStart = monthStart.subtract({ days: offset });
@@ -168,9 +175,17 @@ export function PanelDatePicker({
     </button>
     {open ? <PickerDialog label={isFa ? "انتخاب تاریخ" : "Choose date"} onClose={close}>
       <div dir={isFa ? "rtl" : "ltr"}>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2">
           <button type="button" data-autofocus onClick={() => setVisibleMonth((month) => month.subtract({ months: 1 }))} aria-label={isFa ? "ماه قبل" : "Previous month"} className="inline-flex size-10 cursor-pointer items-center justify-center rounded-xl border border-zinc-200 hover:border-emerald-400 hover:text-emerald-700 dark:border-zinc-700"><ArrowIcon previous locale={locale} /></button>
-          <h2 id={titleId} aria-live="polite" className="font-semibold">{monthFormatter.format(dateForIntl(visibleMonth))}</h2>
+          <h2 id={titleId} aria-live="polite" className="sr-only">{monthFormatter.format(dateForIntl(visibleMonth))} {number.format(visibleMonth.year)}</h2>
+          <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_6.5rem] gap-2">
+            <PanelSelect controlSize="compact" value={visibleMonth.month} onChange={(event) => setVisibleMonth((month) => startOfMonth(month.set({ month: Number(event.target.value) })))} aria-label={isFa ? "ماه" : "Month"}>
+              {months.map((item) => <option key={item.month} value={item.month}>{item.label}</option>)}
+            </PanelSelect>
+            <PanelSelect controlSize="compact" value={visibleMonth.year} onChange={(event) => setVisibleMonth((month) => startOfMonth(month.set({ year: Number(event.target.value) })))} aria-label={isFa ? "سال" : "Year"}>
+              {years.map((year) => <option key={year} value={year}>{number.format(year)}</option>)}
+            </PanelSelect>
+          </div>
           <button type="button" onClick={() => setVisibleMonth((month) => month.add({ months: 1 }))} aria-label={isFa ? "ماه بعد" : "Next month"} className="inline-flex size-10 cursor-pointer items-center justify-center rounded-xl border border-zinc-200 hover:border-emerald-400 hover:text-emerald-700 dark:border-zinc-700"><ArrowIcon previous={false} locale={locale} /></button>
         </div>
         <div role="grid" aria-labelledby={titleId} className="mt-4 grid grid-cols-7 gap-1">
