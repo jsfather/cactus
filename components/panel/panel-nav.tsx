@@ -20,6 +20,9 @@ type NavIcon =
   | "categories"
   | "media"
   | "exams"
+  | "terms"
+  | "levels"
+  | "schedule"
   | "comments"
   | "about"
   | "users"
@@ -39,6 +42,9 @@ function Icon({ name, className = "size-5" }: { name: NavIcon; className?: strin
   if (name === "categories") return <svg {...common} aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2" /><rect x="13.5" y="3.5" width="7" height="7" rx="2" /><rect x="3.5" y="13.5" width="7" height="7" rx="2" /><rect x="13.5" y="13.5" width="7" height="7" rx="2" /></svg>;
   if (name === "media") return <svg {...common} aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="9" cy="10" r="2" /><path strokeLinecap="round" strokeLinejoin="round" d="m5 18 4.5-4 3 2.5 2.5-2 4 3.5" /></svg>;
   if (name === "exams") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M7 4.5h10a2 2 0 0 1 2 2V21H5V6.5a2 2 0 0 1 2-2Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5V3h6v1.5M8.5 10l1.5 1.5 2.5-3M8.5 16h7" /></svg>;
+  if (name === "terms") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M4 5.5h16v14H4zM8 3v5M16 3v5M4 9.5h16" /><path strokeLinecap="round" d="M8 13h3M8 16h6" /></svg>;
+  if (name === "levels") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m12 3 8 4-8 4-8-4 8-4Z" /><path strokeLinecap="round" strokeLinejoin="round" d="m4 12 8 4 8-4M4 17l8 4 8-4" /></svg>;
+  if (name === "schedule") return <svg {...common} aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2" /><path strokeLinecap="round" d="M7.5 3v4M16.5 3v4M3.5 9.5h17M8 13h3M13.5 13H16M8 17h3" /></svg>;
   if (name === "comments") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 4v-4H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" /><path strokeLinecap="round" d="M8 9h8M8 13h5" /></svg>;
   if (name === "about") return <svg {...common} aria-hidden="true"><circle cx="12" cy="12" r="9" /><path strokeLinecap="round" d="M12 11v6M12 7.5v.25" /></svg>;
   if (name === "users") return <svg {...common} aria-hidden="true"><circle cx="9" cy="8" r="3" /><path strokeLinecap="round" d="M3.5 20a5.5 5.5 0 0 1 11 0M16 5.5a3 3 0 0 1 0 5.8M16.5 15a5 5 0 0 1 4 5" /></svg>;
@@ -74,9 +80,16 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
 
   const overview: NavItem = { href: roleHome[user.role], label: dictionary.nav.overview, icon: "home" };
   const directLinks: NavItem[] = user.role === "student"
-    ? [{ href: "/panel/student/information", label: dictionary.nav.studentInformation, icon: "studentInfo" }]
+    ? [
+        { href: "/panel/student/schedule", label: dictionary.nav.schedule, icon: "schedule" },
+        { href: "/panel/student/information", label: dictionary.nav.studentInformation, icon: "studentInfo" },
+      ]
     : user.role === "teacher"
-      ? [{ href: "/panel/teacher/profile", label: dictionary.nav.teacherProfile, icon: "teacherProfile" }]
+      ? [
+          { href: "/panel/teacher/terms", label: dictionary.nav.terms, icon: "terms" },
+          { href: "/panel/teacher/schedule", label: dictionary.nav.schedule, icon: "schedule" },
+          { href: "/panel/teacher/profile", label: dictionary.nav.teacherProfile, icon: "teacherProfile" },
+        ]
       : [];
   const groups: NavGroup[] = user.role === "admin"
     ? [
@@ -84,7 +97,11 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
           id: "education",
           label: dictionary.nav.education,
           icon: "exams",
-          items: [{ href: "/panel/admin/exams", label: dictionary.nav.exams, icon: "exams" }],
+          items: [
+            { href: "/panel/admin/terms", label: dictionary.nav.terms, icon: "terms" },
+            { href: "/panel/admin/term-levels", label: dictionary.nav.termLevels, icon: "levels" },
+            { href: "/panel/admin/exams", label: dictionary.nav.exams, icon: "exams" },
+          ],
         },
         {
           id: "people",
@@ -211,7 +228,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
       </div>
 
       <div className="flex shrink-0 items-center justify-between border-t border-zinc-200 pt-3 text-xs lg:hidden dark:border-zinc-800">
-        <a href={locale === "en" ? "/en" : "/"} className="rounded-lg px-1 py-1 text-zinc-500 outline-none transition hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-300">{dictionary.nav.publicSite}</a>
+        <a href={locale === "en" ? "/en" : "/"} target="_blank" rel="noopener noreferrer" aria-label={dictionary.nav.publicSiteNewTabLabel} className="rounded-lg px-1 py-1 text-zinc-500 outline-none transition hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-300">{dictionary.nav.publicSite}</a>
         <form action={logout}><button type="submit" className="cursor-pointer rounded-lg px-1 py-1 text-red-600 outline-none transition hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-500 dark:text-red-400">{dictionary.nav.signOut}</button></form>
       </div>
 
@@ -225,7 +242,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
           <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4 shrink-0 text-zinc-400 transition group-hover:text-emerald-600 rtl:rotate-180" fill="none" stroke="currentColor" strokeWidth="1.8"><path strokeLinecap="round" strokeLinejoin="round" d="M7 4.5 12.5 10 7 15.5" /></svg>
         </Link>
         <div className="mt-3 flex items-center justify-between gap-3 px-2 text-xs">
-          <a href={locale === "en" ? "/en" : "/"} className="rounded-lg px-1 py-1 text-zinc-500 outline-none transition hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-300">{dictionary.nav.publicSite}</a>
+          <a href={locale === "en" ? "/en" : "/"} target="_blank" rel="noopener noreferrer" aria-label={dictionary.nav.publicSiteNewTabLabel} className="rounded-lg px-1 py-1 text-zinc-500 outline-none transition hover:text-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-300">{dictionary.nav.publicSite}</a>
           <form action={logout}><button type="submit" className="cursor-pointer rounded-lg px-1 py-1 text-red-600 outline-none transition hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-500 dark:text-red-400">{dictionary.nav.signOut}</button></form>
         </div>
       </div>

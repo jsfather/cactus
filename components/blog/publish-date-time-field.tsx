@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PanelInput } from "@/components/panel/form-controls";
+import { PanelDatePicker, PanelTimePicker } from "@/components/panel/date-time-picker";
 import type { Locale } from "@/lib/i18n/config";
 
 function toTehranLocalValue(value: string) {
@@ -36,18 +36,15 @@ export function PublishDateTimeField({
   locale: Locale;
 }) {
   const [value, setValue] = useState(() => toTehranLocalValue(initialValue));
+  const [datePart = "", timePart = ""] = value.split("T");
 
   return (
     <>
       <input type="hidden" name="publishedAt" value={toUtcIso(value)} />
-      <PanelInput
-        type="datetime-local"
-        value={value}
-        onChange={(event) => setValue(event.target.value)}
-        className="nums-en"
-        dir="ltr"
-        aria-label={locale === "fa" ? "زمان انتشار خودکار" : "Automatic publication time"}
-      />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <PanelDatePicker locale={locale} value={datePart} onValueChange={(date) => setValue(date ? `${date}T${timePart || "09:00"}` : "")} aria-label={locale === "fa" ? "تاریخ انتشار خودکار" : "Automatic publication date"} />
+        <PanelTimePicker locale={locale} value={timePart} onValueChange={(time) => setValue(`${datePart}T${time}`)} aria-label={locale === "fa" ? "زمان انتشار خودکار" : "Automatic publication time"} />
+      </div>
     </>
   );
 }

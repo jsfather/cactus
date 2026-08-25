@@ -25,6 +25,7 @@ import {
   teacherProfiles,
   teacherSkills,
   teacherWorkExperiences,
+  termLevels,
   users,
 } from "./schema";
 
@@ -37,6 +38,7 @@ const starterSiteContentSeedKey = "seed.site-content.about.v1";
 const starterCommentSeedKey = "seed.comments.starter.v1";
 const starterTeacherProfileSeedKey = "seed.teacher-profile.starter.v1";
 const starterHonorSeedKey = "seed.honors.starter.v1";
+const starterTermLevelSeedKey = "seed.terms.level.starter.v1";
 const starterMediaPathname = "content/starter/cactus-placeholder.png";
 const starterHonorMediaPathname = "content/starter/cactus-honor-placeholder.png";
 const adminBootstrapLockId = 1128352836;
@@ -162,6 +164,25 @@ export async function setupDatabase() {
     });
 
     if (adminId) {
+      await database.transaction(async (transaction) => {
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterTermLevelSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+        if (!claimedSeed) return;
+        const [existingLevel] = await transaction.select({ id: termLevels.id }).from(termLevels).limit(1);
+        if (!existingLevel) {
+          await transaction.insert(termLevels).values({
+            titleFa: "مقدماتی",
+            titleEn: "Foundation",
+            descriptionFa: "سطح آغازین برای ترم‌های پایه رباتیک و برنامه‌نویسی.",
+            descriptionEn: "An introductory level for foundational robotics and programming terms.",
+            sortOrder: 1,
+          });
+        }
+      });
+
       await database.transaction(async (transaction) => {
         const [claimedSeed] = await transaction
           .insert(appSettings)

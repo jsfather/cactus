@@ -24,7 +24,7 @@ const panelSelectBaseClass =
   "w-full cursor-pointer appearance-none border border-zinc-300 bg-white text-zinc-950 outline-none transition focus:border-emerald-600 focus:ring-3 focus:ring-emerald-600/15 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
 
 const panelSelectSizeClass: Record<PanelControlSize, string> = {
-  compact: "h-9 rounded-lg py-0 ps-3 pe-8 text-sm",
+  compact: "h-9 rounded-lg py-0 ps-3 pe-10 text-sm",
   default: "rounded-xl py-3 ps-4 pe-10",
 };
 

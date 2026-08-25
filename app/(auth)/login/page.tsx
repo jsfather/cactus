@@ -3,6 +3,7 @@ import { LoginForm } from "@/components/auth/login-form";
 import { CactusBrand, CactusLogo } from "@/components/brand/cactus-brand";
 import { PreferencesMenu } from "@/components/preferences/preferences-menu";
 import { getCurrentUser } from "@/lib/auth/session";
+import { getSafeReturnTo } from "@/lib/auth/return-to";
 import { getAuthDictionary } from "@/lib/i18n/auth";
 import { localizePath } from "@/lib/i18n/config";
 import { getPreferredLocale } from "@/lib/i18n/server";
@@ -14,8 +15,10 @@ function FeatureIcon({ name }: { name: "spark" | "shield" | "path" }) {
   return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m12 2 1.5 5.2L19 9l-5.5 1.8L12 16l-1.5-5.2L5 9l5.5-1.8L12 2ZM18.5 15l.7 2.3 2.3.7-2.3.8-.7 2.2-.8-2.2-2.2-.8 2.2-.7.8-2.3Z" /></svg>;
 }
 
-export default async function LoginPage() {
-  if (await getCurrentUser()) redirect("/panel");
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ returnTo?: string }> }) {
+  const query = await searchParams;
+  const returnTo = getSafeReturnTo(query.returnTo);
+  if (await getCurrentUser()) redirect(returnTo || "/panel");
 
   const locale = await getPreferredLocale();
   const dictionary = getAuthDictionary(locale);
@@ -76,7 +79,7 @@ export default async function LoginPage() {
                   <h1 className="mt-1.5 text-2xl font-black tracking-tight text-zinc-950 sm:text-3xl dark:text-white">{dictionary.title}</h1>
                   <p className="auth-card-description mt-2 max-w-md text-sm leading-6 text-zinc-600 dark:text-zinc-400">{dictionary.description}</p>
                 </div>
-                <LoginForm locale={locale} />
+                <LoginForm locale={locale} returnTo={returnTo || undefined} />
                 <div className="auth-card-footer mt-5 flex items-center justify-center gap-2 border-t border-zinc-200 pt-4 text-xs text-zinc-400 dark:border-zinc-800"><svg viewBox="0 0 20 20" aria-hidden="true" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="8" width="12" height="9" rx="2" /><path strokeLinecap="round" d="M6.5 8V6.5a3.5 3.5 0 0 1 7 0V8" /></svg><span>{isFa ? "ارتباط امن و محافظت‌شده" : "Secure, protected connection"}</span></div>
               </div>
 

@@ -6,9 +6,11 @@ import { createHonor, updateHonor, type HonorFormState } from "@/app/(panel)/pan
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
 import { ImageUploadField } from "@/components/media/image-upload-field";
+import { PanelDatePicker } from "@/components/panel/date-time-picker";
 import { FieldError, FormLabel, PanelInput, PanelSelect, PanelTextarea } from "@/components/panel/form-controls";
 import { PanelFormFooter, PanelFormSection, primaryButtonClass, secondaryButtonClass } from "@/components/panel/ui";
 import type { Locale } from "@/lib/i18n/config";
+import { getTehranTodayIso } from "@/lib/date/local";
 
 export type HonorFormValues = {
   slug: string;
@@ -36,7 +38,7 @@ export function HonorForm({ locale, mode = "create", honorId, initialValues = em
   const [state, action, pending] = useActionState(formAction, initialState);
   useActionErrorToast(state);
   const { certificateImageUrl, ...textValues } = initialValues;
-  const { bind } = usePreservedFields(textValues);
+  const { bind, bindValue } = usePreservedFields(textValues);
 
   return <form action={action} className="space-y-6">
     <input type="hidden" name="locale" value={locale} />
@@ -76,7 +78,7 @@ export function HonorForm({ locale, mode = "create", honorId, initialValues = em
         </PanelFormSection>
         <PanelFormSection title={isFa ? "تاریخ و انتشار" : "Date and publishing"} description={isFa ? "فقط موارد منتشرشده در سایت عمومی دیده می‌شوند." : "Only published items appear on the public website."}>
           <div className="space-y-5">
-            <div><FormLabel label={isFa ? "تاریخ صدور *" : "Issue date *"}><PanelInput {...bind("issuedAt")} type="date" required max={new Date().toISOString().slice(0, 10)} dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.issuedAt} /></div>
+            <div><FormLabel label={isFa ? "تاریخ صدور *" : "Issue date *"}><PanelDatePicker {...bindValue("issuedAt")} locale={locale} required max={getTehranTodayIso()} aria-label={isFa ? "تاریخ صدور" : "Issue date"} /></FormLabel><FieldError errors={state.fieldErrors?.issuedAt} /></div>
             <div><FormLabel label={isFa ? "وضعیت انتشار" : "Publication status"}><PanelSelect {...bind("status")}><option value="draft">{isFa ? "پیش‌نویس" : "Draft"}</option><option value="published">{isFa ? "منتشرشده" : "Published"}</option></PanelSelect></FormLabel><FieldError errors={state.fieldErrors?.status} /></div>
           </div>
         </PanelFormSection>

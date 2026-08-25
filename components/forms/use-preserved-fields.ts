@@ -27,5 +27,15 @@ export function usePreservedFields<T extends Record<string, string>>(
     };
   }
 
-  return { bind, setValues, values };
+  function bindValue<K extends keyof T>(name: K) {
+    return {
+      name: String(name),
+      value: values[name],
+      onValueChange: (value: string) => {
+        setValues((current) => ({ ...current, [name]: value }));
+      },
+    };
+  }
+
+  return { bind, bindValue, setValues, values };
 }

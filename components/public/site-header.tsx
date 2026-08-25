@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { CactusBrand } from "@/components/brand/cactus-brand";
 import { PreferencesMenu } from "@/components/preferences/preferences-menu";
+import { getCurrentUser } from "@/lib/auth/session";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 
-export function SiteHeader({
+export async function SiteHeader({
   locale,
   currentPath = "/",
 }: {
   locale: Locale;
   currentPath?: string;
 }) {
+  const user = await getCurrentUser();
   const dictionary = getDictionary(locale);
   const alternateLocale = locale === "fa" ? "en" : "fa";
   const alternatePath = localizePath(alternateLocale, currentPath);
@@ -61,12 +63,12 @@ export function SiteHeader({
           >
             {dictionary.about}
           </Link>
-          <a
-            href="/login"
+          <Link
+            href={user ? "/panel" : "/login"}
             className="rounded-xl border border-emerald-700/20 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100 sm:px-4 dark:border-emerald-400/20 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-950"
           >
-            {dictionary.panel}
-          </a>
+            {user ? dictionary.myPanel : dictionary.panel}
+          </Link>
           <PreferencesMenu
             locale={locale}
             alternateHref={languageHref}

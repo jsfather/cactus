@@ -1,0 +1,23 @@
+import { DeleteTermButton } from "@/components/terms/delete-term-button";
+import { TermStatusBadge } from "@/components/terms/term-status-badge";
+import { PanelListControls } from "@/components/panel/list-controls";
+import { PanelEditIcon, PanelEmptyState, PanelPage, PanelPageHeader, PanelPrimaryLink, PanelSurface, PanelTable, PanelTableActionLink, PanelTableActions, PanelTableCell } from "@/components/panel/ui";
+import type { TermStatus } from "@/lib/db/schema";
+import { getPanelLocale } from "@/lib/i18n/panel-server";
+import { getSearchParam } from "@/lib/panel/pagination";
+import { getAdminTerms } from "@/lib/terms/queries";
+
+export default async function TermsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const [locale, query] = await Promise.all([getPanelLocale(), searchParams]); const isFa = locale === "fa";
+  const rawStatus = getSearchParam(query, "status");
+  const search = getSearchParam(query, "q").slice(0, 100);
+  const status: TermStatus | "all" = ["draft", "enrollment_open", "active", "completed", "cancelled"].includes(rawStatus) ? rawStatus as TermStatus : "all";
+  const items = await getAdminTerms(locale, status, search);
+  const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { year: "numeric", month: "short", day: "numeric" });
+  return <PanelPage>
+    <PanelPageHeader eyebrow={isFa ? "آموزش و برنامه‌ریزی" : "Learning and scheduling"} title={isFa ? "مدیریت ترم‌ها" : "Term management"} description={isFa ? "ترم‌ها، مدرس‌ها، پیش‌نیازها، ثبت‌نام و برنامه هفتگی را از یک ساختار یکپارچه مدیریت کنید." : "Manage terms, teachers, prerequisites, enrollment, and weekly schedules in one system."} actions={<PanelPrimaryLink href="/panel/admin/terms/new">{isFa ? "ترم جدید" : "New term"}</PanelPrimaryLink>} />
+    <PanelSurface><PanelListControls action="/panel/admin/terms" locale={locale} query={search} searchPlaceholder={isFa ? "جست‌وجوی عنوان یا سطح ترم…" : "Search term title or level…"} filters={[{ name: "status", label: isFa ? "وضعیت" : "Status", value: status, options: [{ value: "all", label: isFa ? "همه وضعیت‌ها" : "All statuses" }, { value: "draft", label: isFa ? "پیش‌نویس" : "Draft" }, { value: "enrollment_open", label: isFa ? "ثبت‌نام باز" : "Enrollment open" }, { value: "active", label: isFa ? "در حال برگزاری" : "Active" }, { value: "completed", label: isFa ? "تکمیل‌شده" : "Completed" }, { value: "cancelled", label: isFa ? "لغوشده" : "Cancelled" }] }]} />
+      {items.length ? <PanelTable columns={[{ label: isFa ? "ترم" : "Term", className: "w-[28%]" }, { label: isFa ? "بازه" : "Dates", className: "w-[19%]" }, { label: isFa ? "وضعیت" : "Status", className: "w-[14%]" }, { label: isFa ? "افراد" : "People", className: "w-[19%]" }, { label: isFa ? "عملیات" : "Actions", className: "w-[20%]" }]}>{items.map((term) => <tr key={term.id}><PanelTableCell><p className="font-semibold">{locale === "en" ? term.titleEn || term.titleFa : term.titleFa}</p><p className="mt-1 text-xs text-zinc-500">{locale === "en" ? term.levelTitleEn || term.levelTitleFa : term.levelTitleFa}</p></PanelTableCell><PanelTableCell><span className="text-xs text-zinc-600 dark:text-zinc-400">{date.format(new Date(`${term.startDate}T12:00:00Z`))}<br />{date.format(new Date(`${term.endDate}T12:00:00Z`))}</span></PanelTableCell><PanelTableCell><TermStatusBadge status={term.status} locale={locale} /></PanelTableCell><PanelTableCell className="text-zinc-600 dark:text-zinc-400"><p>{isFa ? `${term.teacherCount.toLocaleString("fa-IR")} مدرس` : `${term.teacherCount} teacher${term.teacherCount === 1 ? "" : "s"}`}</p><p className="mt-1 text-xs">{isFa ? `${term.studentCount.toLocaleString("fa-IR")} دانش پژوه · ${term.scheduleCount.toLocaleString("fa-IR")} زمان` : `${term.studentCount} students · ${term.scheduleCount} slots`}</p></PanelTableCell><PanelTableCell><PanelTableActions><PanelTableActionLink href={`/panel/admin/terms/${term.id}/edit`} label={isFa ? "ویرایش و مدیریت ترم" : "Edit and manage term"}><PanelEditIcon /></PanelTableActionLink><DeleteTermButton termId={term.id} locale={locale} /></PanelTableActions></PanelTableCell></tr>)}</PanelTable> : <PanelEmptyState title={isFa ? "ترمی پیدا نشد" : "No terms found"} description={search || status !== "all" ? (isFa ? "عبارت جست‌وجو یا فیلتر را تغییر دهید." : "Try changing the search or filter.") : (isFa ? "اولین ترم را بسازید." : "Create the first term.")} action={!search && status === "all" ? <PanelPrimaryLink href="/panel/admin/terms/new">{isFa ? "ساخت ترم" : "Create term"}</PanelPrimaryLink> : undefined} />}
+    </PanelSurface>
+  </PanelPage>;
+}

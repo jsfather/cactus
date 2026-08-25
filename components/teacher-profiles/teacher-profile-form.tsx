@@ -11,9 +11,11 @@ import { RichTextEditor } from "@/components/content/rich-text-editor";
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
 import { ImageUploadField } from "@/components/media/image-upload-field";
+import { PanelDatePicker } from "@/components/panel/date-time-picker";
 import { FieldError, FormLabel, PanelInput, PanelTextarea } from "@/components/panel/form-controls";
 import { PanelFormFooter, PanelFormSection, primaryButtonClass, secondaryButtonClass } from "@/components/panel/ui";
 import type { Locale } from "@/lib/i18n/config";
+import { getTehranTodayIso } from "@/lib/date/local";
 
 type SkillValue = { _key: string; nameFa: string; nameEn: string; score: number };
 type WorkValue = { _key: string; companyFa: string; companyEn: string; positionFa: string; positionEn: string; periodFa: string; periodEn: string; descriptionFa: string; descriptionEn: string };
@@ -64,7 +66,7 @@ export function TeacherProfileForm({
     : saveOwnTeacherProfile;
   const [state, action, pending] = useActionState(actionHandler, initialState);
   useActionErrorToast(state);
-  const { bind } = usePreservedFields({
+  const { bind, bindValue } = usePreservedFields({
     firstNameFa: initialValues.firstNameFa,
     lastNameFa: initialValues.lastNameFa,
     firstNameEn: initialValues.firstNameEn,
@@ -152,7 +154,7 @@ export function TeacherProfileForm({
           </PanelFormSection>
           <PanelFormSection title={isFa ? "نمایش در سایت" : "Website visibility"} description={isFa ? "فقط حساب‌های فعال با این گزینه در صفحه مدرسین و صفحه اصلی نمایش داده می‌شوند." : "Only active accounts with this option enabled appear on the Teachers page and homepage."}>
             <div className="space-y-5">
-              <TextField label={isFa ? "عضو کاکتوس از تاریخ *" : "Cactus member since *"} errors={state.fieldErrors?.memberSince}><PanelInput {...bind("memberSince")} type="date" required max={new Date().toISOString().slice(0, 10)} dir="ltr" className="nums-en" /></TextField>
+              <TextField label={isFa ? "عضو کاکتوس از تاریخ *" : "Cactus member since *"} errors={state.fieldErrors?.memberSince}><PanelDatePicker {...bindValue("memberSince")} locale={locale} required max={getTehranTodayIso()} aria-label={isFa ? "تاریخ عضویت در کاکتوس" : "Cactus member since"} /></TextField>
               <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-start dark:border-zinc-800 dark:bg-zinc-900">
                 <input type="checkbox" name="isPublic" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} className="mt-0.5 size-4 shrink-0 accent-emerald-700" />
                 <span><span className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">{isFa ? "نمایش عمومی مدرس" : "Show teacher publicly"}</span><span className="mt-1 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">{isFa ? "با خاموش کردن این گزینه، صفحه عمومی بلافاصله از دسترس خارج می‌شود." : "Turning this off immediately removes the public profile."}</span></span>

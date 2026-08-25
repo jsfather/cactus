@@ -9,7 +9,7 @@ import { hashPassword } from "@/lib/auth/password";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
-import { studentDocuments, users, userRole, type UserRole } from "@/lib/db/schema";
+import { studentDocuments, termEnrollments, termTeachers, users, userRole, type UserRole } from "@/lib/db/schema";
 import { roleHome } from "@/lib/auth/roles";
 import { userSectionConfig } from "@/lib/users/config";
 import { isAllowedImageReference } from "@/lib/media/reference";
@@ -76,6 +76,8 @@ function revalidateUserPages() {
     revalidatePath(userSectionConfig[role].path);
   }
   revalidatePath("/panel/admin");
+  revalidatePath("/panel/admin/terms");
+  revalidatePath("/panel/teacher/terms");
 }
 
 export async function createManagedUser(
@@ -153,6 +155,20 @@ export async function updateManagedUser(
 
     if ((remainingAdmins?.value ?? 0) === 0) {
       return { error: parsed.data.locale === "en" ? "At least one active administrator must remain." : "حداقل یک همکار فعال باید در سامانه باقی بماند." };
+    }
+  }
+
+  if (validOriginalRole.data === "teacher" && (parsed.data.role !== "teacher" || !parsed.data.isActive)) {
+    const [assignments] = await getDatabase().select({ value: count() }).from(termTeachers).where(eq(termTeachers.teacherId, validUserId.data));
+    if ((assignments?.value ?? 0) > 0) {
+      return { error: parsed.data.locale === "en" ? "Reassign or remove this teacher from every term before changing their role or deactivating the account." : "پیش از تغییر نقش یا غیرفعال‌کردن حساب، این مدرس را از همه ترم‌ها حذف یا جایگزین کنید." };
+    }
+  }
+
+  if (validOriginalRole.data === "student" && (parsed.data.role !== "student" || !parsed.data.isActive)) {
+    const [activeEnrollments] = await getDatabase().select({ value: count() }).from(termEnrollments).where(and(eq(termEnrollments.studentId, validUserId.data), eq(termEnrollments.status, "active")));
+    if ((activeEnrollments?.value ?? 0) > 0) {
+      return { error: parsed.data.locale === "en" ? "Withdraw this student from active terms before changing their role or deactivating the account." : "پیش از تغییر نقش یا غیرفعال‌کردن حساب، انصراف دانش پژوه را از ترم‌های فعال ثبت کنید." };
     }
   }
 

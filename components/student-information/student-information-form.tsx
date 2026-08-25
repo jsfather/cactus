@@ -5,10 +5,12 @@ import { submitStudentInformation, type StudentInformationFormState } from "@/ap
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
 import { ImageUploadField } from "@/components/media/image-upload-field";
+import { PanelDatePicker } from "@/components/panel/date-time-picker";
 import { FieldError, FormLabel, PanelInput, PanelSelect, PanelTextarea } from "@/components/panel/form-controls";
 import { PanelFormFooter, PanelFormSection, primaryButtonClass } from "@/components/panel/ui";
 import { PrivateDocumentField } from "@/components/student-information/private-document-field";
 import type { StudentAllergyStatus, StudentDocumentKind } from "@/lib/db/schema";
+import { getTehranTodayIso } from "@/lib/date/local";
 import type { Locale } from "@/lib/i18n/config";
 
 type InformationValue = {
@@ -64,7 +66,7 @@ export function StudentInformationForm({
   const isFa = locale === "fa";
   const [state, action, pending] = useActionState(submitStudentInformation, initialState);
   useActionErrorToast(state);
-  const { bind, values } = usePreservedFields({
+  const { bind, bindValue, values } = usePreservedFields({
     firstNameFa: student.firstNameFa,
     lastNameFa: student.lastNameFa,
     firstNameEn: student.firstNameEn,
@@ -109,7 +111,7 @@ export function StudentInformationForm({
               <FormLabel label={isFa ? "شماره موبایل" : "Mobile number"}><PanelInput value={student.mobile} readOnly disabled dir="ltr" className="nums-en" /></FormLabel>
               <div><FormLabel label={isFa ? "ایمیل (اختیاری)" : "Email (optional)"}><PanelInput {...bind("email")} type="email" dir="ltr" className="nums-en" autoComplete="email" /></FormLabel><FieldError errors={state.fieldErrors?.email} /></div>
               <div><FormLabel label={isFa ? "کد ملی (اختیاری)" : "National ID (optional)"}><PanelInput {...bind("nationalCode")} inputMode="numeric" maxLength={10} dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.nationalCode} /></div>
-              <div><FormLabel label={isFa ? "تاریخ تولد *" : "Birth date *"}><PanelInput {...bind("birthDate")} type="date" required dir="ltr" className="nums-en" max={new Date().toISOString().slice(0, 10)} /></FormLabel><FieldError errors={state.fieldErrors?.birthDate} /></div>
+              <div><FormLabel label={isFa ? "تاریخ تولد *" : "Birth date *"}><PanelDatePicker {...bindValue("birthDate")} locale={locale} required max={getTehranTodayIso()} aria-label={isFa ? "تاریخ تولد" : "Birth date"} /></FormLabel><FieldError errors={state.fieldErrors?.birthDate} /></div>
               <div><FormLabel label={isFa ? "سطح تحصیلی فارسی *" : "Education level in Persian *"}><PanelInput {...bind("educationLevelFa")} required dir="rtl" /></FormLabel><FieldError errors={state.fieldErrors?.educationLevelFa} /></div>
               <div><FormLabel label={isFa ? "سطح تحصیلی انگلیسی (اختیاری)" : "Education level in English (optional)"}><PanelInput {...bind("educationLevelEn")} dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.educationLevelEn} /></div>
             </div>
@@ -164,4 +166,3 @@ export function StudentInformationForm({
     </form>
   );
 }
-

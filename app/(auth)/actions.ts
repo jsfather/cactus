@@ -5,6 +5,7 @@ import { eq, sql } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { verifyPassword } from "@/lib/auth/password";
+import { getSafeReturnTo } from "@/lib/auth/return-to";
 import { createSession } from "@/lib/auth/session";
 import { normalizeIranianMobile, normalizeOtpCode } from "@/lib/auth/mobile";
 import { consumeOtp, requestOtp } from "@/lib/auth/otp";
@@ -33,6 +34,10 @@ function readLocale(formData: FormData): Locale {
 function readMobile(formData: FormData) {
   const value = formData.get("mobile");
   return normalizeIranianMobile(typeof value === "string" ? value : "");
+}
+
+function readReturnTo(formData: FormData) {
+  return getSafeReturnTo(formData.get("returnTo"));
 }
 
 export async function requestAuthenticationOtp(
@@ -128,7 +133,7 @@ export async function verifyAuthenticationOtp(
 
   if (purpose === "login") {
     await createSession(existingUser.id);
-    redirect("/panel");
+    redirect(readReturnTo(formData) || "/panel");
   }
 
   try {
@@ -214,5 +219,5 @@ export async function loginWithPassword(
   }
 
   await createSession(user.id);
-  redirect("/panel");
+  redirect(readReturnTo(formData) || "/panel");
 }

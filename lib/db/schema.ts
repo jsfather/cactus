@@ -8,6 +8,7 @@ import {
   pgEnum,
   pgTable,
   text,
+  time,
   timestamp,
   uniqueIndex,
   uuid,
@@ -60,6 +61,27 @@ export const studentAllergyStatus = pgEnum("student_allergy_status", [
 export const studentDocumentKind = pgEnum("student_document_kind", [
   "national_card",
   "education_certificate",
+]);
+export const termStatus = pgEnum("term_status", [
+  "draft",
+  "enrollment_open",
+  "active",
+  "completed",
+  "cancelled",
+]);
+export const termDeliveryMode = pgEnum("term_delivery_mode", [
+  "in_person",
+  "online",
+  "hybrid",
+]);
+export const termEnrollmentStatus = pgEnum("term_enrollment_status", [
+  "active",
+  "withdrawn",
+  "completed",
+]);
+export const termEnrollmentSource = pgEnum("term_enrollment_source", [
+  "direct",
+  "invitation",
 ]);
 
 export const appSettings = pgTable("app_settings", {
@@ -350,6 +372,156 @@ export const teacherEducations = pgTable(
     ),
     index("teacher_educations_profile_index").on(table.teacherProfileId),
     check("teacher_educations_sort_order_check", sql`${table.sortOrder} > 0`),
+  ],
+);
+
+export const termLevels = pgTable(
+  "term_levels",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    titleFa: varchar("title_fa", { length: 160 }).notNull(),
+    titleEn: varchar("title_en", { length: 160 }),
+    descriptionFa: text("description_fa"),
+    descriptionEn: text("description_en"),
+    sortOrder: integer("sort_order").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("term_levels_title_fa_unique").on(table.titleFa),
+    uniqueIndex("term_levels_sort_order_unique").on(table.sortOrder),
+    check("term_levels_sort_order_check", sql`${table.sortOrder} > 0`),
+  ],
+);
+
+export const terms = pgTable(
+  "terms",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    titleFa: varchar("title_fa", { length: 240 }).notNull(),
+    titleEn: varchar("title_en", { length: 240 }),
+    descriptionFa: text("description_fa"),
+    descriptionEn: text("description_en"),
+    levelId: uuid("level_id")
+      .notNull()
+      .references(() => termLevels.id, { onDelete: "restrict" }),
+    status: termStatus("status").default("draft").notNull(),
+    deliveryMode: termDeliveryMode("delivery_mode").notNull(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    capacity: integer("capacity"),
+    tuitionToman: bigint("tuition_toman", { mode: "number" }).default(0).notNull(),
+    locationFa: varchar("location_fa", { length: 500 }),
+    locationEn: varchar("location_en", { length: 500 }),
+    meetingUrl: text("meeting_url"),
+    creatorId: uuid("creator_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("terms_level_status_dates_index").on(table.levelId, table.status, table.startDate, table.endDate),
+    index("terms_status_dates_index").on(table.status, table.startDate, table.endDate),
+    index("terms_creator_id_index").on(table.creatorId),
+    check("terms_date_range_check", sql`${table.endDate} >= ${table.startDate}`),
+    check("terms_capacity_check", sql`${table.capacity} is null or ${table.capacity} > 0`),
+    check("terms_tuition_check", sql`${table.tuitionToman} >= 0`),
+    check(
+      "terms_delivery_details_check",
+      sql`(
+        (${table.deliveryMode} = 'in_person' and nullif(btrim(${table.locationFa}), '') is not null)
+        or (${table.deliveryMode} = 'online' and nullif(btrim(${table.meetingUrl}), '') is not null)
+        or (${table.deliveryMode} = 'hybrid' and nullif(btrim(${table.locationFa}), '') is not null and nullif(btrim(${table.meetingUrl}), '') is not null)
+      )`,
+    ),
+  ],
+);
+
+export const termPrerequisites = pgTable(
+  "term_prerequisites",
+  {
+    termId: uuid("term_id").notNull().references(() => terms.id, { onDelete: "cascade" }),
+    prerequisiteTermId: uuid("prerequisite_term_id").notNull().references(() => terms.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("term_prerequisites_unique").on(table.termId, table.prerequisiteTermId),
+    index("term_prerequisites_prerequisite_index").on(table.prerequisiteTermId),
+    check("term_prerequisites_not_self_check", sql`${table.termId} <> ${table.prerequisiteTermId}`),
+  ],
+);
+
+export const termTeachers = pgTable(
+  "term_teachers",
+  {
+    termId: uuid("term_id").notNull().references(() => terms.id, { onDelete: "cascade" }),
+    teacherId: uuid("teacher_id").notNull().references(() => users.id, { onDelete: "restrict" }),
+    assignedById: uuid("assigned_by_id").references(() => users.id, { onDelete: "set null" }),
+    assignedAt: timestamp("assigned_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("term_teachers_unique").on(table.termId, table.teacherId),
+    index("term_teachers_teacher_index").on(table.teacherId),
+  ],
+);
+
+export const termSchedules = pgTable(
+  "term_schedules",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    termId: uuid("term_id").notNull().references(() => terms.id, { onDelete: "cascade" }),
+    dayOfWeek: integer("day_of_week").notNull(),
+    startTime: time("start_time", { withTimezone: false }).notNull(),
+    endTime: time("end_time", { withTimezone: false }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("term_schedules_term_slot_unique").on(table.termId, table.dayOfWeek, table.startTime),
+    index("term_schedules_term_day_index").on(table.termId, table.dayOfWeek, table.startTime),
+    check("term_schedules_day_check", sql`${table.dayOfWeek} between 0 and 6`),
+    check("term_schedules_time_check", sql`${table.endTime} > ${table.startTime}`),
+  ],
+);
+
+export const termEnrollments = pgTable(
+  "term_enrollments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    termId: uuid("term_id").notNull().references(() => terms.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    status: termEnrollmentStatus("status").default("active").notNull(),
+    source: termEnrollmentSource("source").notNull(),
+    enrolledById: uuid("enrolled_by_id").references(() => users.id, { onDelete: "set null" }),
+    enrolledAt: timestamp("enrolled_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("term_enrollments_term_student_unique").on(table.termId, table.studentId),
+    index("term_enrollments_student_status_index").on(table.studentId, table.status),
+    index("term_enrollments_term_status_index").on(table.termId, table.status),
+  ],
+);
+
+export const termInvitations = pgTable(
+  "term_invitations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    termId: uuid("term_id").notNull().references(() => terms.id, { onDelete: "cascade" }),
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    maxUses: integer("max_uses"),
+    useCount: integer("use_count").default(0).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    createdById: uuid("created_by_id").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("term_invitations_token_hash_unique").on(table.tokenHash),
+    index("term_invitations_term_created_index").on(table.termId, table.createdAt),
+    index("term_invitations_expiry_index").on(table.expiresAt),
+    check("term_invitations_max_uses_check", sql`${table.maxUses} is null or ${table.maxUses} > 0`),
+    check("term_invitations_use_count_check", sql`${table.useCount} >= 0`),
   ],
 );
 
@@ -785,3 +957,8 @@ export type ExamQuestionType = (typeof examQuestionType.enumValues)[number];
 export type CommentStatus = (typeof commentStatus.enumValues)[number];
 export type ProductCategory = typeof productCategories.$inferSelect;
 export type ProductVariant = typeof productVariants.$inferSelect;
+export type Term = typeof terms.$inferSelect;
+export type TermLevel = typeof termLevels.$inferSelect;
+export type TermStatus = (typeof termStatus.enumValues)[number];
+export type TermDeliveryMode = (typeof termDeliveryMode.enumValues)[number];
+export type TermEnrollmentStatus = (typeof termEnrollmentStatus.enumValues)[number];

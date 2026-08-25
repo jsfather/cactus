@@ -20,7 +20,7 @@ function Spinner() {
   return <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />;
 }
 
-export function MobileAuthForm({ locale }: { locale: Locale }) {
+export function MobileAuthForm({ locale, returnTo }: { locale: Locale; returnTo?: string }) {
   const dictionary = getAuthDictionary(locale);
   const isFa = locale === "fa";
   const [requestState, requestAction, requesting] = useActionState(requestAuthenticationOtp, initialState);
@@ -54,6 +54,7 @@ export function MobileAuthForm({ locale }: { locale: Locale }) {
     return (
       <form action={requestAction} className="space-y-4">
         <input type="hidden" name="locale" value={locale} />
+        {returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}
         <div>
           <div className="rounded-xl border border-zinc-200 bg-zinc-50/80 p-1 shadow-inner shadow-zinc-950/[0.02] transition focus-within:border-emerald-500 focus-within:ring-3 focus-within:ring-emerald-600/10 dark:border-zinc-800 dark:bg-zinc-950/70 dark:focus-within:border-emerald-600">
             <label htmlFor="auth-mobile" className="block px-3 pt-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400">{dictionary.mobile}</label>
@@ -88,14 +89,14 @@ export function MobileAuthForm({ locale }: { locale: Locale }) {
 
       {usePassword && requestState.purpose === "login" ? (
         <form action={passwordAction} className="space-y-3">
-          <input type="hidden" name="locale" value={locale} /><input type="hidden" name="mobile" value={mobile} />
+          <input type="hidden" name="locale" value={locale} />{returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}<input type="hidden" name="mobile" value={mobile} />
           <FormLabel label={dictionary.password}><span className="relative block"><PanelInput name="password" type={showPassword ? "text" : "password"} required autoComplete="current-password" dir="ltr" className="nums-en pe-14" autoFocus /><button type="button" onClick={() => setShowPassword((current) => !current)} aria-label={showPassword ? (isFa ? "پنهان کردن رمز عبور" : "Hide password") : (isFa ? "نمایش رمز عبور" : "Show password")} className="absolute end-2 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"><svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="M2.5 10s2.7-4.5 7.5-4.5 7.5 4.5 7.5 4.5-2.7 4.5-7.5 4.5S2.5 10 2.5 10Z" /><circle cx="10" cy="10" r="2.2" />{showPassword ? null : <path d="m3 3 14 14" />}</svg></button></span></FormLabel>
           {error ? <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300">{error}</p> : null}
           <button type="submit" disabled={passwordPending} className={submitClass}>{passwordPending ? <><Spinner />{dictionary.verifyingCode}</> : <>{dictionary.passwordSubmit}<ArrowIcon /></>}</button>
         </form>
       ) : (
         <form ref={verifyFormRef} action={verifyAction} className="space-y-3">
-          <input type="hidden" name="locale" value={locale} /><input type="hidden" name="mobile" value={mobile} /><input type="hidden" name="purpose" value={requestState.purpose} />
+          <input type="hidden" name="locale" value={locale} />{returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}<input type="hidden" name="mobile" value={mobile} /><input type="hidden" name="purpose" value={requestState.purpose} />
           <OtpCodeInput key={requestState.attemptId} locale={locale} error={error} onValueChange={updateOtpCode} onComplete={submitCompletedOtp} />
           <button type="submit" disabled={verifying || otpCode.length !== 6} className={submitClass}>{verifying ? <><Spinner />{dictionary.verifyingCode}</> : <>{dictionary.verifyCode}<ArrowIcon /></>}</button>
         </form>
@@ -104,12 +105,12 @@ export function MobileAuthForm({ locale }: { locale: Locale }) {
       {requestState.purpose === "login" && requestState.hasPassword ? <div className="relative flex items-center"><span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" /><span className="px-3 text-xs text-zinc-400">{isFa ? "یا" : "or"}</span><span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" /></div> : null}
       {requestState.purpose === "login" && requestState.hasPassword ? <button type="button" className="flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-300" onClick={() => setUsePassword((value) => !value)}><svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="8" width="12" height="9" rx="2" /><path strokeLinecap="round" d="M6.5 8V6.5a3.5 3.5 0 0 1 7 0V8" /></svg>{usePassword ? dictionary.useOtp : dictionary.usePassword}</button> : null}
 
-      {!usePassword ? <ResendControl key={requestState.attemptId} locale={locale} mobile={mobile} requesting={requesting} action={requestAction} /> : null}
+      {!usePassword ? <ResendControl key={requestState.attemptId} locale={locale} mobile={mobile} returnTo={returnTo} requesting={requesting} action={requestAction} /> : null}
     </div>
   );
 }
 
-function ResendControl({ locale, mobile, requesting, action }: { locale: Locale; mobile: string; requesting: boolean; action: (payload: FormData) => void }) {
+function ResendControl({ locale, mobile, returnTo, requesting, action }: { locale: Locale; mobile: string; returnTo?: string; requesting: boolean; action: (payload: FormData) => void }) {
   const dictionary = getAuthDictionary(locale);
   const isFa = locale === "fa";
   const [seconds, setSeconds] = useState(60);
@@ -119,5 +120,5 @@ function ResendControl({ locale, mobile, requesting, action }: { locale: Locale;
     return () => window.clearInterval(timer);
   }, []);
 
-  return <form action={action} className="text-center"><input type="hidden" name="locale" value={locale} /><input type="hidden" name="mobile" value={mobile} /><p className="text-xs text-zinc-500 dark:text-zinc-400">{isFa ? "کد را دریافت نکردید؟" : "Didn't receive the code?"}</p><button type="submit" disabled={requesting || seconds > 0} className={`${textButtonClass} mt-1 disabled:cursor-not-allowed disabled:text-zinc-400`}>{requesting ? dictionary.requestingCode : seconds > 0 ? `${dictionary.resendCode} (${new Intl.NumberFormat(isFa ? "fa-IR" : "en-US").format(seconds)})` : dictionary.resendCode}</button></form>;
+  return <form action={action} className="text-center"><input type="hidden" name="locale" value={locale} />{returnTo ? <input type="hidden" name="returnTo" value={returnTo} /> : null}<input type="hidden" name="mobile" value={mobile} /><p className="text-xs text-zinc-500 dark:text-zinc-400">{isFa ? "کد را دریافت نکردید؟" : "Didn't receive the code?"}</p><button type="submit" disabled={requesting || seconds > 0} className={`${textButtonClass} mt-1 disabled:cursor-not-allowed disabled:text-zinc-400`}>{requesting ? dictionary.requestingCode : seconds > 0 ? `${dictionary.resendCode} (${new Intl.NumberFormat(isFa ? "fa-IR" : "en-US").format(seconds)})` : dictionary.resendCode}</button></form>;
 }
