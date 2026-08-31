@@ -97,6 +97,10 @@ export function PanelReviewIcon() {
   return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="M3.5 10s2.3-4 6.5-4 6.5 4 6.5 4-2.3 4-6.5 4-6.5-4-6.5-4Z" /><circle cx="10" cy="10" r="2" /></svg>;
 }
 
+export function PanelRegisterIcon() {
+  return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="M5 3.5h10a2 2 0 0 1 2 2v11H3v-11a2 2 0 0 1 2-2Z" /><path strokeLinecap="round" strokeLinejoin="round" d="m6.5 9 1.5 1.5 3-3M6.5 13.5h7M13 8h1" /></svg>;
+}
+
 export function PanelActionSpinner() {
   return <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />;
 }
@@ -134,9 +138,9 @@ export function PanelPageHeader({
   );
 }
 
-export function PanelSurface({ children }: { children: ReactNode }) {
+export function PanelSurface({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <section className={`overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 ${className}`}>
       {children}
     </section>
   );

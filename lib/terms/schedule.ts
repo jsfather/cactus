@@ -28,23 +28,42 @@ export function normalizeTermTime(value: string) {
 export function countScheduledSessions(
   startDate: string,
   endDate: string,
-  schedules: Array<{ dayOfWeek: number }>,
+  schedules: Array<TermScheduleValue>,
 ) {
-  if (!schedules.length) return 0;
+  return buildTermSessions(startDate, endDate, schedules).length;
+}
+
+export type GeneratedTermSession = {
+  sessionDate: string;
+  startTime: string;
+  endTime: string;
+  sequence: number;
+};
+
+export function buildTermSessions(
+  startDate: string,
+  endDate: string,
+  schedules: Array<TermScheduleValue>,
+): GeneratedTermSession[] {
+  if (!schedules.length) return [];
   const start = new Date(`${startDate}T12:00:00Z`);
   const end = new Date(`${endDate}T12:00:00Z`);
-  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end < start) return 0;
+  if (!Number.isFinite(start.getTime()) || !Number.isFinite(end.getTime()) || end < start) return [];
 
-  const selectedDays = new Set<number>(
-    schedules
-      .map((schedule) => termWeekDays.find((day) => day.value === schedule.dayOfWeek)?.jsDay)
-      .filter((day) => day !== undefined),
-  );
-  let count = 0;
+  const generated: Omit<GeneratedTermSession, "sequence">[] = [];
   for (const cursor = new Date(start); cursor <= end; cursor.setUTCDate(cursor.getUTCDate() + 1)) {
-    if (selectedDays.has(cursor.getUTCDay())) count += 1;
+    const matching = schedules
+      .filter((schedule) => termWeekDays.find((day) => day.value === schedule.dayOfWeek)?.jsDay === cursor.getUTCDay())
+      .sort((first, second) => first.startTime.localeCompare(second.startTime));
+    for (const schedule of matching) {
+      generated.push({
+        sessionDate: cursor.toISOString().slice(0, 10),
+        startTime: normalizeTermTime(schedule.startTime),
+        endTime: normalizeTermTime(schedule.endTime),
+      });
+    }
   }
-  return count;
+  return generated.map((session, index) => ({ ...session, sequence: index + 1 }));
 }
 
 export function schedulesOverlap(

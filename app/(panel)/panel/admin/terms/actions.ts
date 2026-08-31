@@ -7,8 +7,8 @@ import { z } from "zod";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
-import { termEnrollments, termLevels, termPrerequisites, termSchedules, termTeachers, terms, users } from "@/lib/db/schema";
-import { schedulesOverlap } from "@/lib/terms/schedule";
+import { sessionStudentRecords, termEnrollments, termLevels, termPrerequisites, termSchedules, termSessions, termTeachers, terms, users } from "@/lib/db/schema";
+import { buildTermSessions, normalizeTermTime, schedulesOverlap } from "@/lib/terms/schedule";
 import { readTermFormData, termSchema } from "@/lib/terms/validation";
 
 export type TermFormState = { error?: string; fieldErrors?: Record<string, string[]> };
@@ -105,6 +105,32 @@ async function saveTerm(termId: string | null, creatorId: string, data: z.infer<
       if (count.value > data.capacity) return { error: data.locale === "fa" ? "ظرفیت نمی‌تواند کمتر از تعداد دانش پژوهان فعال باشد." : "Capacity cannot be lower than the active enrollment count." };
     }
 
+    const generatedSessions = buildTermSessions(data.startDate, data.endDate, data.schedules);
+    if (!generatedSessions.length) {
+      return { error: data.locale === "fa" ? "در بازه انتخاب‌شده هیچ جلسه‌ای ساخته نمی‌شود." : "The selected date range does not produce any sessions." };
+    }
+
+    const existingSessions = termId
+      ? await transaction
+          .select({
+            id: termSessions.id,
+            sessionDate: termSessions.sessionDate,
+            startTime: termSessions.startTime,
+            hasRecords: sql<boolean>`exists(select 1 from ${sessionStudentRecords} record where record.session_id = ${termSessions.id})`,
+          })
+          .from(termSessions)
+          .where(eq(termSessions.termId, termId))
+      : [];
+    const generatedKeys = new Set(generatedSessions.map((session) => `${session.sessionDate}|${session.startTime}`));
+    const protectedSession = existingSessions.find((session) => !generatedKeys.has(`${session.sessionDate}|${normalizeTermTime(session.startTime)}`) && session.hasRecords);
+    if (protectedSession) {
+      return {
+        error: data.locale === "fa"
+          ? "این تغییر یک جلسه دارای حضور‌و‌غیاب یا نمره را حذف می‌کند. ابتدا برنامه را حفظ کنید یا سوابق آن جلسه را بررسی کنید."
+          : "This change would remove a session with attendance or grades. Keep the schedule or review that session's records first.",
+      };
+    }
+
     const values = {
       titleFa: data.titleFa,
       titleEn: data.titleEn || null,
@@ -139,6 +165,33 @@ async function saveTerm(termId: string | null, creatorId: string, data: z.infer<
     await transaction.insert(termTeachers).values(data.teacherIds.map((teacherId) => ({ termId: savedId!, teacherId, assignedById: creatorId })));
     if (data.prerequisiteIds.length) await transaction.insert(termPrerequisites).values(data.prerequisiteIds.map((prerequisiteTermId) => ({ termId: savedId!, prerequisiteTermId })));
     await transaction.insert(termSchedules).values(data.schedules.map((schedule) => ({ termId: savedId!, ...schedule })));
+    if (termId) {
+      const obsoleteIds = existingSessions
+        .filter((session) => !generatedKeys.has(`${session.sessionDate}|${normalizeTermTime(session.startTime)}`))
+        .map((session) => session.id);
+      if (obsoleteIds.length) await transaction.delete(termSessions).where(inArray(termSessions.id, obsoleteIds));
+
+      await transaction
+        .update(termSessions)
+        .set({ sequence: sql`${termSessions.sequence} + 1000000` })
+        .where(eq(termSessions.termId, termId));
+      const existingByKey = new Map(
+        existingSessions.map((session) => [`${session.sessionDate}|${normalizeTermTime(session.startTime)}`, session]),
+      );
+      for (const session of generatedSessions) {
+        const existing = existingByKey.get(`${session.sessionDate}|${session.startTime}`);
+        if (existing) {
+          await transaction
+            .update(termSessions)
+            .set({ endTime: session.endTime, sequence: session.sequence, updatedAt: new Date() })
+            .where(eq(termSessions.id, existing.id));
+        } else {
+          await transaction.insert(termSessions).values({ termId, ...session });
+        }
+      }
+    } else {
+      await transaction.insert(termSessions).values(generatedSessions.map((session) => ({ termId: savedId!, ...session })));
+    }
     return { id: savedId };
   });
 }

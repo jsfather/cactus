@@ -20,6 +20,7 @@ type NavIcon =
   | "categories"
   | "media"
   | "exams"
+  | "attendance"
   | "terms"
   | "levels"
   | "schedule"
@@ -42,6 +43,7 @@ function Icon({ name, className = "size-5" }: { name: NavIcon; className?: strin
   if (name === "categories") return <svg {...common} aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2" /><rect x="13.5" y="3.5" width="7" height="7" rx="2" /><rect x="3.5" y="13.5" width="7" height="7" rx="2" /><rect x="13.5" y="13.5" width="7" height="7" rx="2" /></svg>;
   if (name === "media") return <svg {...common} aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3" /><circle cx="9" cy="10" r="2" /><path strokeLinecap="round" strokeLinejoin="round" d="m5 18 4.5-4 3 2.5 2.5-2 4 3.5" /></svg>;
   if (name === "exams") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M7 4.5h10a2 2 0 0 1 2 2V21H5V6.5a2 2 0 0 1 2-2Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M9 4.5V3h6v1.5M8.5 10l1.5 1.5 2.5-3M8.5 16h7" /></svg>;
+  if (name === "attendance") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M6 3.5h12a2 2 0 0 1 2 2v15H4v-15a2 2 0 0 1 2-2Z" /><path strokeLinecap="round" strokeLinejoin="round" d="m7.5 9 1.7 1.7 3.3-3.4M7.5 15h9M15 8h1.5" /></svg>;
   if (name === "terms") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M4 5.5h16v14H4zM8 3v5M16 3v5M4 9.5h16" /><path strokeLinecap="round" d="M8 13h3M8 16h6" /></svg>;
   if (name === "levels") return <svg {...common} aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="m12 3 8 4-8 4-8-4 8-4Z" /><path strokeLinecap="round" strokeLinejoin="round" d="m4 12 8 4 8-4M4 17l8 4 8-4" /></svg>;
   if (name === "schedule") return <svg {...common} aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2" /><path strokeLinecap="round" d="M7.5 3v4M16.5 3v4M3.5 9.5h17M8 13h3M13.5 13H16M8 17h3" /></svg>;
@@ -86,6 +88,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
       ]
     : user.role === "teacher"
       ? [
+          { href: "/panel/teacher/attendance", label: dictionary.nav.attendance, icon: "attendance" },
           { href: "/panel/teacher/terms", label: dictionary.nav.terms, icon: "terms" },
           { href: "/panel/teacher/schedule", label: dictionary.nav.schedule, icon: "schedule" },
           { href: "/panel/teacher/profile", label: dictionary.nav.teacherProfile, icon: "teacherProfile" },
@@ -98,6 +101,7 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
           label: dictionary.nav.education,
           icon: "exams",
           items: [
+            { href: "/panel/admin/attendance", label: dictionary.nav.attendance, icon: "attendance" },
             { href: "/panel/admin/terms", label: dictionary.nav.terms, icon: "terms" },
             { href: "/panel/admin/term-levels", label: dictionary.nav.termLevels, icon: "levels" },
             { href: "/panel/admin/exams", label: dictionary.nav.exams, icon: "exams" },

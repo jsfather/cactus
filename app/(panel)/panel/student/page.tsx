@@ -1,5 +1,7 @@
 import { requireRole } from "@/lib/auth/session";
-import { PanelPage, PanelPageHeader, PanelSurface } from "@/components/panel/ui";
+import { StudentDailySchedule } from "@/components/attendance/student-daily-schedule";
+import { PanelPage, PanelPageHeader, PanelPrimaryLink } from "@/components/panel/ui";
+import { getStudentUpcomingSessions } from "@/lib/attendance/queries";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { getLocalizedUserName } from "@/lib/users/name";
@@ -12,6 +14,7 @@ export default async function StudentDashboard() {
     redirect("/panel/student/information");
   }
   const dictionary = getPanelDictionary(locale);
+  const sessions = await getStudentUpcomingSessions(user.id);
 
   return (
     <PanelPage>
@@ -19,12 +22,9 @@ export default async function StudentDashboard() {
         eyebrow={dictionary.dashboard.studentEyebrow}
         title={`${dictionary.dashboard.hello}، ${getLocalizedUserName(user, locale)}`}
         description={dictionary.dashboard.studentDescription}
+        actions={<PanelPrimaryLink href="/panel/student/schedule">{locale === "fa" ? "برنامه هفتگی" : "Weekly schedule"}</PanelPrimaryLink>}
       />
-      <PanelSurface>
-        <div className="p-6 text-sm leading-7 text-zinc-600 dark:text-zinc-400">
-          {dictionary.dashboard.comingSoon}
-        </div>
-      </PanelSurface>
+      <StudentDailySchedule sessions={sessions} locale={locale} />
     </PanelPage>
   );
 }

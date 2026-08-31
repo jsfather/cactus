@@ -1,7 +1,7 @@
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
-import { asc, eq, or, sql } from "drizzle-orm";
+import { and, asc, eq, or, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
@@ -21,11 +21,17 @@ import {
   products,
   productVariants,
   siteContent,
+  sessionStudentRecords,
   teacherEducations,
   teacherProfiles,
   teacherSkills,
   teacherWorkExperiences,
   termLevels,
+  termEnrollments,
+  termSchedules,
+  termSessions,
+  termTeachers,
+  terms,
   users,
 } from "./schema";
 
@@ -39,6 +45,7 @@ const starterCommentSeedKey = "seed.comments.starter.v1";
 const starterTeacherProfileSeedKey = "seed.teacher-profile.starter.v1";
 const starterHonorSeedKey = "seed.honors.starter.v1";
 const starterTermLevelSeedKey = "seed.terms.level.starter.v1";
+const starterAttendanceSeedKey = "seed.attendance.starter.v1";
 const starterMediaPathname = "content/starter/cactus-placeholder.png";
 const starterHonorMediaPathname = "content/starter/cactus-honor-placeholder.png";
 const adminBootstrapLockId = 1128352836;
@@ -718,6 +725,68 @@ export async function setupDatabase() {
           periodFa: "۱۳۹۸ تا ۱۴۰۲",
           periodEn: "2019–2023",
           sortOrder: 1,
+        });
+      });
+
+      await database.transaction(async (transaction) => {
+        const [existingTerm] = await transaction.select({ id: terms.id }).from(terms).limit(1);
+        if (existingTerm) {
+          await transaction
+            .insert(appSettings)
+            .values({ key: starterAttendanceSeedKey, value: "complete" })
+            .onConflictDoNothing();
+          return;
+        }
+        const [level] = await transaction.select({ id: termLevels.id }).from(termLevels).orderBy(asc(termLevels.sortOrder)).limit(1);
+        const [teacher] = await transaction.select({ id: users.id }).from(users).where(and(eq(users.role, "teacher"), eq(users.isActive, true))).orderBy(asc(users.createdAt)).limit(1);
+        const [student] = await transaction.select({ id: users.id }).from(users).where(and(eq(users.role, "student"), eq(users.isActive, true))).orderBy(asc(users.createdAt)).limit(1);
+        if (!level || !teacher || !student) return;
+        const [claimedSeed] = await transaction
+          .insert(appSettings)
+          .values({ key: starterAttendanceSeedKey, value: "complete" })
+          .onConflictDoNothing()
+          .returning({ key: appSettings.key });
+        if (!claimedSeed) return;
+
+        const start = new Date();
+        start.setUTCHours(12, 0, 0, 0);
+        const end = new Date(start);
+        end.setUTCDate(end.getUTCDate() + 27);
+        const startDate = start.toISOString().slice(0, 10);
+        const endDate = end.toISOString().slice(0, 10);
+        const dayOfWeek = start.getUTCDay() === 6 ? 0 : start.getUTCDay() + 1;
+        const [term] = await transaction.insert(terms).values({
+          titleFa: "کلاس نمونه حضور و نمره",
+          titleEn: "Sample attendance & grading class",
+          descriptionFa: "این ترم پیش‌نویس، گردش‌کار جلسات، حضور و غیبت و ثبت نمره را نمایش می‌دهد.",
+          descriptionEn: "This draft term demonstrates session attendance and grading workflows.",
+          levelId: level.id,
+          status: "draft",
+          deliveryMode: "in_person",
+          startDate,
+          endDate,
+          capacity: 12,
+          tuitionToman: 0,
+          locationFa: "کلاس نمونه کاکتوس",
+          locationEn: "Cactus demo classroom",
+          creatorId: adminId,
+        }).returning({ id: terms.id });
+        await transaction.insert(termTeachers).values({ termId: term.id, teacherId: teacher.id, assignedById: adminId });
+        await transaction.insert(termSchedules).values({ termId: term.id, dayOfWeek, startTime: "09:00", endTime: "10:30" });
+        await transaction.insert(termEnrollments).values({ termId: term.id, studentId: student.id, status: "active", source: "direct", enrolledById: adminId });
+        const sessions = Array.from({ length: 4 }, (_, index) => {
+          const sessionDate = new Date(start);
+          sessionDate.setUTCDate(sessionDate.getUTCDate() + index * 7);
+          return { termId: term.id, sessionDate: sessionDate.toISOString().slice(0, 10), startTime: "09:00", endTime: "10:30", sequence: index + 1 };
+        });
+        const [firstSession] = await transaction.insert(termSessions).values(sessions).returning({ id: termSessions.id });
+        await transaction.insert(sessionStudentRecords).values({
+          sessionId: firstSession.id,
+          studentId: student.id,
+          attendance: "present",
+          grade: "18",
+          note: "سابقه نمونه؛ پیش از استفاده واقعی قابل ویرایش است.",
+          recordedById: adminId,
         });
       });
     }

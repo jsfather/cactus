@@ -49,7 +49,7 @@ export function TermForm({
   const isFa = locale === "fa";
   const number = useMemo(() => new Intl.NumberFormat(isFa ? "fa-IR" : "en-US"), [isFa]);
   const date = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }), [isFa]);
-  const estimatedSessions = countScheduledSessions(values.startDate, values.endDate, schedules);
+  const generatedSessionCount = countScheduledSessions(values.startDate, values.endDate, schedules);
 
   function toggle(selected: string[], setSelected: (value: string[]) => void, id: string) {
     setSelected(selected.includes(id) ? selected.filter((item) => item !== id) : [...selected, id]);
@@ -86,7 +86,7 @@ export function TermForm({
           </div>
         </PanelFormSection>
 
-        <PanelFormSection title={isFa ? "برنامه هفتگی" : "Weekly schedule"} description={isFa ? "حداقل یک جلسه هفتگی تعریف کنید. سامانه تعداد تقریبی جلسات و برنامه همه افراد را از همین الگو می‌سازد." : "Add at least one weekly meeting. The system derives estimated sessions and everyone's schedule from this pattern."}>
+        <PanelFormSection title={isFa ? "برنامه هفتگی و ساخت جلسات" : "Weekly schedule & session generation"} description={isFa ? "حداقل یک زمان هفتگی تعریف کنید. هنگام ذخیره، سامانه همه جلسات تاریخ‌دار را از همین الگو می‌سازد." : "Add at least one weekly slot. Saving generates every dated class session from this pattern."}>
           <div className="space-y-3">
             {schedules.map((schedule, index) => <div key={index} className="grid items-end gap-3 rounded-xl border border-zinc-200 p-4 sm:grid-cols-[1fr_1fr_1fr_auto] dark:border-zinc-800">
               <FormLabel label={isFa ? "روز" : "Day"}><PanelSelect value={schedule.dayOfWeek} onChange={(event) => updateSchedule(index, "dayOfWeek", Number(event.target.value))}>{termWeekDays.map((day) => <option key={day.value} value={day.value}>{day[locale]}</option>)}</PanelSelect></FormLabel>
@@ -94,7 +94,7 @@ export function TermForm({
               <FormLabel label={isFa ? "پایان" : "Ends"}><PanelTimePicker locale={locale} value={schedule.endTime} onValueChange={(value) => updateSchedule(index, "endTime", value)} required aria-label={isFa ? `زمان پایان جلسه ${number.format(index + 1)}` : `Meeting ${index + 1} end time`} /></FormLabel>
               <button type="button" disabled={schedules.length === 1} onClick={() => setSchedules((current) => current.filter((_, itemIndex) => itemIndex !== index))} className="h-12 cursor-pointer rounded-xl border border-red-200 px-4 text-sm font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-red-900 dark:text-red-400">{isFa ? "حذف" : "Remove"}</button>
             </div>)}
-            <div className="flex flex-col gap-3 rounded-xl bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:bg-emerald-950/30"><p className="text-sm text-emerald-900 dark:text-emerald-200">{estimatedSessions ? (isFa ? `برآورد: ${number.format(estimatedSessions)} جلسه در بازه انتخاب‌شده` : `Estimate: ${number.format(estimatedSessions)} meetings in the selected date range`) : (isFa ? "با انتخاب تاریخ‌ها، تعداد تقریبی جلسات نمایش داده می‌شود." : "Choose dates to see the estimated meeting count.")}</p><button type="button" onClick={() => setSchedules((current) => [...current, { dayOfWeek: 0, startTime: "09:00", endTime: "10:30" }])} className={secondaryButtonClass}>{isFa ? "افزودن زمان" : "Add meeting"}</button></div>
+            <div className="flex flex-col gap-3 rounded-xl bg-emerald-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:bg-emerald-950/30"><p className="text-sm text-emerald-900 dark:text-emerald-200">{generatedSessionCount ? (isFa ? `${number.format(generatedSessionCount)} جلسه تاریخ‌دار ساخته می‌شود` : `${number.format(generatedSessionCount)} dated sessions will be generated`) : (isFa ? "تاریخ‌ها را انتخاب کنید تا تعداد جلسات مشخص شود." : "Choose dates to see the generated session count.")}</p><button type="button" onClick={() => setSchedules((current) => [...current, { dayOfWeek: 0, startTime: "09:00", endTime: "10:30" }])} className={secondaryButtonClass}>{isFa ? "افزودن زمان" : "Add meeting"}</button></div>
             <FieldError errors={state.fieldErrors?.schedules} />
           </div>
         </PanelFormSection>
@@ -127,7 +127,7 @@ export function TermForm({
       </aside>
     </div>
 
-    <PanelFormFooter error={state.error} message={isFa ? "تعداد جلسات و مدت ترم از تاریخ‌ها و برنامه هفتگی محاسبه می‌شود؛ نیازی به ورود دستی آن‌ها نیست." : "Duration and session count are derived from dates and the weekly schedule."}>
+    <PanelFormFooter error={state.error} message={isFa ? "تغییر برنامه، جلسات بدون سابقه را همگام می‌کند؛ جلسه دارای حضور یا نمره هرگز خودکار حذف نمی‌شود." : "Schedule changes resync untouched sessions; a session with attendance or grades is never deleted automatically."}>
       <Link href="/panel/admin/terms" className={secondaryButtonClass}>{isFa ? "انصراف" : "Cancel"}</Link>
       <button disabled={pending || !levels.length || !teachers.length} className={primaryButtonClass}>{pending ? (isFa ? "در حال ذخیره…" : "Saving…") : (isFa ? "ذخیره ترم" : "Save term")}</button>
     </PanelFormFooter>

@@ -6,6 +6,7 @@ import {
   termLevels,
   termPrerequisites,
   termSchedules,
+  termSessions,
   termTeachers,
   terms,
   users,
@@ -62,12 +63,14 @@ export async function getAdminTerms(locale: Locale, status: TermStatus | "all" =
       teacherCount: sql<number>`count(distinct ${termTeachers.teacherId})::int`,
       studentCount: sql<number>`count(distinct ${termEnrollments.studentId}) filter (where ${termEnrollments.status} = 'active')::int`,
       scheduleCount: sql<number>`count(distinct ${termSchedules.id})::int`,
+      sessionCount: sql<number>`count(distinct ${termSessions.id})::int`,
     })
     .from(terms)
     .innerJoin(termLevels, eq(terms.levelId, termLevels.id))
     .leftJoin(termTeachers, eq(termTeachers.termId, terms.id))
     .leftJoin(termEnrollments, eq(termEnrollments.termId, terms.id))
     .leftJoin(termSchedules, eq(termSchedules.termId, terms.id))
+    .leftJoin(termSessions, eq(termSessions.termId, terms.id))
     .where(and(
       status === "all" ? undefined : eq(terms.status, status),
       search ? or(ilike(terms.titleFa, pattern), ilike(terms.titleEn, pattern), ilike(termLevels.titleFa, pattern), ilike(termLevels.titleEn, pattern)) : undefined,
@@ -180,11 +183,13 @@ export async function getTeacherTerms(teacherId: string) {
       levelTitleFa: termLevels.titleFa,
       levelTitleEn: termLevels.titleEn,
       studentCount: sql<number>`count(distinct ${termEnrollments.studentId}) filter (where ${termEnrollments.status} = 'active')::int`,
+      sessionCount: sql<number>`count(distinct ${termSessions.id})::int`,
     })
     .from(termTeachers)
     .innerJoin(terms, eq(termTeachers.termId, terms.id))
     .innerJoin(termLevels, eq(terms.levelId, termLevels.id))
     .leftJoin(termEnrollments, eq(termEnrollments.termId, terms.id))
+    .leftJoin(termSessions, eq(termSessions.termId, terms.id))
     .where(eq(termTeachers.teacherId, teacherId))
     .groupBy(terms.id, termLevels.id)
     .orderBy(desc(terms.startDate));

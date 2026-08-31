@@ -5,6 +5,7 @@ import {
   date,
   index,
   integer,
+  numeric,
   pgEnum,
   pgTable,
   text,
@@ -82,6 +83,12 @@ export const termEnrollmentStatus = pgEnum("term_enrollment_status", [
 export const termEnrollmentSource = pgEnum("term_enrollment_source", [
   "direct",
   "invitation",
+]);
+export const attendanceStatus = pgEnum("attendance_status", [
+  "present",
+  "absent",
+  "late",
+  "excused",
 ]);
 
 export const appSettings = pgTable("app_settings", {
@@ -500,6 +507,74 @@ export const termEnrollments = pgTable(
     uniqueIndex("term_enrollments_term_student_unique").on(table.termId, table.studentId),
     index("term_enrollments_student_status_index").on(table.studentId, table.status),
     index("term_enrollments_term_status_index").on(table.termId, table.status),
+  ],
+);
+
+export const termSessions = pgTable(
+  "term_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    termId: uuid("term_id")
+      .notNull()
+      .references(() => terms.id, { onDelete: "cascade" }),
+    sessionDate: date("session_date").notNull(),
+    startTime: time("start_time", { withTimezone: false }).notNull(),
+    endTime: time("end_time", { withTimezone: false }).notNull(),
+    sequence: integer("sequence").notNull(),
+    gradeMax: numeric("grade_max", { precision: 6, scale: 2 })
+      .default("20")
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("term_sessions_term_date_time_unique").on(
+      table.termId,
+      table.sessionDate,
+      table.startTime,
+    ),
+    uniqueIndex("term_sessions_term_sequence_unique").on(table.termId, table.sequence),
+    index("term_sessions_term_date_index").on(table.termId, table.sessionDate, table.startTime),
+    check("term_sessions_time_check", sql`${table.endTime} > ${table.startTime}`),
+    check("term_sessions_sequence_check", sql`${table.sequence} > 0`),
+    check("term_sessions_grade_max_check", sql`${table.gradeMax} > 0 and ${table.gradeMax} <= 1000`),
+  ],
+);
+
+export const sessionStudentRecords = pgTable(
+  "session_student_records",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sessionId: uuid("session_id")
+      .notNull()
+      .references(() => termSessions.id, { onDelete: "cascade" }),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    attendance: attendanceStatus("attendance"),
+    grade: numeric("grade", { precision: 6, scale: 2 }),
+    note: varchar("note", { length: 500 }),
+    recordedById: uuid("recorded_by_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("session_student_records_session_student_unique").on(
+      table.sessionId,
+      table.studentId,
+    ),
+    index("session_student_records_student_index").on(table.studentId, table.sessionId),
+    index("session_student_records_recorder_index").on(table.recordedById),
+    check(
+      "session_student_records_grade_check",
+      sql`${table.grade} is null or (${table.grade} >= 0 and ${table.grade} <= 1000)`,
+    ),
+    check(
+      "session_student_records_has_value_check",
+      sql`${table.attendance} is not null or ${table.grade} is not null or nullif(btrim(${table.note}), '') is not null`,
+    ),
   ],
 );
 
@@ -962,3 +1037,5 @@ export type TermLevel = typeof termLevels.$inferSelect;
 export type TermStatus = (typeof termStatus.enumValues)[number];
 export type TermDeliveryMode = (typeof termDeliveryMode.enumValues)[number];
 export type TermEnrollmentStatus = (typeof termEnrollmentStatus.enumValues)[number];
+export type AttendanceStatus = (typeof attendanceStatus.enumValues)[number];
+export type TermSession = typeof termSessions.$inferSelect;
