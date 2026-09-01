@@ -309,7 +309,7 @@ export const courses = {
   title: 'دوره‌ها',
   description: 'دوره‌های رباتیک و هوش مصنوعی را مرور کنید',
   allCourses: 'همه دوره‌ها',
-  noCourses: 'دوره‌ای موجود نیست',
+  noCourses: 'هنوز دوره‌ای ثبت نشده است',
   duration: 'مدت دوره',
   level: 'سطح',
   instructor: 'مدرس',

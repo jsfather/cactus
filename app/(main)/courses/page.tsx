@@ -37,6 +37,9 @@ const formatRating = (rating: PublicCourse['rating']) => {
   return Number.isFinite(numericRating) ? numericRating.toFixed(1) : '0.0';
 };
 
+const isPublished = (value: PublicCourse['is_published']) =>
+  value === true || value === 1 || value === '1' || value === 'true';
+
 function CoursesContent() {
   const { t, dir } = useLocale();
   const router = useRouter();
@@ -78,7 +81,9 @@ function CoursesContent() {
           price_type: filters.price_type || undefined,
           sort,
         });
-        setCourses(response.data);
+        setCourses(
+          response.data.filter((course) => isPublished(course.is_published))
+        );
       } catch (error) {
         console.error('Error fetching courses:', error);
       } finally {

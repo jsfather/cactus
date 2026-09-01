@@ -16,15 +16,26 @@ import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { useCoursePage } from '@/app/lib/hooks/use-course-page';
 import Select from '@/app/components/ui/Select';
 import { termService } from '@/app/lib/services/term.service';
+import { teacherService } from '@/app/lib/services/teacher.service';
+import { levelService } from '@/app/lib/services/level.service';
 import type { Term } from '@/app/lib/types/term';
+import type { Teacher } from '@/app/lib/types/teacher';
+import type { Level } from '@/app/lib/types/level';
 
 const schema = z.object({
   term_id: z.string().min(1, 'شناسه ترم الزامی است'),
-  title: z.string().min(1, 'عنوان دوره الزامی است'),
+  teacher_id: z.string().min(1, 'مدرس الزامی است'),
+  level_id: z.string().min(1, 'رده سنی الزامی است'),
+  topic: z.string().min(1, 'عنوان دوره الزامی است'),
+  description: z.string().min(1, 'توضیحات دوره الزامی است'),
+  price: z.coerce.number().min(0, 'قیمت معتبر وارد کنید'),
+  capacity: z.coerce.number().int().min(1, 'ظرفیت باید بیشتر از صفر باشد'),
+  level: z.enum(['beginner', 'intermediate', 'advanced']),
+  price_type: z.enum(['free', 'paid']),
   supplementary_description: z.string().optional(),
   intro_video_url: z.string().optional(),
   certificate_image_url: z.string().optional(),
-  related_blog_tags: z.array(z.string()),
+  related_blog_ids: z.array(z.string()),
   is_published: z.boolean(),
   faqs: z.array(
     z.object({
@@ -50,8 +61,8 @@ const schema = z.object({
     z.object({
       name: z.string().min(1, 'نام ابزار الزامی است'),
       description: z.string().optional(),
-      link: z.string().url('لینک معتبر وارد کنید'),
-      icon: z.string().optional(),
+      url: z.string().url('لینک معتبر وارد کنید'),
+      emoji: z.string().optional(),
     })
   ),
 });
@@ -67,6 +78,8 @@ export default function CoursePageFormPage({
   const router = useRouter();
   const isNew = resolvedParams.id === 'new';
   const [terms, setTerms] = useState<Term[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [levels, setLevels] = useState<Level[]>([]);
 
   const {
     currentCoursePage,
@@ -87,11 +100,18 @@ export default function CoursePageFormPage({
     resolver: zodResolver(schema),
     defaultValues: {
       term_id: '',
-      title: '',
+      teacher_id: '',
+      level_id: '',
+      topic: '',
+      description: '',
+      price: 0,
+      capacity: 1,
+      level: 'beginner',
+      price_type: 'paid',
       supplementary_description: '',
       intro_video_url: '',
       certificate_image_url: '',
-      related_blog_tags: [],
+      related_blog_ids: [],
       is_published: false,
       faqs: [],
       video_testimonials: [],
@@ -111,9 +131,13 @@ export default function CoursePageFormPage({
   useEffect(() => {
     Promise.all([
       termService.getList(),
+      teacherService.getList(),
+      levelService.getList(),
     ])
-      .then(([termResponse]) => {
+      .then(([termResponse, teacherResponse, levelResponse]) => {
         setTerms(termResponse.data);
+        setTeachers(teacherResponse.data);
+        setLevels(levelResponse.data);
       })
       .catch(() => toast.error('دریافت اطلاعات پایه دوره انجام نشد'));
   }, []);
@@ -128,13 +152,22 @@ export default function CoursePageFormPage({
     if (currentCoursePage && !isNew) {
       reset({
         term_id: String(currentCoursePage.term_id),
-        title: currentCoursePage.title || currentCoursePage.topic || '',
+        teacher_id: String(currentCoursePage.teacher_id || ''),
+        level_id: String(currentCoursePage.level_id || ''),
+        topic: currentCoursePage.topic || currentCoursePage.title,
+        description: currentCoursePage.description || '',
+        price: currentCoursePage.price || 0,
+        capacity: currentCoursePage.capacity || 1,
+        level: currentCoursePage.level || 'beginner',
+        price_type: currentCoursePage.price_type || 'paid',
         supplementary_description:
           currentCoursePage.supplementary_description || '',
         intro_video_url: currentCoursePage.intro_video_url || '',
         certificate_image_url: currentCoursePage.certificate_image_url || '',
-        related_blog_tags: currentCoursePage.related_blog_tags || [],
-        is_published: Boolean(currentCoursePage.is_published),
+        related_blog_ids: (currentCoursePage.related_blog_ids || []).map(
+          String
+        ),
+        is_published: currentCoursePage.is_published,
         faqs: currentCoursePage.faqs.map(({ question, answer }) => ({
           question,
           answer,
@@ -152,8 +185,8 @@ export default function CoursePageFormPage({
         recommended_tools: currentCoursePage.recommended_tools.map((tool) => ({
           name: tool.name,
           description: tool.description || '',
-          link: tool.link || tool.url || '',
-          icon: tool.icon || tool.emoji || '',
+          url: tool.url || tool.link,
+          emoji: tool.emoji || tool.icon || '',
         })),
       });
     }
@@ -162,7 +195,18 @@ export default function CoursePageFormPage({
   const onSubmit = async (data: FormData) => {
     try {
       clearError();
-      const payload = data;
+      const payload = {
+        ...data,
+        related_blog_ids: data.related_blog_ids
+          .map(Number)
+          .filter((id) => Number.isInteger(id) && id > 0),
+        recommended_tools: data.recommended_tools.map((tool) => ({
+          name: tool.name,
+          description: tool.description,
+          url: tool.url,
+          emoji: tool.emoji,
+        })),
+      };
 
       if (isNew) {
         await createCoursePage(payload);
@@ -230,10 +274,110 @@ export default function CoursePageFormPage({
                 />
               )}
             />
+            <Controller
+              name="teacher_id"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="teacher_id"
+                  label="مدرس"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: '', label: 'انتخاب مدرس' },
+                    ...teachers.map((teacher) => ({
+                      value: teacher.user_id.toString(),
+                      label: `${teacher.user.first_name} ${teacher.user.last_name}`,
+                    })),
+                  ]}
+                  error={errors.teacher_id?.message}
+                  required
+                />
+              )}
+            />
+            <Controller
+              name="level_id"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="level_id"
+                  label="رده سنی / سطح"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: '', label: 'انتخاب رده سنی' },
+                    ...levels.map((level) => ({
+                      value: level.id.toString(),
+                      label: `${level.name} (${level.label})`,
+                    })),
+                  ]}
+                  error={errors.level_id?.message}
+                  required
+                />
+              )}
+            />
             <Input
               label="عنوان دوره"
-              {...register('title')}
-              error={errors.title?.message}
+              {...register('topic')}
+              error={errors.topic?.message}
+              required
+            />
+            <Controller
+              name="level"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="level"
+                  label="سطح دشواری"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: 'beginner', label: 'مقدماتی' },
+                    { value: 'intermediate', label: 'متوسط' },
+                    { value: 'advanced', label: 'پیشرفته' },
+                  ]}
+                />
+              )}
+            />
+            <Controller
+              name="price_type"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  id="price_type"
+                  label="نوع قیمت"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: 'paid', label: 'پولی' },
+                    { value: 'free', label: 'رایگان' },
+                  ]}
+                />
+              )}
+            />
+            <Input
+              type="number"
+              min="0"
+              label="قیمت (تومان)"
+              {...register('price')}
+              error={errors.price?.message}
+              required
+            />
+            <Input
+              type="number"
+              min="1"
+              label="ظرفیت"
+              {...register('capacity')}
+              error={errors.capacity?.message}
+              required
+            />
+          </div>
+          <div className="mt-4">
+            <Textarea
+              label="توضیحات اصلی دوره"
+              {...register('description')}
+              error={errors.description?.message}
+              rows={4}
               required
             />
           </div>
@@ -441,8 +585,8 @@ export default function CoursePageFormPage({
                 toolFields.append({
                   name: '',
                   description: '',
-                  link: '',
-                  icon: '',
+                  url: '',
+                  emoji: '',
                 })
               }
             >
@@ -472,13 +616,13 @@ export default function CoursePageFormPage({
                 />
                 <Input
                   label="آیکون (ایموجی)"
-                  {...register(`recommended_tools.${index}.icon`)}
+                  {...register(`recommended_tools.${index}.emoji`)}
                   placeholder="🔧"
                 />
                 <Input
                   label="لینک"
-                  {...register(`recommended_tools.${index}.link`)}
-                  error={errors.recommended_tools?.[index]?.link?.message}
+                  {...register(`recommended_tools.${index}.url`)}
+                  error={errors.recommended_tools?.[index]?.url?.message}
                 />
                 <Input
                   label="توضیحات"
@@ -494,11 +638,11 @@ export default function CoursePageFormPage({
             مقالات مرتبط
           </h2>
           <Controller
-            name="related_blog_tags"
+            name="related_blog_ids"
             control={control}
             render={({ field }) => (
               <TagInput
-                label="برچسب مقالات مرتبط (هر برچسب را با Enter اضافه کنید)"
+                label="شناسه مقالات مرتبط (هر شناسه را با Enter اضافه کنید)"
                 value={field.value || []}
                 onChange={field.onChange}
               />

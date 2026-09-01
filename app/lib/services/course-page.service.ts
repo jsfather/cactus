@@ -8,10 +8,14 @@ import {
   UpdateCoursePageRequest,
 } from '@/app/lib/types/course';
 
+const parsePublished = (value: unknown) =>
+  value === true || value === 1 || value === '1' || value === 'true';
+
 const normalizeCourse = (course: CoursePageContent): CoursePageContent => ({
   ...course,
   title: course.title || course.topic || '',
   topic: course.topic || course.title,
+  is_published: parsePublished(course.is_published),
   related_blog_tags: course.related_blog_tags || [],
   faqs: course.faqs || [],
   syllabus: course.syllabus || [],
@@ -26,14 +30,14 @@ const normalizeCourse = (course: CoursePageContent): CoursePageContent => ({
 export class CoursePageService {
   async getList(): Promise<GetCoursePageListResponse> {
     const response = await apiClient.get<GetCoursePageListResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.GET_ALL
+      API_ENDPOINTS.PANEL.ADMIN.COURSES.GET_ALL
     );
     return { ...response, data: response.data.map(normalizeCourse) };
   }
 
   async getById(id: string): Promise<GetCoursePageResponse> {
     const response = await apiClient.get<GetCoursePageResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.GET_BY_ID(id)
+      API_ENDPOINTS.PANEL.ADMIN.COURSES.GET_BY_ID(id)
     );
     return { ...response, data: normalizeCourse(response.data) };
   }
@@ -42,7 +46,7 @@ export class CoursePageService {
     payload: CreateCoursePageRequest
   ): Promise<GetCoursePageResponse> {
     return apiClient.post<GetCoursePageResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.CREATE,
+      API_ENDPOINTS.PANEL.ADMIN.COURSES.CREATE,
       payload
     );
   }
@@ -52,15 +56,13 @@ export class CoursePageService {
     payload: UpdateCoursePageRequest
   ): Promise<GetCoursePageResponse> {
     return apiClient.put<GetCoursePageResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.UPDATE(id),
+      API_ENDPOINTS.PANEL.ADMIN.COURSES.UPDATE(id),
       payload
     );
   }
 
   async delete(id: string): Promise<void> {
-    return apiClient.delete<void>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.DELETE(id)
-    );
+    return apiClient.delete<void>(API_ENDPOINTS.PANEL.ADMIN.COURSES.DELETE(id));
   }
 }
 
