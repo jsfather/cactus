@@ -197,6 +197,10 @@ export default function CoursePageFormPage({
       clearError();
       const payload = {
         ...data,
+        term_id: Number(data.term_id),
+        teacher_id: Number(data.teacher_id),
+        level_id: Number(data.level_id),
+        is_published: Boolean(data.is_published),
         related_blog_ids: data.related_blog_ids
           .map(Number)
           .filter((id) => Number.isInteger(id) && id > 0),
@@ -212,7 +216,18 @@ export default function CoursePageFormPage({
         await createCoursePage(payload);
         toast.success('دوره با موفقیت ایجاد شد');
       } else {
-        await updateCoursePage(resolvedParams.id, payload);
+        const savedCourse = await updateCoursePage(resolvedParams.id, payload);
+        const fieldsPersisted =
+          String(savedCourse.term_id) === String(payload.term_id) &&
+          String(savedCourse.teacher_id) === String(payload.teacher_id) &&
+          String(savedCourse.level_id) === String(payload.level_id) &&
+          savedCourse.is_published === payload.is_published;
+
+        if (!fieldsPersisted) {
+          throw new Error(
+            'سرور بعضی از فیلدهای دوره یا وضعیت انتشار را ذخیره نکرد'
+          );
+        }
         toast.success('دوره با موفقیت به‌روزرسانی شد');
       }
 
