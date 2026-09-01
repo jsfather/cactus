@@ -127,21 +127,14 @@ export interface GetCoursePageResponse {
 
 export interface CreateCoursePageRequest {
   term_id: number | string;
-  teacher_id: number | string;
-  level_id: number | string;
-  topic: string;
-  description: string;
-  price: number;
-  capacity: number;
-  level: CourseLevel;
-  price_type: CoursePriceType;
+  title: string;
   supplementary_description?: string;
   intro_video_url?: string;
   certificate_image_url?: string;
   faqs?: CourseFAQ[];
   video_testimonials?: CourseVideoTestimonial[];
   syllabus?: CourseSyllabusSection[];
-  related_blog_ids?: number[];
+  related_blog_tags?: string[];
   recommended_tools?: CourseRecommendedTool[];
   is_published?: boolean;
 }

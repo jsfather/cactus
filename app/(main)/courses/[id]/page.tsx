@@ -73,11 +73,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   const { page_content: content } = course;
-  const priceDisplay =
-    course.price_type === 'free'
-      ? t.courses.filters.prices.free
-      : `${course.price_label} ${t.common.toman}`;
-
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <div className="border-b dark:border-gray-800">
@@ -270,15 +265,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
           <aside className="lg:sticky lg:top-24 lg:h-fit">
             <div className="rounded-2xl bg-gray-50 p-6 dark:bg-gray-800">
-              <div className="mb-6 text-center">
-                <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                  {t.courses.detail.price}
-                </p>
-                <p className="text-primary-600 text-3xl font-bold">
-                  {priceDisplay}
-                </p>
-              </div>
-
               <div className="mb-6 space-y-4">
                 <div className="flex items-center gap-3">
                   <BookOpen className="text-primary-600 h-5 w-5" />

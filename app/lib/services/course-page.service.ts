@@ -26,14 +26,14 @@ const normalizeCourse = (course: CoursePageContent): CoursePageContent => ({
 export class CoursePageService {
   async getList(): Promise<GetCoursePageListResponse> {
     const response = await apiClient.get<GetCoursePageListResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSES.GET_ALL
+      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.GET_ALL
     );
     return { ...response, data: response.data.map(normalizeCourse) };
   }
 
   async getById(id: string): Promise<GetCoursePageResponse> {
     const response = await apiClient.get<GetCoursePageResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSES.GET_BY_ID(id)
+      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.GET_BY_ID(id)
     );
     return { ...response, data: normalizeCourse(response.data) };
   }
@@ -42,7 +42,7 @@ export class CoursePageService {
     payload: CreateCoursePageRequest
   ): Promise<GetCoursePageResponse> {
     return apiClient.post<GetCoursePageResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSES.CREATE,
+      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.CREATE,
       payload
     );
   }
@@ -52,13 +52,15 @@ export class CoursePageService {
     payload: UpdateCoursePageRequest
   ): Promise<GetCoursePageResponse> {
     return apiClient.put<GetCoursePageResponse>(
-      API_ENDPOINTS.PANEL.ADMIN.COURSES.UPDATE(id),
+      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.UPDATE(id),
       payload
     );
   }
 
   async delete(id: string): Promise<void> {
-    return apiClient.delete<void>(API_ENDPOINTS.PANEL.ADMIN.COURSES.DELETE(id));
+    return apiClient.delete<void>(
+      API_ENDPOINTS.PANEL.ADMIN.COURSE_PAGES.DELETE(id)
+    );
   }
 }
 

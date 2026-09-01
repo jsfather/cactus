@@ -308,15 +308,10 @@ function CoursesContent() {
                       className="object-cover dark:opacity-90"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div className="absolute right-4 bottom-4 left-4 flex items-center justify-between">
+                    <div className="absolute right-4 bottom-4 left-4 flex items-center">
                       <span className="bg-primary-600 rounded-full px-3 py-1 text-sm text-white">
                         {course.level_label}
                       </span>
-                      {course.price_type === 'free' && (
-                        <span className="rounded-full bg-green-500 px-3 py-1 text-sm text-white">
-                          {t.courses.filters.prices.free}
-                        </span>
-                      )}
                     </div>
                   </div>
                   <div className="p-6">
@@ -340,14 +335,9 @@ function CoursesContent() {
                         ({course.rating_count ?? 0})
                       </span>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center">
                       <span className="text-sm text-gray-500 dark:text-gray-400">
                         {course.duration}
-                      </span>
-                      <span className="text-primary-600 dark:text-primary-400 font-bold">
-                        {course.price_type === 'free'
-                          ? t.courses.filters.prices.free
-                          : `${course.price_label} ${t.common.toman}`}
                       </span>
                     </div>
                   </div>
