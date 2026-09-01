@@ -32,6 +32,11 @@ const emptyFilters: CourseFilterValues = {
   price_type: '',
 };
 
+const formatRating = (rating: PublicCourse['rating']) => {
+  const numericRating = Number(rating);
+  return Number.isFinite(numericRating) ? numericRating.toFixed(1) : '0.0';
+};
+
 function CoursesContent() {
   const { t, dir } = useLocale();
   const router = useRouter();
@@ -329,10 +334,10 @@ function CoursesContent() {
                     <div className="mb-3 flex items-center gap-1">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                       <span className="text-sm font-medium">
-                        {course.rating.toFixed(1)}
+                        {formatRating(course.rating)}
                       </span>
                       <span className="text-sm text-gray-400">
-                        ({course.rating_count})
+                        ({course.rating_count ?? 0})
                       </span>
                     </div>
                     <div className="flex items-center justify-between">

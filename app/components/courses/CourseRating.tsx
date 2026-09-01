@@ -4,12 +4,14 @@ import { Star } from 'lucide-react';
 import { useLocale } from '@/app/contexts/LocaleContext';
 
 interface CourseRatingProps {
-  rating: number;
-  ratingCount: number;
+  rating?: number | string | null;
+  ratingCount?: number | null;
 }
 
 export default function CourseRating({ rating, ratingCount }: CourseRatingProps) {
   const { t } = useLocale();
+  const parsedRating = Number(rating);
+  const numericRating = Number.isFinite(parsedRating) ? parsedRating : 0;
 
   return (
     <div className="flex items-center gap-3">
@@ -18,7 +20,7 @@ export default function CourseRating({ rating, ratingCount }: CourseRatingProps)
           <Star
             key={star}
             className={`h-5 w-5 ${
-              star <= Math.round(rating)
+              star <= Math.round(numericRating)
                 ? 'fill-yellow-400 text-yellow-400'
                 : 'text-gray-300 dark:text-gray-600'
             }`}
@@ -26,10 +28,10 @@ export default function CourseRating({ rating, ratingCount }: CourseRatingProps)
         ))}
       </div>
       <span className="text-lg font-bold text-gray-900 dark:text-white">
-        {rating.toFixed(1)}
+        {numericRating.toFixed(1)}
       </span>
       <span className="text-sm text-gray-500 dark:text-gray-400">
-        ({ratingCount} {t.courses.detail.reviews})
+        ({ratingCount ?? 0} {t.courses.detail.reviews})
       </span>
     </div>
   );

@@ -49,8 +49,8 @@ export interface PublicCourse {
   price: number;
   price_label: string;
   image: string;
-  rating: number;
-  rating_count: number;
+  rating?: number | string | null;
+  rating_count?: number | null;
   student_count?: number;
   term_id?: number | string;
   is_popular?: boolean;
