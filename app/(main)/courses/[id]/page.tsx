@@ -28,6 +28,8 @@ import {
 } from '@/app/components/courses/CourseSections';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Button } from '@/app/components/ui/Button';
+import { getImageUrl } from '@/app/lib/utils/image';
+import { getCourseLevelLabel } from '@/app/lib/utils/course';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -73,6 +75,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   const { page_content: content } = course;
+  const courseImage = getImageUrl(course.image) || '/logo.svg';
+  const instructorImage = getImageUrl(course.instructor?.avatar) || '/logo.svg';
   return (
     <div dir={dir} className="min-h-screen bg-white pt-20 dark:bg-gray-900">
       <div className="border-b dark:border-gray-800">
@@ -108,7 +112,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 ratingCount={content.rating_count ?? course.rating_count}
               />
               <span className="rounded-full bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
-                {course.topic_label}
+                {course.topic_label || course.title}
               </span>
               <span className="rounded-full bg-gray-100 px-3 py-1 text-sm dark:bg-gray-800">
                 {course.age_group_label}
@@ -127,7 +131,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             ) : (
               <div className="relative mb-8 h-[400px] overflow-hidden rounded-2xl">
                 <Image
-                  src={course.image}
+                  src={courseImage}
                   alt={course.title}
                   fill
                   className="object-cover"
@@ -149,7 +153,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {t.courses.level}
                   </p>
-                  <p className="font-bold">{course.level_label}</p>
+                  <p className="font-bold">
+                    {getCourseLevelLabel(course.level, dir)}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -237,7 +243,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 </h2>
                 <div className="flex items-start gap-4">
                   <Image
-                    src={course.instructor.avatar}
+                    src={instructorImage}
                     alt={course.instructor.name}
                     width={80}
                     height={80}

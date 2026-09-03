@@ -14,7 +14,9 @@ interface CoursePageStore {
   error: string | null;
   fetchCoursePageList: () => Promise<void>;
   fetchCoursePageById: (id: string) => Promise<void>;
-  createCoursePage: (payload: CreateCoursePageRequest) => Promise<CoursePageContent>;
+  createCoursePage: (
+    payload: CreateCoursePageRequest
+  ) => Promise<CoursePageContent>;
   updateCoursePage: (
     id: string,
     payload: UpdateCoursePageRequest
@@ -44,7 +46,7 @@ export const useCoursePageStore = create<CoursePageStore>()(
     },
 
     fetchCoursePageById: async (id: string) => {
-      set({ loading: true, error: null });
+      set({ currentCoursePage: null, loading: true, error: null });
       try {
         const response = await coursePageService.getById(id);
         set({ currentCoursePage: response.data, loading: false });

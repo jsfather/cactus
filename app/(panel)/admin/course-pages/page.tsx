@@ -8,15 +8,38 @@ import Breadcrumbs from '@/app/components/ui/Breadcrumbs';
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { useCoursePage } from '@/app/lib/hooks/use-course-page';
 import { CoursePageContent } from '@/app/lib/types/course';
-import { BookOpen, Plus, Eye } from 'lucide-react';
+import { BookOpen, Plus, Eye, Trash2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export default function CoursePagesAdminPage() {
   const router = useRouter();
-  const { coursePageList, loading, fetchCoursePageList } = useCoursePage();
+  const {
+    coursePageList,
+    loading,
+    error,
+    fetchCoursePageList,
+    deleteCoursePage,
+  } = useCoursePage();
 
   useEffect(() => {
     fetchCoursePageList();
   }, [fetchCoursePageList]);
+
+  const handleDelete = async (course: CoursePageContent) => {
+    if (!window.confirm(`دوره «${course.title}» حذف شود؟`)) return;
+
+    try {
+      await deleteCoursePage(String(course.id));
+      toast.success('دوره با موفقیت حذف شد');
+      await fetchCoursePageList();
+    } catch (deleteError) {
+      const message =
+        deleteError instanceof Error
+          ? deleteError.message
+          : 'حذف دوره انجام نشد';
+      toast.error(message);
+    }
+  };
 
   const columns: Column<CoursePageContent>[] = [
     { header: 'عنوان', accessor: 'title' },
@@ -60,9 +83,18 @@ export default function CoursePagesAdminPage() {
           <Button
             variant="secondary"
             className="h-8 px-3 text-xs"
-            onClick={() => window.open(`/courses/${row.course_id || row.term_id}`, '_blank')}
+            onClick={() => window.open(`/courses/${row.id}`, '_blank')}
+            aria-label={`مشاهده ${row.title}`}
           >
             <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="danger"
+            className="h-8 px-3 text-xs"
+            onClick={() => handleDelete(row)}
+            aria-label={`حذف ${row.title}`}
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -84,19 +116,32 @@ export default function CoursePagesAdminPage() {
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold dark:text-white">
             <BookOpen className="h-7 w-7" />
-            مدیریت صفحات دوره
+            مدیریت دوره‌ها
           </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            توضیحات تکمیلی، ویدیو، FAQ، سرفصل و ابزارهای پیشنهادی هر دوره
+            ساخت، ویرایش، انتشار و مدیریت محتوای کامل دوره‌ها
           </p>
         </div>
         <Button onClick={() => router.push('/admin/course-pages/new')}>
           <Plus className="h-4 w-4" />
-          صفحه دوره جدید
+          دوره جدید
         </Button>
       </div>
 
-      <Table data={coursePageList} columns={columns} />
+      {error ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+          <p>{error}</p>
+          <button
+            type="button"
+            onClick={fetchCoursePageList}
+            className="mt-2 font-semibold underline"
+          >
+            تلاش دوباره
+          </button>
+        </div>
+      ) : (
+        <Table data={coursePageList} columns={columns} />
+      )}
     </main>
   );
 }

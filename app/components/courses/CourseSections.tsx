@@ -20,10 +20,16 @@ export function RelatedArticles({ tags }: RelatedArticlesProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (tags.length === 0) {
+      setBlogs([]);
+      setLoading(false);
+      return;
+    }
+
     const fetchBlogs = async () => {
       try {
         const response = await publicBlogService.getList({
-          tags: tags.length > 0 ? tags.join(',') : undefined,
+          tags: tags.join(','),
         });
         setBlogs(response.data.slice(0, 3));
       } catch {

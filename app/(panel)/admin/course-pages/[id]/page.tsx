@@ -24,7 +24,7 @@ import type { Level } from '@/app/lib/types/level';
 
 const schema = z.object({
   term_id: z.string().min(1, 'شناسه ترم الزامی است'),
-  teacher_id: z.string().min(1, 'مدرس الزامی است'),
+  teacher_id: z.string().optional(),
   level_id: z.string().min(1, 'رده سنی الزامی است'),
   topic: z.string().min(1, 'عنوان دوره الزامی است'),
   description: z.string().min(1, 'توضیحات دوره الزامی است'),
@@ -35,7 +35,9 @@ const schema = z.object({
   supplementary_description: z.string().optional(),
   intro_video_url: z.string().optional(),
   certificate_image_url: z.string().optional(),
-  related_blog_ids: z.array(z.string()),
+  related_blog_ids: z.array(
+    z.string().regex(/^\d+$/, 'شناسه مقاله باید یک عدد مثبت باشد')
+  ),
   is_published: z.boolean(),
   faqs: z.array(
     z.object({
@@ -61,10 +63,14 @@ const schema = z.object({
     z.object({
       name: z.string().min(1, 'نام ابزار الزامی است'),
       description: z.string().optional(),
-      url: z.string().url('لینک معتبر وارد کنید'),
+      url: z.union([z.literal(''), z.string().url('لینک معتبر وارد کنید')]),
       emoji: z.string().optional(),
     })
   ),
+});
+
+const createSchema = schema.extend({
+  teacher_id: z.string().min(1, 'مدرس الزامی است'),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -84,6 +90,7 @@ export default function CoursePageFormPage({
   const {
     currentCoursePage,
     loading,
+    error,
     fetchCoursePageById,
     createCoursePage,
     updateCoursePage,
@@ -97,7 +104,7 @@ export default function CoursePageFormPage({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(isNew ? createSchema : schema),
     defaultValues: {
       term_id: '',
       teacher_id: '',
@@ -129,17 +136,29 @@ export default function CoursePageFormPage({
   const toolFields = useFieldArray({ control, name: 'recommended_tools' });
 
   useEffect(() => {
-    Promise.all([
+    Promise.allSettled([
       termService.getList(),
       teacherService.getList(),
       levelService.getList(),
-    ])
-      .then(([termResponse, teacherResponse, levelResponse]) => {
-        setTerms(termResponse.data);
-        setTeachers(teacherResponse.data);
-        setLevels(levelResponse.data);
-      })
-      .catch(() => toast.error('دریافت اطلاعات پایه دوره انجام نشد'));
+    ]).then(([termResponse, teacherResponse, levelResponse]) => {
+      if (termResponse.status === 'fulfilled') {
+        setTerms(termResponse.value.data);
+      }
+      if (teacherResponse.status === 'fulfilled') {
+        setTeachers(teacherResponse.value.data);
+      }
+      if (levelResponse.status === 'fulfilled') {
+        setLevels(levelResponse.value.data);
+      }
+
+      if (
+        termResponse.status === 'rejected' ||
+        teacherResponse.status === 'rejected' ||
+        levelResponse.status === 'rejected'
+      ) {
+        toast.error('بخشی از اطلاعات پایه دوره دریافت نشد');
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -156,8 +175,8 @@ export default function CoursePageFormPage({
         level_id: String(currentCoursePage.level_id || ''),
         topic: currentCoursePage.topic || currentCoursePage.title,
         description: currentCoursePage.description || '',
-        price: currentCoursePage.price || 0,
-        capacity: currentCoursePage.capacity || 1,
+        price: currentCoursePage.price ?? 0,
+        capacity: currentCoursePage.capacity ?? 1,
         level: currentCoursePage.level || 'beginner',
         price_type: currentCoursePage.price_type || 'paid',
         supplementary_description:
@@ -198,7 +217,7 @@ export default function CoursePageFormPage({
       const payload = {
         ...data,
         term_id: Number(data.term_id),
-        teacher_id: Number(data.teacher_id),
+        ...(data.teacher_id ? { teacher_id: Number(data.teacher_id) } : {}),
         level_id: Number(data.level_id),
         is_published: Boolean(data.is_published),
         related_blog_ids: data.related_blog_ids
@@ -216,18 +235,7 @@ export default function CoursePageFormPage({
         await createCoursePage(payload);
         toast.success('دوره با موفقیت ایجاد شد');
       } else {
-        const savedCourse = await updateCoursePage(resolvedParams.id, payload);
-        const fieldsPersisted =
-          String(savedCourse.term_id) === String(payload.term_id) &&
-          String(savedCourse.teacher_id) === String(payload.teacher_id) &&
-          String(savedCourse.level_id) === String(payload.level_id) &&
-          savedCourse.is_published === payload.is_published;
-
-        if (!fieldsPersisted) {
-          throw new Error(
-            'سرور بعضی از فیلدهای دوره یا وضعیت انتشار را ذخیره نکرد'
-          );
-        }
+        await updateCoursePage(resolvedParams.id, payload);
         toast.success('دوره با موفقیت به‌روزرسانی شد');
       }
 
@@ -238,6 +246,20 @@ export default function CoursePageFormPage({
   };
 
   if (loading && !isNew) return <LoadingSpinner />;
+
+  if (!isNew && error && !currentCoursePage) {
+    return (
+      <main className="space-y-4">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+          {error}
+        </div>
+        <Button variant="secondary" onClick={() => router.back()}>
+          <ArrowRight className="h-4 w-4" />
+          بازگشت
+        </Button>
+      </main>
+    );
+  }
 
   return (
     <main>
@@ -306,7 +328,7 @@ export default function CoursePageFormPage({
                     })),
                   ]}
                   error={errors.teacher_id?.message}
-                  required
+                  required={isNew}
                 />
               )}
             />

@@ -1,6 +1,8 @@
-export type CourseTopic = 'robotics' | 'programming' | 'ai' | 'electronics';
+export type CourseTopic = string;
 export type CourseLevel = 'beginner' | 'intermediate' | 'advanced';
-export type CourseAgeGroup = '6-10' | '10-14' | '14-18' | '18+';
+// The deployed API filters age groups by their id (for example "2") and
+// returns the human-readable range separately.
+export type CourseAgeGroup = string;
 export type CoursePriceType = 'free' | 'paid';
 
 export interface CourseFAQ {
@@ -48,9 +50,10 @@ export interface PublicCourse {
   price_type: CoursePriceType;
   price: number;
   price_label: string;
-  image: string;
-  rating: number;
-  rating_count: number;
+  image?: string;
+  video?: string;
+  rating: number | string | null;
+  rating_count: number | null;
   student_count?: number;
   term_id?: number | string;
   is_popular?: boolean;
@@ -71,6 +74,8 @@ export interface CoursePageContent {
   capacity?: number;
   level?: CourseLevel;
   price_type?: CoursePriceType;
+  image?: string;
+  video?: string;
   supplementary_description?: string;
   intro_video_url?: string;
   certificate_image_url?: string;
@@ -109,8 +114,16 @@ export interface GetCourseListResponse {
   data: PublicCourse[];
   meta?: {
     total: number;
-    page: number;
+    page?: number;
+    current_page?: number;
     per_page: number;
+    last_page?: number;
+  };
+  links?: {
+    first?: string;
+    last?: string;
+    prev?: string | null;
+    next?: string | null;
   };
 }
 
@@ -128,7 +141,7 @@ export interface GetCoursePageResponse {
 
 export interface CreateCoursePageRequest {
   term_id: number | string;
-  teacher_id: number | string;
+  teacher_id?: number | string;
   level_id: number | string;
   topic: string;
   description: string;
@@ -136,6 +149,8 @@ export interface CreateCoursePageRequest {
   capacity: number;
   level: CourseLevel;
   price_type: CoursePriceType;
+  image?: string;
+  video?: string;
   supplementary_description?: string;
   intro_video_url?: string;
   certificate_image_url?: string;

@@ -23,6 +23,10 @@ import type { PublicCourse } from '@/app/lib/types/course';
 import type { Blog } from '@/app/lib/types/blog';
 import { formatDateToPersian } from '@/app/lib/utils';
 import { getImageUrl } from '@/app/lib/utils/image';
+import {
+  getCourseLevelLabel,
+  parseCoursePublished,
+} from '@/app/lib/utils/course';
 
 interface Feature {
   title: string;
@@ -82,7 +86,13 @@ export default function Page() {
     publicCourseService
       .getList()
       .then((response) => {
-        if (active) setCourses(response.data);
+        if (active) {
+          setCourses(
+            response.data.filter((course) =>
+              parseCoursePublished(course.is_published)
+            )
+          );
+        }
       })
       .catch(() => {
         if (active) setCourses([]);
@@ -853,7 +863,7 @@ export default function Page() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                       <div className="absolute right-4 bottom-4 left-4">
                         <span className="bg-primary-600 dark:bg-primary-700 rounded-full px-3 py-1 text-sm text-white">
-                          {course.level_label}
+                          {getCourseLevelLabel(course.level, dir)}
                         </span>
                       </div>
                     </div>

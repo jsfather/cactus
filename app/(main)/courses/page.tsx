@@ -24,6 +24,10 @@ import CourseFilters, {
 import LoadingSpinner from '@/app/components/ui/LoadingSpinner';
 import { Button } from '@/app/components/ui/Button';
 import { getImageUrl } from '@/app/lib/utils/image';
+import {
+  getCourseLevelLabel,
+  parseCoursePublished,
+} from '@/app/lib/utils/course';
 
 const emptyFilters: CourseFilterValues = {
   topic: '',
@@ -36,9 +40,6 @@ const formatRating = (rating: PublicCourse['rating']) => {
   const numericRating = Number(rating);
   return Number.isFinite(numericRating) ? numericRating.toFixed(1) : '0.0';
 };
-
-const isPublished = (value: PublicCourse['is_published']) =>
-  value === true || value === 1 || value === '1' || value === 'true';
 
 function CoursesContent() {
   const { t, dir } = useLocale();
@@ -67,7 +68,56 @@ function CoursesContent() {
       !!searchParams.get('price_type')
   );
   const [courses, setCourses] = useState<PublicCourse[]>([]);
+  const [filterOptions, setFilterOptions] = useState<{
+    topics: Array<{ value: string; label: string }>;
+    ageGroups: Array<{ value: string; label: string }>;
+  }>({ topics: [], ageGroups: [] });
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+
+    publicCourseService
+      .getList()
+      .then((response) => {
+        if (!active) return;
+        const publishedCourses = response.data.filter((course) =>
+          parseCoursePublished(course.is_published)
+        );
+        const topics = Array.from(
+          new Map(
+            publishedCourses
+              .filter((course) => course.topic)
+              .map((course) => [
+                course.topic,
+                {
+                  value: course.topic,
+                  label: course.topic_label || course.topic,
+                },
+              ])
+          ).values()
+        );
+        const ageGroups = Array.from(
+          new Map(
+            publishedCourses
+              .filter((course) => course.age_group)
+              .map((course) => [
+                course.age_group,
+                {
+                  value: course.age_group,
+                  label: course.age_group_label || course.age_group,
+                },
+              ])
+          ).values()
+        );
+        setFilterOptions({ topics, ageGroups });
+      })
+      .catch(() => setFilterOptions({ topics: [], ageGroups: [] }));
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -82,7 +132,9 @@ function CoursesContent() {
           sort,
         });
         setCourses(
-          response.data.filter((course) => isPublished(course.is_published))
+          response.data.filter((course) =>
+            parseCoursePublished(course.is_published)
+          )
         );
       } catch (error) {
         console.error('Error fetching courses:', error);
@@ -250,6 +302,8 @@ function CoursesContent() {
             onChange={setFilters}
             onClear={clearFilters}
             show={showFilters}
+            topics={filterOptions.topics}
+            ageGroups={filterOptions.ageGroups}
           />
 
           <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -315,14 +369,18 @@ function CoursesContent() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                     <div className="absolute right-4 bottom-4 left-4 flex items-center">
                       <span className="bg-primary-600 rounded-full px-3 py-1 text-sm text-white">
-                        {course.level_label}
+                        {getCourseLevelLabel(course.level, dir)}
                       </span>
                     </div>
                   </div>
                   <div className="p-6">
                     <div className="mb-2 flex items-center gap-2 text-sm text-gray-500">
-                      <span>{course.topic_label}</span>
-                      <span>•</span>
+                      {course.topic_label !== course.title && (
+                        <>
+                          <span>{course.topic_label}</span>
+                          <span>•</span>
+                        </>
+                      )}
                       <span>{course.age_group_label}</span>
                     </div>
                     <h3 className="mb-2 text-xl font-bold dark:text-gray-100">

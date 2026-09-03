@@ -1,18 +1,13 @@
-import axios from 'axios';
+import { publicApiClient } from '@/app/lib/api/client';
 import { API_ENDPOINTS } from '@/app/lib/api/endpoints';
 import {
   GetCourseListResponse,
   GetCourseResponse,
   CourseListParams,
 } from '@/app/lib/types/course';
+import { normalizePublicCourse } from '@/app/lib/utils/course';
 
 export class PublicCourseService {
-  private baseURL: string;
-
-  constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
-  }
-
   async getList(params?: CourseListParams): Promise<GetCourseListResponse> {
     const queryParams = new URLSearchParams();
     if (params?.search) queryParams.append('search', params.search);
@@ -23,17 +18,22 @@ export class PublicCourseService {
     if (params?.sort) queryParams.append('sort', params.sort);
 
     const queryString = queryParams.toString();
-    const url = `${this.baseURL}${API_ENDPOINTS.PUBLIC.COURSES.GET_ALL}${queryString ? `?${queryString}` : ''}`;
+    const url = `${API_ENDPOINTS.PUBLIC.COURSES.GET_ALL}${queryString ? `?${queryString}` : ''}`;
+    const response = await publicApiClient.get<GetCourseListResponse>(url);
 
-    const response = await axios.get<GetCourseListResponse>(url);
-    return response.data;
+    return {
+      ...response,
+      data: Array.isArray(response.data)
+        ? response.data.map(normalizePublicCourse)
+        : [],
+    };
   }
 
   async getById(id: string): Promise<GetCourseResponse> {
-    const response = await axios.get<GetCourseResponse>(
-      `${this.baseURL}${API_ENDPOINTS.PUBLIC.COURSES.GET_BY_ID(id)}`
+    const response = await publicApiClient.get<GetCourseResponse>(
+      API_ENDPOINTS.PUBLIC.COURSES.GET_BY_ID(id)
     );
-    return response.data;
+    return { ...response, data: normalizePublicCourse(response.data) };
   }
 }
 

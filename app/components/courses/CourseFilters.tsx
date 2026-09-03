@@ -21,6 +21,8 @@ interface CourseFiltersProps {
   onChange: (filters: CourseFilterValues) => void;
   onClear: () => void;
   show: boolean;
+  topics: Array<{ value: string; label: string }>;
+  ageGroups: Array<{ value: string; label: string }>;
 }
 
 export default function CourseFilters({
@@ -28,6 +30,8 @@ export default function CourseFilters({
   onChange,
   onClear,
   show,
+  topics,
+  ageGroups,
 }: CourseFiltersProps) {
   const { t } = useLocale();
 
@@ -67,14 +71,11 @@ export default function CourseFilters({
             className="focus:ring-primary-500 w-full rounded-xl border border-gray-200 px-4 py-2.5 focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-700"
           >
             <option value="">{t.courses.filters.all}</option>
-            <option value="robotics">{t.courses.filters.topics.robotics}</option>
-            <option value="programming">
-              {t.courses.filters.topics.programming}
-            </option>
-            <option value="ai">{t.courses.filters.topics.ai}</option>
-            <option value="electronics">
-              {t.courses.filters.topics.electronics}
-            </option>
+            {topics.map((topic) => (
+              <option key={topic.value} value={topic.value}>
+                {topic.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -88,7 +89,9 @@ export default function CourseFilters({
             className="focus:ring-primary-500 w-full rounded-xl border border-gray-200 px-4 py-2.5 focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-700"
           >
             <option value="">{t.courses.filters.all}</option>
-            <option value="beginner">{t.courses.filters.levels.beginner}</option>
+            <option value="beginner">
+              {t.courses.filters.levels.beginner}
+            </option>
             <option value="intermediate">
               {t.courses.filters.levels.intermediate}
             </option>
@@ -108,10 +111,11 @@ export default function CourseFilters({
             className="focus:ring-primary-500 w-full rounded-xl border border-gray-200 px-4 py-2.5 focus:border-transparent focus:ring-2 dark:border-gray-600 dark:bg-gray-700"
           >
             <option value="">{t.courses.filters.all}</option>
-            <option value="6-10">{t.courses.filters.ages['6-10']}</option>
-            <option value="10-14">{t.courses.filters.ages['10-14']}</option>
-            <option value="14-18">{t.courses.filters.ages['14-18']}</option>
-            <option value="18+">{t.courses.filters.ages['18+']}</option>
+            {ageGroups.map((ageGroup) => (
+              <option key={ageGroup.value} value={ageGroup.value}>
+                {ageGroup.label}
+              </option>
+            ))}
           </select>
         </div>
 
