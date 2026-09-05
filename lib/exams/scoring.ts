@@ -1,4 +1,55 @@
 import type { AnswerMap, ExamSnapshot } from "@/lib/workflow-types";
-const normalize=(v:string)=>v.normalize("NFKC").trim().toLocaleLowerCase().replaceAll("ي","ی").replaceAll("ك","ک").replace(/\s+/g," ");
-export function scoreExam(questions:ExamSnapshot[],answers:AnswerMap){let earned=0,total=0;for(const q of questions){total+=q.points;const answer=answers[q.id]??[];let correct=false;if(q.type==="short_answer")correct=answer.length===1&&[q.correctAnswerFa,q.correctAnswerEn].some(v=>v&&normalize(v)===normalize(answer[0]));else if(q.type==="true_false")correct=answer.length===1&&answer[0]===String(q.correctBoolean);else {const expected=q.options.filter(o=>o.isCorrect).map(o=>o.id).sort();const actual=[...new Set(answer)].sort();correct=expected.length>0&&expected.length===actual.length&&expected.every((v,i)=>v===actual[i]);}if(correct)earned+=q.points;}return total?Math.round(100*earned/total):0;}
-export function validAnswers(questions:ExamSnapshot[],answers:AnswerMap){return Object.entries(answers).every(([id,values])=>{const q=questions.find(q=>q.id===id);if(!q||values.some(v=>v.length>5000))return false;if(q.type==="short_answer")return values.length<=1;if(q.type==="true_false")return values.length<=1&&values.every(v=>["true","false"].includes(v));return (q.type==="multiple_choice"||values.length<=1)&&new Set(values).size===values.length&&values.every(v=>q.options.some(o=>o.id===v));});}
+const normalize = (v: string) =>
+  v
+    .normalize("NFKC")
+    .trim()
+    .toLocaleLowerCase()
+    .replaceAll("ي", "ی")
+    .replaceAll("ك", "ک")
+    .replace(/\s+/g, " ");
+export function scoreExam(questions: ExamSnapshot[], answers: AnswerMap) {
+  let earned = 0,
+    total = 0;
+  for (const q of questions) {
+    total += q.points;
+    const answer = answers[q.id] ?? [];
+    let correct = false;
+    if (q.type === "short_answer")
+      correct =
+        answer.length === 1 &&
+        [q.correctAnswerFa, q.correctAnswerEn].some(
+          (v) => v && normalize(v) === normalize(answer[0]),
+        );
+    else if (q.type === "true_false")
+      correct = answer.length === 1 && answer[0] === String(q.correctBoolean);
+    else {
+      const expected = q.options
+        .filter((o) => o.isCorrect)
+        .map((o) => o.id)
+        .sort();
+      const actual = [...new Set(answer)].sort();
+      correct =
+        expected.length > 0 &&
+        expected.length === actual.length &&
+        expected.every((v, i) => v === actual[i]);
+    }
+    if (correct) earned += q.points;
+  }
+  return total ? Math.round((100 * earned) / total) : 0;
+}
+export function validAnswers(questions: ExamSnapshot[], answers: AnswerMap) {
+  return Object.entries(answers).every(([id, values]) => {
+    const q = questions.find((q) => q.id === id);
+    if (!q || values.some((v) => v.length > 5000)) return false;
+    if (q.type === "short_answer") return values.length <= 1;
+    if (q.type === "true_false")
+      return (
+        values.length <= 1 && values.every((v) => ["true", "false"].includes(v))
+      );
+    return (
+      (q.type === "multiple_choice" || values.length <= 1) &&
+      new Set(values).size === values.length &&
+      values.every((v) => q.options.some((o) => o.id === v))
+    );
+  });
+}

@@ -71,7 +71,10 @@ export function PublicVariantPicker({
             {formattedPrice} <span className="text-sm">{dictionary.toman}</span>
           </strong>
           {selected ? (
-            <span className="nums-en mt-1 block text-xs text-zinc-500" dir="ltr">
+            <span
+              className="nums-en mt-1 block text-xs text-zinc-500"
+              dir="ltr"
+            >
               SKU: {selected.sku}
             </span>
           ) : null}
@@ -86,7 +89,19 @@ export function PublicVariantPicker({
           {inventory > 0 ? dictionary.inStock : dictionary.outOfStock}
         </span>
       </div>
-      <AddToCart locale={locale} inventory={inventory} item={{ productId: product.id, variantId: selected?.id ?? "", titleFa: product.titleFa + (selected ? ` · ${selected.titleFa}` : ""), titleEn: (product.titleEn || product.titleFa) + (selected ? ` · ${selected.titleEn || selected.titleFa}` : ""), price }} />
+      <AddToCart
+        locale={locale}
+        inventory={inventory}
+        item={{
+          productId: product.id,
+          variantId: selected?.id ?? "",
+          titleFa: product.titleFa + (selected ? ` · ${selected.titleFa}` : ""),
+          titleEn:
+            (product.titleEn || product.titleFa) +
+            (selected ? ` · ${selected.titleEn || selected.titleFa}` : ""),
+          price,
+        }}
+      />
     </div>
   );
 }

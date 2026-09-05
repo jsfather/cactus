@@ -1,18 +1,248 @@
-import { desc,eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
-import { coursePages,terms,posts } from "@/lib/db/schema";
+import { coursePages, terms, posts } from "@/lib/db/schema";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
-import { text,title } from "@/lib/workflows";
-import { saveCourse,deleteCourse } from "@/lib/resources/course-actions";
-import { ActionForm,DeleteAction } from "./action-form";
+import { text, title } from "@/lib/workflows";
+import { saveCourse, deleteCourse } from "@/lib/resources/course-actions";
+import { ActionForm, DeleteAction } from "./action-form";
 import { CourseSectionsEditor } from "./course-sections-editor";
-import { PanelPage,PanelPageHeader,PanelPrimaryLink,PanelSurface,PanelTable,PanelTableCell,PanelTableActions,PanelTableActionLink,PanelEditIcon,PanelEmptyState } from "@/components/panel/ui";
-export async function CourseAdmin({id}:{id?:string}){await requireRole("admin");const locale=await getPanelLocale();const db=getDatabase();if(id){if(id!=="new"&&!z.uuid().safeParse(id).success)notFound();const [item]=id==="new"?[]:await db.select().from(coursePages).where(eq(coursePages.id,id));if(id!=="new"&&!item)notFound();const termOptions=await db.select().from(terms);const blogs=await db.select().from(posts);return <PanelPage><PanelPageHeader eyebrow={text(locale,"دوره‌ها","Courses")} title={text(locale,"صفحه معرفی دوره","Course page")} description={text(locale,"محتوای دوره را به یک ترم قابل ثبت‌نام متصل کنید.","Connect course content to an enrollable term.")}/><ActionForm locale={locale} action={saveCourse.bind(null,item?.id??null)} initial={item?Object.fromEntries(Object.entries(item).map(([k,v])=>[k,String(v??"")])):{}} fields={[
-{name:"slug",label:text(locale,"نشانی انگلیسی","URL slug"),required:true},{name:"termId",label:text(locale,"ترم مرتبط","Linked term"),options:[{value:"",label:text(locale,"بدون ترم","No term")},...termOptions.map(t=>({value:t.id,label:title(t,locale)}))]},
-{name:"titleFa",label:text(locale,"عنوان فارسی","Persian title"),required:true},{name:"titleEn",label:text(locale,"عنوان انگلیسی","English title")},{name:"summaryFa",label:text(locale,"خلاصه فارسی","Persian summary"),type:"textarea",required:true},{name:"summaryEn",label:text(locale,"خلاصه انگلیسی","English summary"),type:"textarea"},{name:"contentFa",label:text(locale,"شرح فارسی","Persian description"),type:"rich",required:true},{name:"contentEn",label:text(locale,"شرح انگلیسی","English description"),type:"rich"},
-{name:"topic",label:text(locale,"موضوع","Topic"),required:true},{name:"level",label:text(locale,"سطح","Level"),options:[{value:"beginner",label:text(locale,"مقدماتی","Beginner")},{value:"intermediate",label:text(locale,"متوسط","Intermediate")},{value:"advanced",label:text(locale,"پیشرفته","Advanced")}]},{name:"ageGroup",label:text(locale,"گروه سنی","Age group"),required:true},{name:"duration",label:text(locale,"مدت دوره","Duration"),required:true},{name:"coverImageUrl",label:text(locale,"تصویر دوره","Course cover"),type:"image"},{name:"videoUrl",label:text(locale,"ویدئوی معرفی","Introduction video"),type:"url"},{name:"certificateImageUrl",label:text(locale,"نمونه گواهی","Sample certificate"),type:"image"},{name:"status",label:text(locale,"وضعیت","Status"),options:[{value:"draft",label:text(locale,"پیش‌نویس","Draft")},{value:"published",label:text(locale,"منتشرشده","Published")}]},{name:"isFeatured",label:text(locale,"دوره ویژه","Featured course"),options:[{value:"false",label:text(locale,"خیر","No")},{value:"true",label:text(locale,"بله","Yes")}]}
-]}><CourseSectionsEditor locale={locale} initial={item?.sections} blogs={blogs.map(b=>({id:b.id,label:title(b,locale)}))}/></ActionForm></PanelPage>;}
-const items=await db.select().from(coursePages).orderBy(desc(coursePages.updatedAt));return <PanelPage><PanelPageHeader eyebrow={text(locale,"آموزش","Learning")} title={text(locale,"صفحه‌های دوره","Course pages")} description="" actions={<PanelPrimaryLink href="/panel/admin/courses/new">{text(locale,"دوره جدید","New course")}</PanelPrimaryLink>}/><PanelSurface>{items.length?<PanelTable columns={[{label:text(locale,"عنوان","Title"),className:"w-[60%]"},{label:text(locale,"وضعیت","Status"),className:"w-[20%]"},{label:text(locale,"عملیات","Actions"),className:"w-[20%]"}]}>{items.map(c=><tr key={c.id}><PanelTableCell>{title(c,locale)}</PanelTableCell><PanelTableCell>{text(locale,c.status==="draft"?"پیش‌نویس":"منتشرشده",c.status)}</PanelTableCell><PanelTableCell><PanelTableActions><PanelTableActionLink href={`/panel/admin/courses/${c.id}`} label={text(locale,"ویرایش","Edit")}><PanelEditIcon/></PanelTableActionLink><DeleteAction locale={locale} action={deleteCourse.bind(null,c.id,locale)}/></PanelTableActions></PanelTableCell></tr>)}</PanelTable>:<PanelEmptyState title={text(locale,"دوره‌ای وجود ندارد","No courses yet")} description=""/>}</PanelSurface></PanelPage>;}
+import {
+  PanelPage,
+  PanelPageHeader,
+  PanelPrimaryLink,
+  PanelSurface,
+  PanelTable,
+  PanelTableCell,
+  PanelTableActions,
+  PanelTableActionLink,
+  PanelEditIcon,
+  PanelEmptyState,
+} from "@/components/panel/ui";
+export async function CourseAdmin({ id }: { id?: string }) {
+  await requireRole("admin");
+  const locale = await getPanelLocale();
+  const db = getDatabase();
+  if (id) {
+    if (id !== "new" && !z.uuid().safeParse(id).success) notFound();
+    const [item] =
+      id === "new"
+        ? []
+        : await db.select().from(coursePages).where(eq(coursePages.id, id));
+    if (id !== "new" && !item) notFound();
+    const termOptions = await db.select().from(terms);
+    const blogs = await db.select().from(posts);
+    return (
+      <PanelPage>
+        <PanelPageHeader
+          eyebrow={text(locale, "دوره‌ها", "Courses")}
+          title={text(locale, "صفحه معرفی دوره", "Course page")}
+          description={text(
+            locale,
+            "محتوای دوره را به یک ترم قابل ثبت‌نام متصل کنید.",
+            "Connect course content to an enrollable term.",
+          )}
+        />
+        <ActionForm
+          locale={locale}
+          action={saveCourse.bind(null, item?.id ?? null)}
+          initial={
+            item
+              ? Object.fromEntries(
+                  Object.entries(item).map(([k, v]) => [k, String(v ?? "")]),
+                )
+              : {}
+          }
+          fields={[
+            {
+              name: "slug",
+              label: text(locale, "نشانی انگلیسی", "URL slug"),
+              required: true,
+            },
+            {
+              name: "termId",
+              label: text(locale, "ترم مرتبط", "Linked term"),
+              options: [
+                { value: "", label: text(locale, "بدون ترم", "No term") },
+                ...termOptions.map((t) => ({
+                  value: t.id,
+                  label: title(t, locale),
+                })),
+              ],
+            },
+            {
+              name: "titleFa",
+              label: text(locale, "عنوان فارسی", "Persian title"),
+              required: true,
+            },
+            {
+              name: "titleEn",
+              label: text(locale, "عنوان انگلیسی", "English title"),
+            },
+            {
+              name: "summaryFa",
+              label: text(locale, "خلاصه فارسی", "Persian summary"),
+              type: "textarea",
+              required: true,
+            },
+            {
+              name: "summaryEn",
+              label: text(locale, "خلاصه انگلیسی", "English summary"),
+              type: "textarea",
+            },
+            {
+              name: "contentFa",
+              label: text(locale, "شرح فارسی", "Persian description"),
+              type: "rich",
+              required: true,
+            },
+            {
+              name: "contentEn",
+              label: text(locale, "شرح انگلیسی", "English description"),
+              type: "rich",
+            },
+            {
+              name: "topic",
+              label: text(locale, "موضوع", "Topic"),
+              required: true,
+            },
+            {
+              name: "level",
+              label: text(locale, "سطح", "Level"),
+              options: [
+                {
+                  value: "beginner",
+                  label: text(locale, "مقدماتی", "Beginner"),
+                },
+                {
+                  value: "intermediate",
+                  label: text(locale, "متوسط", "Intermediate"),
+                },
+                {
+                  value: "advanced",
+                  label: text(locale, "پیشرفته", "Advanced"),
+                },
+              ],
+            },
+            {
+              name: "ageGroup",
+              label: text(locale, "گروه سنی", "Age group"),
+              required: true,
+            },
+            {
+              name: "duration",
+              label: text(locale, "مدت دوره", "Duration"),
+              required: true,
+            },
+            {
+              name: "coverImageUrl",
+              label: text(locale, "تصویر دوره", "Course cover"),
+              type: "image",
+            },
+            {
+              name: "videoUrl",
+              label: text(locale, "ویدئوی معرفی", "Introduction video"),
+              type: "url",
+            },
+            {
+              name: "certificateImageUrl",
+              label: text(locale, "نمونه گواهی", "Sample certificate"),
+              type: "image",
+            },
+            {
+              name: "status",
+              label: text(locale, "وضعیت", "Status"),
+              options: [
+                { value: "draft", label: text(locale, "پیش‌نویس", "Draft") },
+                {
+                  value: "published",
+                  label: text(locale, "منتشرشده", "Published"),
+                },
+              ],
+            },
+            {
+              name: "isFeatured",
+              label: text(locale, "دوره ویژه", "Featured course"),
+              options: [
+                { value: "false", label: text(locale, "خیر", "No") },
+                { value: "true", label: text(locale, "بله", "Yes") },
+              ],
+            },
+          ]}
+        >
+          <CourseSectionsEditor
+            locale={locale}
+            initial={item?.sections}
+            blogs={blogs.map((b) => ({ id: b.id, label: title(b, locale) }))}
+          />
+        </ActionForm>
+      </PanelPage>
+    );
+  }
+  const items = await db
+    .select()
+    .from(coursePages)
+    .orderBy(desc(coursePages.updatedAt));
+  return (
+    <PanelPage>
+      <PanelPageHeader
+        eyebrow={text(locale, "آموزش", "Learning")}
+        title={text(locale, "صفحه‌های دوره", "Course pages")}
+        description=""
+        actions={
+          <PanelPrimaryLink href="/panel/admin/courses/new">
+            {text(locale, "دوره جدید", "New course")}
+          </PanelPrimaryLink>
+        }
+      />
+      <PanelSurface>
+        {items.length ? (
+          <PanelTable
+            columns={[
+              { label: text(locale, "عنوان", "Title"), className: "w-[60%]" },
+              { label: text(locale, "وضعیت", "Status"), className: "w-[20%]" },
+              {
+                label: text(locale, "عملیات", "Actions"),
+                className: "w-[20%]",
+              },
+            ]}
+          >
+            {items.map((c) => (
+              <tr key={c.id}>
+                <PanelTableCell>{title(c, locale)}</PanelTableCell>
+                <PanelTableCell>
+                  {text(
+                    locale,
+                    c.status === "draft" ? "پیش‌نویس" : "منتشرشده",
+                    c.status,
+                  )}
+                </PanelTableCell>
+                <PanelTableCell>
+                  <PanelTableActions>
+                    <PanelTableActionLink
+                      href={`/panel/admin/courses/${c.id}`}
+                      label={text(locale, "ویرایش", "Edit")}
+                    >
+                      <PanelEditIcon />
+                    </PanelTableActionLink>
+                    <DeleteAction
+                      locale={locale}
+                      action={deleteCourse.bind(null, c.id, locale)}
+                    />
+                  </PanelTableActions>
+                </PanelTableCell>
+              </tr>
+            ))}
+          </PanelTable>
+        ) : (
+          <PanelEmptyState
+            title={text(locale, "دوره‌ای وجود ندارد", "No courses yet")}
+            description=""
+          />
+        )}
+      </PanelSurface>
+    </PanelPage>
+  );
+}

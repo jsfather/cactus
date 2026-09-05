@@ -1,1 +1,4 @@
-export { NotificationsPage as default } from "@/components/workflows/support-pages";
+import { NotificationsPage } from "@/components/workflows/support-pages";
+export default function Page() {
+  return <NotificationsPage />;
+}

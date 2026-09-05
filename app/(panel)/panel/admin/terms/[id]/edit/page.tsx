@@ -1,3 +1,4 @@
+import { OnlineClassControls } from "@/components/terms/online-class-controls";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { ToastOnMount } from "@/components/feedback/toast-effects";
@@ -17,5 +18,5 @@ export default async function EditTermPage({ params, searchParams }: { params: P
     <PanelBackLink href="/panel/admin/terms">{isFa ? "بازگشت" : "Back"}</PanelBackLink><PanelPageHeader eyebrow={isFa ? "مدیریت کامل ترم" : "Complete term management"} title={locale === "en" ? `Edit ${term.titleEn || term.titleFa}` : `ویرایش ${term.titleFa}`} description={isFa ? "اطلاعات ترم، برنامه و ثبت‌نام‌ها را مدیریت کنید." : "Manage term information, schedules, and enrollment."} />
     <TermForm locale={locale} termId={term.id} {...options} initialValues={{ titleFa: term.titleFa, titleEn: term.titleEn || "", descriptionFa: term.descriptionFa || "", descriptionEn: term.descriptionEn || "", levelId: term.levelId, status: term.status, deliveryMode: term.deliveryMode, startDate: term.startDate, endDate: term.endDate, capacity: term.capacity === null ? "" : String(term.capacity), tuitionToman: String(term.tuitionToman), locationFa: term.locationFa || "", locationEn: term.locationEn || "", meetingUrl: term.meetingUrl || "" }} initialTeacherIds={term.teacherIds} initialPrerequisiteIds={term.prerequisiteIds} initialSchedules={term.schedules.map((slot) => ({ dayOfWeek: slot.dayOfWeek, startTime: normalizeTermTime(slot.startTime), endTime: normalizeTermTime(slot.endTime) }))} />
     <TermEnrollmentManager termId={term.id} locale={locale} students={students} roster={roster} invitations={invitations} enrollmentOpen={term.status === "enrollment_open"} />
-  </PanelPage>;
+  <OnlineClassControls termId={term.id} locale={locale} manager /></PanelPage>;
 }

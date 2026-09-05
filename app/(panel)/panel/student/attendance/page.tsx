@@ -1,1 +1,4 @@
-export { StudentAttendancePage as default } from "@/components/workflows/student-pages";
+import { StudentAttendancePage } from "@/components/workflows/student-pages";
+export default function Page() {
+  return <StudentAttendancePage />;
+}

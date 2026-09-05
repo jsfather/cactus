@@ -1,1 +1,4 @@
-import { StudentAttendancePage } from "@/components/workflows/student-pages";export default function Page(){return <StudentAttendancePage role="teacher" absent/>;}
+import { StudentAttendancePage } from "@/components/workflows/student-pages";
+export default function Page() {
+  return <StudentAttendancePage role="teacher" absent />;
+}

@@ -1,3 +1,5 @@
+import { ActionForm } from "@/components/workflows/action-form";
+import { saveSpecifications } from "@/lib/products/specification-actions";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { ToastOnMount } from "@/components/feedback/toast-effects";
@@ -22,6 +24,7 @@ export default async function EditProductPage({ params, searchParams }: { params
     <PanelBackLink href="/panel/admin/products">{dictionary.common.back}</PanelBackLink>
     <PanelPageHeader eyebrow={dictionary.shop.eyebrow} title={locale === "en" ? `Edit ${product.titleEn || product.titleFa}` : `ویرایش ${product.titleFa}`} description={dictionary.shop.description} />
     <ProductForm locale={locale} mode="edit" productId={product.id} categories={categories} initialValues={{ slug: product.slug, titleFa: product.titleFa, titleEn: product.titleEn || "", summaryFa: product.summaryFa, summaryEn: product.summaryEn || "", contentFa: product.contentFa, contentEn: product.contentEn || "", coverImageUrl: product.coverImageUrl || "", price: String(product.price), inventory: String(product.inventory), status: product.status, isFeatured: product.isFeatured, categoryIds }} />
+    <ActionForm locale={locale} heading={locale === "fa" ? "مشخصات فنی" : "Technical specifications"} action={saveSpecifications.bind(null, product.id)} initial={{ specificationsFa: product.specificationsFa ?? "", specificationsEn: product.specificationsEn ?? "" }} fields={[{name:"specificationsFa",label:locale === "fa" ? "ویژگی‌های فارسی، هر خط یک ویژگی" : "Persian specifications, one per line",type:"textarea"},{name:"specificationsEn",label:locale === "fa" ? "ویژگی‌های انگلیسی، هر خط یک ویژگی" : "English specifications, one per line",type:"textarea"}]} />
     <PanelSurface>
       <header className="flex flex-col gap-4 border-b border-zinc-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800"><div><h2 className="font-bold">{locale === "fa" ? "تنوع‌های محصول" : "Product variants"}</h2><p className="mt-1 text-xs text-zinc-500">{locale === "fa" ? "SKU، قیمت و موجودی مستقل برای انتخاب‌های محصول." : "Independent SKU, price, and inventory options."}</p></div><PanelPrimaryLink href={`/panel/admin/products/${id}/variants/new`} size="compact">{locale === "fa" ? "تنوع جدید" : "New variant"}</PanelPrimaryLink></header>
       {variants.length ? <PanelTable columns={[{ label: locale === "fa" ? "عنوان" : "Title", className: "w-[28%]" }, { label: "SKU", className: "w-[22%]" }, { label: dictionary.shop.price, className: "w-[17%]" }, { label: dictionary.shop.inventory, className: "w-[13%]" }, { label: dictionary.common.actions, className: "w-[20%]" }]}>

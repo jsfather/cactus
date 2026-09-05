@@ -23,8 +23,12 @@ export async function SiteHeader({
     <header className="relative z-50 border-b border-emerald-950/10 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-8 lg:px-10">
         <Link href={localizePath(locale, "/")} aria-label={dictionary.school}>
-          <span className="sm:hidden"><CactusBrand locale={locale} compact /></span>
-          <span className="hidden sm:inline"><CactusBrand locale={locale} /></span>
+          <span className="sm:hidden">
+            <CactusBrand locale={locale} compact />
+          </span>
+          <span className="hidden sm:inline">
+            <CactusBrand locale={locale} />
+          </span>
         </Link>
 
         <nav className="flex items-center gap-2 sm:gap-5">
@@ -71,14 +75,32 @@ export async function SiteHeader({
             {user ? dictionary.myPanel : dictionary.panel}
           </Link>
           <CartLink locale={locale} />
-          <PreferencesMenu
-            locale={locale}
-            alternateHref={languageHref}
-          />
+          <PreferencesMenu locale={locale} alternateHref={languageHref} />
         </nav>
       </div>
-      <nav aria-label={locale === "fa" ? "بخش‌های سایت" : "Site sections"} className="mx-auto flex max-w-7xl gap-5 overflow-x-auto px-5 pb-4 text-sm font-medium sm:px-8 lg:px-10">
-        {[["/courses", "دوره‌ها", "Courses"], ["/shop", "فروشگاه", "Shop"], ["/blog", "وبلاگ", "Blog"], ["/teachers", "مدرس‌ها", "Teachers"], ["/honors", "افتخارات", "Honors"], ["/requirements", "پیش‌نیازها", "Requirements"], ["/about", "درباره ما", "About"], ["/search", "جست‌وجو", "Search"]].map(([path, fa, en]) => <Link key={path} href={localizePath(locale, path)} aria-current={currentPath === path ? "page" : undefined} className="whitespace-nowrap text-zinc-600 transition hover:text-emerald-700 aria-[current=page]:text-emerald-700 dark:text-zinc-300 dark:hover:text-emerald-400">{locale === "fa" ? fa : en}</Link>)}
+      <nav
+        aria-label={locale === "fa" ? "بخش‌های سایت" : "Site sections"}
+        className="mx-auto flex max-w-7xl gap-5 overflow-x-auto px-5 pb-4 text-sm font-medium sm:px-8 lg:px-10"
+      >
+        {[
+          ["/courses", "دوره‌ها", "Courses"],
+          ["/shop", "فروشگاه", "Shop"],
+          ["/blog", "وبلاگ", "Blog"],
+          ["/teachers", "مدرس‌ها", "Teachers"],
+          ["/honors", "افتخارات", "Honors"],
+          ["/requirements", "پیش‌نیازها", "Requirements"],
+          ["/about", "درباره ما", "About"],
+          ["/search", "جست‌وجو", "Search"],
+        ].map(([path, fa, en]) => (
+          <Link
+            key={path}
+            href={localizePath(locale, path)}
+            aria-current={currentPath === path ? "page" : undefined}
+            className="whitespace-nowrap text-zinc-600 transition hover:text-emerald-700 aria-[current=page]:text-emerald-700 dark:text-zinc-300 dark:hover:text-emerald-400"
+          >
+            {locale === "fa" ? fa : en}
+          </Link>
+        ))}
       </nav>
     </header>
   );

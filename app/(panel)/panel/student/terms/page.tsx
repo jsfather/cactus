@@ -1,1 +1,4 @@
-export { StudentTermsPage as default } from "@/components/workflows/student-pages";
+import { StudentTermsPage } from "@/components/workflows/student-pages";
+export default function Page() {
+  return <StudentTermsPage />;
+}

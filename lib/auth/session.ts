@@ -1,3 +1,4 @@
+import { getSafeReturnTo } from "./return-to";
 import { createHash, randomBytes } from "node:crypto";
 import { cache } from "react";
 import { and, eq, gt } from "drizzle-orm";
@@ -97,11 +98,12 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     : null;
 });
 
-export async function requireUser() {
+export async function requireUser(returnTo?: string) {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login");
+    const safe = getSafeReturnTo(returnTo);
+    redirect(safe ? `/login?returnTo=${encodeURIComponent(safe)}` : "/login");
   }
 
   return user;

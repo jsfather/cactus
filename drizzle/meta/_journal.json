@@ -134,6 +134,20 @@
       "when": 1788595494790,
       "tag": "0018_comment_replies",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1788611588967,
+      "tag": "0019_software_requirements",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1788611691664,
+      "tag": "0020_product_specifications",
+      "breakpoints": true
     }
   ]
 }

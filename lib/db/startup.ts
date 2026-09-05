@@ -48,7 +48,8 @@ const starterHonorSeedKey = "seed.honors.starter.v1";
 const starterTermLevelSeedKey = "seed.terms.level.starter.v1";
 const starterAttendanceSeedKey = "seed.attendance.starter.v1";
 const starterMediaPathname = "content/starter/cactus-placeholder.png";
-const starterHonorMediaPathname = "content/starter/cactus-honor-placeholder.png";
+const starterHonorMediaPathname =
+  "content/starter/cactus-honor-placeholder.png";
 const adminBootstrapLockId = 1128352836;
 const starterMediaPng = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9Zl1sAAAAASUVORK5CYII=",
@@ -89,7 +90,9 @@ export async function setupDatabase() {
 
     const adminId = await database.transaction(async (transaction) => {
       // Serialize bootstrap across replicas so only one can observe an admin-free database.
-      await transaction.execute(sql`select pg_advisory_xact_lock(${adminBootstrapLockId})`);
+      await transaction.execute(
+        sql`select pg_advisory_xact_lock(${adminBootstrapLockId})`,
+      );
 
       const rawMobile = process.env.ADMIN_MOBILE?.trim() || "";
       const mobile = normalizeIranianMobile(rawMobile);
@@ -122,7 +125,10 @@ export async function setupDatabase() {
       const email = process.env.ADMIN_EMAIL?.trim().toLowerCase() || null;
       const password = process.env.ADMIN_PASSWORD || null;
 
-      if ((rawMobile || password) && (!mobile || !password || password.length < 8)) {
+      if (
+        (rawMobile || password) &&
+        (!mobile || !password || password.length < 8)
+      ) {
         throw new Error(
           "ADMIN_MOBILE and ADMIN_PASSWORD (minimum 8 characters) must be provided together.",
         );
@@ -135,7 +141,11 @@ export async function setupDatabase() {
       const [existingUser] = await transaction
         .select({ id: users.id })
         .from(users)
-        .where(email ? or(eq(users.mobile, mobile), eq(users.email, email)) : eq(users.mobile, mobile))
+        .where(
+          email
+            ? or(eq(users.mobile, mobile), eq(users.email, email))
+            : eq(users.mobile, mobile),
+        )
         .limit(1);
 
       if (existingUser) {
@@ -145,7 +155,9 @@ export async function setupDatabase() {
       }
 
       const adminNameFa = splitName(
-        process.env.ADMIN_NAME_FA?.trim() || process.env.ADMIN_NAME?.trim() || "همکار کاکتوس",
+        process.env.ADMIN_NAME_FA?.trim() ||
+          process.env.ADMIN_NAME?.trim() ||
+          "همکار کاکتوس",
         "همکار",
         "کاکتوس",
       );
@@ -159,10 +171,14 @@ export async function setupDatabase() {
         .values({
           mobile,
           email,
-          firstNameFa: process.env.ADMIN_FIRST_NAME_FA?.trim() || adminNameFa.firstName,
-          lastNameFa: process.env.ADMIN_LAST_NAME_FA?.trim() || adminNameFa.lastName,
-          firstNameEn: process.env.ADMIN_FIRST_NAME_EN?.trim() || adminNameEn.firstName,
-          lastNameEn: process.env.ADMIN_LAST_NAME_EN?.trim() || adminNameEn.lastName,
+          firstNameFa:
+            process.env.ADMIN_FIRST_NAME_FA?.trim() || adminNameFa.firstName,
+          lastNameFa:
+            process.env.ADMIN_LAST_NAME_FA?.trim() || adminNameFa.lastName,
+          firstNameEn:
+            process.env.ADMIN_FIRST_NAME_EN?.trim() || adminNameEn.firstName,
+          lastNameEn:
+            process.env.ADMIN_LAST_NAME_EN?.trim() || adminNameEn.lastName,
           passwordHash: await hashPassword(password),
           role: "admin",
         })
@@ -179,13 +195,18 @@ export async function setupDatabase() {
           .onConflictDoNothing()
           .returning({ key: appSettings.key });
         if (!claimedSeed) return;
-        const [existingLevel] = await transaction.select({ id: termLevels.id }).from(termLevels).limit(1);
+        const [existingLevel] = await transaction
+          .select({ id: termLevels.id })
+          .from(termLevels)
+          .limit(1);
         if (!existingLevel) {
           await transaction.insert(termLevels).values({
             titleFa: "مقدماتی",
             titleEn: "Foundation",
-            descriptionFa: "سطح آغازین برای ترم‌های پایه رباتیک و برنامه‌نویسی.",
-            descriptionEn: "An introductory level for foundational robotics and programming terms.",
+            descriptionFa:
+              "سطح آغازین برای ترم‌های پایه رباتیک و برنامه‌نویسی.",
+            descriptionEn:
+              "An introductory level for foundational robotics and programming terms.",
             sortOrder: 1,
           });
         }
@@ -236,13 +257,26 @@ export async function setupDatabase() {
           .onConflictDoNothing()
           .returning({ key: appSettings.key });
         if (!claimedSeed) return;
-        const [existingHonor] = await transaction.select({ id: honors.id }).from(honors).limit(1);
+        const [existingHonor] = await transaction
+          .select({ id: honors.id })
+          .from(honors)
+          .limit(1);
         if (existingHonor) return;
         const honorImageUrl = `/media/${starterHonorMediaPathname}`;
-        const [existingHonorImage] = await transaction.select({ id: mediaAssets.id }).from(mediaAssets).where(eq(mediaAssets.url, honorImageUrl)).limit(1);
+        const [existingHonorImage] = await transaction
+          .select({ id: mediaAssets.id })
+          .from(mediaAssets)
+          .where(eq(mediaAssets.url, honorImageUrl))
+          .limit(1);
         if (!existingHonorImage) {
-          const uploadRoot = path.resolve(process.env.UPLOAD_DIR?.trim() || path.join(process.cwd(), ".data", "uploads"));
-          const absolutePath = path.join(uploadRoot, ...starterHonorMediaPathname.split("/"));
+          const uploadRoot = path.resolve(
+            process.env.UPLOAD_DIR?.trim() ||
+              path.join(process.cwd(), ".data", "uploads"),
+          );
+          const absolutePath = path.join(
+            uploadRoot,
+            ...starterHonorMediaPathname.split("/"),
+          );
           await mkdir(path.dirname(absolutePath), { recursive: true });
           await writeFile(absolutePath, starterMediaPng);
           await transaction.insert(mediaAssets).values({
@@ -261,8 +295,10 @@ export async function setupDatabase() {
           slug: "cactus-learning-achievement",
           titleFa: "گواهینامه نمونه مسیر یادگیری کاکتوس",
           titleEn: "Cactus Learning Journey Certificate",
-          descriptionFa: "این مورد نمونه، ساختار ثبت و نمایش افتخارات و گواهینامه‌های کاکتوس را نشان می‌دهد.",
-          descriptionEn: "This starter item demonstrates how Cactus honors and certificates are managed and presented.",
+          descriptionFa:
+            "این مورد نمونه، ساختار ثبت و نمایش افتخارات و گواهینامه‌های کاکتوس را نشان می‌دهد.",
+          descriptionEn:
+            "This starter item demonstrates how Cactus honors and certificates are managed and presented.",
           organizationFa: "مدرسه رباتیک کاکتوس",
           organizationEn: "Cactus Robotics School",
           locationFa: "تهران، ایران",
@@ -332,14 +368,20 @@ export async function setupDatabase() {
               slug: "robotics-kits",
               titleFa: "کیت‌های رباتیک",
               titleEn: "Robotics Kits",
-              descriptionFa: "کیت‌ها و ابزارهای آموزشی برای ساخت پروژه‌های رباتیک.",
-              descriptionEn: "Educational kits and tools for building robotics projects.",
+              descriptionFa:
+                "کیت‌ها و ابزارهای آموزشی برای ساخت پروژه‌های رباتیک.",
+              descriptionEn:
+                "Educational kits and tools for building robotics projects.",
             })
             .returning({ id: productCategories.id });
         }
 
         const [product] = await transaction
-          .select({ id: products.id, price: products.price, inventory: products.inventory })
+          .select({
+            id: products.id,
+            price: products.price,
+            inventory: products.inventory,
+          })
           .from(products)
           .orderBy(asc(products.createdAt))
           .limit(1);
@@ -384,12 +426,18 @@ export async function setupDatabase() {
             email: "hello@cactus.local",
             addressFa: "تهران، ایران",
             addressEn: "Tehran, Iran",
-            aboutUsFa: "<p>کاکتوس یک مدرسه رباتیک پروژه‌محور برای پرورش سازندگان آینده است.</p>",
-            aboutUsEn: "<p>Cactus is a project-based robotics school for tomorrow’s makers.</p>",
-            missionFa: "<p>ماموریت ما تبدیل کنجکاوی کودکان و نوجوانان به مهارت ساختن و حل مسئله است.</p>",
-            missionEn: "<p>Our mission is to turn young people’s curiosity into making and problem-solving skills.</p>",
-            visionFa: "<p>چشم‌انداز ما نسلی خلاق، مسئول و توانمند در استفاده از فناوری است.</p>",
-            visionEn: "<p>We envision a creative, responsible generation empowered by technology.</p>",
+            aboutUsFa:
+              "<p>کاکتوس یک مدرسه رباتیک پروژه‌محور برای پرورش سازندگان آینده است.</p>",
+            aboutUsEn:
+              "<p>Cactus is a project-based robotics school for tomorrow’s makers.</p>",
+            missionFa:
+              "<p>ماموریت ما تبدیل کنجکاوی کودکان و نوجوانان به مهارت ساختن و حل مسئله است.</p>",
+            missionEn:
+              "<p>Our mission is to turn young people’s curiosity into making and problem-solving skills.</p>",
+            visionFa:
+              "<p>چشم‌انداز ما نسلی خلاق، مسئول و توانمند در استفاده از فناوری است.</p>",
+            visionEn:
+              "<p>We envision a creative, responsible generation empowered by technology.</p>",
             footerTextFa: "همه حقوق برای مدرسه رباتیک کاکتوس محفوظ است.",
             footerTextEn: "All rights reserved by Cactus Robotics School.",
             updatedById: adminId,
@@ -417,10 +465,14 @@ export async function setupDatabase() {
             .values({
               titleFa: "آزمون مقدماتی رباتیک",
               titleEn: "Robotics Fundamentals Quiz",
-              descriptionFa: "یک آزمون نمونه برای سنجش مفاهیم پایه مدار و رباتیک.",
-              descriptionEn: "A starter quiz covering basic circuits and robotics concepts.",
-              instructionsFa: "هر سؤال را با دقت بخوانید و بهترین پاسخ را انتخاب کنید.",
-              instructionsEn: "Read each question carefully and choose the best answer.",
+              descriptionFa:
+                "یک آزمون نمونه برای سنجش مفاهیم پایه مدار و رباتیک.",
+              descriptionEn:
+                "A starter quiz covering basic circuits and robotics concepts.",
+              instructionsFa:
+                "هر سؤال را با دقت بخوانید و بهترین پاسخ را انتخاب کنید.",
+              instructionsEn:
+                "Read each question carefully and choose the best answer.",
               status: "draft",
               durationMinutes: 15,
               passingScore: 60,
@@ -437,8 +489,10 @@ export async function setupDatabase() {
               type: "single_choice",
               promptFa: "کدام قطعه جریان الکتریکی را محدود می‌کند؟",
               promptEn: "Which component limits electric current?",
-              explanationFa: "مقاومت برای محدود کردن جریان در مدار استفاده می‌شود.",
-              explanationEn: "A resistor is used to limit current in a circuit.",
+              explanationFa:
+                "مقاومت برای محدود کردن جریان در مدار استفاده می‌شود.",
+              explanationEn:
+                "A resistor is used to limit current in a circuit.",
               points: 2,
               sortOrder: 1,
             })
@@ -474,7 +528,8 @@ export async function setupDatabase() {
             promptFa: "حسگرها به ربات کمک می‌کنند محیط اطراف خود را تشخیص دهد.",
             promptEn: "Sensors help a robot perceive its environment.",
             explanationFa: "حسگرها اطلاعات محیط را به کنترل‌گر ربات می‌رسانند.",
-            explanationEn: "Sensors provide environmental input to the robot controller.",
+            explanationEn:
+              "Sensors provide environmental input to the robot controller.",
             points: 1,
             sortOrder: 2,
             correctBoolean: true,
@@ -497,29 +552,32 @@ export async function setupDatabase() {
           .limit(1);
 
         if (!existingProduct) {
-          const [createdProduct] = await transaction.insert(products).values({
-            slug: "starter-robotics-kit",
-            titleFa: "کیت شروع رباتیک کاکتوس",
-            titleEn: "Cactus Starter Robotics Kit",
-            summaryFa:
-              "یک مجموعه کامل و آموزشی برای ساخت نخستین پروژه‌های رباتیک در خانه یا کلاس.",
-            summaryEn:
-              "A complete learning kit for building first robotics projects at home or in class.",
-            contentFa:
-              "<h2>شروعی ساده برای ساختن</h2><p>این کیت قطعات اصلی، راهنمای پروژه‌محور و تمرین‌های گام‌به‌گام مورد نیاز دانش پژوهان تازه‌کار را در یک بسته فراهم می‌کند.</p><ul><li>مناسب کودکان و نوجوانان</li><li>راهنمای فارسی پروژه‌ها</li><li>قابل استفاده در خانه و کلاس</li></ul>",
-            contentEn:
-              "<h2>An easy way to start building</h2><p>This kit brings together essential parts, a project-based guide, and step-by-step exercises for new makers.</p><ul><li>Designed for young makers</li><li>Project-based instructions</li><li>Useful at home or in class</li></ul>",
-            price: 2450000,
-            inventory: 12,
-            status: "published",
-            isFeatured: true,
-            publishedAt: new Date(),
-            authorId: adminId,
-          }).returning({
-            id: products.id,
-            price: products.price,
-            inventory: products.inventory,
-          });
+          const [createdProduct] = await transaction
+            .insert(products)
+            .values({
+              slug: "starter-robotics-kit",
+              titleFa: "کیت شروع رباتیک کاکتوس",
+              titleEn: "Cactus Starter Robotics Kit",
+              summaryFa:
+                "یک مجموعه کامل و آموزشی برای ساخت نخستین پروژه‌های رباتیک در خانه یا کلاس.",
+              summaryEn:
+                "A complete learning kit for building first robotics projects at home or in class.",
+              contentFa:
+                "<h2>شروعی ساده برای ساختن</h2><p>این کیت قطعات اصلی، راهنمای پروژه‌محور و تمرین‌های گام‌به‌گام مورد نیاز دانش پژوهان تازه‌کار را در یک بسته فراهم می‌کند.</p><ul><li>مناسب کودکان و نوجوانان</li><li>راهنمای فارسی پروژه‌ها</li><li>قابل استفاده در خانه و کلاس</li></ul>",
+              contentEn:
+                "<h2>An easy way to start building</h2><p>This kit brings together essential parts, a project-based guide, and step-by-step exercises for new makers.</p><ul><li>Designed for young makers</li><li>Project-based instructions</li><li>Useful at home or in class</li></ul>",
+              price: 2450000,
+              inventory: 12,
+              status: "published",
+              isFeatured: true,
+              publishedAt: new Date(),
+              authorId: adminId,
+            })
+            .returning({
+              id: products.id,
+              price: products.price,
+              inventory: products.inventory,
+            });
 
           const [category] = await transaction
             .select({ id: productCategories.id })
@@ -560,9 +618,13 @@ export async function setupDatabase() {
 
         if (!existingAsset) {
           const uploadRoot = path.resolve(
-            process.env.UPLOAD_DIR?.trim() || path.join(process.cwd(), ".data", "uploads"),
+            process.env.UPLOAD_DIR?.trim() ||
+              path.join(process.cwd(), ".data", "uploads"),
           );
-          const absolutePath = path.join(uploadRoot, ...starterMediaPathname.split("/"));
+          const absolutePath = path.join(
+            uploadRoot,
+            ...starterMediaPathname.split("/"),
+          );
           await mkdir(path.dirname(absolutePath), { recursive: true });
           await writeFile(absolutePath, starterMediaPng);
 
@@ -660,7 +722,12 @@ export async function setupDatabase() {
         let [demoTeacher] = await transaction
           .select({ id: users.id })
           .from(users)
-          .where(or(eq(users.mobile, "seed:teacher"), eq(users.mobile, "seed:teacher-profile")))
+          .where(
+            or(
+              eq(users.mobile, "seed:teacher"),
+              eq(users.mobile, "seed:teacher-profile"),
+            ),
+          )
           .limit(1);
         if (!demoTeacher) {
           [demoTeacher] = await transaction
@@ -672,7 +739,9 @@ export async function setupDatabase() {
               lastNameEn: "Teacher",
               mobile: "seed:teacher-profile",
               email: "teacher.profile.example@cactus.local",
-              passwordHash: await hashPassword(randomBytes(32).toString("base64url")),
+              passwordHash: await hashPassword(
+                randomBytes(32).toString("base64url"),
+              ),
               role: "teacher",
               isActive: false,
             })
@@ -688,20 +757,38 @@ export async function setupDatabase() {
             nationalCode: "seed-demo1",
             cityFa: "تهران",
             cityEn: "Tehran",
-            biographyFa: "<p>مدرس نمونه کاکتوس با تمرکز بر آموزش پروژه‌محور رباتیک و برنامه‌نویسی.</p>",
-            biographyEn: "<p>A Cactus demo teacher focused on project-based robotics and programming education.</p>",
-            aboutFa: "<p>این پروفایل نمونه، ساختار معرفی مدرس را نشان می‌دهد و پیش از انتشار می‌تواند توسط مدیر ویرایش شود.</p>",
-            aboutEn: "<p>This starter profile demonstrates the teacher profile structure and can be edited before publishing.</p>",
-            achievementsFa: "<p>طراحی مسیرهای آموزشی عملی برای سازندگان جوان.</p>",
-            achievementsEn: "<p>Designed practical learning paths for young makers.</p>",
+            biographyFa:
+              "<p>مدرس نمونه کاکتوس با تمرکز بر آموزش پروژه‌محور رباتیک و برنامه‌نویسی.</p>",
+            biographyEn:
+              "<p>A Cactus demo teacher focused on project-based robotics and programming education.</p>",
+            aboutFa:
+              "<p>این پروفایل نمونه، ساختار معرفی مدرس را نشان می‌دهد و پیش از انتشار می‌تواند توسط مدیر ویرایش شود.</p>",
+            aboutEn:
+              "<p>This starter profile demonstrates the teacher profile structure and can be edited before publishing.</p>",
+            achievementsFa:
+              "<p>طراحی مسیرهای آموزشی عملی برای سازندگان جوان.</p>",
+            achievementsEn:
+              "<p>Designed practical learning paths for young makers.</p>",
             memberSince: "2025-01-01",
             isPublic: false,
           })
           .returning({ id: teacherProfiles.id });
 
         await transaction.insert(teacherSkills).values([
-          { teacherProfileId: profile.id, nameFa: "رباتیک", nameEn: "Robotics", score: 90, sortOrder: 1 },
-          { teacherProfileId: profile.id, nameFa: "برنامه‌نویسی", nameEn: "Programming", score: 85, sortOrder: 2 },
+          {
+            teacherProfileId: profile.id,
+            nameFa: "رباتیک",
+            nameEn: "Robotics",
+            score: 90,
+            sortOrder: 1,
+          },
+          {
+            teacherProfileId: profile.id,
+            nameFa: "برنامه‌نویسی",
+            nameEn: "Programming",
+            score: 85,
+            sortOrder: 2,
+          },
         ]);
         await transaction.insert(teacherWorkExperiences).values({
           teacherProfileId: profile.id,
@@ -711,8 +798,10 @@ export async function setupDatabase() {
           positionEn: "Robotics Teacher",
           periodFa: "۱۴۰۳ تا امروز",
           periodEn: "2025–Present",
-          descriptionFa: "آموزش پروژه‌محور الکترونیک، برنامه‌نویسی و ساخت ربات.",
-          descriptionEn: "Project-based teaching in electronics, programming, and robot building.",
+          descriptionFa:
+            "آموزش پروژه‌محور الکترونیک، برنامه‌نویسی و ساخت ربات.",
+          descriptionEn:
+            "Project-based teaching in electronics, programming, and robot building.",
           sortOrder: 1,
         });
         await transaction.insert(teacherEducations).values({
@@ -730,7 +819,10 @@ export async function setupDatabase() {
       });
 
       await database.transaction(async (transaction) => {
-        const [existingTerm] = await transaction.select({ id: terms.id }).from(terms).limit(1);
+        const [existingTerm] = await transaction
+          .select({ id: terms.id })
+          .from(terms)
+          .limit(1);
         if (existingTerm) {
           await transaction
             .insert(appSettings)
@@ -738,9 +830,23 @@ export async function setupDatabase() {
             .onConflictDoNothing();
           return;
         }
-        const [level] = await transaction.select({ id: termLevels.id }).from(termLevels).orderBy(asc(termLevels.sortOrder)).limit(1);
-        const [teacher] = await transaction.select({ id: users.id }).from(users).where(and(eq(users.role, "teacher"), eq(users.isActive, true))).orderBy(asc(users.createdAt)).limit(1);
-        const [student] = await transaction.select({ id: users.id }).from(users).where(and(eq(users.role, "student"), eq(users.isActive, true))).orderBy(asc(users.createdAt)).limit(1);
+        const [level] = await transaction
+          .select({ id: termLevels.id })
+          .from(termLevels)
+          .orderBy(asc(termLevels.sortOrder))
+          .limit(1);
+        const [teacher] = await transaction
+          .select({ id: users.id })
+          .from(users)
+          .where(and(eq(users.role, "teacher"), eq(users.isActive, true)))
+          .orderBy(asc(users.createdAt))
+          .limit(1);
+        const [student] = await transaction
+          .select({ id: users.id })
+          .from(users)
+          .where(and(eq(users.role, "student"), eq(users.isActive, true)))
+          .orderBy(asc(users.createdAt))
+          .limit(1);
         if (!level || !teacher || !student) return;
         const [claimedSeed] = await transaction
           .insert(appSettings)
@@ -756,31 +862,66 @@ export async function setupDatabase() {
         const startDate = start.toISOString().slice(0, 10);
         const endDate = end.toISOString().slice(0, 10);
         const dayOfWeek = start.getUTCDay() === 6 ? 0 : start.getUTCDay() + 1;
-        const [term] = await transaction.insert(terms).values({
-          titleFa: "کلاس نمونه حضور و نمره",
-          titleEn: "Sample attendance & grading class",
-          descriptionFa: "این ترم پیش‌نویس، گردش‌کار جلسات، حضور و غیبت و ثبت نمره را نمایش می‌دهد.",
-          descriptionEn: "This draft term demonstrates session attendance and grading workflows.",
-          levelId: level.id,
-          status: "draft",
-          deliveryMode: "in_person",
-          startDate,
-          endDate,
-          capacity: 12,
-          tuitionToman: 0,
-          locationFa: "کلاس نمونه کاکتوس",
-          locationEn: "Cactus demo classroom",
-          creatorId: adminId,
-        }).returning({ id: terms.id });
-        await transaction.insert(termTeachers).values({ termId: term.id, teacherId: teacher.id, assignedById: adminId });
-        await transaction.insert(termSchedules).values({ termId: term.id, dayOfWeek, startTime: "09:00", endTime: "10:30" });
-        await transaction.insert(termEnrollments).values({ termId: term.id, studentId: student.id, status: "active", source: "direct", enrolledById: adminId });
+        const [term] = await transaction
+          .insert(terms)
+          .values({
+            titleFa: "کلاس نمونه حضور و نمره",
+            titleEn: "Sample attendance & grading class",
+            descriptionFa:
+              "این ترم پیش‌نویس، گردش‌کار جلسات، حضور و غیبت و ثبت نمره را نمایش می‌دهد.",
+            descriptionEn:
+              "This draft term demonstrates session attendance and grading workflows.",
+            levelId: level.id,
+            status: "draft",
+            deliveryMode: "in_person",
+            startDate,
+            endDate,
+            capacity: 12,
+            tuitionToman: 0,
+            locationFa: "کلاس نمونه کاکتوس",
+            locationEn: "Cactus demo classroom",
+            creatorId: adminId,
+          })
+          .returning({ id: terms.id });
+        await transaction
+          .insert(termTeachers)
+          .values({
+            termId: term.id,
+            teacherId: teacher.id,
+            assignedById: adminId,
+          });
+        await transaction
+          .insert(termSchedules)
+          .values({
+            termId: term.id,
+            dayOfWeek,
+            startTime: "09:00",
+            endTime: "10:30",
+          });
+        await transaction
+          .insert(termEnrollments)
+          .values({
+            termId: term.id,
+            studentId: student.id,
+            status: "active",
+            source: "direct",
+            enrolledById: adminId,
+          });
         const sessions = Array.from({ length: 4 }, (_, index) => {
           const sessionDate = new Date(start);
           sessionDate.setUTCDate(sessionDate.getUTCDate() + index * 7);
-          return { termId: term.id, sessionDate: sessionDate.toISOString().slice(0, 10), startTime: "09:00", endTime: "10:30", sequence: index + 1 };
+          return {
+            termId: term.id,
+            sessionDate: sessionDate.toISOString().slice(0, 10),
+            startTime: "09:00",
+            endTime: "10:30",
+            sequence: index + 1,
+          };
         });
-        const [firstSession] = await transaction.insert(termSessions).values(sessions).returning({ id: termSessions.id });
+        const [firstSession] = await transaction
+          .insert(termSessions)
+          .values(sessions)
+          .returning({ id: termSessions.id });
         await transaction.insert(sessionStudentRecords).values({
           sessionId: firstSession.id,
           studentId: student.id,

@@ -1,22 +1,509 @@
 import Link from "next/link";
-import { and,asc,desc,eq,or } from "drizzle-orm";
+import { and, asc, desc, eq, or } from "drizzle-orm";
 import { z } from "zod";
 import { notFound } from "next/navigation";
-import { requireUser,requireRole } from "@/lib/auth/session";
+import { requireUser, requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
-import { tickets,ticketMessages,ticketDepartments,users,notifications } from "@/lib/db/schema";
+import {
+  tickets,
+  ticketMessages,
+  ticketDepartments,
+  users,
+  notifications,
+} from "@/lib/db/schema";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { userNameSql } from "@/lib/learning/queries";
-import { text,title } from "@/lib/workflows";
-import { saveTicket,replyTicket,deleteTicket,changeTicketStatus,saveDepartment,deleteDepartment,saveNotification,readNotification,deleteNotification } from "@/lib/support/actions";
-import { ActionForm,DeleteAction,ActionButton,type Field } from "./action-form";
-import { PanelPage,PanelPageHeader,PanelPrimaryLink,PanelSurface,PanelTable,PanelTableCell,PanelTableActions,PanelEmptyState,PanelFormSection } from "@/components/panel/ui";
-export async function TicketsPage({id,edit=false}:{id?:string;edit?:boolean}){
- const user=await requireUser();const locale=await getPanelLocale();const admin=user.role==="admin";const db=getDatabase();if(id&&id!=="new"&&!z.uuid().safeParse(id).success)notFound();
- const [ticket]=id&&id!=="new"?await db.select().from(tickets).where(and(eq(tickets.id,id),admin?undefined:or(eq(tickets.ownerId,user.id),user.role==="teacher"?eq(tickets.assignedToId,user.id):undefined))):[];if(id&&id!=="new"&&!ticket)notFound();
- if(id==="new"||edit){if(edit&&!admin)notFound();const departments=await db.select().from(ticketDepartments).where(eq(ticketDepartments.isActive,true));const people=admin?await db.select({id:users.id,name:userNameSql(locale),role:users.role}).from(users).where(eq(users.isActive,true)):[];const fields:Field[]=[{name:"subject",label:text(locale,"موضوع","Subject"),required:true},{name:"departmentId",label:text(locale,"دپارتمان","Department"),options:departments.map(d=>({value:d.id,label:title(d,locale)})),required:true},...(!edit?[{name:"body",label:text(locale,"پیام","Message"),type:"textarea",required:true},{name:"attachmentUrl",label:text(locale,"پیوند فایل","Attachment link"),type:"url"}]:[])];if(admin)fields.push({name:"ownerId",label:text(locale,"صاحب تیکت","Ticket owner"),options:people.map(p=>({value:p.id,label:p.name}))},{name:"assignedToId",label:text(locale,"مسئول پاسخ","Assignee"),options:[{value:"",label:text(locale,"تعیین نشده","Unassigned")},...people.filter(p=>["teacher","admin"].includes(p.role)).map(p=>({value:p.id,label:p.name}))]},{name:"status",label:text(locale,"وضعیت","Status"),options:[{value:"open",label:text(locale,"باز","Open")},{value:"pending",label:text(locale,"در انتظار","Pending")},{value:"closed",label:text(locale,"بسته","Closed")}]});return <PanelPage><PanelPageHeader eyebrow={text(locale,"پشتیبانی","Support")} title={text(locale,"تیکت","Ticket")} description=""/><ActionForm locale={locale} action={saveTicket.bind(null,ticket?.id??null)} initial={ticket?Object.fromEntries(Object.entries(ticket).map(([k,v])=>[k,String(v??"")])):{}} fields={fields}/></PanelPage>;}
- if(ticket){const messages=await db.select({message:ticketMessages,name:userNameSql(locale)}).from(ticketMessages).innerJoin(users,eq(users.id,ticketMessages.authorId)).where(eq(ticketMessages.ticketId,ticket.id)).orderBy(asc(ticketMessages.createdAt));return <PanelPage><PanelPageHeader eyebrow={text(locale,"پشتیبانی","Support")} title={ticket.subject} description={text(locale,{open:"باز",pending:"در انتظار",closed:"بسته"}[ticket.status]??ticket.status,ticket.status)} actions={admin?<PanelPrimaryLink href={`/panel/tickets/${ticket.id}/edit`}>{text(locale,"ویرایش","Edit")}</PanelPrimaryLink>:undefined}/>{messages.map(({message:m,name})=><PanelSurface key={m.id} className="p-6"><p className="text-sm text-zinc-500">{name} · {m.createdAt.toLocaleString(locale)}</p><p className="mt-4 whitespace-pre-wrap leading-8">{m.body}</p>{m.attachmentUrl&&<a className="text-emerald-700" href={m.attachmentUrl} target="_blank" rel="noopener noreferrer">{text(locale,"فایل پیوست","Attachment")}</a>}</PanelSurface>)}{ticket.status!=="closed"&&<ActionForm locale={locale} action={replyTicket.bind(null,ticket.id)} heading={text(locale,"پاسخ","Reply")} fields={[{name:"body",label:text(locale,"پیام","Message"),type:"textarea",required:true},{name:"attachmentUrl",label:text(locale,"پیوند فایل","Attachment link"),type:"url"}]}/>}<ActionButton locale={locale} action={changeTicketStatus.bind(null,ticket.id,ticket.status==="closed"?"open":"closed",locale)} label={ticket.status==="closed"?text(locale,"بازگشایی تیکت","Reopen ticket"):text(locale,"بستن تیکت","Close ticket")}/></PanelPage>;}
- const items=await db.select().from(tickets).where(admin?undefined:or(eq(tickets.ownerId,user.id),user.role==="teacher"?eq(tickets.assignedToId,user.id):undefined)).orderBy(desc(tickets.updatedAt));return <PanelPage><PanelPageHeader eyebrow={text(locale,"پشتیبانی","Support")} title={text(locale,"تیکت‌ها","Tickets")} description={text(locale,"گفت‌وگوهای پشتیبانی و آموزشی شما","Your support and learning conversations")} actions={<PanelPrimaryLink href="/panel/tickets/new">{text(locale,"تیکت جدید","New ticket")}</PanelPrimaryLink>}/>{admin&&<Link href="/panel/admin/departments" className="text-emerald-700 dark:text-emerald-400">{text(locale,"مدیریت دپارتمان‌ها","Manage departments")}</Link>}<PanelSurface>{items.length?<PanelTable columns={[{label:text(locale,"موضوع","Subject"),className:"w-[60%]"},{label:text(locale,"وضعیت","Status"),className:"w-[25%]"},{label:text(locale,"عملیات","Actions"),className:"w-[15%]"}]}>{items.map(t=><tr key={t.id}><PanelTableCell><Link href={`/panel/tickets/${t.id}`} className="font-semibold">{t.subject}</Link></PanelTableCell><PanelTableCell>{text(locale,{open:"باز",pending:"در انتظار",closed:"بسته"}[t.status]??t.status,t.status)}</PanelTableCell><PanelTableCell>{admin&&<DeleteAction locale={locale} action={deleteTicket.bind(null,t.id,locale)}/>}</PanelTableCell></tr>)}</PanelTable>:<PanelEmptyState title={text(locale,"تیکتی وجود ندارد","No tickets yet")} description=""/>}</PanelSurface></PanelPage>;
+import { text, title } from "@/lib/workflows";
+import {
+  saveTicket,
+  replyTicket,
+  deleteTicket,
+  changeTicketStatus,
+  saveDepartment,
+  deleteDepartment,
+  saveNotification,
+  readNotification,
+  deleteNotification,
+} from "@/lib/support/actions";
+import {
+  ActionForm,
+  DeleteAction,
+  ActionButton,
+  type Field,
+} from "./action-form";
+import {
+  PanelPage,
+  PanelPageHeader,
+  PanelPrimaryLink,
+  PanelSurface,
+  PanelTable,
+  PanelTableCell,
+  PanelTableActions,
+  PanelEmptyState,
+  PanelFormSection,
+} from "@/components/panel/ui";
+export async function TicketsPage({
+  id,
+  edit = false,
+}: {
+  id?: string;
+  edit?: boolean;
+}) {
+  const user = await requireUser();
+  const locale = await getPanelLocale();
+  const admin = user.role === "admin";
+  const db = getDatabase();
+  if (id && id !== "new" && !z.uuid().safeParse(id).success) notFound();
+  const [ticket] =
+    id && id !== "new"
+      ? await db
+          .select()
+          .from(tickets)
+          .where(
+            and(
+              eq(tickets.id, id),
+              admin
+                ? undefined
+                : or(
+                    eq(tickets.ownerId, user.id),
+                    user.role === "teacher"
+                      ? eq(tickets.assignedToId, user.id)
+                      : undefined,
+                  ),
+            ),
+          )
+      : [];
+  if (id && id !== "new" && !ticket) notFound();
+  if (id === "new" || edit) {
+    if (edit && !admin) notFound();
+    const departments = await db
+      .select()
+      .from(ticketDepartments)
+      .where(eq(ticketDepartments.isActive, true));
+    const people = admin
+      ? await db
+          .select({ id: users.id, name: userNameSql(locale), role: users.role })
+          .from(users)
+          .where(eq(users.isActive, true))
+      : [];
+    const fields: Field[] = [
+      {
+        name: "subject",
+        label: text(locale, "موضوع", "Subject"),
+        required: true,
+      },
+      {
+        name: "departmentId",
+        label: text(locale, "دپارتمان", "Department"),
+        options: departments.map((d) => ({
+          value: d.id,
+          label: title(d, locale),
+        })),
+        required: true,
+      },
+      ...(!edit
+        ? [
+            {
+              name: "body",
+              label: text(locale, "پیام", "Message"),
+              type: "textarea",
+              required: true,
+            },
+            {
+              name: "attachmentUrl",
+              label: text(locale, "پیوند فایل", "Attachment link"),
+              type: "url",
+            },
+          ]
+        : []),
+    ];
+    if (admin)
+      fields.push(
+        {
+          name: "ownerId",
+          label: text(locale, "صاحب تیکت", "Ticket owner"),
+          options: people.map((p) => ({ value: p.id, label: p.name })),
+        },
+        {
+          name: "assignedToId",
+          label: text(locale, "مسئول پاسخ", "Assignee"),
+          options: [
+            { value: "", label: text(locale, "تعیین نشده", "Unassigned") },
+            ...people
+              .filter((p) => ["teacher", "admin"].includes(p.role))
+              .map((p) => ({ value: p.id, label: p.name })),
+          ],
+        },
+        {
+          name: "status",
+          label: text(locale, "وضعیت", "Status"),
+          options: [
+            { value: "open", label: text(locale, "باز", "Open") },
+            { value: "pending", label: text(locale, "در انتظار", "Pending") },
+            { value: "closed", label: text(locale, "بسته", "Closed") },
+          ],
+        },
+      );
+    return (
+      <PanelPage>
+        <PanelPageHeader
+          eyebrow={text(locale, "پشتیبانی", "Support")}
+          title={text(locale, "تیکت", "Ticket")}
+          description=""
+        />
+        <ActionForm
+          locale={locale}
+          action={saveTicket.bind(null, ticket?.id ?? null)}
+          initial={
+            ticket
+              ? Object.fromEntries(
+                  Object.entries(ticket).map(([k, v]) => [k, String(v ?? "")]),
+                )
+              : {}
+          }
+          fields={fields}
+        />
+      </PanelPage>
+    );
+  }
+  if (ticket) {
+    const messages = await db
+      .select({ message: ticketMessages, name: userNameSql(locale) })
+      .from(ticketMessages)
+      .innerJoin(users, eq(users.id, ticketMessages.authorId))
+      .where(eq(ticketMessages.ticketId, ticket.id))
+      .orderBy(asc(ticketMessages.createdAt));
+    return (
+      <PanelPage>
+        <PanelPageHeader
+          eyebrow={text(locale, "پشتیبانی", "Support")}
+          title={ticket.subject}
+          description={text(
+            locale,
+            { open: "باز", pending: "در انتظار", closed: "بسته" }[
+              ticket.status
+            ] ?? ticket.status,
+            ticket.status,
+          )}
+          actions={
+            admin ? (
+              <PanelPrimaryLink href={`/panel/tickets/${ticket.id}/edit`}>
+                {text(locale, "ویرایش", "Edit")}
+              </PanelPrimaryLink>
+            ) : undefined
+          }
+        />
+        {messages.map(({ message: m, name }) => (
+          <PanelSurface key={m.id} className="p-6">
+            <p className="text-sm text-zinc-500">
+              {name} · {m.createdAt.toLocaleString(locale)}
+            </p>
+            <p className="mt-4 whitespace-pre-wrap leading-8">{m.body}</p>
+            {m.attachmentUrl && (
+              <a
+                className="text-emerald-700"
+                href={m.attachmentUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {text(locale, "فایل پیوست", "Attachment")}
+              </a>
+            )}
+          </PanelSurface>
+        ))}
+        {ticket.status !== "closed" && (
+          <ActionForm
+            locale={locale}
+            action={replyTicket.bind(null, ticket.id)}
+            heading={text(locale, "پاسخ", "Reply")}
+            fields={[
+              {
+                name: "body",
+                label: text(locale, "پیام", "Message"),
+                type: "textarea",
+                required: true,
+              },
+              {
+                name: "attachmentUrl",
+                label: text(locale, "پیوند فایل", "Attachment link"),
+                type: "url",
+              },
+            ]}
+          />
+        )}
+        <ActionButton
+          locale={locale}
+          action={changeTicketStatus.bind(
+            null,
+            ticket.id,
+            ticket.status === "closed" ? "open" : "closed",
+            locale,
+          )}
+          label={
+            ticket.status === "closed"
+              ? text(locale, "بازگشایی تیکت", "Reopen ticket")
+              : text(locale, "بستن تیکت", "Close ticket")
+          }
+        />
+      </PanelPage>
+    );
+  }
+  const items = await db
+    .select()
+    .from(tickets)
+    .where(
+      admin
+        ? undefined
+        : or(
+            eq(tickets.ownerId, user.id),
+            user.role === "teacher"
+              ? eq(tickets.assignedToId, user.id)
+              : undefined,
+          ),
+    )
+    .orderBy(desc(tickets.updatedAt));
+  return (
+    <PanelPage>
+      <PanelPageHeader
+        eyebrow={text(locale, "پشتیبانی", "Support")}
+        title={text(locale, "تیکت‌ها", "Tickets")}
+        description={text(
+          locale,
+          "گفت‌وگوهای پشتیبانی و آموزشی شما",
+          "Your support and learning conversations",
+        )}
+        actions={
+          <PanelPrimaryLink href="/panel/tickets/new">
+            {text(locale, "تیکت جدید", "New ticket")}
+          </PanelPrimaryLink>
+        }
+      />
+      {admin && (
+        <Link
+          href="/panel/admin/departments"
+          className="text-emerald-700 dark:text-emerald-400"
+        >
+          {text(locale, "مدیریت دپارتمان‌ها", "Manage departments")}
+        </Link>
+      )}
+      <PanelSurface>
+        {items.length ? (
+          <PanelTable
+            columns={[
+              { label: text(locale, "موضوع", "Subject"), className: "w-[60%]" },
+              { label: text(locale, "وضعیت", "Status"), className: "w-[25%]" },
+              {
+                label: text(locale, "عملیات", "Actions"),
+                className: "w-[15%]",
+              },
+            ]}
+          >
+            {items.map((t) => (
+              <tr key={t.id}>
+                <PanelTableCell>
+                  <Link
+                    href={`/panel/tickets/${t.id}`}
+                    className="font-semibold"
+                  >
+                    {t.subject}
+                  </Link>
+                </PanelTableCell>
+                <PanelTableCell>
+                  {text(
+                    locale,
+                    { open: "باز", pending: "در انتظار", closed: "بسته" }[
+                      t.status
+                    ] ?? t.status,
+                    t.status,
+                  )}
+                </PanelTableCell>
+                <PanelTableCell>
+                  {admin && (
+                    <DeleteAction
+                      locale={locale}
+                      action={deleteTicket.bind(null, t.id, locale)}
+                    />
+                  )}
+                </PanelTableCell>
+              </tr>
+            ))}
+          </PanelTable>
+        ) : (
+          <PanelEmptyState
+            title={text(locale, "تیکتی وجود ندارد", "No tickets yet")}
+            description=""
+          />
+        )}
+      </PanelSurface>
+    </PanelPage>
+  );
 }
-export async function DepartmentsPage(){await requireRole("admin");const locale=await getPanelLocale();const items=await getDatabase().select().from(ticketDepartments);const fields:Field[]=[{name:"titleFa",label:text(locale,"عنوان فارسی","Persian title"),required:true},{name:"titleEn",label:text(locale,"عنوان انگلیسی","English title")},{name:"isActive",label:text(locale,"وضعیت","Status"),options:[{value:"true",label:text(locale,"فعال","Active")},{value:"false",label:text(locale,"غیرفعال","Inactive")}]}];return <PanelPage><PanelPageHeader eyebrow={text(locale,"پشتیبانی","Support")} title={text(locale,"دپارتمان‌ها","Departments")} description=""/><ActionForm locale={locale} heading={text(locale,"دپارتمان جدید","New department")} action={saveDepartment.bind(null,null)} fields={fields}/>{items.map(d=><PanelFormSection key={d.id} title={title(d,locale)}><ActionForm locale={locale} action={saveDepartment.bind(null,d.id)} initial={{titleFa:d.titleFa,titleEn:d.titleEn??"",isActive:String(d.isActive)}} fields={fields}/><div className="mt-4"><DeleteAction locale={locale} action={deleteDepartment.bind(null,d.id,locale)}/></div></PanelFormSection>)}</PanelPage>;}
-export async function NotificationsPage({admin=false}:{admin?:boolean}){const user=admin?await requireRole("admin"):await requireUser();const locale=await getPanelLocale();const db=getDatabase();const items=await db.select().from(notifications).where(admin?undefined:eq(notifications.userId,user.id)).orderBy(desc(notifications.createdAt));const people=admin?await db.select({id:users.id,name:userNameSql(locale)}).from(users):[];const fields:Field[]=[{name:"userId",label:text(locale,"گیرنده","Recipient"),options:people.map(p=>({value:p.id,label:p.name}))},{name:"titleFa",label:text(locale,"عنوان فارسی","Persian title"),required:true},{name:"titleEn",label:text(locale,"عنوان انگلیسی","English title")},{name:"bodyFa",label:text(locale,"متن فارسی","Persian message"),type:"textarea",required:true},{name:"bodyEn",label:text(locale,"متن انگلیسی","English message"),type:"textarea"},{name:"href",label:text(locale,"مسیر داخلی","Internal path")}];return <PanelPage><PanelPageHeader eyebrow={text(locale,"پنل","Workspace")} title={text(locale,"اعلان‌ها","Notifications")} description=""/>{admin&&<ActionForm locale={locale} action={saveNotification.bind(null,null)} fields={fields}/>}<div className="space-y-4">{items.map(n=><PanelSurface key={n.id} className="p-6"><h2 className="font-bold">{title(n,locale)} {!n.readAt&&<span className="text-emerald-600">●</span>}</h2><p className="mt-3 whitespace-pre-wrap">{locale==="en"?n.bodyEn||n.bodyFa:n.bodyFa}</p><div className="mt-4 flex flex-wrap items-center gap-3">{n.href&&<Link className="text-emerald-700 dark:text-emerald-400" href={n.href}>{text(locale,"مشاهده","Open")}</Link>}{!admin&&!n.readAt&&<ActionButton locale={locale} action={readNotification.bind(null,n.id,locale)} label={text(locale,"خوانده شد","Mark read")}/>}<DeleteAction locale={locale} action={deleteNotification.bind(null,n.id,locale)}/></div>{admin&&<details className="mt-4"><summary className="cursor-pointer">{text(locale,"ویرایش","Edit")}</summary><ActionForm locale={locale} action={saveNotification.bind(null,n.id)} initial={Object.fromEntries(Object.entries(n).map(([k,v])=>[k,String(v??"")]))} fields={fields}/></details>}</PanelSurface>)}</div>{!items.length&&<PanelEmptyState title={text(locale,"اعلانی وجود ندارد","No notifications yet")} description=""/>}</PanelPage>;}
+export async function DepartmentsPage() {
+  await requireRole("admin");
+  const locale = await getPanelLocale();
+  const items = await getDatabase().select().from(ticketDepartments);
+  const fields: Field[] = [
+    {
+      name: "titleFa",
+      label: text(locale, "عنوان فارسی", "Persian title"),
+      required: true,
+    },
+    { name: "titleEn", label: text(locale, "عنوان انگلیسی", "English title") },
+    {
+      name: "isActive",
+      label: text(locale, "وضعیت", "Status"),
+      options: [
+        { value: "true", label: text(locale, "فعال", "Active") },
+        { value: "false", label: text(locale, "غیرفعال", "Inactive") },
+      ],
+    },
+  ];
+  return (
+    <PanelPage>
+      <PanelPageHeader
+        eyebrow={text(locale, "پشتیبانی", "Support")}
+        title={text(locale, "دپارتمان‌ها", "Departments")}
+        description=""
+      />
+      <ActionForm
+        locale={locale}
+        heading={text(locale, "دپارتمان جدید", "New department")}
+        action={saveDepartment.bind(null, null)}
+        fields={fields}
+      />
+      {items.map((d) => (
+        <PanelFormSection key={d.id} title={title(d, locale)}>
+          <ActionForm
+            locale={locale}
+            action={saveDepartment.bind(null, d.id)}
+            initial={{
+              titleFa: d.titleFa,
+              titleEn: d.titleEn ?? "",
+              isActive: String(d.isActive),
+            }}
+            fields={fields}
+          />
+          <div className="mt-4">
+            <DeleteAction
+              locale={locale}
+              action={deleteDepartment.bind(null, d.id, locale)}
+            />
+          </div>
+        </PanelFormSection>
+      ))}
+    </PanelPage>
+  );
+}
+export async function NotificationsPage({
+  admin = false,
+}: {
+  admin?: boolean;
+}) {
+  const user = admin ? await requireRole("admin") : await requireUser();
+  const locale = await getPanelLocale();
+  const db = getDatabase();
+  const items = await db
+    .select()
+    .from(notifications)
+    .where(admin ? undefined : eq(notifications.userId, user.id))
+    .orderBy(desc(notifications.createdAt));
+  const people = admin
+    ? await db.select({ id: users.id, name: userNameSql(locale) }).from(users)
+    : [];
+  const fields: Field[] = [
+    {
+      name: "userId",
+      label: text(locale, "گیرنده", "Recipient"),
+      options: people.map((p) => ({ value: p.id, label: p.name })),
+    },
+    {
+      name: "titleFa",
+      label: text(locale, "عنوان فارسی", "Persian title"),
+      required: true,
+    },
+    { name: "titleEn", label: text(locale, "عنوان انگلیسی", "English title") },
+    {
+      name: "bodyFa",
+      label: text(locale, "متن فارسی", "Persian message"),
+      type: "textarea",
+      required: true,
+    },
+    {
+      name: "bodyEn",
+      label: text(locale, "متن انگلیسی", "English message"),
+      type: "textarea",
+    },
+    { name: "href", label: text(locale, "مسیر داخلی", "Internal path") },
+  ];
+  return (
+    <PanelPage>
+      <PanelPageHeader
+        eyebrow={text(locale, "پنل", "Workspace")}
+        title={text(locale, "اعلان‌ها", "Notifications")}
+        description=""
+      />
+      {admin && (
+        <ActionForm
+          locale={locale}
+          action={saveNotification.bind(null, null)}
+          fields={fields}
+        />
+      )}
+      <div className="space-y-4">
+        {items.map((n) => (
+          <PanelSurface key={n.id} className="p-6">
+            <h2 className="font-bold">
+              {title(n, locale)}{" "}
+              {!n.readAt && <span className="text-emerald-600">●</span>}
+            </h2>
+            <p className="mt-3 whitespace-pre-wrap">
+              {locale === "en" ? n.bodyEn || n.bodyFa : n.bodyFa}
+            </p>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              {n.href && (
+                <Link
+                  className="text-emerald-700 dark:text-emerald-400"
+                  href={n.href}
+                >
+                  {text(locale, "مشاهده", "Open")}
+                </Link>
+              )}
+              {!admin && !n.readAt && (
+                <ActionButton
+                  locale={locale}
+                  action={readNotification.bind(null, n.id, locale)}
+                  label={text(locale, "خوانده شد", "Mark read")}
+                />
+              )}
+              <DeleteAction
+                locale={locale}
+                action={deleteNotification.bind(null, n.id, locale)}
+              />
+            </div>
+            {admin && (
+              <details className="mt-4">
+                <summary className="cursor-pointer">
+                  {text(locale, "ویرایش", "Edit")}
+                </summary>
+                <ActionForm
+                  locale={locale}
+                  action={saveNotification.bind(null, n.id)}
+                  initial={Object.fromEntries(
+                    Object.entries(n).map(([k, v]) => [k, String(v ?? "")]),
+                  )}
+                  fields={fields}
+                />
+              </details>
+            )}
+          </PanelSurface>
+        ))}
+      </div>
+      {!items.length && (
+        <PanelEmptyState
+          title={text(locale, "اعلانی وجود ندارد", "No notifications yet")}
+          description=""
+        />
+      )}
+    </PanelPage>
+  );
+}

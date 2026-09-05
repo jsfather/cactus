@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PanelBackLink, PanelPage, PanelPageHeader, PanelSurface } from "@/components/panel/ui";
 import { StudentReviewActions } from "@/components/student-information/student-review-actions";
@@ -24,6 +25,7 @@ export default async function StudentInformationReviewPage({ params }: { params:
   return <PanelPage>
     <PanelBackLink href="/panel/admin/students">{isFa ? "بازگشت به دانش پژوهان" : "Back to students"}</PanelBackLink>
     <PanelPageHeader eyebrow={isFa ? "بررسی پرونده" : "Submission review"} title={getLocalizedUserName(student, locale) || student.mobile} description={isFa ? `وضعیت فعلی: ${statusLabel}` : `Current status: ${statusLabel}`} />
+    <Link className="font-semibold text-emerald-700 dark:text-emerald-400" href={`/panel/admin/students/${id}/previous-courses`}>{isFa ? "مدیریت سوابق آموزشی" : "Manage previous courses"}</Link>
     {!information ? <PanelSurface><div className="p-8 text-center text-sm text-zinc-500">{isFa ? "این دانش پژوه هنوز اطلاعات خود را ارسال نکرده است." : "This student has not submitted their information yet."}</div></PanelSurface> : <>
       {information.rejectionReason ? <div className="rounded-2xl border border-red-200 bg-red-50 p-5 dark:border-red-900 dark:bg-red-950/30"><h2 className="font-semibold text-red-900 dark:text-red-200">{isFa ? "آخرین دلیل رد" : "Latest rejection reason"}</h2><p className="mt-2 whitespace-pre-wrap text-sm text-red-800 dark:text-red-300">{information.rejectionReason}</p></div> : null}
       <PanelSurface>

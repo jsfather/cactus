@@ -42,9 +42,13 @@ export async function BlogPostPage({
       }).format(post.publishedAt)
     : null;
   const pathname = `${locale === "en" ? "/en" : ""}/blog/${post.slug}`;
-  const seoDescription = locale === "en"
-    ? post.seoDescriptionEn || post.excerptEn || post.seoDescriptionFa || post.excerptFa
-    : post.seoDescriptionFa || post.excerptFa;
+  const seoDescription =
+    locale === "en"
+      ? post.seoDescriptionEn ||
+        post.excerptEn ||
+        post.seoDescriptionFa ||
+        post.excerptFa
+      : post.seoDescriptionFa || post.excerptFa;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -54,7 +58,11 @@ export async function BlogPostPage({
     datePublished: post.publishedAt?.toISOString(),
     dateModified: post.updatedAt.toISOString(),
     author: { "@type": "Person", name: post.authorName },
-    publisher: { "@type": "Organization", name: locale === "fa" ? "کاکتوس" : "Cactus", url: absoluteUrl(locale === "en" ? "/en" : "/") },
+    publisher: {
+      "@type": "Organization",
+      name: locale === "fa" ? "کاکتوس" : "Cactus",
+      url: absoluteUrl(locale === "en" ? "/en" : "/"),
+    },
     keywords: post.tags.join(", "),
     inLanguage: locale === "fa" ? "fa-IR" : "en-US",
     mainEntityOfPage: post.canonicalUrl || absoluteUrl(pathname),
@@ -92,9 +100,17 @@ export async function BlogPostPage({
                 </span>
               </div>
               {post.tags.length ? (
-                <ul className="mt-6 flex flex-wrap gap-2" aria-label={locale === "fa" ? "برچسب‌ها" : "Tags"}>
+                <ul
+                  className="mt-6 flex flex-wrap gap-2"
+                  aria-label={locale === "fa" ? "برچسب‌ها" : "Tags"}
+                >
                   {post.tags.map((tag) => (
-                    <li key={tag} className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">{tag}</li>
+                    <li
+                      key={tag}
+                      className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
+                    >
+                      {tag}
+                    </li>
                   ))}
                 </ul>
               ) : null}
@@ -105,13 +121,20 @@ export async function BlogPostPage({
             <div className="mx-auto -mt-1 w-full max-w-5xl px-5 pt-10 sm:px-8">
               <div className="aspect-[16/7] overflow-hidden rounded-[2rem] bg-zinc-100 shadow-2xl shadow-emerald-950/10 dark:bg-zinc-900">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={post.coverImageUrl} alt="" className="size-full object-cover" />
+                <img
+                  src={post.coverImageUrl}
+                  alt=""
+                  className="size-full object-cover"
+                />
               </div>
             </div>
           ) : null}
 
           <div className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
-            <RichContent html={content} className="text-lg leading-9 text-zinc-700 dark:text-zinc-300" />
+            <RichContent
+              html={content}
+              className="text-lg leading-9 text-zinc-700 dark:text-zinc-300"
+            />
           </div>
         </article>
         <Reactions kind="post" id={post.id} locale={locale} />

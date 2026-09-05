@@ -1,1 +1,4 @@
-export { TicketsPage as default } from "@/components/workflows/support-pages";
+import { TicketsPage } from "@/components/workflows/support-pages";
+export default function Page() {
+  return <TicketsPage />;
+}

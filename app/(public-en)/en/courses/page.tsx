@@ -1,1 +1,8 @@
-import { CourseIndex } from "@/components/public/discovery-pages"; export default async function Page({searchParams}:{searchParams:Promise<Record<string,string>>}){return <CourseIndex locale="en" params={await searchParams}/>;}
+import { CourseIndex } from "@/components/public/discovery-pages";
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>;
+}) {
+  return <CourseIndex locale="en" params={await searchParams} />;
+}

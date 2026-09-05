@@ -34,10 +34,9 @@ export function getDatabase(): Database {
   });
   const database = drizzle(pool, { schema });
 
-  if (process.env.NODE_ENV !== "production") {
-    globalForDatabase.cactusPool = pool;
-    globalForDatabase.cactusDatabase = database;
-  }
+  // One bounded pool per server process, including production requests.
+  globalForDatabase.cactusPool = pool;
+  globalForDatabase.cactusDatabase = database;
 
   return database;
 }

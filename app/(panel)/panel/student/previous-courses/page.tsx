@@ -1,1 +1,4 @@
-export { PreviousCoursesPage as default } from "@/components/workflows/student-pages";
+import { PreviousCoursesPage } from "@/components/workflows/student-pages";
+export default function Page() {
+  return <PreviousCoursesPage />;
+}

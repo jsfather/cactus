@@ -18,6 +18,8 @@ import {
 
 function publicProductSelection(locale: Locale) {
   return {
+    specificationsFa: products.specificationsFa,
+    specificationsEn: products.specificationsEn,
     id: products.id,
     slug: products.slug,
     titleFa: products.titleFa,

@@ -1,1 +1,4 @@
-export { CourseAdmin as default } from "@/components/workflows/course-admin";
+import { CourseAdmin } from "@/components/workflows/course-admin";
+export default function Page() {
+  return <CourseAdmin />;
+}

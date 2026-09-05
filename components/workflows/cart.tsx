@@ -1,22 +1,270 @@
 "use client";
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { z } from "zod";
 import { useFeedback } from "@/components/feedback/feedback-provider";
 import { PanelInput } from "@/components/panel/form-controls";
-import { primaryButtonClass,secondaryButtonClass,PanelEmptyState } from "@/components/panel/ui";
+import {
+  primaryButtonClass,
+  secondaryButtonClass,
+  PanelEmptyState,
+} from "@/components/panel/ui";
 import { ActionForm } from "./action-form";
 import { checkout } from "@/lib/commerce/actions";
 import { text } from "@/lib/workflows";
-import { localizePath,type Locale } from "@/lib/i18n/config";
-const key="cactus-cart-v1";
-const schema=z.array(z.object({productId:z.uuid(),variantId:z.string(),titleFa:z.string(),titleEn:z.string(),price:z.number().nonnegative(),quantity:z.number().int().min(1).max(100)})).max(50);
-export type CartItem=z.infer<typeof schema>[number];
-function subscribe(fn:()=>void){window.addEventListener("storage",fn);window.addEventListener("cactus-cart",fn);return()=>{window.removeEventListener("storage",fn);window.removeEventListener("cactus-cart",fn);};}
-function snapshot(){try{return localStorage.getItem(key)??"[]";}catch{return "[]";}}
-function parse(raw:string){try{const p=schema.safeParse(JSON.parse(raw));return p.success?p.data:[];}catch{return [];}}
-function write(items:CartItem[]){localStorage.setItem(key,JSON.stringify(items));window.dispatchEvent(new Event("cactus-cart"));}
-function useCart(){return parse(useSyncExternalStore(subscribe,snapshot,()=>"[]"));}
-export function AddToCart({locale,item,inventory}:{locale:Locale;item:Omit<CartItem,"quantity">;inventory:number}){const{toast}=useFeedback();return <button className={primaryButtonClass} disabled={inventory<1} onClick={()=>{try{const cart=parse(snapshot());const existing=cart.find(i=>i.productId===item.productId&&i.variantId===item.variantId);if((existing?.quantity??0)>=Math.min(inventory,100)||!existing&&cart.length>=50){toast.error(text(locale,"موجودی یا ظرفیت سبد کافی نیست.","Stock or cart limit reached."));return;}write(existing?cart.map(i=>i===existing?{...i,quantity:i.quantity+1}:i):[...cart,{...item,quantity:1}]);toast.success(text(locale,"به سبد اضافه شد.","Added to cart."));}catch{toast.error(text(locale,"ذخیره سبد ممکن نیست.","Cart storage is unavailable."));}}}>{text(locale,"افزودن به سبد","Add to cart")}</button>;}
-export function CartLink({locale}:{locale:Locale}){const cart=useCart();return <Link href={localizePath(locale,"/shop/checkout")} className="whitespace-nowrap text-sm font-semibold text-emerald-700 dark:text-emerald-400">{text(locale,"سبد","Cart")} ({cart.reduce((n,i)=>n+i.quantity,0)})</Link>;}
-export function CartCheckout({locale,requestKey}:{locale:Locale;requestKey:string}){const items=useCart();const{toast}=useFeedback();function update(next:CartItem[]){try{write(next);}catch{toast.error(text(locale,"ذخیره سبد ممکن نیست.","Cart storage is unavailable."));}}return items.length?<div className="grid items-start gap-8 lg:grid-cols-[1fr_400px]"><div className="space-y-4">{items.map(i=><div key={`${i.productId}:${i.variantId}`} className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800"><div className="min-w-40 flex-1"><h2 className="font-bold">{locale==="en"?i.titleEn||i.titleFa:i.titleFa}</h2><p className="mt-2 text-zinc-500">{(i.price*i.quantity).toLocaleString(locale)} {text(locale,"تومان","toman")}</p></div><PanelInput className="!w-24" aria-label={text(locale,"تعداد","Quantity")} type="number" min={1} max={100} value={i.quantity} onChange={e=>{const quantity=Number(e.target.value);if(Number.isInteger(quantity)&&quantity>=1&&quantity<=100)update(items.map(row=>row===i?{...row,quantity}:row));}}/><button className={secondaryButtonClass} onClick={()=>update(items.filter(row=>row!==i))}>{text(locale,"حذف","Remove")}</button></div>)}<p className="text-xl font-bold">{text(locale,"جمع تقریبی","Estimated total")}: {items.reduce((n,i)=>n+i.price*i.quantity,0).toLocaleString(locale)} {text(locale,"تومان","toman")}</p><p className="text-sm text-zinc-500">{text(locale,"قیمت و موجودی هنگام ثبت سفارش بررسی می‌شود.","Prices and stock are checked when you place the order.")}</p></div><ActionForm locale={locale} action={checkout} heading={text(locale,"نشانی تحویل","Delivery address")} submitLabel={text(locale,"ثبت سفارش","Place order")} fields={[{name:"address",label:text(locale,"نشانی کامل","Full address"),type:"textarea",required:true},{name:"postalCode",label:text(locale,"کد پستی ۱۰ رقمی","10-digit postal code"),required:true},{name:"notes",label:text(locale,"توضیحات سفارش","Order notes"),type:"textarea"}]}><input type="hidden" name="cart" value={JSON.stringify(items)}/><input type="hidden" name="requestKey" value={requestKey}/></ActionForm></div>:<PanelEmptyState title={text(locale,"سبد شما خالی است","Your cart is empty")} description={text(locale,"ابزارهای مورد نیاز پروژه بعدی خود را پیدا کنید.","Find the tools for your next project.")} action={<Link className={primaryButtonClass} href={localizePath(locale,"/shop")}>{text(locale,"رفتن به فروشگاه","Browse the shop")}</Link>}/>;}
+import { localizePath, type Locale } from "@/lib/i18n/config";
+const key = "cactus-cart-v1";
+const schema = z
+  .array(
+    z.object({
+      productId: z.uuid(),
+      variantId: z.string(),
+      titleFa: z.string(),
+      titleEn: z.string(),
+      price: z.number().nonnegative(),
+      quantity: z.number().int().min(1).max(100),
+    }),
+  )
+  .max(50);
+export type CartItem = z.infer<typeof schema>[number];
+function subscribe(fn: () => void) {
+  window.addEventListener("storage", fn);
+  window.addEventListener("cactus-cart", fn);
+  return () => {
+    window.removeEventListener("storage", fn);
+    window.removeEventListener("cactus-cart", fn);
+  };
+}
+function snapshot() {
+  try {
+    return localStorage.getItem(key) ?? "[]";
+  } catch {
+    return "[]";
+  }
+}
+function parse(raw: string) {
+  try {
+    const p = schema.safeParse(JSON.parse(raw));
+    return p.success ? p.data : [];
+  } catch {
+    return [];
+  }
+}
+function write(items: CartItem[]) {
+  localStorage.setItem(key, JSON.stringify(items));
+  window.dispatchEvent(new Event("cactus-cart"));
+}
+function useCart() {
+  return parse(useSyncExternalStore(subscribe, snapshot, () => "[]"));
+}
+export function AddToCart({
+  locale,
+  item,
+  inventory,
+}: {
+  locale: Locale;
+  item: Omit<CartItem, "quantity">;
+  inventory: number;
+}) {
+  const { toast } = useFeedback();
+  return (
+    <button
+      className={primaryButtonClass}
+      disabled={inventory < 1}
+      onClick={() => {
+        try {
+          const cart = parse(snapshot());
+          const existing = cart.find(
+            (i) =>
+              i.productId === item.productId && i.variantId === item.variantId,
+          );
+          if (
+            (existing?.quantity ?? 0) >= Math.min(inventory, 100) ||
+            (!existing && cart.length >= 50)
+          ) {
+            toast.error(
+              text(
+                locale,
+                "موجودی یا ظرفیت سبد کافی نیست.",
+                "Stock or cart limit reached.",
+              ),
+            );
+            return;
+          }
+          write(
+            existing
+              ? cart.map((i) =>
+                  i === existing ? { ...i, quantity: i.quantity + 1 } : i,
+                )
+              : [...cart, { ...item, quantity: 1 }],
+          );
+          toast.success(text(locale, "به سبد اضافه شد.", "Added to cart."));
+        } catch {
+          toast.error(
+            text(
+              locale,
+              "ذخیره سبد ممکن نیست.",
+              "Cart storage is unavailable.",
+            ),
+          );
+        }
+      }}
+    >
+      {text(locale, "افزودن به سبد", "Add to cart")}
+    </button>
+  );
+}
+export function CartLink({ locale }: { locale: Locale }) {
+  const cart = useCart();
+  return (
+    <Link
+      href={localizePath(locale, "/shop/checkout")}
+      className="whitespace-nowrap text-sm font-semibold text-emerald-700 dark:text-emerald-400"
+    >
+      {text(locale, "سبد", "Cart")} ({cart.reduce((n, i) => n + i.quantity, 0)})
+    </Link>
+  );
+}
+export function CartCheckout({
+  locale,
+  requestKey,
+}: {
+  locale: Locale;
+  requestKey: string;
+}) {
+  const items = useCart();
+  const { toast } = useFeedback();
+  function update(next: CartItem[]) {
+    try {
+      write(next);
+    } catch {
+      toast.error(
+        text(locale, "ذخیره سبد ممکن نیست.", "Cart storage is unavailable."),
+      );
+    }
+  }
+  return items.length ? (
+    <div className="grid items-start gap-8 lg:grid-cols-[1fr_400px]">
+      <div className="space-y-4">
+        {items.map((i) => (
+          <div
+            key={`${i.productId}:${i.variantId}`}
+            className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800"
+          >
+            <div className="min-w-40 flex-1">
+              <h2 className="font-bold">
+                {locale === "en" ? i.titleEn || i.titleFa : i.titleFa}
+              </h2>
+              <p className="mt-2 text-zinc-500">
+                {(i.price * i.quantity).toLocaleString(locale)}{" "}
+                {text(locale, "تومان", "toman")}
+              </p>
+            </div>
+            <PanelInput
+              className="!w-24"
+              aria-label={text(locale, "تعداد", "Quantity")}
+              type="number"
+              min={1}
+              max={100}
+              value={i.quantity}
+              onChange={(e) => {
+                const quantity = Number(e.target.value);
+                if (
+                  Number.isInteger(quantity) &&
+                  quantity >= 1 &&
+                  quantity <= 100
+                )
+                  update(
+                    items.map((row) =>
+                      row === i ? { ...row, quantity } : row,
+                    ),
+                  );
+              }}
+            />
+            <button
+              className={secondaryButtonClass}
+              onClick={() => update(items.filter((row) => row !== i))}
+            >
+              {text(locale, "حذف", "Remove")}
+            </button>
+          </div>
+        ))}
+        <p className="text-xl font-bold">
+          {text(locale, "جمع تقریبی", "Estimated total")}:{" "}
+          {items
+            .reduce((n, i) => n + i.price * i.quantity, 0)
+            .toLocaleString(locale)}{" "}
+          {text(locale, "تومان", "toman")}
+        </p>
+        <p className="text-sm text-zinc-500">
+          {text(
+            locale,
+            "قیمت و موجودی هنگام ثبت سفارش بررسی می‌شود.",
+            "Prices and stock are checked when you place the order.",
+          )}
+        </p>
+      </div>
+      <ActionForm
+        locale={locale}
+        action={checkout}
+        heading={text(locale, "نشانی تحویل", "Delivery address")}
+        submitLabel={text(locale, "ثبت سفارش", "Place order")}
+        fields={[
+          {
+            name: "address",
+            label: text(locale, "نشانی کامل", "Full address"),
+            type: "textarea",
+            required: true,
+          },
+          {
+            name: "postalCode",
+            label: text(locale, "کد پستی ۱۰ رقمی", "10-digit postal code"),
+            required: true,
+          },
+          {
+            name: "notes",
+            label: text(locale, "توضیحات سفارش", "Order notes"),
+            type: "textarea",
+          },
+        ]}
+      >
+        <input type="hidden" name="cart" value={JSON.stringify(items)} />
+        <input type="hidden" name="requestKey" value={requestKey} />
+      </ActionForm>
+    </div>
+  ) : (
+    <PanelEmptyState
+      title={text(locale, "سبد شما خالی است", "Your cart is empty")}
+      description={text(
+        locale,
+        "ابزارهای مورد نیاز پروژه بعدی خود را پیدا کنید.",
+        "Find the tools for your next project.",
+      )}
+      action={
+        <Link
+          className={primaryButtonClass}
+          href={localizePath(locale, "/shop")}
+        >
+          {text(locale, "رفتن به فروشگاه", "Browse the shop")}
+        </Link>
+      }
+    />
+  );
+}
+
+// Remove only purchased quantities once; another tab may have added more items.
+export function CompleteCart({ orderId, items }: { orderId: string; items: { productId: string | null; variantId: string | null; quantity: number }[] }) {
+  useEffect(() => {
+    const marker = `cactus-cart-order:${orderId}`;
+    try {
+      if (localStorage.getItem(marker)) return;
+      write(parse(snapshot()).flatMap(row => {
+        const purchased = items.find(item => item.productId === row.productId && (item.variantId || "") === row.variantId);
+        const quantity = row.quantity - (purchased?.quantity ?? 0);
+        return quantity > 0 ? [{ ...row, quantity }] : [];
+      }));
+      localStorage.setItem(marker, "1");
+    } catch { /* Checkout remains valid when browser storage is disabled. */ }
+  }, [orderId, items]);
+  return null;
+}
