@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
-import { honors, mediaAssets, posts, products, users } from "@/lib/db/schema";
+import { coursePages, learningActivities, resources, honors, mediaAssets, posts, products, users } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 import { resolveUploadPath } from "@/lib/media/storage";
 
@@ -57,14 +57,17 @@ export async function deleteMediaAsset(assetIdValue: string, locale: Locale, red
   if (!asset) return { error: locale === "en" ? "This media item no longer exists." : "این رسانه دیگر وجود ندارد." };
 
   const pattern = `%${asset.url}%`;
-  const [avatarUse, postUse, productUse, honorUse] = await Promise.all([
+  const [avatarUse, postUse, productUse, honorUse, courseUse, activityUse, resourceUse] = await Promise.all([
     database.select({ id: users.id }).from(users).where(like(users.avatarUrl, pattern)).limit(1),
     database.select({ id: posts.id }).from(posts).where(or(like(posts.coverImageUrl, pattern), like(posts.contentFa, pattern), like(posts.contentEn, pattern))).limit(1),
     database.select({ id: products.id }).from(products).where(or(like(products.coverImageUrl, pattern), like(products.contentFa, pattern), like(products.contentEn, pattern))).limit(1),
     database.select({ id: honors.id }).from(honors).where(like(honors.certificateImageUrl, pattern)).limit(1),
+    database.select({ id: coursePages.id }).from(coursePages).where(or(like(coursePages.coverImageUrl, pattern),like(coursePages.certificateImageUrl, pattern),like(coursePages.contentFa, pattern),like(coursePages.contentEn, pattern))).limit(1),
+    database.select({ id: learningActivities.id }).from(learningActivities).where(or(like(learningActivities.contentFa, pattern),like(learningActivities.contentEn, pattern))).limit(1),
+    database.select({ id: resources.id }).from(resources).where(or(like(resources.contentFa, pattern),like(resources.contentEn, pattern))).limit(1),
   ]);
 
-  if (avatarUse.length || postUse.length || productUse.length || honorUse.length) {
+  if (avatarUse.length || postUse.length || productUse.length || honorUse.length || courseUse.length || activityUse.length || resourceUse.length) {
     return { error: locale === "en" ? "This image is currently used by a profile or published content. Remove it there first." : "این تصویر در پروفایل یا محتوای سایت استفاده شده است. ابتدا آن را از محل استفاده حذف کنید." };
   }
 

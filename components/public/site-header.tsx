@@ -1,3 +1,4 @@
+import { CartLink } from "@/components/workflows/cart";
 import Link from "next/link";
 import { CactusBrand } from "@/components/brand/cactus-brand";
 import { PreferencesMenu } from "@/components/preferences/preferences-menu";
@@ -69,12 +70,16 @@ export async function SiteHeader({
           >
             {user ? dictionary.myPanel : dictionary.panel}
           </Link>
+          <CartLink locale={locale} />
           <PreferencesMenu
             locale={locale}
             alternateHref={languageHref}
           />
         </nav>
       </div>
+      <nav aria-label={locale === "fa" ? "بخش‌های سایت" : "Site sections"} className="mx-auto flex max-w-7xl gap-5 overflow-x-auto px-5 pb-4 text-sm font-medium sm:px-8 lg:px-10">
+        {[["/courses", "دوره‌ها", "Courses"], ["/shop", "فروشگاه", "Shop"], ["/blog", "وبلاگ", "Blog"], ["/teachers", "مدرس‌ها", "Teachers"], ["/honors", "افتخارات", "Honors"], ["/requirements", "پیش‌نیازها", "Requirements"], ["/about", "درباره ما", "About"], ["/search", "جست‌وجو", "Search"]].map(([path, fa, en]) => <Link key={path} href={localizePath(locale, path)} aria-current={currentPath === path ? "page" : undefined} className="whitespace-nowrap text-zinc-600 transition hover:text-emerald-700 aria-[current=page]:text-emerald-700 dark:text-zinc-300 dark:hover:text-emerald-400">{locale === "fa" ? fa : en}</Link>)}
+      </nav>
     </header>
   );
 }

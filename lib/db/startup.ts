@@ -1,3 +1,4 @@
+import { seedWorkflows } from "./workflow-seeds";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -789,6 +790,7 @@ export async function setupDatabase() {
           recordedById: adminId,
         });
       });
+      await seedWorkflows(database, adminId);
     }
   } finally {
     await pool.end();

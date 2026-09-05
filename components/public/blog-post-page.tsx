@@ -1,3 +1,4 @@
+import { Reactions } from "@/components/workflows/reactions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -113,6 +114,7 @@ export async function BlogPostPage({
             <RichContent html={content} className="text-lg leading-9 text-zinc-700 dark:text-zinc-300" />
           </div>
         </article>
+        <Reactions kind="post" id={post.id} locale={locale} />
         <CommentsSection
           locale={locale}
           targetType="post"

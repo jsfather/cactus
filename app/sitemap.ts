@@ -2,7 +2,7 @@ import { and, eq, lte } from "drizzle-orm";
 import type { MetadataRoute } from "next";
 import { connection } from "next/server";
 import { getDatabase } from "@/lib/db/client";
-import { honors, posts, products, teacherProfiles, users } from "@/lib/db/schema";
+import { coursePages, honors, posts, products, teacherProfiles, users } from "@/lib/db/schema";
 import { absoluteUrl } from "@/lib/seo/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -29,6 +29,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .where(and(eq(honors.status, "published"), lte(honors.publishedAt, now))),
   ]);
 
+  const publishedCourses = await database.select().from(coursePages).where(eq(coursePages.status, "published"));
+
   const localizedEntry = (
     faPath: string,
     enPath: string,
@@ -48,6 +50,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...localizedEntry("/", "/en", { changeFrequency: "weekly", priority: 1 }),
+    ...localizedEntry("/courses", "/en/courses", { changeFrequency: "weekly", priority: 0.9 }),
+    ...localizedEntry("/requirements", "/en/requirements", { changeFrequency: "monthly", priority: 0.6 }),
+    ...publishedCourses.flatMap(c => localizedEntry(`/courses/${c.slug}`, `/en/courses/${c.slug}`, { lastModified: c.updatedAt, priority: 0.8 })),
     ...localizedEntry("/blog", "/en/blog", { changeFrequency: "daily", priority: 0.8 }),
     ...localizedEntry("/shop", "/en/shop", { changeFrequency: "daily", priority: 0.8 }),
     ...localizedEntry("/teachers", "/en/teachers", { changeFrequency: "weekly", priority: 0.8 }),

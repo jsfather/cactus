@@ -5,6 +5,7 @@ import {
   date,
   index,
   integer,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -817,6 +818,8 @@ export const comments = pgTable(
     authorId: uuid("author_id").references(() => users.id, {
       onDelete: "set null",
     }),
+    replyFa: text("reply_fa"),
+    replyEn: text("reply_en"),
     authorNameFa: varchar("author_name_fa", { length: 180 }).notNull(),
     authorNameEn: varchar("author_name_en", { length: 180 }).notNull(),
     body: text("body").notNull(),
@@ -1039,3 +1042,174 @@ export type TermDeliveryMode = (typeof termDeliveryMode.enumValues)[number];
 export type TermEnrollmentStatus = (typeof termEnrollmentStatus.enumValues)[number];
 export type AttendanceStatus = (typeof attendanceStatus.enumValues)[number];
 export type TermSession = typeof termSessions.$inferSelect;
+
+
+// Course marketing content is separate from scheduled, enrollable terms.
+export const coursePages = pgTable("course_pages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: varchar("slug", { length: 180 }).notNull().unique(),
+  termId: uuid("term_id").references(() => terms.id, { onDelete: "set null" }),
+  titleFa: varchar("title_fa", { length: 240 }).notNull(),
+  titleEn: varchar("title_en", { length: 240 }),
+  summaryFa: text("summary_fa").notNull(), summaryEn: text("summary_en"),
+  contentFa: text("content_fa").notNull(), contentEn: text("content_en"),
+  topic: varchar("topic", { length: 120 }).notNull(),
+  level: varchar("level", { length: 30 }).notNull(),
+  ageGroup: varchar("age_group", { length: 80 }).notNull(),
+  duration: varchar("duration", { length: 80 }).notNull(),
+  coverImageUrl: text("cover_image_url"), videoUrl: text("video_url"), certificateImageUrl: text("certificate_image_url"),
+  sections: jsonb("sections").$type<import("@/lib/workflow-types").CourseSections>().notNull(),
+  status: postStatus("status").default("draft").notNull(),
+  isFeatured: boolean("is_featured").default(false).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index("course_pages_status_topic_idx").on(t.status, t.topic)]);
+
+export const resources = pgTable("resources", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  kind: varchar("kind", { length: 30 }).notNull(),
+  titleFa: varchar("title_fa", { length: 240 }).notNull(), titleEn: varchar("title_en", { length: 240 }),
+  contentFa: text("content_fa").notNull(), contentEn: text("content_en"),
+  audience: varchar("audience", { length: 30 }).default("all").notNull(),
+  attachmentUrl: text("attachment_url"),
+  status: postStatus("status").default("draft").notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index("resources_kind_status_idx").on(t.kind, t.status)]);
+
+export const learningActivities = pgTable("learning_activities", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  kind: varchar("kind", { length: 30 }).notNull(),
+  termId: uuid("term_id").notNull().references(() => terms.id, { onDelete: "cascade" }),
+  sessionId: uuid("session_id").references(() => termSessions.id, { onDelete: "set null" }),
+  creatorId: uuid("creator_id").notNull().references(() => users.id, { onDelete: "restrict" }),
+  titleFa: varchar("title_fa", { length: 240 }).notNull(), titleEn: varchar("title_en", { length: 240 }),
+  contentFa: text("content_fa").notNull(), contentEn: text("content_en"),
+  attachmentUrl: text("attachment_url"), videoUrl: text("video_url"),
+  dueAt: timestamp("due_at", { withTimezone: true }),
+  status: postStatus("status").default("draft").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index("learning_activities_term_kind_idx").on(t.termId, t.kind)]);
+
+export const homeworkSubmissions = pgTable("homework_submissions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  activityId: uuid("activity_id").notNull().references(() => learningActivities.id, { onDelete: "cascade" }),
+  studentId: uuid("student_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  body: text("body").notNull(), attachmentUrl: text("attachment_url"),
+  grade: integer("grade"), feedback: text("feedback"),
+  reviewedById: uuid("reviewed_by_id").references(() => users.id, { onDelete: "set null" }),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [uniqueIndex("homework_submission_student_unique").on(t.activityId, t.studentId), check("homework_grade_range", sql`${t.grade} between 0 and 100`)]);
+
+export const homeworkMessages = pgTable("homework_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  submissionId: uuid("submission_id").notNull().references(() => homeworkSubmissions.id, { onDelete: "cascade" }),
+  authorId: uuid("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  body: text("body").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const previousCourses = pgTable("previous_courses", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  studentId: uuid("student_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  titleFa: varchar("title_fa", { length: 240 }).notNull(), titleEn: varchar("title_en", { length: 240 }),
+  institution: varchar("institution", { length: 240 }).notNull(), completedOn: date("completed_on"),
+  description: text("description"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const ticketDepartments = pgTable("ticket_departments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  titleFa: varchar("title_fa", { length: 160 }).notNull(), titleEn: varchar("title_en", { length: 160 }),
+  isActive: boolean("is_active").default(true).notNull(),
+});
+export const tickets = pgTable("tickets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  ownerId: uuid("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  departmentId: uuid("department_id").notNull().references(() => ticketDepartments.id, { onDelete: "restrict" }),
+  assignedToId: uuid("assigned_to_id").references(() => users.id, { onDelete: "set null" }),
+  subject: varchar("subject", { length: 240 }).notNull(),
+  status: varchar("status", { length: 20 }).default("open").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index("tickets_owner_status_idx").on(t.ownerId, t.status)]);
+export const ticketMessages = pgTable("ticket_messages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  ticketId: uuid("ticket_id").notNull().references(() => tickets.id, { onDelete: "cascade" }),
+  authorId: uuid("author_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  body: text("body").notNull(), attachmentUrl: text("attachment_url"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+export const notifications = pgTable("notifications", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  titleFa: varchar("title_fa", { length: 240 }).notNull(), titleEn: varchar("title_en", { length: 240 }),
+  bodyFa: text("body_fa").notNull(), bodyEn: text("body_en"), href: text("href"),
+  readAt: timestamp("read_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [index("notifications_user_created_idx").on(t.userId, t.createdAt)]);
+
+export const orders = pgTable("orders", {
+  id: uuid("id").defaultRandom().primaryKey(), code: varchar("code", { length: 40 }).notNull().unique(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "restrict" }),
+  requestKey: uuid("request_key").notNull(),
+  status: varchar("status", { length: 20 }).default("pending").notNull(),
+  paymentStatus: varchar("payment_status", { length: 20 }).default("pending").notNull(),
+  totalToman: bigint("total_toman", { mode: "number" }).notNull(),
+  address: text("address").notNull(), postalCode: varchar("postal_code", { length: 10 }).notNull(),
+  notes: text("notes"), trackingCode: varchar("tracking_code", { length: 120 }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [uniqueIndex("orders_user_request_unique").on(t.userId, t.requestKey), check("orders_total_nonnegative", sql`${t.totalToman} >= 0`)]);
+export const orderItems = pgTable("order_items", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  orderId: uuid("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  productId: uuid("product_id").references(() => products.id, { onDelete: "set null" }),
+  variantId: uuid("variant_id").references(() => productVariants.id, { onDelete: "set null" }),
+  termId: uuid("term_id").references(() => terms.id, { onDelete: "set null" }),
+  titleFa: text("title_fa").notNull(), titleEn: text("title_en"),
+  quantity: integer("quantity").notNull(), unitPriceToman: bigint("unit_price_toman", { mode: "number" }).notNull(),
+}, (t) => [check("order_items_quantity_positive", sql`${t.quantity} > 0`), check("order_items_price_nonnegative", sql`${t.unitPriceToman} >= 0`)]);
+export const payments = pgTable("payments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  orderId: uuid("order_id").notNull().references(() => orders.id, { onDelete: "restrict" }),
+  authority: varchar("authority", { length: 100 }).unique(),
+  reference: varchar("reference", { length: 120 }),
+  status: varchar("status", { length: 20 }).default("pending").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+export const examAssignments = pgTable("exam_assignments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  examId: uuid("exam_id").notNull().references(() => exams.id, { onDelete: "cascade" }),
+  studentId: uuid("student_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  availableAt: timestamp("available_at", { withTimezone: true }), dueAt: timestamp("due_at", { withTimezone: true }),
+  maxAttempts: integer("max_attempts").default(1).notNull(),
+}, (t) => [uniqueIndex("exam_assignments_unique").on(t.examId, t.studentId), check("exam_assignment_max_attempts", sql`${t.maxAttempts} between 1 and 20`)]);
+export const examAttempts = pgTable("exam_attempts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  assignmentId: uuid("assignment_id").notNull().references(() => examAssignments.id, { onDelete: "cascade" }),
+  studentId: uuid("student_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  snapshot: jsonb("snapshot").$type<import("@/lib/workflow-types").ExamSnapshot[]>().notNull(),
+  answers: jsonb("answers").$type<import("@/lib/workflow-types").AnswerMap>().default({}).notNull(),
+  passingScore: integer("passing_score").notNull(), score: integer("score"),
+  startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }), finishedAt: timestamp("finished_at", { withTimezone: true }),
+}, (t) => [index("exam_attempts_assignment_idx").on(t.assignmentId)]);
+
+export const attachments = pgTable("attachments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  uploaderId: uuid("uploader_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  pathname: text("pathname").notNull().unique(), originalName: varchar("original_name", { length: 240 }).notNull(),
+  mimeType: varchar("mime_type", { length: 100 }).notNull(), size: integer("size").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+export const contentReactions = pgTable("content_reactions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  postId: uuid("post_id").references(() => posts.id, { onDelete: "cascade" }),
+  courseId: uuid("course_id").references(() => coursePages.id, { onDelete: "cascade" }),
+  value: integer("value").notNull(),
+}, (t) => [uniqueIndex("reaction_user_post_unique").on(t.userId,t.postId),uniqueIndex("reaction_user_course_unique").on(t.userId,t.courseId),check("reaction_one_target",sql`((${t.postId} is not null)::int + (${t.courseId} is not null)::int)=1`),check("reaction_value_range",sql`${t.value} between 1 and 5`)]);

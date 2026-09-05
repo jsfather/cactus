@@ -1,5 +1,6 @@
 "use client";
 
+import { AddToCart } from "@/components/workflows/cart";
 import { useState } from "react";
 import type { ProductVariant } from "@/lib/db/schema";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -7,11 +8,13 @@ import { localeConfig, type Locale } from "@/lib/i18n/config";
 
 export function PublicVariantPicker({
   locale,
+  product,
   basePrice,
   baseInventory,
   variants,
 }: {
   locale: Locale;
+  product: { id: string; titleFa: string; titleEn: string | null };
   basePrice: number;
   baseInventory: number;
   variants: ProductVariant[];
@@ -83,6 +86,7 @@ export function PublicVariantPicker({
           {inventory > 0 ? dictionary.inStock : dictionary.outOfStock}
         </span>
       </div>
+      <AddToCart locale={locale} inventory={inventory} item={{ productId: product.id, variantId: selected?.id ?? "", titleFa: product.titleFa + (selected ? ` · ${selected.titleFa}` : ""), titleEn: (product.titleEn || product.titleFa) + (selected ? ` · ${selected.titleEn || selected.titleFa}` : ""), price }} />
     </div>
   );
 }

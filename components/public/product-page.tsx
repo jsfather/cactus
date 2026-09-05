@@ -47,7 +47,7 @@ export async function ProductPage({ locale, slug }: { locale: Locale; slug: stri
                 </ul>
               ) : null}
               <p className="mt-5 text-lg leading-8 text-zinc-600 dark:text-zinc-300">{summary}</p>
-              <PublicVariantPicker locale={locale} basePrice={product.price} baseInventory={product.inventory} variants={product.variants} />
+              <PublicVariantPicker product={product} locale={locale} basePrice={product.price} baseInventory={product.inventory} variants={product.variants} />
             </div>
           </div>
         </section>

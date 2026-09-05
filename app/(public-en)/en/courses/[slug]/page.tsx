@@ -1,0 +1,1 @@
+import { CourseDetail } from "@/components/public/discovery-pages"; export default async function Page({params}:{params:Promise<{slug:string}>}){return <CourseDetail locale="en" slug={(await params).slug}/>;}

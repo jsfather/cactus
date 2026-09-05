@@ -120,6 +120,20 @@
       "when": 1788157048361,
       "tag": "0016_sleepy_angel",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1788595231181,
+      "tag": "0017_main_feature_parity",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1788595494790,
+      "tag": "0018_comment_replies",
+      "breakpoints": true
     }
   ]
 }

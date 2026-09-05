@@ -94,6 +94,29 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
           { href: "/panel/teacher/profile", label: dictionary.nav.teacherProfile, icon: "teacherProfile" },
         ]
       : [];
+  const fa = locale === "fa";
+  const sharedLinks: NavItem[] = [
+    { href: "/panel/orders", label: fa ? "سفارش‌ها" : "Orders", icon: "shop" },
+    { href: "/panel/tickets", label: fa ? "پشتیبانی" : "Support", icon: "comments" },
+    { href: "/panel/notifications", label: fa ? "اعلان‌ها" : "Notifications", icon: "about" },
+    { href: "/panel/guides", label: fa ? "راهنما" : "Guides", icon: "blog" },
+  ];
+  directLinks.push(...sharedLinks);
+  if (user.role === "student") directLinks.unshift(
+    { href: "/panel/student/terms", label: fa ? "کلاس‌ها و ثبت‌نام" : "Classes & enrollment", icon: "terms" },
+    { href: "/panel/student/attendance", label: fa ? "حضور و نمره‌ها" : "Attendance & grades", icon: "attendance" },
+    { href: "/panel/student/exams", label: fa ? "آزمون‌ها" : "Exams", icon: "exams" },
+    { href: "/panel/student/learning/homework", label: fa ? "تکالیف" : "Homework", icon: "blog" },
+    { href: "/panel/student/learning/recordings", label: fa ? "جلسات ضبط‌شده" : "Recorded lessons", icon: "media" },
+    { href: "/panel/student/previous-courses", label: fa ? "دوره‌های گذشته" : "Previous courses", icon: "levels" },
+  );
+  if (user.role === "teacher") directLinks.push(
+    { href: "/panel/teacher/students", label: fa ? "دانش پژوهان" : "Students", icon: "users" },
+    { href: "/panel/teacher/absences", label: fa ? "غیبت‌ها" : "Absences", icon: "attendance" },
+    { href: "/panel/teacher/learning/homework", label: fa ? "تکالیف" : "Homework", icon: "blog" },
+    { href: "/panel/teacher/learning/recordings", label: fa ? "جلسات ضبط‌شده" : "Recorded lessons", icon: "media" },
+    { href: "/panel/teacher/learning/reports", label: fa ? "گزارش‌های آموزشی" : "Teaching reports", icon: "blog" },
+  );
   const groups: NavGroup[] = user.role === "admin"
     ? [
         {
@@ -105,6 +128,12 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
             { href: "/panel/admin/terms", label: dictionary.nav.terms, icon: "terms" },
             { href: "/panel/admin/term-levels", label: dictionary.nav.termLevels, icon: "levels" },
             { href: "/panel/admin/exams", label: dictionary.nav.exams, icon: "exams" },
+            { href: "/panel/admin/exam-assignments", label: fa ? "تخصیص و نتایج آزمون" : "Exam assignments & results", icon: "exams" },
+            { href: "/panel/admin/courses", label: fa ? "صفحه‌های دوره" : "Course pages", icon: "blog" },
+            { href: "/panel/admin/learning/homework", label: fa ? "تکالیف" : "Homework", icon: "blog" },
+            { href: "/panel/admin/learning/recordings", label: fa ? "جلسات ضبط‌شده" : "Recorded lessons", icon: "media" },
+            { href: "/panel/admin/learning/reports", label: fa ? "گزارش‌های آموزشی" : "Teaching reports", icon: "blog" },
+            { href: "/panel/admin/absences", label: fa ? "غیبت‌ها" : "Absences", icon: "attendance" },
           ],
         },
         {
@@ -128,6 +157,11 @@ export function PanelNav({ user, locale }: { user: CurrentUser; locale: Locale }
             { href: "/panel/admin/media", label: dictionary.nav.media, icon: "media" },
             { href: "/panel/admin/comments", label: dictionary.nav.comments, icon: "comments" },
             { href: "/panel/admin/about", label: dictionary.nav.about, icon: "about" },
+            { href: "/panel/admin/resources/faqs", label: fa ? "پرسش‌های متداول" : "FAQs", icon: "about" },
+            { href: "/panel/admin/resources/guides", label: fa ? "راهنمای پنل" : "Panel guides", icon: "blog" },
+            { href: "/panel/admin/resources/requirements", label: fa ? "پیش‌نیازهای یادگیری" : "Learning requirements", icon: "levels" },
+            { href: "/panel/admin/notifications", label: fa ? "مدیریت اعلان‌ها" : "Manage notifications", icon: "about" },
+            { href: "/panel/admin/departments", label: fa ? "دپارتمان‌های پشتیبانی" : "Support departments", icon: "comments" },
           ],
         },
         {
