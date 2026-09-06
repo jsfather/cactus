@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    // Images are served from la.ecactus.co; skip server-side Sharp optimization
+    // to avoid CPU/RAM growth and cache ENOENT errors in standalone Docker.
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',

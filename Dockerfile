@@ -32,8 +32,12 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN groupadd --system --gid 1001 nodejs \
-  && useradd --system --uid 1001 --gid nodejs nextjs
+  && useradd --system --uid 1001 --gid nodejs --create-home --home-dir /home/nextjs nextjs
+ENV HOME=/home/nextjs
+ENV TMPDIR=/tmp
 COPY --from=builder /app/public ./public
+RUN mkdir -p .next/cache /home/nextjs \
+  && chown -R nextjs:nodejs .next /home/nextjs
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
