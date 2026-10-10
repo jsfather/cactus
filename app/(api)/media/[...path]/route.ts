@@ -17,6 +17,8 @@ export async function GET(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const { path: parts } = await params;
+  // Private documents and attachments are served only by their authorized API routes.
+  if (parts[0] === "private") return new Response(null, { status: 404 });
   const absolutePath = resolveUploadPath(parts);
   if (!absolutePath) return new Response(null, { status: 404 });
 

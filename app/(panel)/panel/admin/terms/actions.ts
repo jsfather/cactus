@@ -33,7 +33,7 @@ async function validateRelations(
   const locale = data.locale;
   const [[level], teacherRows, prerequisiteRows] = await Promise.all([
     transaction.select({ id: termLevels.id }).from(termLevels).where(eq(termLevels.id, data.levelId)).limit(1),
-    transaction.select({ id: users.id }).from(users).where(and(inArray(users.id, data.teacherIds), eq(users.role, "teacher"), eq(users.isActive, true))),
+    data.teacherIds.length ? transaction.select({ id: users.id }).from(users).where(and(inArray(users.id, data.teacherIds), eq(users.role, "teacher"), eq(users.isActive, true))) : Promise.resolve([]),
     data.prerequisiteIds.length ? transaction.select({ id: terms.id }).from(terms).where(inArray(terms.id, data.prerequisiteIds)) : Promise.resolve([]),
   ]);
   if (!level) return locale === "fa" ? "سطح انتخاب‌شده معتبر نیست." : "The selected level is invalid.";
@@ -106,7 +106,7 @@ async function saveTerm(termId: string | null, creatorId: string, data: z.infer<
     }
 
     const generatedSessions = buildTermSessions(data.startDate, data.endDate, data.schedules);
-    if (!generatedSessions.length) {
+    if (data.schedules.length && !generatedSessions.length) {
       return { error: data.locale === "fa" ? "در بازه انتخاب‌شده هیچ جلسه‌ای ساخته نمی‌شود." : "The selected date range does not produce any sessions." };
     }
 
@@ -162,9 +162,9 @@ async function saveTerm(termId: string | null, creatorId: string, data: z.infer<
       savedId = created.id;
     }
     if (!savedId) throw new Error("Term identifier was not created.");
-    await transaction.insert(termTeachers).values(data.teacherIds.map((teacherId) => ({ termId: savedId!, teacherId, assignedById: creatorId })));
+    if (data.teacherIds.length) await transaction.insert(termTeachers).values(data.teacherIds.map((teacherId) => ({ termId: savedId!, teacherId, assignedById: creatorId })));
     if (data.prerequisiteIds.length) await transaction.insert(termPrerequisites).values(data.prerequisiteIds.map((prerequisiteTermId) => ({ termId: savedId!, prerequisiteTermId })));
-    await transaction.insert(termSchedules).values(data.schedules.map((schedule) => ({ termId: savedId!, ...schedule })));
+    if (data.schedules.length) await transaction.insert(termSchedules).values(data.schedules.map((schedule) => ({ termId: savedId!, ...schedule })));
     if (termId) {
       const obsoleteIds = existingSessions
         .filter((session) => !generatedKeys.has(`${session.sessionDate}|${normalizeTermTime(session.startTime)}`))
@@ -189,7 +189,7 @@ async function saveTerm(termId: string | null, creatorId: string, data: z.infer<
           await transaction.insert(termSessions).values({ termId, ...session });
         }
       }
-    } else {
+    } else if (generatedSessions.length) {
       await transaction.insert(termSessions).values(generatedSessions.map((session) => ({ termId: savedId!, ...session })));
     }
     return { id: savedId };
@@ -201,15 +201,17 @@ export async function createTerm(_state: TermFormState, formData: FormData): Pro
   const parsed = termSchema.safeParse(readTermFormData(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
   if (!parsed.success) return { error: locale === "fa" ? "اطلاعات ترم، مدرس‌ها و برنامه هفتگی را بررسی کنید." : "Review the term, teachers, and weekly schedule.", fieldErrors: z.flattenError(parsed.error).fieldErrors };
+  let savedId: string;
   try {
     const result = await saveTerm(null, admin.id, parsed.data);
     if (result.error) return { error: result.error };
-    refreshTermPaths(result.id);
-    redirect(`/panel/admin/terms/${result.id}/edit?toast=created`);
+    savedId = result.id!;
   } catch (error) {
     if (hasPostgresErrorCode(error, "23505")) return { error: locale === "fa" ? "یکی از زمان‌های هفتگی تکراری است." : "One of the weekly meeting times is duplicated." };
     return { error: locale === "fa" ? "ترم ذخیره نشد." : "The term could not be saved." };
   }
+  refreshTermPaths(savedId);
+  redirect(`/panel/admin/terms/${savedId}/edit?toast=created`);
 }
 
 export async function updateTerm(termIdValue: string, _state: TermFormState, formData: FormData): Promise<TermFormState> {
@@ -221,12 +223,12 @@ export async function updateTerm(termIdValue: string, _state: TermFormState, for
   try {
     const result = await saveTerm(termId.data, admin.id, parsed.data);
     if (result.error) return { error: result.error };
-    refreshTermPaths(termId.data);
-    redirect(`/panel/admin/terms/${termId.data}/edit?toast=updated`);
   } catch (error) {
     if (hasPostgresErrorCode(error, "23505")) return { error: locale === "fa" ? "یکی از زمان‌های هفتگی تکراری است." : "One of the weekly meeting times is duplicated." };
     return { error: locale === "fa" ? "ترم به‌روزرسانی نشد." : "The term could not be updated." };
   }
+  refreshTermPaths(termId.data);
+  redirect(`/panel/admin/terms/${termId.data}/edit?toast=updated`);
 }
 
 export async function deleteTerm(termIdValue: string, locale: "fa" | "en"): Promise<TermMutationState> {

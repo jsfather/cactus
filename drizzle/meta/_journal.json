@@ -148,6 +148,13 @@
       "when": 1788611691664,
       "tag": "0020_product_specifications",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1791629897546,
+      "tag": "0021_draft_term_assignments",
+      "breakpoints": true
     }
   ]
 }

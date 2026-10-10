@@ -39,12 +39,20 @@ export const termSchema = z
     locationFa: z.string().trim().max(500),
     locationEn: z.string().trim().max(500),
     meetingUrl: z.union([z.literal(""), z.url({ protocol: /^https?$/ })]),
-    teacherIds: z.array(z.uuid()).min(1).max(30),
+    teacherIds: z.array(z.uuid()).max(30),
     prerequisiteIds: z.array(z.uuid()).max(30),
-    schedules: z.array(scheduleSchema).min(1).max(14),
+    schedules: z.array(scheduleSchema).max(14),
     locale: z.enum(["fa", "en"]),
   })
   .superRefine((data, context) => {
+    if (data.status !== "draft") {
+      if (!data.teacherIds.length) {
+        context.addIssue({ code: "custom", path: ["teacherIds"], message: data.locale === "fa" ? "برای خروج از پیش‌نویس حداقل یک مدرس فعال انتخاب کنید." : "Select at least one active teacher before leaving draft status." });
+      }
+      if (!data.schedules.length) {
+        context.addIssue({ code: "custom", path: ["schedules"], message: data.locale === "fa" ? "برای خروج از پیش‌نویس حداقل یک زمان هفتگی تعریف کنید." : "Add at least one weekly slot before leaving draft status." });
+      }
+    }
     if (data.endDate < data.startDate) {
       context.addIssue({ code: "custom", path: ["endDate"], message: data.locale === "fa" ? "تاریخ پایان باید پس از تاریخ شروع باشد." : "End date must be on or after the start date." });
     }
@@ -94,9 +102,9 @@ export function readTermFormData(formData: FormData) {
     endDate: formData.get("endDate"),
     capacity: formData.get("capacity"),
     tuitionToman: formData.get("tuitionToman"),
-    locationFa: formData.get("locationFa"),
-    locationEn: formData.get("locationEn"),
-    meetingUrl: formData.get("meetingUrl"),
+    locationFa: formData.get("locationFa") ?? "",
+    locationEn: formData.get("locationEn") ?? "",
+    meetingUrl: formData.get("meetingUrl") ?? "",
     teacherIds: formData.getAll("teacherIds"),
     prerequisiteIds: formData.getAll("prerequisiteIds"),
     schedules,
