@@ -14,7 +14,13 @@ export function PublicVariantPicker({
   variants,
 }: {
   locale: Locale;
-  product: { id: string; titleFa: string; titleEn: string | null };
+  product: {
+    id: string;
+    titleFa: string;
+    titleEn: string | null;
+    coverImageUrl?: string | null;
+    slug?: string;
+  };
   basePrice: number;
   baseInventory: number;
   variants: ProductVariant[];
@@ -100,6 +106,8 @@ export function PublicVariantPicker({
             (product.titleEn || product.titleFa) +
             (selected ? ` · ${selected.titleEn || selected.titleFa}` : ""),
           price,
+          imageUrl: product.coverImageUrl || undefined,
+          slug: product.slug,
         }}
       />
     </div>

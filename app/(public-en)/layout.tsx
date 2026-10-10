@@ -3,6 +3,7 @@ import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
+import "@/components/public/public.css";
 import { getSiteUrl } from "@/lib/seo/site";
 
 export const metadata: Metadata = {

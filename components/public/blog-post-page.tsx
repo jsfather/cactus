@@ -69,9 +69,9 @@ export async function BlogPostPage({
   };
 
   return (
-    <div className="min-h-dvh bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+    <div className="public-site public-detail">
       <SiteHeader locale={locale} currentPath={`/blog/${post.slug}`} />
-      <main>
+      <main id="public-main">
         <article>
           <script
             type="application/ld+json"

@@ -1,11 +1,11 @@
-import { CartLink } from "@/components/workflows/cart";
 import Link from "next/link";
-import { CactusBrand } from "@/components/brand/cactus-brand";
+import { CartLink } from "@/components/workflows/cart";
+import { CactusLogo } from "@/components/brand/cactus-brand";
 import { PreferencesMenu } from "@/components/preferences/preferences-menu";
 import { getCurrentUser } from "@/lib/auth/session";
-import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localizePath, type Locale } from "@/lib/i18n/config";
-
+import { MobileNavigation } from "./mobile-navigation";
+import { publicLinks } from "./navigation-links";
 export async function SiteHeader({
   locale,
   currentPath = "/",
@@ -14,94 +14,69 @@ export async function SiteHeader({
   currentPath?: string;
 }) {
   const user = await getCurrentUser();
-  const dictionary = getDictionary(locale);
   const alternateLocale = locale === "fa" ? "en" : "fa";
-  const alternatePath = localizePath(alternateLocale, currentPath);
-  const languageHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(alternatePath)}`;
-
+  const languageHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(localizePath(alternateLocale, currentPath))}`;
   return (
-    <header className="relative z-50 border-b border-emerald-950/10 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85">
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-8 lg:px-10">
-        <Link href={localizePath(locale, "/")} aria-label={dictionary.school}>
-          <span className="sm:hidden">
-            <CactusBrand locale={locale} compact />
-          </span>
-          <span className="hidden sm:inline">
-            <CactusBrand locale={locale} />
-          </span>
-        </Link>
-
-        <nav className="flex items-center gap-2 sm:gap-5">
+    <header className="public-header">
+      <a href="#public-main" className="public-skip">
+        {locale === "fa" ? "رفتن به محتوای اصلی" : "Skip to content"}
+      </a>
+      <div className="public-wrap">
+        <div className="public-header-top">
           <Link
             href={localizePath(locale, "/")}
-            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 sm:block dark:text-zinc-300 dark:hover:text-emerald-400"
+            className="public-brand"
+            aria-label={locale === "fa" ? "کاکتوس — خانه" : "Cactus — Home"}
           >
-            {dictionary.home}
+            <CactusLogo />
+            {locale === "fa" ? "کاکتوس" : "Cactus"}
           </Link>
-          <Link
-            href={localizePath(locale, "/blog")}
-            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 sm:block dark:text-zinc-300 dark:hover:text-emerald-400"
-          >
-            {dictionary.blog}
-          </Link>
-          <Link
-            href={localizePath(locale, "/teachers")}
-            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 md:block dark:text-zinc-300 dark:hover:text-emerald-400"
-          >
-            {dictionary.teachers}
-          </Link>
-          <Link
-            href={localizePath(locale, "/honors")}
-            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 lg:block dark:text-zinc-300 dark:hover:text-emerald-400"
-          >
-            {dictionary.honors}
-          </Link>
-          <Link
-            href={localizePath(locale, "/shop")}
-            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 xl:block dark:text-zinc-300 dark:hover:text-emerald-400"
-          >
-            {dictionary.shop}
-          </Link>
-          <Link
-            href={localizePath(locale, "/about")}
-            className="hidden text-sm font-medium text-zinc-600 transition hover:text-emerald-700 2xl:block dark:text-zinc-300 dark:hover:text-emerald-400"
-          >
-            {dictionary.about}
-          </Link>
-          <Link
-            href={user ? "/panel" : "/login"}
-            className="rounded-xl border border-emerald-700/20 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800 transition hover:bg-emerald-100 sm:px-4 dark:border-emerald-400/20 dark:bg-emerald-950/60 dark:text-emerald-300 dark:hover:bg-emerald-950"
-          >
-            {user ? dictionary.myPanel : dictionary.panel}
-          </Link>
-          <CartLink locale={locale} />
-          <PreferencesMenu locale={locale} alternateHref={languageHref} />
+          <span className="public-header-note">
+            {locale === "fa"
+              ? "مدرسه‌ای برای نسل سازنده"
+              : "A school for the next generation of makers"}
+          </span>
+          <div className="public-header-tools">
+            <Link
+              className="public-button public-button--outline"
+              href={user ? "/panel" : "/login"}
+            >
+              {locale === "fa"
+                ? user
+                  ? "پنل من"
+                  : "ورود به پنل"
+                : user
+                  ? "My panel"
+                  : "Sign in"}
+            </Link>
+            <CartLink locale={locale} />
+            <PreferencesMenu locale={locale} alternateHref={languageHref} />
+            <MobileNavigation
+              locale={locale}
+              currentPath={currentPath}
+              signedIn={!!user}
+            />
+          </div>
+        </div>
+        <nav
+          className="public-nav"
+          aria-label={locale === "fa" ? "بخش‌های سایت" : "Site sections"}
+        >
+          {publicLinks.map(([path, fa, en]) => (
+            <Link
+              key={path}
+              href={localizePath(locale, path)}
+              aria-current={
+                currentPath === path || currentPath.startsWith(path + "/")
+                  ? "page"
+                  : undefined
+              }
+            >
+              {locale === "fa" ? fa : en}
+            </Link>
+          ))}
         </nav>
       </div>
-      <nav
-        aria-label={locale === "fa" ? "بخش‌های سایت" : "Site sections"}
-        className="mx-auto flex max-w-7xl gap-5 overflow-x-auto px-5 pb-4 text-sm font-medium sm:px-8 lg:px-10"
-      >
-        {[
-          ["/courses", "دوره‌ها", "Courses"],
-          ["/shop", "فروشگاه", "Shop"],
-          ["/blog", "وبلاگ", "Blog"],
-          ["/teachers", "مدرس‌ها", "Teachers"],
-          ["/honors", "افتخارات", "Honors"],
-          ["/requirements", "پیش‌نیازها", "Requirements"],
-          ["/about", "درباره ما", "About"],
-          ["/search", "جست‌وجو", "Search"],
-        ].map(([path, fa, en]) => (
-          <Link
-            key={path}
-            href={localizePath(locale, path)}
-            aria-current={currentPath === path ? "page" : undefined}
-            className="whitespace-nowrap text-zinc-600 transition hover:text-emerald-700 aria-[current=page]:text-emerald-700 dark:text-zinc-300 dark:hover:text-emerald-400"
-          >
-            {locale === "fa" ? fa : en}
-          </Link>
-        ))}
-      </nav>
     </header>
   );
 }

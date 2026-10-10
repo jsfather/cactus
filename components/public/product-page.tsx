@@ -1,3 +1,4 @@
+import { CircuitMark } from "./design";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
@@ -39,12 +40,12 @@ export async function ProductPage({
       ? product.contentEn || product.contentFa
       : product.contentFa;
   return (
-    <div className="min-h-dvh bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+    <div className="public-site public-detail">
       <SiteHeader locale={locale} currentPath={`/shop/${product.slug}`} />
-      <main>
+      <main id="public-main">
         <section className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
           <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-2 lg:px-10 lg:py-20">
-            <div className="aspect-[4/3] overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-100 to-amber-50 dark:from-emerald-950 dark:to-zinc-900">
+            <div className="aspect-[4/3] overflow-hidden rounded-[2rem] product-detail-visual">
               {product.coverImageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -53,9 +54,7 @@ export async function ProductPage({
                   className="size-full object-cover"
                 />
               ) : (
-                <span className="grid size-full place-items-center text-7xl text-emerald-700/30">
-                  ✦
-                </span>
+                <span className="product-placeholder"><CircuitMark /></span>
               )}
             </div>
             <div className="self-center">
@@ -104,8 +103,27 @@ export async function ProductPage({
             className="text-lg leading-9 text-zinc-700 dark:text-zinc-300"
           />
         </article>
-        {(product.specificationsFa || product.specificationsEn) && <section className="mx-auto max-w-3xl px-5 pb-10"><h2 className="mb-5 text-2xl font-bold">{locale === "fa" ? "مشخصات فنی" : "Technical specifications"}</h2><ul className="divide-y divide-zinc-200 rounded-2xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">{(locale === "en" ? product.specificationsEn || product.specificationsFa : product.specificationsFa)?.split("\n").filter(Boolean).map((spec, i) => <li className="p-4" key={i}>{spec}</li>)}</ul></section>}
-      <CommentsSection
+        {(product.specificationsFa || product.specificationsEn) && (
+          <section className="mx-auto max-w-3xl px-5 pb-10">
+            <h2 className="mb-5 text-2xl font-bold">
+              {locale === "fa" ? "مشخصات فنی" : "Technical specifications"}
+            </h2>
+            <ul className="divide-y divide-zinc-200 rounded-2xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
+              {(locale === "en"
+                ? product.specificationsEn || product.specificationsFa
+                : product.specificationsFa
+              )
+                ?.split("\n")
+                .filter(Boolean)
+                .map((spec, i) => (
+                  <li className="p-4" key={i}>
+                    {spec}
+                  </li>
+                ))}
+            </ul>
+          </section>
+        )}
+        <CommentsSection
           locale={locale}
           targetType="product"
           targetId={product.id}

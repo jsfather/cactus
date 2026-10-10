@@ -18,6 +18,8 @@ import { localizePath, type Locale } from "@/lib/i18n/config";
 import { escapeLikePattern } from "@/lib/panel/pagination";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
+import { PageIntro, Arrow } from "./design";
+import { SearchForm } from "./search-form";
 import { PanelInput, PanelSelect } from "@/components/panel/form-controls";
 import { primaryButtonClass, PanelEmptyState } from "@/components/panel/ui";
 import { RichContent } from "@/components/content/rich-content";
@@ -35,27 +37,46 @@ export async function PublicShell({
   description?: string;
   children: React.ReactNode;
 }) {
+  const kinds: Record<string, [string, string, string]> = {
+    "/courses": ["01", "مسیرهای یادگیری", "LEARNING PATHS"],
+    "/search": ["08", "کنجکاوی‌ات را دنبال کن", "FOLLOW YOUR CURIOSITY"],
+    "/requirements": ["06", "آماده برای شروع", "READY TO BEGIN"],
+    "/shop/checkout": [
+      "09",
+      "پروژه بعدی، یک قدم نزدیک‌تر",
+      "ONE STEP CLOSER TO YOUR NEXT PROJECT",
+    ],
+  };
+  const [index, fa, en] = kinds[path] ?? [
+    "01",
+    "یادگیری با کاکتوس",
+    "LEARN WITH CACTUS",
+  ];
   return (
-    <div className="min-h-dvh bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+    <div className="public-site">
       <SiteHeader locale={locale} currentPath={path} />
-      <main className="mx-auto max-w-7xl space-y-10 px-5 py-14 sm:px-8">
-        <header className="max-w-3xl">
-          <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-            {text(locale, "یادگیری با کاکتوس", "Learn with Cactus")}
-          </p>
-          <h1 className="mt-4 text-4xl font-black sm:text-5xl">{heading}</h1>
-          {description && (
-            <p className="mt-5 text-lg leading-8 text-zinc-500">
-              {description}
-            </p>
-          )}
-        </header>
-        {children}
+      <main id="public-main">
+        <PageIntro
+          locale={locale}
+          kind={
+            path === "/search"
+              ? "search"
+              : path === "/requirements"
+                ? "requirements"
+                : "course"
+          }
+          index={index}
+          eyebrow={locale === "fa" ? fa : en}
+          title={heading}
+          description={description}
+        />
+        <div className="public-wrap public-shell-content">{children}</div>
       </main>
       <SiteFooter locale={locale} />
     </div>
   );
 }
+
 export async function CourseIndex({
   locale,
   params = {},
@@ -480,7 +501,7 @@ export async function SearchPage({
           .where(
             and(
               eq(posts.status, "published"),
-            lte(posts.publishedAt, new Date()),
+              lte(posts.publishedAt, new Date()),
               or(ilike(posts.titleFa, pattern), ilike(posts.titleEn, pattern)),
             ),
           )
@@ -555,40 +576,67 @@ export async function SearchPage({
       path="/search"
       heading={text(locale, "در کاکتوس جست‌وجو کنید", "Search Cactus")}
     >
-      <form className="flex gap-3">
-        <PanelInput
-          name="q"
-          defaultValue={query}
-          aria-label={text(locale, "جست‌وجو", "Search")}
-          placeholder={text(
-            locale,
-            "دوره، محصول، مقاله یا مدرس…",
-            "Course, product, article, or teacher…",
-          )}
-        />
-        <button className={primaryButtonClass}>
-          {text(locale, "جست‌وجو", "Search")}
-        </button>
-      </form>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {results.map((r) => (
-          <Link
-            key={r.key}
-            href={localizePath(locale, r.href)}
-            className="rounded-2xl border border-zinc-200 p-6 hover:border-emerald-500 dark:border-zinc-800"
-          >
-            <p className="text-xs text-emerald-700 dark:text-emerald-400">
-              {r.kind}
-            </p>
-            <h2 className="mt-3 font-bold">{r.label}</h2>
-          </Link>
-        ))}
-      </div>
+      <SearchForm locale={locale} query={query} />
+      <p role="status" className="public-description">
+        {query
+          ? text(
+              locale,
+              `${results.length.toLocaleString("fa")} نتیجه برای «${query}»`,
+              `${results.length} results for “${query}”`,
+            )
+          : text(
+              locale,
+              "چه چیزی می‌خواهید بسازید یا یاد بگیرید؟ در دوره‌ها، مقاله‌ها، محصولات و مدرس‌ها جست‌وجو کنید.",
+              "What would you like to build or learn? Search courses, articles, products, and teachers.",
+            )}
+      </p>
+      {[...new Set(results.map((r) => r.kind))].map((kind) => (
+        <section key={kind} className="search-group">
+          <h2>{kind}</h2>
+          {results
+            .filter((r) => r.kind === kind)
+            .map((r) => (
+              <Link
+                key={`${r.kind}:${r.key}`}
+                href={localizePath(locale, r.href)}
+                className="search-result"
+              >
+                <span dir="auto">{r.label}</span>
+                <Arrow />
+              </Link>
+            ))}
+        </section>
+      ))}
       {query && !results.length && (
         <PanelEmptyState
           title={text(locale, "نتیجه‌ای پیدا نشد", "No results found")}
-          description=""
+          description={text(
+            locale,
+            "عبارت کوتاه‌تر یا واژه دیگری را امتحان کنید.",
+            "Try a shorter phrase or a different keyword.",
+          )}
         />
+      )}
+      {!query && (
+        <nav
+          className="search-suggestions"
+          aria-label={text(locale, "پیشنهادهای جست‌وجو", "Explore by section")}
+        >
+          {[
+            ["/courses", "دوره‌ها", "Courses"],
+            ["/blog", "وبلاگ", "Journal"],
+            ["/shop", "فروشگاه", "Shop"],
+          ].map(([path, fa, en]) => (
+            <Link
+              key={path}
+              className="public-link"
+              href={localizePath(locale, path)}
+            >
+              {text(locale, fa, en)}
+              <Arrow />
+            </Link>
+          ))}
+        </nav>
       )}
     </PublicShell>
   );
@@ -600,8 +648,29 @@ export async function RequirementsPage({ locale }: { locale: Locale }) {
       locale={locale}
       path="/requirements"
       heading={text(locale, "برای یادگیری آماده شوید", "Get ready to learn")}
+      description={text(
+        locale,
+        "نرم‌افزارها و راهنمای آماده‌سازی را پیدا کنید؛ پیش از شروع، با ابزارهای مسیرتان آشنا شوید.",
+        "Find preparation guides and software, and get familiar with the tools for your learning path.",
+      )}
     >
+      <div className="preparation-intro">
+        <span className="public-kicker">
+          {text(locale, "ابزارهای مسیر شما", "YOUR LEARNING TOOLKIT")}
+        </span>
+        <Link className="public-link" href={localizePath(locale, "/courses")}>
+          {text(
+            locale,
+            "مشاهده دوره‌ها و شرایط هر دوره",
+            "Explore courses and their requirements",
+          )}
+          <Arrow />
+        </Link>
+      </div>
       <ResourceContent kind="requirements" locale={locale} />
+      <h2 className="text-2xl font-bold">
+        {text(locale, "پرسش‌های متداول", "Frequently asked questions")}
+      </h2>
       <ResourceContent kind="faqs" locale={locale} />
     </PublicShell>
   );

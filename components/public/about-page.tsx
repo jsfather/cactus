@@ -1,17 +1,126 @@
 import { connection } from "next/server";
 import { RichContent } from "@/components/content/rich-content";
-import { SiteFooter } from "@/components/public/site-footer";
-import { SiteHeader } from "@/components/public/site-header";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { getSiteContent } from "@/lib/site-content/queries";
-
-export async function AboutPage({ locale }: { locale: Locale }) { await connection(); const [dictionary, content] = await Promise.all([Promise.resolve(getDictionary(locale)), getSiteContent()]); const about = locale === "en" ? content.aboutUsEn || content.aboutUsFa : content.aboutUsFa; const mission = locale === "en" ? content.missionEn || content.missionFa : content.missionFa; const vision = locale === "en" ? content.visionEn || content.visionFa : content.visionFa; const address = locale === "en" ? content.addressEn || content.addressFa : content.addressFa;
-  return <div className="min-h-dvh bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50"><SiteHeader locale={locale} currentPath="/about" /><main>
-    <header className="border-b border-emerald-950/10 bg-emerald-950 text-white"><div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-10"><p className="font-semibold text-emerald-300">{dictionary.school}</p><h1 className="mt-5 max-w-4xl text-4xl font-black sm:text-6xl">{dictionary.aboutTitle}</h1><p className="mt-5 max-w-2xl text-lg leading-8 text-emerald-100/80">{dictionary.aboutDescription}</p></div></header>
-    <section className="mx-auto max-w-4xl px-5 py-16 sm:px-8 sm:py-24"><RichContent html={about} className="text-lg leading-9 text-zinc-700 dark:text-zinc-300" /></section>
-    <section className="bg-zinc-50 dark:bg-zinc-900/60"><div className="mx-auto grid max-w-7xl gap-6 px-5 py-16 sm:px-8 lg:grid-cols-2 lg:px-10 lg:py-24"><article className="rounded-3xl border border-zinc-200 bg-white p-7 dark:border-zinc-800 dark:bg-zinc-950"><h2 className="text-2xl font-black text-emerald-800 dark:text-emerald-300">{dictionary.mission}</h2><RichContent html={mission} className="mt-5 leading-8 text-zinc-600 dark:text-zinc-300" /></article><article className="rounded-3xl border border-zinc-200 bg-white p-7 dark:border-zinc-800 dark:bg-zinc-950"><h2 className="text-2xl font-black text-emerald-800 dark:text-emerald-300">{dictionary.vision}</h2><RichContent html={vision} className="mt-5 leading-8 text-zinc-600 dark:text-zinc-300" /></article></div></section>
-    <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-10 lg:py-24"><h2 className="text-3xl font-black">{dictionary.contact}</h2><div className="mt-8 grid gap-4 sm:grid-cols-3">{content.contactNumber ? <ContactItem label={dictionary.contactNumber} value={content.contactNumber} href={`tel:${content.contactNumber}`} ltr /> : null}{content.email ? <ContactItem label={dictionary.email} value={content.email} href={`mailto:${content.email}`} ltr /> : null}{address ? <ContactItem label={dictionary.address} value={address} /> : null}</div></section>
-  </main><SiteFooter locale={locale} /></div>;
+import { SiteHeader } from "./site-header";
+import { SiteFooter } from "./site-footer";
+import { PageIntro, ClosingInvitation } from "./design";
+import { Reveal } from "./public-motion";
+export async function AboutPage({ locale }: { locale: Locale }) {
+  await connection();
+  const d = getDictionary(locale);
+  const c = await getSiteContent();
+  const local = (en: string | null, fa: string | null) =>
+    locale === "en" ? en || fa || "" : fa || "";
+  return (
+    <div className="public-site">
+      <SiteHeader locale={locale} currentPath="/about" />
+      <main id="public-main">
+        <PageIntro
+          locale={locale}
+          kind="about"
+          index="07"
+          eyebrow={
+            locale === "fa"
+              ? "کنجکاوی، نقطه شروع ماست"
+              : "CURIOSITY IS OUR STARTING POINT"
+          }
+          title={d.aboutTitle}
+          description={d.aboutDescription}
+        />
+        <section className="public-section public-wrap">
+          <Reveal className="about-story">
+            <div>
+              <p className="public-kicker">
+                {locale === "fa" ? "داستان کاکتوس" : "OUR STORY"}
+              </p>
+              <h2 className="mt-4">
+                {locale === "fa"
+                  ? "از ایده تا تجربه"
+                  : "From ideas to experience"}
+              </h2>
+            </div>
+            <div dir={locale === "en" && !c.aboutUsEn ? "rtl" : undefined}>
+              <RichContent
+                html={local(c.aboutUsEn, c.aboutUsFa)}
+                className="text-lg"
+              />
+            </div>
+          </Reveal>
+        </section>
+        <section className="public-section about-philosophy">
+          <Reveal className="public-wrap about-philosophy-grid">
+            {[
+              [d.mission, c.missionEn, c.missionFa],
+              [d.vision, c.visionEn, c.visionFa],
+            ].map(([label, en, fa]) => (
+              <article key={label}>
+                <h2>{label}</h2>
+                <div dir={locale === "en" && !en ? "rtl" : undefined}>
+                  <RichContent html={local(en, fa || "")} />
+                </div>
+              </article>
+            ))}
+          </Reveal>
+        </section>
+        <section className="public-wrap public-section about-contact">
+          <h2>{d.contact}</h2>
+          <div className="contact-items">
+            {c.contactNumber && (
+              <ContactItem
+                label={d.contactNumber}
+                value={c.contactNumber}
+                href={`tel:${c.contactNumber}`}
+                ltr
+              />
+            )}
+            {c.email && (
+              <ContactItem
+                label={d.email}
+                value={c.email}
+                href={`mailto:${c.email}`}
+                ltr
+              />
+            )}
+            {(c.addressFa || c.addressEn) && (
+              <ContactItem
+                label={d.address}
+                value={local(c.addressEn, c.addressFa)}
+              />
+            )}
+          </div>
+        </section>
+        <ClosingInvitation locale={locale} />
+      </main>
+      <SiteFooter locale={locale} />
+    </div>
+  );
 }
-function ContactItem({ label, value, href, ltr = false }: { label: string; value: string; href?: string; ltr?: boolean }) { const content = <><span className="block text-xs font-semibold text-emerald-700 dark:text-emerald-400">{label}</span><span className={`mt-2 block text-sm leading-7 ${ltr ? "nums-en text-start" : ""}`} dir={ltr ? "ltr" : undefined}>{value}</span></>; return href ? <a href={href} className="rounded-2xl border border-zinc-200 p-5 transition hover:border-emerald-300 dark:border-zinc-800 dark:hover:border-emerald-800">{content}</a> : <div className="rounded-2xl border border-zinc-200 p-5">{content}</div>; }
+function ContactItem({
+  label,
+  value,
+  href,
+  ltr = false,
+}: {
+  label: string;
+  value: string;
+  href?: string;
+  ltr?: boolean;
+}) {
+  const children = (
+    <>
+      <span>{label}</span>
+      <span dir={ltr ? "ltr" : undefined} className={ltr ? "nums-en" : ""}>
+        {value}
+      </span>
+    </>
+  );
+  return href ? (
+    <a className="contact-item" href={href}>
+      {children}
+    </a>
+  ) : (
+    <div className="contact-item">{children}</div>
+  );
+}

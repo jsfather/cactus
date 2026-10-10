@@ -1,17 +1,15 @@
+/* eslint-disable @next/next/no-img-element -- Managed media can use arbitrary validated remote hosts. */
 "use client";
 import Link from "next/link";
 import { useEffect, useSyncExternalStore } from "react";
 import { z } from "zod";
 import { useFeedback } from "@/components/feedback/feedback-provider";
 import { PanelInput } from "@/components/panel/form-controls";
-import {
-  primaryButtonClass,
-  secondaryButtonClass,
-  PanelEmptyState,
-} from "@/components/panel/ui";
+import { primaryButtonClass, PanelEmptyState } from "@/components/panel/ui";
 import { ActionForm } from "./action-form";
 import { checkout } from "@/lib/commerce/actions";
 import { text } from "@/lib/workflows";
+import { CircuitMark } from "@/components/public/design";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 const key = "cactus-cart-v1";
 const schema = z
@@ -22,6 +20,8 @@ const schema = z
       titleFa: z.string(),
       titleEn: z.string(),
       price: z.number().nonnegative(),
+      imageUrl: z.string().max(2048).optional(),
+      slug: z.string().max(200).optional(),
       quantity: z.number().int().min(1).max(100),
     }),
   )
@@ -69,7 +69,7 @@ export function AddToCart({
   const { toast } = useFeedback();
   return (
     <button
-      className={primaryButtonClass}
+      className="public-button"
       disabled={inventory < 1}
       onClick={() => {
         try {
@@ -119,9 +119,22 @@ export function CartLink({ locale }: { locale: Locale }) {
   return (
     <Link
       href={localizePath(locale, "/shop/checkout")}
-      className="whitespace-nowrap text-sm font-semibold text-emerald-700 dark:text-emerald-400"
+      className="public-cart-link"
     >
-      {text(locale, "سبد", "Cart")} ({cart.reduce((n, i) => n + i.quantity, 0)})
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden="true"
+        className="size-5"
+      >
+        <path d="M6 7h14l-2 10H8L5 3H2M9 21h1m6 0h1" />
+      </svg>
+      <span>{text(locale, "سبد", "Cart")}</span>
+      <span>
+        {cart.reduce((n, i) => n + i.quantity, 0).toLocaleString(locale)}
+      </span>
     </Link>
   );
 }
@@ -149,11 +162,30 @@ export function CartCheckout({
         {items.map((i) => (
           <div
             key={`${i.productId}:${i.variantId}`}
-            className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800"
+            className="public-cart-row"
           >
+            {i.imageUrl && /^(\/media\/|https?:\/\/)/.test(i.imageUrl) ? (
+               <img
+                className="cart-thumbnail"
+                src={i.imageUrl}
+                alt=""
+              />
+            ) : (
+              <span className="cart-thumbnail">
+                <CircuitMark />
+              </span>
+            )}
             <div className="min-w-40 flex-1">
               <h2 className="font-bold">
-                {locale === "en" ? i.titleEn || i.titleFa : i.titleFa}
+                {i.slug ? (
+                  <Link href={localizePath(locale, `/shop/${i.slug}`)}>
+                    {locale === "en" ? i.titleEn || i.titleFa : i.titleFa}
+                  </Link>
+                ) : locale === "en" ? (
+                  i.titleEn || i.titleFa
+                ) : (
+                  i.titleFa
+                )}
               </h2>
               <p className="mt-2 text-zinc-500">
                 {(i.price * i.quantity).toLocaleString(locale)}{" "}
@@ -162,7 +194,7 @@ export function CartCheckout({
             </div>
             <PanelInput
               className="!w-24"
-              aria-label={text(locale, "تعداد", "Quantity")}
+              aria-label={`${text(locale, "تعداد", "Quantity")} — ${locale === "en" ? i.titleEn || i.titleFa : i.titleFa}`}
               type="number"
               min={1}
               max={100}
@@ -182,27 +214,35 @@ export function CartCheckout({
               }}
             />
             <button
-              className={secondaryButtonClass}
-              onClick={() => update(items.filter((row) => row !== i))}
+              className="public-link text-sm"
+              aria-label={`${text(locale, "حذف", "Remove")} — ${locale === "en" ? i.titleEn || i.titleFa : i.titleFa}`}
+              onClick={() => {
+                update(items.filter((row) => row !== i));
+                toast.success(
+                  text(locale, "از سبد حذف شد.", "Removed from cart."),
+                );
+              }}
             >
               {text(locale, "حذف", "Remove")}
             </button>
           </div>
         ))}
-        <p className="text-xl font-bold">
-          {text(locale, "جمع تقریبی", "Estimated total")}:{" "}
-          {items
-            .reduce((n, i) => n + i.price * i.quantity, 0)
-            .toLocaleString(locale)}{" "}
-          {text(locale, "تومان", "toman")}
-        </p>
-        <p className="text-sm text-zinc-500">
-          {text(
-            locale,
-            "قیمت و موجودی هنگام ثبت سفارش بررسی می‌شود.",
-            "Prices and stock are checked when you place the order.",
-          )}
-        </p>
+        <div className="cart-order-summary">
+          <p className="cart-total">
+            {text(locale, "جمع تقریبی", "Estimated total")}:{" "}
+            {items
+              .reduce((n, i) => n + i.price * i.quantity, 0)
+              .toLocaleString(locale)}{" "}
+            {text(locale, "تومان", "toman")}
+          </p>
+          <p className="text-sm text-zinc-500">
+            {text(
+              locale,
+              "قیمت و موجودی هنگام ثبت سفارش بررسی می‌شود.",
+              "Prices and stock are checked when you place the order.",
+            )}
+          </p>
+        </div>
       </div>
       <ActionForm
         locale={locale}
@@ -253,18 +293,36 @@ export function CartCheckout({
 }
 
 // Remove only purchased quantities once; another tab may have added more items.
-export function CompleteCart({ orderId, items }: { orderId: string; items: { productId: string | null; variantId: string | null; quantity: number }[] }) {
+export function CompleteCart({
+  orderId,
+  items,
+}: {
+  orderId: string;
+  items: {
+    productId: string | null;
+    variantId: string | null;
+    quantity: number;
+  }[];
+}) {
   useEffect(() => {
     const marker = `cactus-cart-order:${orderId}`;
     try {
       if (localStorage.getItem(marker)) return;
-      write(parse(snapshot()).flatMap(row => {
-        const purchased = items.find(item => item.productId === row.productId && (item.variantId || "") === row.variantId);
-        const quantity = row.quantity - (purchased?.quantity ?? 0);
-        return quantity > 0 ? [{ ...row, quantity }] : [];
-      }));
+      write(
+        parse(snapshot()).flatMap((row) => {
+          const purchased = items.find(
+            (item) =>
+              item.productId === row.productId &&
+              (item.variantId || "") === row.variantId,
+          );
+          const quantity = row.quantity - (purchased?.quantity ?? 0);
+          return quantity > 0 ? [{ ...row, quantity }] : [];
+        }),
+      );
       localStorage.setItem(marker, "1");
-    } catch { /* Checkout remains valid when browser storage is disabled. */ }
+    } catch {
+      /* Checkout remains valid when browser storage is disabled. */
+    }
   }, [orderId, items]);
   return null;
 }
