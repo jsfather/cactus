@@ -69,7 +69,12 @@ export async function ShopIndexPage({
               className={`product-grid ${products.length === 1 ? "product-grid--single" : ""}`}
             >
               {products.map((p) => (
-                <ProductCard key={p.id} product={p} locale={locale} headingLevel={2} />
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  locale={locale}
+                  headingLevel={2}
+                />
               ))}
             </Reveal>
           ) : (

@@ -87,10 +87,16 @@ export async function BlogPostPage({
               >
                 {dictionary.backToBlog}
               </Link>
-              <h1 className="mt-6 text-4xl font-black leading-tight text-balance sm:text-5xl sm:leading-tight">
+              <h1
+                dir={locale === "en" && !post.titleEn ? "rtl" : undefined}
+                className="mt-6 text-4xl font-black leading-tight text-balance sm:text-5xl sm:leading-tight"
+              >
                 {title}
               </h1>
-              <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-300">
+              <p
+                dir={locale === "en" && !post.excerptEn ? "rtl" : undefined}
+                className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-300"
+              >
                 {excerpt}
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400">
@@ -133,6 +139,8 @@ export async function BlogPostPage({
           <div className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
             <RichContent
               html={content}
+              dir={locale === "en" && !post.contentEn ? "rtl" : undefined}
+              lang={locale === "en" && !post.contentEn ? "fa" : locale}
               className="text-lg leading-9 text-zinc-700 dark:text-zinc-300"
             />
           </div>

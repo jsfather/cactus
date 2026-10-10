@@ -87,6 +87,7 @@ export async function AboutPage({ locale }: { locale: Locale }) {
               <ContactItem
                 label={d.address}
                 value={local(c.addressEn, c.addressFa)}
+                rtl={locale === "en" && !c.addressEn}
               />
             )}
           </div>
@@ -102,16 +103,21 @@ function ContactItem({
   value,
   href,
   ltr = false,
+  rtl = false,
 }: {
   label: string;
   value: string;
   href?: string;
   ltr?: boolean;
+  rtl?: boolean;
 }) {
   const children = (
     <>
       <span>{label}</span>
-      <span dir={ltr ? "ltr" : undefined} className={ltr ? "nums-en" : ""}>
+      <span
+        dir={ltr ? "ltr" : rtl ? "rtl" : undefined}
+        className={ltr ? "nums-en" : ""}
+      >
         {value}
       </span>
     </>

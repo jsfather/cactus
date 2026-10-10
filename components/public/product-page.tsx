@@ -66,7 +66,10 @@ export async function ProductPage({
               >
                 {dictionary.backToShop}
               </Link>
-              <h1 className="mt-5 text-4xl font-black leading-tight sm:text-5xl">
+              <h1
+                dir={locale === "en" && !product.titleEn ? "rtl" : undefined}
+                className="mt-5 text-4xl font-black leading-tight sm:text-5xl"
+              >
                 {title}
               </h1>
               {product.categories.length ? (
@@ -86,7 +89,10 @@ export async function ProductPage({
                   ))}
                 </ul>
               ) : null}
-              <p className="mt-5 text-lg leading-8 text-zinc-600 dark:text-zinc-300">
+              <p
+                dir={locale === "en" && !product.summaryEn ? "rtl" : undefined}
+                className="mt-5 text-lg leading-8 text-zinc-600 dark:text-zinc-300"
+              >
                 {summary}
               </p>
               <PublicVariantPicker
@@ -102,6 +108,8 @@ export async function ProductPage({
         <article className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
           <RichContent
             html={content}
+            dir={locale === "en" && !product.contentEn ? "rtl" : undefined}
+            lang={locale === "en" && !product.contentEn ? "fa" : locale}
             className="text-lg leading-9 text-zinc-700 dark:text-zinc-300"
           />
         </article>
