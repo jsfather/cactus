@@ -150,10 +150,12 @@ export function CartCheckout({
   function update(next: CartItem[]) {
     try {
       write(next);
+      return true;
     } catch {
       toast.error(
         text(locale, "ذخیره سبد ممکن نیست.", "Cart storage is unavailable."),
       );
+      return false;
     }
   }
   return items.length ? (
@@ -165,11 +167,7 @@ export function CartCheckout({
             className="public-cart-row"
           >
             {i.imageUrl && /^(\/media\/|https?:\/\/)/.test(i.imageUrl) ? (
-               <img
-                className="cart-thumbnail"
-                src={i.imageUrl}
-                alt=""
-              />
+              <img className="cart-thumbnail" src={i.imageUrl} alt="" />
             ) : (
               <span className="cart-thumbnail">
                 <CircuitMark />
@@ -217,10 +215,10 @@ export function CartCheckout({
               className="public-link text-sm"
               aria-label={`${text(locale, "حذف", "Remove")} — ${locale === "en" ? i.titleEn || i.titleFa : i.titleFa}`}
               onClick={() => {
-                update(items.filter((row) => row !== i));
-                toast.success(
-                  text(locale, "از سبد حذف شد.", "Removed from cart."),
-                );
+                if (update(items.filter((row) => row !== i)))
+                  toast.success(
+                    text(locale, "از سبد حذف شد.", "Removed from cart."),
+                  );
               }}
             >
               {text(locale, "حذف", "Remove")}

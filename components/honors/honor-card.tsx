@@ -10,10 +10,13 @@ const localized = (en: string | null, fa: string, locale: Locale) =>
 export function HonorCard({
   honor,
   locale,
+  headingLevel = 3,
 }: {
   honor: HonorSummary;
   locale: Locale;
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const d = getDictionary(locale);
   const title = localized(honor.titleEn, honor.titleFa, locale);
   const categories =
@@ -36,9 +39,9 @@ export function HonorCard({
             <span key={c}>{c}</span>
           ))}
         </div>
-        <h3>
+        <Heading>
           <Link href={href}>{title}</Link>
-        </h3>
+        </Heading>
         <p>
           {localized(honor.organizationEn, honor.organizationFa, locale)} ·{" "}
           {date}

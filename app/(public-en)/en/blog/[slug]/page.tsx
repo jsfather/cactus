@@ -2,7 +2,11 @@ import { BlogPostPage } from "@/components/public/blog-post-page";
 import type { Metadata } from "next";
 import { getPostMetadata } from "@/lib/blog/seo";
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   return getPostMetadata("en", (await params).slug);
 }
 

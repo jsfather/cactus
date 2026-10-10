@@ -12,10 +12,13 @@ const localized = (en: string | null, fa: string, locale: Locale) =>
 export function PublicTeacherCard({
   teacher,
   locale,
+  headingLevel = 3,
 }: {
   teacher: TeacherCardValue;
   locale: Locale;
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const d = getDictionary(locale);
   const name =
     getLocalizedUserName(teacher, locale) ||
@@ -35,19 +38,15 @@ export function PublicTeacherCard({
     <article className="public-teacher">
       <Link href={href} className="teacher-portrait" aria-label={name}>
         {teacher.avatarUrl ? (
-           <img
-            src={teacher.avatarUrl}
-            alt={name}
-            loading="lazy"
-          />
+          <img src={teacher.avatarUrl} alt={name} loading="lazy" />
         ) : (
           <span aria-hidden="true">{name.slice(0, 1)}</span>
         )}
       </Link>
       <div>
-        <h3>
+        <Heading>
           <Link href={href}>{name}</Link>
-        </h3>
+        </Heading>
         {position && <p>{position}</p>}
         <p>{localized(teacher.cityEn, teacher.cityFa, locale)}</p>
         <p

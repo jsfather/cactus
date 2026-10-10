@@ -441,7 +441,7 @@ a:hover .public-arrow {
   width: 35%;
   height: auto;
 }
-.public-product h3 {
+.public-product :is(h2, h3) {
   font-size: 1.3rem;
   font-weight: 800;
   line-height: 1.7;
@@ -593,7 +593,7 @@ a:hover .public-arrow {
     transparent 24px
   );
 }
-.public-post h3 {
+.public-post :is(h2, h3) {
   font-size: 1.6rem;
   line-height: 1.6;
   font-weight: 850;
@@ -666,7 +666,7 @@ a:hover .public-arrow {
   color: var(--green);
   font-weight: 900;
 }
-.public-teacher h3 {
+.public-teacher :is(h2, h3) {
   font-size: 1.5rem;
   font-weight: 850;
   line-height: 1.5;
@@ -716,7 +716,7 @@ a:hover .public-arrow {
   height: 100%;
   object-fit: contain;
 }
-.public-honor h3 {
+.public-honor :is(h2, h3) {
   font-size: clamp(1.5rem, 2.5vw, 2.5rem);
   font-weight: 850;
   line-height: 1.5;
@@ -926,8 +926,8 @@ a:hover .public-arrow {
   border-radius: 3px;
   box-shadow: none;
 }
-.public-detail main [class*="text-zinc-"],
-.public-detail main [class*="text-emerald-"] {
+.public-detail main p[class*="text-zinc-"],
+.public-detail main p[class*="text-emerald-"] {
   color: var(--muted);
 }
 .public-detail main h1,
@@ -1140,7 +1140,7 @@ a:hover .public-arrow {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2rem 1rem;
   }
-  .public-product h3 {
+  .public-product :is(h2, h3) {
     font-size: 1rem;
     line-height: 1.6;
   }
@@ -1168,7 +1168,7 @@ a:hover .public-arrow {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  .public-post h3 {
+  .public-post :is(h2, h3) {
     font-size: 1.5rem;
   }
   .page-intro-grid {
@@ -1224,7 +1224,7 @@ a:hover .public-arrow {
     grid-template-columns: 100px minmax(0, 1fr);
     gap: 1rem;
   }
-  .public-teacher h3 {
+  .public-teacher :is(h2, h3) {
     font-size: 1.2rem;
   }
 }
@@ -1270,6 +1270,161 @@ a:hover .public-arrow {
 .public-site .public-link.text-sm {
   font-size: 0.8rem;
 }
-.product-copy{display:flex;flex:1;flex-direction:column}.product-grid--single{grid-template-columns:1fr}.product-grid--single .public-product{display:grid;grid-template-columns:1.1fr 1fr;gap:3rem;align-items:center}.product-grid--single .product-visual{margin:0;aspect-ratio:1.3}.product-grid--single .public-product h3{font-size:clamp(1.5rem,3vw,2.5rem)}.product-grid--single .product-bottom{margin-block-start:1.5rem}.public-detail .product-detail-visual{background:var(--surface);border:1px solid var(--line)}
-.page-intro--blog .page-intro-grid{grid-template-columns:1fr}.page-intro--blog .page-index{display:none}.page-intro--blog .public-title{font-size:clamp(3rem,7.5vw,7rem);border-block-end:2px solid #192720;padding-block-end:1.5rem;max-width:none}.page-intro--about .page-intro-grid{grid-template-columns:1fr}.page-intro--about .page-index{display:none}.page-intro--about .public-description{margin-inline-start:auto}.page-intro--requirements{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:80px 80px}.page-intro--requirements .public-title,.page-intro--requirements .public-description{background:var(--paper);width:fit-content}.page-intro--teachers{padding-block-end:2.5rem}.page-intro--teachers .page-index{font-size:8rem;color:var(--orange)}.public-shell-content form:has(textarea) section{border-radius:0;box-shadow:none;border-color:var(--line);background:var(--paper)}
-@media(max-width:767px){.product-grid--single .public-product{grid-template-columns:1fr;gap:1.5rem}.product-grid--single .product-bottom{flex-direction:row}.page-intro--blog .public-title{font-size:clamp(2.75rem,11vw,4rem)}}
+.product-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+.product-grid--single {
+  grid-template-columns: 1fr;
+}
+.product-grid--single .public-product {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+.product-grid--single .product-visual {
+  margin: 0;
+  aspect-ratio: 1.3;
+}
+.product-grid--single .public-product :is(h2, h3) {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+.product-grid--single .product-bottom {
+  margin-block-start: 1.5rem;
+}
+.public-detail .product-detail-visual {
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.page-intro--blog .page-intro-grid {
+  grid-template-columns: 1fr;
+}
+.page-intro--blog .page-index {
+  display: none;
+}
+.page-intro--blog .public-title {
+  font-size: clamp(3rem, 7.5vw, 7rem);
+  border-block-end: 2px solid #192720;
+  padding-block-end: 1.5rem;
+  max-width: none;
+}
+.page-intro--about .page-intro-grid {
+  grid-template-columns: 1fr;
+}
+.page-intro--about .page-index {
+  display: none;
+}
+.page-intro--about .public-description {
+  margin-inline-start: auto;
+}
+.page-intro--requirements {
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+.page-intro--requirements .public-title,
+.page-intro--requirements .public-description {
+  background: var(--paper);
+  width: fit-content;
+}
+.page-intro--teachers {
+  padding-block-end: 2.5rem;
+}
+.page-intro--teachers .page-index {
+  font-size: 8rem;
+  color: var(--orange);
+}
+.public-shell-content form:has(textarea) section {
+  border-radius: 0;
+  box-shadow: none;
+  border-color: var(--line);
+  background: var(--paper);
+}
+@media (max-width: 767px) {
+  .product-grid--single .public-product {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .product-grid--single .product-bottom {
+    flex-direction: row;
+  }
+  .page-intro--blog .public-title {
+    font-size: clamp(2.75rem, 11vw, 4rem);
+  }
+}
+.public-status {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+}
+.public-status h1 {
+  font-weight: 850;
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.6;
+}
+.public-loading-line {
+  width: 8rem;
+  height: 2px;
+  background: var(--green);
+  transform-origin: center;
+  animation: public-line 1.2s ease-in-out infinite alternate;
+}
+.software-filters {
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.software-item {
+  border-color: var(--line);
+  position: relative;
+}
+.software-item summary {
+  font-size: 1.25rem;
+  display: block;
+}
+.software-item summary::after {
+  content: "+";
+  position: absolute;
+  inset-inline-end: 1.5rem;
+  top: 1.5rem;
+  color: var(--green);
+  font-family: var(--font-mono);
+}
+.software-item[open] summary::after {
+  content: "−";
+}
+.software-item summary > span {
+  padding-inline-end: 1.5rem;
+}
+.teacher-grid:has(> .public-teacher:only-child) {
+  grid-template-columns: 1fr;
+}
+.teacher-grid > .public-teacher:only-child {
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 3rem;
+  max-width: 900px;
+}
+.teacher-grid > .public-teacher:only-child :is(h2, h3) {
+  font-size: 2rem;
+}
+.teacher-grid > .public-teacher:only-child p {
+  font-size: 1rem;
+}
+@media (max-width: 767px) {
+  .teacher-grid > .public-teacher:only-child {
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+  .teacher-grid > .public-teacher:only-child :is(h2, h3) {
+    font-size: 1.4rem;
+  }
+  .teacher-grid > .public-teacher:only-child p {
+    font-size: 0.85rem;
+  }
+}

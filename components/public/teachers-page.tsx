@@ -35,6 +35,7 @@ export async function TeachersPage({ locale }: { locale: Locale }) {
                   key={item.id}
                   teacher={item}
                   locale={locale}
+              headingLevel={2}
                 />
               ))}
             </Reveal>

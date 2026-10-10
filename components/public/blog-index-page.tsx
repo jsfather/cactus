@@ -27,7 +27,7 @@ export async function BlogIndexPage({ locale }: { locale: Locale }) {
           {posts.length ? (
             <Reveal className="editorial-grid">
               {posts.map((item) => (
-                <PostCard key={item.id} post={item} locale={locale} />
+                <PostCard key={item.id} post={item} locale={locale} headingLevel={2} />
               ))}
             </Reveal>
           ) : (

@@ -8,10 +8,13 @@ type PostSummary = Awaited<ReturnType<typeof getPublishedPosts>>[number];
 export function PostCard({
   post,
   locale,
+  headingLevel = 3,
 }: {
   post: PostSummary;
   locale: Locale;
+  headingLevel?: 2 | 3;
 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   const d = getDictionary(locale);
   const title = locale === "en" ? post.titleEn || post.titleFa : post.titleFa;
   const excerpt =
@@ -26,11 +29,7 @@ export function PostCard({
     <article className="public-post">
       <Link href={href} className="post-visual" aria-label={title}>
         {post.coverImageUrl ? (
-           <img
-            src={post.coverImageUrl}
-            alt=""
-            loading="lazy"
-          />
+          <img src={post.coverImageUrl} alt="" loading="lazy" />
         ) : (
           <span className="post-placeholder nums-en" aria-hidden="true">
             &#123; / &#125;
@@ -41,12 +40,12 @@ export function PostCard({
         <span className="public-kicker">
           {locale === "fa" ? "دفتر کاکتوس" : "CACTUS JOURNAL"}
         </span>
-        <h3
+        <Heading
           className="mt-3"
           dir={locale === "en" && !post.titleEn ? "rtl" : undefined}
         >
           <Link href={href}>{title}</Link>
-        </h3>
+        </Heading>
         <p
           className="line-clamp-3"
           dir={locale === "en" && !post.excerptEn ? "rtl" : undefined}

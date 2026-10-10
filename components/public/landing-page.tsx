@@ -150,7 +150,10 @@ export async function LandingPage({ locale }: { locale: Locale }) {
                 href="/shop"
                 action={d.allProducts}
               />
-              <Reveal pattern="image" className={`product-grid ${products.length === 1 ? "product-grid--single" : ""}`}>
+              <Reveal
+                pattern="image"
+                className={`product-grid ${products.length === 1 ? "product-grid--single" : ""}`}
+              >
                 {products.map((p) => (
                   <ProductCard key={p.id} product={p} locale={locale} />
                 ))}

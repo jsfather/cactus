@@ -64,9 +64,12 @@ export async function ShopIndexPage({
             </nav>
           )}
           {products.length ? (
-            <Reveal pattern="image" className={`product-grid ${products.length === 1 ? "product-grid--single" : ""}`}>
+            <Reveal
+              pattern="image"
+              className={`product-grid ${products.length === 1 ? "product-grid--single" : ""}`}
+            >
               {products.map((p) => (
-                <ProductCard key={p.id} product={p} locale={locale} />
+                <ProductCard key={p.id} product={p} locale={locale} headingLevel={2} />
               ))}
             </Reveal>
           ) : (

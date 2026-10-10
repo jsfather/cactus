@@ -31,7 +31,7 @@ export async function HonorsPage({ locale }: { locale: Locale }) {
           {honors.length ? (
             <Reveal className="honor-list">
               {honors.map((item) => (
-                <HonorCard key={item.id} honor={item} locale={locale} />
+                <HonorCard key={item.id} honor={item} locale={locale} headingLevel={2} />
               ))}
             </Reveal>
           ) : (

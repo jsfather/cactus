@@ -54,7 +54,9 @@ export async function ProductPage({
                   className="size-full object-cover"
                 />
               ) : (
-                <span className="product-placeholder"><CircuitMark /></span>
+                <span className="product-placeholder">
+                  <CircuitMark />
+                </span>
               )}
             </div>
             <div className="self-center">

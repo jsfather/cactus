@@ -34,8 +34,14 @@ export function SearchForm({
       aria-busy={pending}
       onSubmit={(event) => {
         event.preventDefault();
-        const q = new FormData(event.currentTarget).get("q")?.toString().trim() ?? "";
-        startTransition(() => router.push(`${localizePath(locale, "/search")}?${new URLSearchParams({ q })}`, { scroll: false }));
+        const q =
+          new FormData(event.currentTarget).get("q")?.toString().trim() ?? "";
+        startTransition(() =>
+          router.push(
+            `${localizePath(locale, "/search")}?${new URLSearchParams({ q })}`,
+            { scroll: false },
+          ),
+        );
       }}
     >
       <label htmlFor="cactus-search" className="sr-only">
@@ -43,6 +49,7 @@ export function SearchForm({
       </label>
       <input
         ref={ref}
+        key={query}
         id="cactus-search"
         name="q"
         type="search"
@@ -59,7 +66,13 @@ export function SearchForm({
     </form>
   );
 }
-function SearchButton({ locale, pending }: { locale: Locale; pending: boolean }) {
+function SearchButton({
+  locale,
+  pending,
+}: {
+  locale: Locale;
+  pending: boolean;
+}) {
   return (
     <button className="public-button shrink-0" type="submit" disabled={pending}>
       {pending
