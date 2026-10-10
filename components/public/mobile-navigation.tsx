@@ -1,8 +1,10 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 import { publicLinks } from "./navigation-links";
+import { PublicIcon } from "./icons";
 export function MobileNavigation({
   locale,
   currentPath,
@@ -12,62 +14,107 @@ export function MobileNavigation({
   currentPath: string;
   signedIn: boolean;
 }) {
-  const ref = useRef<HTMLDetailsElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
   useEffect(() => {
-    function close(e: PointerEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node))
-        ref.current.open = false;
-    }
-    function escape(e: KeyboardEvent) {
-      if (e.key === "Escape" && ref.current?.open) {
-        ref.current.open = false;
-        ref.current.querySelector("summary")?.focus();
-      }
-    }
-    document.addEventListener("pointerdown", close);
-    document.addEventListener("keydown", escape);
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("pointerdown", close);
-      document.removeEventListener("keydown", escape);
+      document.body.style.overflow = previous;
     };
-  }, []);
+  }, [open]);
+  function close() {
+    dialog.current?.close();
+  }
   return (
-    <details ref={ref} className="public-mobile-menu">
-      <summary
+    <div className="public-mobile-menu">
+      <button
+        ref={trigger}
         aria-label={locale === "fa" ? "فهرست بخش‌های سایت" : "Site navigation"}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => {
+          dialog.current?.showModal();
+          setOpen(true);
+        }}
       >
-        {locale === "fa" ? "منو" : "Menu"} <span aria-hidden="true">☰</span>
-      </summary>
-      <nav
-        className="mobile-nav"
+        <PublicIcon name="menu" />
+      </button>
+      <dialog
+        ref={dialog}
+        className="public-nav-dialog"
         aria-label={locale === "fa" ? "فهرست موبایل" : "Mobile navigation"}
+        onClose={() => {
+          setOpen(false);
+          trigger.current?.focus();
+        }}
+        onClick={(e) => {
+          if (e.target === dialog.current) close();
+        }}
       >
-        {publicLinks.map(([path, fa, en]) => (
+        <div className="mobile-nav-panel">
+          <div className="mobile-nav-heading">
+            <strong>{locale === "fa" ? "کاکتوس" : "Cactus"}</strong>
+            <button
+              autoFocus
+              aria-label={locale === "fa" ? "بستن فهرست" : "Close navigation"}
+              onClick={close}
+            >
+              <PublicIcon name="close" />
+            </button>
+          </div>
           <Link
-            key={path}
-            href={localizePath(locale, path)}
-            aria-current={
-              currentPath === path || currentPath.startsWith(path + "/")
-                ? "page"
-                : undefined
-            }
-            onClick={() => {
-              if (ref.current) ref.current.open = false;
-            }}
+            className="public-button mobile-login"
+            href={signedIn ? "/panel" : "/login"}
+            onClick={close}
           >
-            {locale === "fa" ? fa : en}
+            {locale === "fa"
+              ? signedIn
+                ? "پنل من"
+                : "ورود / ثبت‌نام"
+              : signedIn
+                ? "My panel"
+                : "Sign in"}
           </Link>
-        ))}
-        <Link href={signedIn ? "/panel" : "/login"}>
-          {locale === "fa"
-            ? signedIn
-              ? "پنل من"
-              : "ورود به پنل"
-            : signedIn
-              ? "My panel"
-              : "Sign in"}
-        </Link>
-      </nav>
-    </details>
+          <nav className="mobile-nav">
+            <Link href={localizePath(locale, "/")} onClick={close}>
+              {locale === "fa" ? "خانه" : "Home"}
+            </Link>
+            {publicLinks.map(([path, fa, en]) => (
+              <Link
+                key={path}
+                href={localizePath(locale, path)}
+                aria-current={
+                  currentPath === path || currentPath.startsWith(path + "/")
+                    ? "page"
+                    : undefined
+                }
+                onClick={close}
+              >
+                {locale === "fa" ? fa : en}
+                <span aria-hidden="true">{locale === "fa" ? "‹" : "›"}</span>
+              </Link>
+            ))}
+          </nav>
+          <div className="mobile-nav-promo">
+            <strong>
+              {locale === "fa"
+                ? "آینده را با کاکتوس بساز"
+                : "Build the future with Cactus"}
+            </strong>
+            <span className="mobile-nav-promo-art">
+              <Image
+                src="/images/reference-v4/robot-mascot.svg"
+                alt=""
+                fill
+                sizes="90px"
+              />
+            </span>
+          </div>
+        </div>
+      </dialog>
+    </div>
   );
 }

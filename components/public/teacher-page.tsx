@@ -88,11 +88,11 @@ export async function TeacherPage({
             }}
           />
           <header className="border-b border-emerald-950/10 bg-emerald-50 dark:border-white/10 dark:bg-emerald-950/25">
-            <div className="mx-auto grid w-full max-w-6xl items-center gap-8 px-5 py-14 sm:px-8 sm:py-20 md:grid-cols-[auto_minmax(0,1fr)] lg:px-10">
+            <div className="public-wrap teacher-profile-hero">
               <UserAvatar
                 name={name}
                 src={teacher.avatarUrl}
-                className="size-36 ring-8 ring-white shadow-xl shadow-emerald-950/10 sm:size-44 dark:ring-zinc-900"
+                className="teacher-profile-portrait"
               />
               <div className="min-w-0 text-start">
                 <Link

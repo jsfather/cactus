@@ -35,7 +35,7 @@ export function PublicVariantPicker({
   ).format(price);
 
   return (
-    <div className="mt-8 space-y-4">
+    <div className="public-variant-picker space-y-4">
       {variants.length ? (
         <fieldset>
           <legend className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">

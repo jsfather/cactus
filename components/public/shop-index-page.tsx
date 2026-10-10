@@ -38,7 +38,7 @@ export async function ShopIndexPage({
           title={d.shopTitle}
           description={d.shopDescription}
         />
-        <section className="public-wrap public-section">
+        <section className="public-wrap public-section shop-catalog">
           {categories.length > 0 && (
             <nav
               className="category-nav"
@@ -64,10 +64,7 @@ export async function ShopIndexPage({
             </nav>
           )}
           {products.length ? (
-            <Reveal
-              pattern="image"
-              className={`product-grid ${products.length === 1 ? "product-grid--single" : ""}`}
-            >
+            <Reveal pattern="image" className="product-grid">
               {products.map((p) => (
                 <ProductCard
                   key={p.id}

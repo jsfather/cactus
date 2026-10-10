@@ -79,8 +79,8 @@ export async function BlogPostPage({
               __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
             }}
           />
-          <header className="border-b border-emerald-950/10 bg-emerald-50 dark:border-white/10 dark:bg-emerald-950/25">
-            <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-24">
+          <header className="article-heading">
+            <div className="article-heading-inner">
               <Link
                 href={localizePath(locale, "/blog")}
                 className="text-sm font-semibold text-emerald-700 dark:text-emerald-400"
@@ -136,7 +136,7 @@ export async function BlogPostPage({
             </div>
           ) : null}
 
-          <div className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
+          <div className="article-content-panel">
             <RichContent
               html={content}
               dir={locale === "en" && !post.contentEn ? "rtl" : undefined}

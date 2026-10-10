@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 
 export function Arrow() {
@@ -35,7 +36,6 @@ export function PageIntro({
   eyebrow,
   title,
   description,
-  index,
 }: {
   locale: Locale;
   kind: string;
@@ -46,16 +46,12 @@ export function PageIntro({
 }) {
   return (
     <header className={`page-intro page-intro--${kind}`}>
-      <div className="public-wrap page-intro-grid">
+      <div className="public-wrap page-intro-grid" data-locale={locale}>
         <div>
           <p className="public-kicker">{eyebrow}</p>
           <h1 className="public-title">{title}</h1>
           {description && <p className="public-description">{description}</p>}
         </div>
-        <span aria-hidden="true" className="page-index nums-en" dir="ltr">
-          {index}
-          <span className="sr-only">{locale}</span>
-        </span>
       </div>
     </header>
   );
@@ -93,27 +89,33 @@ export function EmptyState({ children }: { children: React.ReactNode }) {
 }
 export function ClosingInvitation({ locale }: { locale: Locale }) {
   return (
-    <section className="public-section home-close">
-      <div className="public-wrap">
+    <section className="public-wrap home-close">
+      <div>
+        <p className="public-kicker">
+          {locale === "fa" ? "آینده را بساز" : "BUILD YOUR FUTURE"}
+        </p>
         <h2>
-          {locale === "fa" ? (
-            <>
-              ایده بعدی،
-              <br />
-              از تو شروع می‌شود.
-            </>
-          ) : (
-            <>
-              The next idea
-              <br />
-              starts with you.
-            </>
-          )}
+          {locale === "fa"
+            ? "مسیر یادگیری‌ات را با کاکتوس شروع کن"
+            : "Start your learning journey with Cactus"}
         </h2>
+        <p>
+          {locale === "fa"
+            ? "دوره‌ها و ابزارها را کشف کن و برای پروژه بعدی‌ات آماده شو."
+            : "Discover courses and tools, and get ready for your next project."}
+        </p>
         <Link className="public-button" href={localizePath(locale, "/courses")}>
-          {locale === "fa" ? "مسیرت را پیدا کن" : "Find your learning path"}
+          {locale === "fa" ? "مشاهده دوره‌ها" : "Explore courses"}
           <Arrow />
         </Link>
+      </div>
+      <div className="home-close-art">
+        <Image
+          src="/images/reference-v4/robot-mascot.svg"
+          alt=""
+          fill
+          sizes="(max-width:600px) 100px, 240px"
+        />
       </div>
     </section>
   );

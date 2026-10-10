@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { LOCALE_COOKIE, type Locale } from "@/lib/i18n/config";
 
@@ -12,6 +12,13 @@ const localeStorageKey = LOCALE_COOKIE;
 function isTheme(value: string | null): value is Theme {
   return value === "system" || value === "light" || value === "dark";
 }
+
+const subscribeToBootstrap = () => () => {};
+const getServerTheme = (): Theme => "system";
+const getBootstrappedTheme = (): Theme => {
+  const value = document.documentElement.dataset.theme ?? null;
+  return isTheme(value) ? value : "system";
+};
 
 function applyTheme(theme: Theme) {
   const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -50,18 +57,19 @@ function ThemeIcon({ theme }: { theme: Theme }) {
 export function PreferencesMenu({
   locale = "fa",
   alternateHref,
+  variant = "default",
 }: {
   locale?: Locale;
   alternateHref?: string;
+  variant?: "default" | "public";
 }) {
   const router = useRouter();
   const menuRef = useRef<HTMLDetailsElement>(null);
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof document === "undefined") return "system";
-
-    const bootstrappedTheme = document.documentElement.dataset.theme ?? null;
-    return isTheme(bootstrappedTheme) ? bootstrappedTheme : "system";
-  });
+  // Use the server snapshot during hydration, then reflect the pre-paint choice.
+  // This keeps the selected button's accessible state correct after navigation.
+  const bootstrappedTheme = useSyncExternalStore(subscribeToBootstrap, getBootstrappedTheme, getServerTheme);
+  const [selectedTheme, setTheme] = useState<Theme | null>(null);
+  const theme = selectedTheme ?? bootstrappedTheme;
   const isFa = locale === "fa";
   const labels = isFa
     ? {
@@ -145,7 +153,7 @@ export function PreferencesMenu({
 
       const { pathname, search, hash } = window.location;
       const isEnglishPublic = pathname === "/en" || pathname.startsWith("/en/");
-      const isPersianPublic = pathname === "/" ||
+      const isPersianPublic = variant === "public" || pathname === "/" ||
         pathname.startsWith("/blog") ||
         pathname.startsWith("/shop");
       let nextPath = pathname;
@@ -162,7 +170,7 @@ export function PreferencesMenu({
 
     window.addEventListener("storage", handleLocaleStorage);
     return () => window.removeEventListener("storage", handleLocaleStorage);
-  }, [locale, router]);
+  }, [locale, router, variant]);
 
   const selectLocale = (nextLocale: Locale) => {
     try {
@@ -186,6 +194,59 @@ export function PreferencesMenu({
     { value: "light", label: labels.light },
     { value: "dark", label: labels.dark },
   ];
+
+  if (variant === "public") {
+    const languageLabel = isFa ? "تغییر زبان به انگلیسی" : "Switch to Persian";
+
+    return (
+      <div className="public-preferences">
+        {alternateHref ? (
+          <a
+            className="public-locale-switch nums-en"
+            href={alternateHref}
+            hrefLang={isFa ? "en" : "fa"}
+            aria-label={languageLabel}
+            title={languageLabel}
+            dir="ltr"
+            onClick={() => selectLocale(isFa ? "en" : "fa")}
+          >
+            <span className={isFa ? "is-active" : undefined} lang="en">FA</span>
+            <span aria-hidden="true">/</span>
+            <span className={!isFa ? "is-active" : undefined} lang="en">EN</span>
+          </a>
+        ) : null}
+        <details ref={menuRef} className="public-theme-menu" dir={isFa ? "rtl" : "ltr"}>
+          <summary aria-label={labels.menu} title={labels.appearance}>
+            <span className="public-theme-track" aria-hidden="true">
+              <ThemeIcon theme="light" />
+              <span className="public-theme-indicator" />
+              <ThemeIcon theme="dark" />
+            </span>
+          </summary>
+          <div className="public-theme-popover">
+            <p>{labels.appearance}</p>
+            <div className="public-theme-options">
+              {themeOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  suppressHydrationWarning
+                  aria-pressed={theme === option.value}
+                  onClick={() => {
+                    selectTheme(option.value);
+                    menuRef.current?.querySelector("summary")?.focus();
+                  }}
+                >
+                  <ThemeIcon theme={option.value} />
+                  <span>{option.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </details>
+      </div>
+    );
+  }
 
   return (
     <details ref={menuRef} className="group/preferences relative z-40">

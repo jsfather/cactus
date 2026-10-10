@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { connection } from "next/server";
 import { RichContent } from "@/components/content/rich-content";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -31,21 +32,33 @@ export async function AboutPage({ locale }: { locale: Locale }) {
         />
         <section className="public-section public-wrap">
           <Reveal className="about-story">
-            <div>
-              <p className="public-kicker">
-                {locale === "fa" ? "داستان کاکتوس" : "OUR STORY"}
-              </p>
-              <h2 className="mt-4">
-                {locale === "fa"
-                  ? "از ایده تا تجربه"
-                  : "From ideas to experience"}
-              </h2>
-            </div>
-            <div dir={locale === "en" && !c.aboutUsEn ? "rtl" : undefined}>
-              <RichContent
-                html={local(c.aboutUsEn, c.aboutUsFa)}
-                className="text-lg"
-              />
+            <Image
+              src="/images/reference-v4/scene-electronics.svg"
+              alt={
+                locale === "fa"
+                  ? "تصویرسازی یادگیری با مدارهای الکترونیکی"
+                  : "Illustration of learning with electronic circuits"
+              }
+              width={720}
+              height={480}
+            />
+            <div className="about-story-copy">
+              <div>
+                <p className="public-kicker">
+                  {locale === "fa" ? "داستان کاکتوس" : "OUR STORY"}
+                </p>
+                <h2 className="mt-4">
+                  {locale === "fa"
+                    ? "از ایده تا تجربه"
+                    : "From ideas to experience"}
+                </h2>
+              </div>
+              <div dir={locale === "en" && !c.aboutUsEn ? "rtl" : undefined}>
+                <RichContent
+                  html={local(c.aboutUsEn, c.aboutUsFa)}
+                  className="text-lg"
+                />
+              </div>
             </div>
           </Reveal>
         </section>

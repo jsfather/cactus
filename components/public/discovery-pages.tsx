@@ -19,6 +19,7 @@ import { escapeLikePattern } from "@/lib/panel/pagination";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { PageIntro, Arrow } from "./design";
+import { CourseCard } from "./course-card";
 import { SearchForm } from "./search-form";
 import { PanelInput, PanelSelect } from "@/components/panel/form-controls";
 import { primaryButtonClass, PanelEmptyState } from "@/components/panel/ui";
@@ -134,7 +135,7 @@ export async function CourseIndex({
         "From your first circuit to intelligent robots, find the right course for you.",
       )}
     >
-      <form className="grid gap-3 rounded-2xl bg-zinc-50 p-5 sm:grid-cols-3 lg:grid-cols-7 dark:bg-zinc-900">
+      <form className="course-filters grid gap-3 sm:grid-cols-3 lg:grid-cols-7">
         <PanelInput
           name="q"
           defaultValue={q}
@@ -199,39 +200,15 @@ export async function CourseIndex({
           {text(locale, "فیلتر", "Filter")}
         </button>
       </form>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {courses.map(({ course: c, price }) => (
-          <Link
-            key={c.id}
-            href={localizePath(locale, `/courses/${c.slug}`)}
-            className="group overflow-hidden rounded-3xl border border-zinc-200 transition hover:border-emerald-400 dark:border-zinc-800"
-          >
-            <div className="aspect-video bg-emerald-50 dark:bg-emerald-950">
-              {c.coverImageUrl && (
-                <img
-                  src={c.coverImageUrl}
-                  alt=""
-                  className="size-full object-cover"
-                />
-              )}
-            </div>
-            <div className="space-y-3 p-6">
-              <p className="text-sm text-emerald-700 dark:text-emerald-400">
-                {c.topic} · {c.ageGroup}
-              </p>
-              <h2 className="text-xl font-bold">{title(c, locale)}</h2>
-              <p className="line-clamp-3 text-sm leading-7 text-zinc-500">
-                {locale === "en" ? c.summaryEn || c.summaryFa : c.summaryFa}
-              </p>
-              <p className="font-semibold">
-                {price === null
-                  ? text(locale, "اطلاعات دوره", "Course information")
-                  : price === 0
-                    ? text(locale, "رایگان", "Free")
-                    : `${price.toLocaleString(locale)} ${text(locale, "تومان", "toman")}`}
-              </p>
-            </div>
-          </Link>
+      <div className="course-grid">
+        {courses.map(({ course, price }) => (
+          <CourseCard
+            key={course.id}
+            course={course}
+            price={price}
+            locale={locale}
+            headingLevel={2}
+          />
         ))}
       </div>
       {!courses.length && (
@@ -291,7 +268,7 @@ export async function CourseDetail({
       heading={title(c, locale)}
       description={locale === "en" ? c.summaryEn || c.summaryFa : c.summaryFa}
     >
-      <div className="grid items-start gap-10 lg:grid-cols-[1fr_340px]">
+      <div className="course-detail-layout grid items-start gap-8 lg:grid-cols-[1fr_340px]">
         <article className="space-y-8">
           {c.coverImageUrl && (
             <img

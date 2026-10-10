@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CactusLogo } from "@/components/brand/cactus-brand";
+import Image from "next/image";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
 import { getSiteContent } from "@/lib/site-content/queries";
@@ -23,7 +23,12 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
         <div className="public-footer-top">
           <div>
             <Link href={localizePath(locale, "/")} className="public-brand">
-              <CactusLogo />
+              <Image
+                src="/images/reference-v4/cactus-mark.svg"
+                width={30}
+                height={42}
+                alt=""
+              />
               {locale === "fa" ? "کاکتوس" : "Cactus"}
             </Link>
             <p>
@@ -32,53 +37,61 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 : "Stay curious. Experiment. Build."}
             </p>
           </div>
-          <nav
-            aria-label={
-              locale === "fa" ? "پیوندهای پایین صفحه" : "Footer navigation"
-            }
-          >
-            {[
-              ["/courses", "دوره‌ها", "Courses"],
-              ["/requirements", "پیش‌نیازها", "Preparation"],
-              ["/teachers", dictionary.teachers, dictionary.teachers],
-              ["/honors", dictionary.honors, dictionary.honors],
-              ["/blog", dictionary.blog, dictionary.blog],
-              ["/shop", dictionary.shop, dictionary.shop],
-              ["/about", dictionary.about, dictionary.about],
-              ["/search", "جست‌وجو", "Search"],
-            ].map(([path, fa, en]) => (
-              <Link key={path} href={localizePath(locale, path)}>
-                {locale === "fa" ? fa : en}
-              </Link>
-            ))}
-          </nav>
-          <address>
-            {content.contactNumber && (
-              <a
-                href={`tel:${content.contactNumber}`}
-                dir="ltr"
-                className="nums-en block"
-              >
-                {content.contactNumber}
-              </a>
-            )}
-            {content.email && (
-              <a
-                href={`mailto:${content.email}`}
-                dir="ltr"
-                className="nums-en block"
-              >
-                {content.email}
-              </a>
-            )}
-            {address && (
-              <p
-                dir={locale === "en" && !content.addressEn ? "rtl" : undefined}
-              >
-                {address}
-              </p>
-            )}
-          </address>
+          <div className="footer-links">
+            <h2>{locale === "fa" ? "دسترسی سریع" : "Explore Cactus"}</h2>
+            <nav
+              aria-label={
+                locale === "fa" ? "پیوندهای پایین صفحه" : "Footer navigation"
+              }
+            >
+              {[
+                ["/courses", "دوره‌ها", "Courses"],
+                ["/requirements", "پیش‌نیازها", "Preparation"],
+                ["/teachers", dictionary.teachers, dictionary.teachers],
+                ["/honors", dictionary.honors, dictionary.honors],
+                ["/blog", dictionary.blog, dictionary.blog],
+                ["/shop", dictionary.shop, dictionary.shop],
+                ["/about", dictionary.about, dictionary.about],
+                ["/search", "جست‌وجو", "Search"],
+              ].map(([path, fa, en]) => (
+                <Link key={path} href={localizePath(locale, path)}>
+                  {locale === "fa" ? fa : en}
+                </Link>
+              ))}
+            </nav>
+          </div>
+          <div className="footer-contact">
+            <h2>{locale === "fa" ? "اطلاعات تماس" : "Contact us"}</h2>
+            <address>
+              {content.contactNumber && (
+                <a
+                  href={`tel:${content.contactNumber}`}
+                  dir="ltr"
+                  className="nums-en block"
+                >
+                  {content.contactNumber}
+                </a>
+              )}
+              {content.email && (
+                <a
+                  href={`mailto:${content.email}`}
+                  dir="ltr"
+                  className="nums-en block"
+                >
+                  {content.email}
+                </a>
+              )}
+              {address && (
+                <p
+                  dir={
+                    locale === "en" && !content.addressEn ? "rtl" : undefined
+                  }
+                >
+                  {address}
+                </p>
+              )}
+            </address>
+          </div>
         </div>
         <div className="public-footer-bottom">
           <span>

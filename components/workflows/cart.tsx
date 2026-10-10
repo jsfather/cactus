@@ -120,6 +120,7 @@ export function CartLink({ locale }: { locale: Locale }) {
     <Link
       href={localizePath(locale, "/shop/checkout")}
       className="public-cart-link"
+      aria-label={`${text(locale, "سبد خرید", "Shopping cart")}: ${cart.reduce((n, item) => n + item.quantity, 0).toLocaleString(locale)}`}
     >
       <svg
         viewBox="0 0 24 24"

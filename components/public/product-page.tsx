@@ -44,7 +44,7 @@ export async function ProductPage({
       <SiteHeader locale={locale} currentPath={`/shop/${product.slug}`} />
       <main id="public-main">
         <section className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 lg:grid-cols-2 lg:px-10 lg:py-20">
+          <div className="public-wrap product-detail-grid">
             <div className="aspect-[4/3] overflow-hidden rounded-[2rem] product-detail-visual">
               {product.coverImageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -59,7 +59,7 @@ export async function ProductPage({
                 </span>
               )}
             </div>
-            <div className="self-center">
+            <div className="product-detail-copy">
               <Link
                 href={localizePath(locale, "/shop")}
                 className="text-sm font-semibold text-emerald-700 dark:text-emerald-400"
@@ -95,6 +95,8 @@ export async function ProductPage({
               >
                 {summary}
               </p>
+            </div>
+            <aside className="product-buy-panel">
               <PublicVariantPicker
                 product={product}
                 locale={locale}
@@ -102,10 +104,10 @@ export async function ProductPage({
                 baseInventory={product.inventory}
                 variants={product.variants}
               />
-            </div>
+            </aside>
           </div>
         </section>
-        <article className="mx-auto w-full max-w-3xl px-5 py-14 sm:px-8 sm:py-20">
+        <article className="product-description-panel public-wrap">
           <RichContent
             html={content}
             dir={locale === "en" && !product.contentEn ? "rtl" : undefined}
