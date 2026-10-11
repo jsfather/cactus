@@ -544,16 +544,6 @@ export function PanelNav({
                 icon: "comments",
               },
               {
-                href: "/panel/admin/pages",
-                label: locale === "fa" ? "ویرایش صفحات ثابت" : "Static pages",
-                icon: "about",
-              },
-              {
-                href: "/panel/admin/about",
-                label: dictionary.nav.about,
-                icon: "about",
-              },
-              {
                 href: "/panel/admin/resources/faqs",
                 label: fa ? "پرسش‌های متداول" : "FAQs",
                 icon: "about",
@@ -565,7 +555,7 @@ export function PanelNav({
               },
               {
                 href: "/panel/admin/resources/requirements",
-                label: fa ? "پیش‌نیازهای یادگیری" : "Learning requirements",
+                label: fa ? "نرم‌افزارهای مورد نیاز" : "Required software",
                 icon: "levels",
               },
               {
@@ -578,6 +568,16 @@ export function PanelNav({
                 label: fa ? "دپارتمان‌های پشتیبانی" : "Support departments",
                 icon: "comments",
               },
+            ],
+          },
+          {
+            id: "settings",
+            label: fa ? "تنظیمات سایت" : "Site settings",
+            icon: "about",
+            items: [
+              { href: "/panel/admin/settings", label: fa ? "هدر و فوتر" : "Header & footer", icon: "about" },
+              { href: "/panel/admin/pages", label: fa ? "ویرایش صفحات ثابت" : "Static pages", icon: "about" },
+              { href: "/panel/admin/about", label: dictionary.nav.about, icon: "about" },
             ],
           },
           {

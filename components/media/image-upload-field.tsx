@@ -16,6 +16,7 @@ export function ImageUploadField({
   hint,
   aspect = "video",
   layout = "responsive",
+  onChange,
 }: {
   name: string;
   kind: MediaKind;
@@ -25,6 +26,7 @@ export function ImageUploadField({
   hint?: string;
   aspect?: "square" | "video";
   layout?: "responsive" | "stacked";
+  onChange?: (value: string) => void;
 }) {
   const [value, setValue] = useState(initialValue);
   const [busy, setBusy] = useState(false);
@@ -40,9 +42,10 @@ export function ImageUploadField({
   const closePicker = useCallback(() => setPicker((current) => ({ ...current, open: false })), []);
   const selectMedia = useCallback((selection: MediaSelection) => {
     setValue(selection.url);
+    onChange?.(selection.url);
     if (selection.originalName) setMediaName(selection.originalName);
     setError("");
-  }, []);
+  }, [onChange]);
 
   const invalidFileMessage = isFa
     ? "فایل باید JPEG، PNG، WebP یا GIF و حداکثر ۵ مگابایت باشد."
@@ -61,6 +64,7 @@ export function ImageUploadField({
       const result = (await response.json()) as { url?: string; originalName?: string; error?: string };
       if (!response.ok || !result.url) throw new Error(result.error || "Upload failed");
       setValue(result.url);
+      onChange?.(result.url);
       if (result.originalName) setMediaName(result.originalName);
       toast.success(isFa ? "تصویر بارگذاری شد." : "Image uploaded.");
     } catch {
@@ -203,7 +207,7 @@ export function ImageUploadField({
               <button
                 type="button"
                 disabled={busy}
-                onClick={() => { setValue(""); setError(""); }}
+                onClick={() => { setValue(""); onChange?.(""); setError(""); }}
                 className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-xs font-medium text-zinc-600 transition hover:border-red-200 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-red-900 dark:hover:text-red-400"
               >
                 <svg viewBox="0 0 20 20" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M3.5 5.5h13M8 8.5v5m4-5v5M6 5.5l.6 10h6.8l.6-10M8 5.5V4h4v1.5" /></svg>

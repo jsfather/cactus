@@ -20,7 +20,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const user = await getCurrentUser();
-  if (!user) return new NextResponse(null, { status: 401 });
   const { id } = await params;
   if (!z.uuid().safeParse(id).success)
     return new NextResponse(null, { status: 404 });
@@ -30,9 +29,13 @@ export async function GET(
     .from(attachments)
     .where(eq(attachments.id, id));
   if (!item) return new NextResponse(null, { status: 404 });
-  let allowed = user.role === "admin" || item.uploaderId === user.id;
   const url = `/api/attachments/${id}`;
-  if (!allowed) {
+  // Only a deliberately published, public software download is anonymous.
+  // Learning activities, submissions, tickets and other resources retain their role checks.
+  const [publicSoftware] = await db.select({ id: resources.id }).from(resources).where(and(eq(resources.kind, "requirements"), eq(resources.attachmentUrl, url), eq(resources.status, "published"), eq(resources.audience, "all"))).limit(1);
+  let allowed = Boolean(publicSoftware) || Boolean(user && (user.role === "admin" || item.uploaderId === user.id));
+  if (!user && !allowed) return new NextResponse(null, { status: 401 });
+  if (!allowed && user) {
     const activities = await db
       .select({ id: learningActivities.id })
       .from(learningActivities)
@@ -40,7 +43,7 @@ export async function GET(
     for (const a of activities)
       if (await getActivity(user, a.id)) allowed = true;
   }
-  if (!allowed) {
+  if (!allowed && user) {
     const rows = await db
       .select({
         studentId: homeworkSubmissions.studentId,
@@ -59,7 +62,7 @@ export async function GET(
       )
         allowed = true;
   }
-  if (!allowed) {
+  if (!allowed && user) {
     const [row] = await db
       .select({ id: tickets.id })
       .from(ticketMessages)
@@ -77,7 +80,7 @@ export async function GET(
       );
     allowed = Boolean(row);
   }
-  if (!allowed) {
+  if (!allowed && user) {
     const [row] = await db
       .select({ id: resources.id })
       .from(resources)

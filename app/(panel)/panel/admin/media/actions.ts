@@ -1,7 +1,7 @@
 "use server";
 
 import { unlink } from "node:fs/promises";
-import { eq, like, or } from "drizzle-orm";
+import { eq, like, or, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -16,6 +16,8 @@ import {
   posts,
   products,
   users,
+  appSettings,
+  siteContent,
 } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 import { resolveUploadPath } from "@/lib/media/storage";
@@ -127,6 +129,8 @@ export async function deleteMediaAsset(
     courseUse,
     activityUse,
     resourceUse,
+    settingsUse,
+    presentationUse,
   ] = await Promise.all([
     database
       .select({ id: users.id })
@@ -192,6 +196,8 @@ export async function deleteMediaAsset(
         ),
       )
       .limit(1),
+    database.select({ key: appSettings.key }).from(appSettings).where(like(appSettings.value, pattern)).limit(1),
+    database.select({ key: siteContent.key }).from(siteContent).where(sql`${siteContent.presentation}::text like ${pattern}`).limit(1),
   ]);
 
   if (
@@ -201,7 +207,7 @@ export async function deleteMediaAsset(
     honorUse.length ||
     courseUse.length ||
     activityUse.length ||
-    resourceUse.length
+    resourceUse.length || settingsUse.length || presentationUse.length
   ) {
     return {
       error:

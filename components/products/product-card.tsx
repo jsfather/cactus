@@ -1,12 +1,12 @@
 import { formatMarketingText } from "@/lib/content/marketing";
 import { RichContent } from "@/components/content/rich-content";
-import { AddToCart } from "@/components/workflows/cart";
+import { CardPurchase } from "./card-purchase";
 /* eslint-disable @next/next/no-img-element -- Managed media can use arbitrary validated remote hosts. */
 import Link from "next/link";
 import type { getPublishedProducts } from "@/lib/products/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
-import { Arrow, CircuitMark } from "@/components/public/design";
+import { localizePath, type Locale } from "@/lib/i18n/config";
+import { CircuitMark } from "@/components/public/design";
 type ProductSummary = Awaited<ReturnType<typeof getPublishedProducts>>[number];
 export function ProductCard({
   product,
@@ -52,19 +52,7 @@ export function ProductCard({
           dir={locale === "en" && !product.summaryEn ? "rtl" : undefined}
         />
 
-        <div className="product-bottom">
-          <strong>
-            {product.compareAtPrice && product.compareAtPrice > product.price && <del className="block text-xs font-normal opacity-60">{product.compareAtPrice.toLocaleString(locale)} {d.toman}</del>}
-            {new Intl.NumberFormat(localeConfig[locale].dateLocale).format(
-              product.price,
-            )}{" "}
-            <span className="text-xs font-normal">{d.toman}</span>
-          </strong>
-          <Link href={href}>
-            {d.viewProduct} <Arrow />
-          </Link>
-        </div>
-        {product.hasVariants ? <Link className="public-button" href={href}>{locale === "fa" ? "انتخاب تنوع و خرید" : "Choose options"}</Link> : <AddToCart locale={locale} inventory={product.availableInventory} item={{productId: product.id, variantId: "", titleFa: product.titleFa, titleEn: product.titleEn || product.titleFa, price: product.price, imageUrl: product.coverImageUrl || undefined, slug: product.slug}} />}
+        <CardPurchase product={{ id: product.id, slug: product.slug, titleFa: product.titleFa, titleEn: product.titleEn, price: product.price, inventory: product.inventory, coverImageUrl: product.coverImageUrl, variantLabels: product.variantLabels }} locale={locale} />
       </div>
     </article>
   );

@@ -7,6 +7,7 @@ import {
   honors,
   posts,
   products,
+  resources,
   teacherProfiles,
   users,
 } from "@/lib/db/schema";
@@ -73,6 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select()
     .from(coursePages)
     .where(eq(coursePages.status, "published"));
+  const software = await database.select({ id: resources.id, updatedAt: resources.updatedAt }).from(resources).where(and(eq(resources.kind, "requirements"), eq(resources.status, "published"), eq(resources.audience, "all")));
 
   const localizedEntry = (
     faPath: string,
@@ -96,6 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   return [
+    ...software.flatMap(item => localizedEntry(`/requirements/${item.id}`, `/en/requirements/${item.id}`, { lastModified: item.updatedAt, priority: 0.6 })),
     ...localizedEntry("/", "/en", { changeFrequency: "weekly", priority: 1 }),
     ...localizedEntry("/courses", "/en/courses", {
       changeFrequency: "weekly",

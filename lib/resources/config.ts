@@ -3,7 +3,7 @@ export const resourceKind = z.enum(["faqs", "guides", "requirements"]);
 export const resourceLabels = {
   faqs: ["پرسش‌های متداول", "Frequently asked questions"],
   guides: ["راهنمای پنل", "Panel guides"],
-  requirements: ["پیش‌نیازهای یادگیری", "Learning requirements"],
+  requirements: ["نرم‌افزارهای مورد نیاز", "Required software"],
 } as const;
 export const activityKind = z.enum(["homework", "recordings", "reports"]);
 export const activityLabels = {

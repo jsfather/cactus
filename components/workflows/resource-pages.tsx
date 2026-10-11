@@ -1,6 +1,10 @@
 import { SoftwareCatalog } from "./software-catalog";
+import { getSoftwareMetadata, getSoftwareMetadataMap } from "@/lib/resources/software-queries";
+import { parseSoftwareMetadata } from "@/lib/resources/software";
+import { richTextToPlainText } from "@/lib/content/rich-text";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import Link from "next/link";
 import { requireRole, requireUser } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
@@ -42,6 +46,7 @@ export async function ResourceAdmin({
   const label = resourceLabels[kind][locale === "fa" ? 0 : 1];
   const base = `/panel/admin/resources/${kind}`;
   if (id) {
+    if (id !== "new" && !z.uuid().safeParse(id).success) notFound();
     const [item] =
       id === "new"
         ? []
@@ -50,6 +55,7 @@ export async function ResourceAdmin({
             .from(resources)
             .where(and(eq(resources.id, id), eq(resources.kind, kind)));
     if (id !== "new" && !item) notFound();
+    const metadata = kind === "requirements" && item ? await getSoftwareMetadata(item.id) : parseSoftwareMetadata({});
     return (
       <PanelPage>
         <PanelPageHeader
@@ -60,15 +66,31 @@ export async function ResourceAdmin({
         <ActionForm
           locale={locale}
           action={saveResource.bind(null, kind, id === "new" ? null : id)}
+          sections={kind === "requirements" ? [
+            { title: text(locale, "معرفی نرم‌افزار", "Software overview"), fields: ["titleFa", "titleEn", "summaryFa", "summaryEn", "categoryFa", "categoryEn"] },
+            { title: text(locale, "معرفی و راهنمای نصب", "Description & installation"), fields: ["contentFa", "contentEn"] },
+            { title: text(locale, "مشخصات فنی", "Technical details"), fields: ["platforms", "version", "developer", "licenseFa", "licenseEn", "requirementsFa", "requirementsEn"] },
+            { title: text(locale, "تصویر و دانلود", "Image & download"), fields: ["imageUrl", "attachmentUrl", "downloadSize", "documentationUrl"], sidebar: true },
+            { title: text(locale, "انتشار و دسترسی", "Publishing & access"), fields: ["audience", "status", "sortOrder"], sidebar: true },
+          ] : undefined}
           initial={
             item
               ? Object.fromEntries(
-                  Object.entries(item).map(([k, v]) => [k, String(v ?? "")]),
+                  Object.entries({ ...item, ...metadata }).map(([k, v]) => [k, String(v ?? "")]),
                 )
               : {}
           }
           fields={[
             ...(kind === "requirements" ? [
+              { name: "imageUrl", label: text(locale, "تصویر نرم‌افزار", "Software image"), type: "image" },
+              { name: "summaryFa", label: text(locale, "خلاصه فارسی", "Persian summary"), type: "textarea", dir: "rtl" as const },
+              { name: "summaryEn", label: text(locale, "خلاصه انگلیسی", "English summary"), type: "textarea", dir: "ltr" as const },
+              { name: "developer", label: text(locale, "توسعه‌دهنده", "Developer"), dir: "ltr" as const },
+              { name: "licenseFa", label: text(locale, "مجوز فارسی", "Persian license") },
+              { name: "licenseEn", label: text(locale, "مجوز انگلیسی", "English license"), dir: "ltr" as const },
+              { name: "requirementsFa", label: text(locale, "سیستم مورد نیاز فارسی", "Persian system requirements"), type: "textarea", dir: "rtl" as const },
+              { name: "requirementsEn", label: text(locale, "سیستم مورد نیاز انگلیسی", "English system requirements"), type: "textarea", dir: "ltr" as const },
+              { name: "downloadSize", label: text(locale, "حجم دانلود", "Download size"), dir: "ltr" as const },
               { name: "categoryFa", label: text(locale, "دسته فارسی", "Persian category") },
               { name: "categoryEn", label: text(locale, "دسته انگلیسی", "English category") },
               { name: "platforms", label: text(locale, "سیستم‌عامل‌ها با کاما", "Platforms separated by commas"), hint: "Windows, macOS, Linux, Web" },
@@ -225,7 +247,13 @@ export async function ResourceContent({
       ),
     )
     .orderBy(asc(resources.sortOrder));
-  if (kind === "requirements") return <SoftwareCatalog locale={locale} items={items.map(item => ({ ...item, body: <RichContent html={locale === "en" ? item.contentEn || item.contentFa : item.contentFa} /> }))} />;
+  if (kind === "requirements") {
+    const metadata = await getSoftwareMetadataMap();
+    return <SoftwareCatalog locale={locale} items={items.map(item => {
+      const details = metadata.get(item.id) ?? parseSoftwareMetadata({});
+      return { ...item, ...details, summaryFa: details.summaryFa || richTextToPlainText(item.contentFa).slice(0, 180), summaryEn: details.summaryEn || (item.contentEn ? richTextToPlainText(item.contentEn).slice(0, 180) : "") };
+    })} />;
+  }
   return (
     <div className="space-y-4">
       {items.map((item) => (

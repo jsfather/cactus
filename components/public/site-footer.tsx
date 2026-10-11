@@ -1,12 +1,11 @@
 import { getPresentation } from "@/lib/site-content/presentation";
 import Link from "next/link";
 import Image from "next/image";
-import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getSiteNavigation } from "@/lib/site-content/navigation-server";
 import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
 import { getSiteContent } from "@/lib/site-content/queries";
 export async function SiteFooter({ locale }: { locale: Locale }) {
-  const dictionary = getDictionary(locale);
-  const content = await getSiteContent();
+  const [content, settings] = await Promise.all([getSiteContent(), getSiteNavigation()]);
   const presentation = getPresentation(content.presentation);
   const year = new Intl.DateTimeFormat(localeConfig[locale].dateLocale, {
     year: "numeric",
@@ -25,12 +24,15 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
         <div className="public-footer-top">
           <div>
             <Link href={localizePath(locale, "/")} className="public-brand">
-              <Image
+              {settings.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={settings.logoUrl} width={30} height={42} alt="" className="site-managed-logo" />
+              ) : <Image
                 src="/images/reference-v4/cactus-mark.svg"
                 width={30}
                 height={42}
                 alt=""
-              />
+              />}
               {locale === "fa" ? "کاکتوس" : "Cactus"}
             </Link>
             <p>
@@ -48,17 +50,8 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 locale === "fa" ? "پیوندهای پایین صفحه" : "Footer navigation"
               }
             >
-              {[
-                ["/courses", "دوره‌ها", "Courses"],
-                ["/requirements", "پیش‌نیازها", "Preparation"],
-                ["/teachers", dictionary.teachers, dictionary.teachers],
-                ["/honors", dictionary.honors, dictionary.honors],
-                ["/blog", dictionary.blog, dictionary.blog],
-                ["/shop", dictionary.shop, dictionary.shop],
-                ["/about", dictionary.about, dictionary.about],
-                ["/search", "جست‌وجو", "Search"],
-              ].map(([path, fa, en]) => (
-                <Link key={path} href={localizePath(locale, path)}>
+              {settings.footerLinks.map(({ href: path, labelFa: fa, labelEn: en }) => (
+                <Link key={path} href={path.startsWith("/") ? localizePath(locale, path) : path}>
                   {locale === "fa" ? fa : en}
                 </Link>
               ))}

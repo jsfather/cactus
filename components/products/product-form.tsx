@@ -128,6 +128,9 @@ export function ProductForm({ locale, mode = "create", productId, initialValues 
         </div>
 
         <aside className="space-y-6 xl:sticky xl:top-6">
+          <PanelFormSection title={isFa ? "تنوع محصول" : "Product variants"} description={isFa ? "برای مدل، رنگ یا بسته‌بندی متفاوت، هر تنوع قیمت، موجودی و شناسه مستقل دارد." : "Each model, colour or pack size can have its own price, inventory and SKU."}>
+            <p className="text-sm leading-7 text-zinc-500">{isFa ? "پس از ذخیره اولیه، در همین صفحه بخش «تنوع‌های محصول» در دسترس است. برای محصول متغیر، ابتدا پیش‌نویس را ذخیره و سپس تنوع‌ها را ایجاد کنید." : "After the initial save, this page includes the product variants section. For a variable product, save a draft first and then create its variants."}</p>
+          </PanelFormSection>
           <PanelFormSection title={dictionary.shop.cover} description={isFa ? "تصویر افقی و واضح محصول را انتخاب کنید." : "Choose a clear landscape product image."}>
             <ImageUploadField name="coverImageUrl" kind="product" locale={locale} initialValue={initialValues.coverImageUrl} label={dictionary.shop.cover} layout="stacked" />
           </PanelFormSection>

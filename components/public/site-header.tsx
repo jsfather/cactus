@@ -5,7 +5,7 @@ import { PreferencesMenu } from "@/components/preferences/preferences-menu";
 import { getCurrentUser } from "@/lib/auth/session";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 import { MobileNavigation } from "./mobile-navigation";
-import { publicLinks } from "./navigation-links";
+import { getSiteNavigation } from "@/lib/site-content/navigation-server";
 import { PublicIcon } from "./icons";
 export async function SiteHeader({
   locale,
@@ -14,7 +14,7 @@ export async function SiteHeader({
   locale: Locale;
   currentPath?: string;
 }) {
-  const user = await getCurrentUser();
+  const [user, settings] = await Promise.all([getCurrentUser(), getSiteNavigation()]);
   const alternateLocale = locale === "fa" ? "en" : "fa";
   const languageHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(localizePath(alternateLocale, currentPath))}`;
   return (
@@ -31,16 +31,19 @@ export async function SiteHeader({
             className="public-brand"
             aria-label={locale === "fa" ? "کاکتوس — خانه" : "Cactus — Home"}
           >
-            <Image
+            {settings.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={settings.logoUrl} width={30} height={42} alt="" className="site-managed-logo" />
+            ) : <Image
               src="/images/reference-v4/cactus-mark.svg"
               width={30}
               height={42}
               alt=""
-            />
+            />}
             <span>
               {locale === "fa" ? "کاکتوس" : "Cactus"}
-              <small className="nums-en" lang="en">
-                ROBOTICS
+              <small lang={locale}>
+                {locale === "fa" ? settings.subtitleFa : settings.subtitleEn}
               </small>
             </span>
           </Link>
@@ -49,12 +52,10 @@ export async function SiteHeader({
             dir={locale === "fa" ? "rtl" : "ltr"}
             aria-label={locale === "fa" ? "بخش‌های سایت" : "Site sections"}
           >
-            {publicLinks
-              .filter(([path]) => path !== "/search")
-              .map(([path, fa, en]) => (
+            {settings.headerLinks.map(({ href: path, labelFa: fa, labelEn: en }) => (
                 <Link
                   key={path}
-                  href={localizePath(locale, path)}
+                  href={path.startsWith("/") ? localizePath(locale, path) : path}
                   aria-current={
                     currentPath === path || currentPath.startsWith(path + "/")
                       ? "page"
@@ -114,6 +115,7 @@ export async function SiteHeader({
               locale={locale}
               currentPath={currentPath}
               signedIn={!!user}
+              links={settings.headerLinks}
             />
           </div>
         </div>

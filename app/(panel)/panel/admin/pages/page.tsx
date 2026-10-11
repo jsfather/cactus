@@ -1,4 +1,5 @@
 import { VideoGalleryEditor } from "@/components/panel/video-gallery-editor";
+import { TestimonialEditor } from "@/components/panel/testimonial-editor";
 import { requireRole } from "@/lib/auth/session";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { getSiteContent } from "@/lib/site-content/queries";
@@ -20,8 +21,15 @@ export default async function StaticPages() {
     { name: "whyContentFa", label: fa ? "چرا کاکتوس؟ فارسی" : "Why Cactus? Persian", type: "rich" },
     { name: "whyContentEn", label: fa ? "چرا کاکتوس؟ انگلیسی" : "Why Cactus? English", type: "rich" },
     ...[["bannerTitle", "عنوان بنر تبرستان", "Tabarestan banner title"], ["bannerText", "متن بنر", "Banner text"]].flatMap(([key, labelFa, labelEn]) => [ { name: `${key}Fa`, label: fa ? `${labelFa} فارسی` : `Persian ${labelEn}`, type: "textarea" }, { name: `${key}En`, label: fa ? `${labelFa} انگلیسی` : `English ${labelEn}`, type: "textarea" } ]),
-    { name: "bannerImageUrl", label: fa ? "تصویر بنر تبرستان" : "Tabarestan banner image", type: "image", hint: fa ? "برای نمایش بنر تصویر انتخاب کنید؛ با حذف تصویر بنر پنهان می‌شود." : "Select an image to show the banner; remove it to hide the banner." },
+    { name: "bannerImageUrl", label: fa ? "تصویر بنر تبرستان" : "Tabarestan banner image", type: "image" },
+    { name: "bannerVisibility", label: fa ? "نمایش بنر" : "Banner visibility", options: [{value: "visible", label: fa ? "نمایش" : "Visible"}, {value: "hidden", label: fa ? "پنهان" : "Hidden"}] },
     { name: "bannerLink", label: fa ? "لینک بنر" : "Banner link", type: "url" },
+    ...[["bannerEyebrow", "برچسب رویداد", "Event overline"], ["bannerSubtitle", "زیرعنوان مسابقه", "Event subtitle"], ["bannerAction", "عنوان دکمه اصلی", "Primary button label"]].flatMap(([key, labelFa, labelEn]) => [{name: `${key}Fa`, label: fa ? `${labelFa} فارسی` : `Persian ${labelEn}`}, {name: `${key}En`, label: fa ? `${labelFa} انگلیسی` : `English ${labelEn}`}]),
+    { name: "bannerEnglishTitle", label: fa ? "عنوان لاتین رویداد" : "Event English display title", dir: "ltr" },
+    { name: "bannerDeadline", label: fa ? "زمان شروع رویداد (ساعت تهران)" : "Event starts at (Tehran time)", type: "datetime-local", hint: fa ? "با خالی گذاشتن، شمارنده پنهان می‌شود." : "Leave empty to hide the countdown." },
+    { name: "bannerBackgroundUrl", label: fa ? "تصویر پس‌زمینه بنر" : "Banner background image", type: "image" },
+    { name: "bannerTheme", label: fa ? "رنگ پس‌زمینه" : "Background theme", options: [{ value: "forest", label: fa ? "سبز جنگلی" : "Forest" }, { value: "emerald", label: fa ? "سبز زمردی" : "Emerald" }, { value: "night", label: fa ? "شب" : "Night" }] },
+    { name: "bannerDetailsLink", label: fa ? "پیوند اطلاعات بیشتر" : "Learn more URL", type: "url" },
     { name: "trustImageUrl", label: fa ? "تصویر نماد اعتماد" : "Trust seal image", type: "image" },
     { name: "trustLink", label: fa ? "لینک اعتبارسنجی نماد اعتماد" : "Trust seal verification link", type: "url" },
   ];
@@ -29,7 +37,7 @@ export default async function StaticPages() {
     {title: fa ? "هیرو صفحه اصلی" : "Homepage hero", fields: ["heroTitleFa", "heroTitleEn", "heroDescriptionFa", "heroDescriptionEn", "heroVideoUrl", "heroImageUrl"]},
     {title: fa ? "عنوان‌های بخش‌ها و متن ثابت" : "Section headings and fixed text", fields: headings.flatMap(([key]) => [`${key}Fa`, `${key}En`])},
     {title: fa ? "چرا کاکتوس؟" : "Why Cactus?", fields: ["whyContentFa", "whyContentEn"]},
-    {title: fa ? "بنر تبرستان" : "Tabarestan banner", fields: ["bannerTitleFa", "bannerTitleEn", "bannerTextFa", "bannerTextEn", "bannerImageUrl", "bannerLink"], sidebar: true},
+    {title: fa ? "بنر تبرستان" : "Tabarestan banner", fields: ["bannerVisibility", "bannerEyebrowFa", "bannerEyebrowEn", "bannerTitleFa", "bannerTitleEn", "bannerEnglishTitle", "bannerSubtitleFa", "bannerSubtitleEn", "bannerTextFa", "bannerTextEn", "bannerDeadline", "bannerImageUrl", "bannerBackgroundUrl", "bannerTheme", "bannerLink", "bannerActionFa", "bannerActionEn", "bannerDetailsLink"], sidebar: true},
     {title: fa ? "نماد اعتماد فوتر" : "Footer trust seal", fields: ["trustImageUrl", "trustLink"], sidebar: true},
-  ]} initial={presentation}><VideoGalleryEditor locale={locale} name="aboutVideos" title={fa ? "چیدمان ویدیوهای درباره" : "About video layout"} urls={presentation.aboutVideos} frames={presentation.aboutVideoFrames} /><VideoGalleryEditor locale={locale} name="testimonialVideos" title={fa ? "چیدمان ویدیوهای رضایت" : "Testimonial video layout"} urls={presentation.testimonialVideos} frames={presentation.testimonialVideoFrames} /></ActionForm></PanelPage>;
+  ]} initial={Object.fromEntries(Object.entries(presentation).filter(([, value]) => typeof value === "string").map(([key, value]) => [key, key === "bannerDeadline" && value ? new Date(Date.parse(String(value)) + 210 * 60000).toISOString().slice(0, 16) : String(value)]))}><VideoGalleryEditor locale={locale} name="aboutVideos" title={fa ? "چیدمان ویدیوهای درباره" : "About video layout"} urls={presentation.aboutVideos} frames={presentation.aboutVideoFrames} /><TestimonialEditor initial={presentation.testimonials} locale={locale} /><VideoGalleryEditor locale={locale} name="testimonialVideos" title={fa ? "ویدیوهای رضایت بدون مشخصات" : "Legacy testimonial videos"} urls={presentation.testimonialVideos} frames={presentation.testimonialVideoFrames} /></ActionForm></PanelPage>;
 }

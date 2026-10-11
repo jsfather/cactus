@@ -1,4 +1,9 @@
 import { HeroVideo } from "./hero-video";
+import { EventBanner } from "./event-banner";
+import { Testimonials } from "./testimonials";
+import { ValueCards } from "./value-cards";
+import { formatMarketingText } from "@/lib/content/marketing";
+import { sanitizeRichText } from "@/lib/content/rich-text";
 import { getPresentation } from "@/lib/site-content/presentation";
 import { VideoGallery } from "./video-player";
 import Image from "next/image";
@@ -45,6 +50,9 @@ export async function LandingPage({ locale }: { locale: Locale }) {
     ]);
   const presentation = getPresentation(content.presentation);
   const local = (fa: string, en: string) => locale === "en" ? en || fa : fa;
+  const aboutHtml = sanitizeRichText(formatMarketingText(locale === "en" ? content.aboutUsEn || content.aboutUsFa : content.aboutUsFa));
+  // Keep the homepage introduction concise; the About page retains the full content.
+  const aboutPreview = aboutHtml.match(/<p(?:\s[^>]*)?>[\s\S]*?<\/p>/gi)?.slice(0, 3).join("") || aboutHtml;
   const features: [string, string, string, string, string, PublicIconName][] = [
     [
       "/shop",
@@ -144,9 +152,12 @@ export async function LandingPage({ locale }: { locale: Locale }) {
             </nav>
           </div>
         </section>
+        <nav className="public-wrap feature-strip feature-strip--hero" aria-label={locale === "fa" ? "بخش‌های وب‌سایت" : "Explore the website"}>
+          {features.map(([path, fa, en, subFa, subEn, icon]) => <Link key={path} href={localizePath(locale, path)}><PublicIcon name={icon} /><strong>{locale === "fa" ? fa : en}</strong><small>{locale === "fa" ? subFa : subEn}</small></Link>)}
+        </nav>
         <section className="public-wrap public-section home-why">
           <SectionHeading locale={locale} title={local(presentation.whyTitleFa, presentation.whyTitleEn)} eyebrow={locale === "fa" ? "یادگیری برای آینده" : "LEARN FOR THE FUTURE"} />
-          <RichContent html={local(presentation.whyContentFa, presentation.whyContentEn)} dir={locale === "en" && !presentation.whyContentEn ? "rtl" : undefined} />
+          <ValueCards html={local(presentation.whyContentFa, presentation.whyContentEn)} dir={locale === "en" && !presentation.whyContentEn ? "rtl" : undefined} />
         </section>
         <section className="public-wrap public-section">
           <Reveal className="home-about">
@@ -154,11 +165,7 @@ export async function LandingPage({ locale }: { locale: Locale }) {
               <p className="public-kicker">{d.aboutTitle}</p>
               <h2>{local(presentation.aboutTitleFa, presentation.aboutTitleEn)}</h2>
               <RichContent
-                html={
-                  locale === "en"
-                    ? content.aboutUsEn || content.aboutUsFa
-                    : content.aboutUsFa
-                }
+                html={aboutPreview}
                 dir={locale === "en" && !content.aboutUsEn ? "rtl" : undefined}
               />
               <div className="home-about-pillars">
@@ -207,11 +214,7 @@ export async function LandingPage({ locale }: { locale: Locale }) {
             </Reveal>
           </section>
         )}
-        {presentation.bannerImageUrl && <section className="public-wrap public-section"><div className="home-promotion">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={presentation.bannerImageUrl} alt={local(presentation.bannerTitleFa, presentation.bannerTitleEn)} loading="lazy" />
-          <div><h2>{local(presentation.bannerTitleFa, presentation.bannerTitleEn)}</h2><p>{local(presentation.bannerTextFa, presentation.bannerTextEn)}</p>{presentation.bannerLink && <a className="public-button" href={presentation.bannerLink} target="_blank" rel="noopener noreferrer">{locale === "fa" ? "اطلاعات بیشتر" : "Learn more"}<Arrow /></a>}</div>
-        </div></section>}
+        {presentation.bannerVisibility === "visible" && (presentation.bannerTitleFa || presentation.bannerTitleEn) && <EventBanner presentation={presentation} locale={locale} />}
         {products.length > 0 && (
           <section className="public-wrap public-section">
             <SectionHeading
@@ -230,7 +233,7 @@ export async function LandingPage({ locale }: { locale: Locale }) {
             </Reveal>
           </section>
         )}
-        <section className="public-wrap public-section"><VideoGallery urls={presentation.testimonialVideos} frames={presentation.testimonialVideoFrames} locale={locale} title={local(presentation.testimonialsTitleFa, presentation.testimonialsTitleEn)} /></section>
+        <section className="public-wrap public-section"><SectionHeading locale={locale} eyebrow={locale === "fa" ? "تجربه‌های واقعی یادگیری" : "REAL LEARNING STORIES"} title={local(presentation.testimonialsTitleFa, presentation.testimonialsTitleEn)} /><Testimonials items={presentation.testimonials} legacyUrls={presentation.testimonialVideos} locale={locale} /></section>
         {posts.length > 0 && (
           <section className="public-wrap public-section">
             <SectionHeading
@@ -285,20 +288,6 @@ export async function LandingPage({ locale }: { locale: Locale }) {
             ))}
           </section>
         )}
-        <nav
-          className="public-wrap feature-strip"
-          aria-label={
-            locale === "fa" ? "بخش‌های وب‌سایت" : "Explore the website"
-          }
-        >
-          {features.map(([path, fa, en, subFa, subEn, icon]) => (
-            <Link key={path} href={localizePath(locale, path)}>
-              <PublicIcon name={icon} />
-              <strong>{locale === "fa" ? fa : en}</strong>
-              <small>{locale === "fa" ? subFa : subEn}</small>
-            </Link>
-          ))}
-        </nav>
         <ClosingInvitation locale={locale} />
       </main>
       <SiteFooter locale={locale} />

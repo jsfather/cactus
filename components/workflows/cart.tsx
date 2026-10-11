@@ -61,15 +61,22 @@ export function AddToCart({
   locale,
   item,
   inventory,
+  iconOnly = false,
+  quantity = 1,
 }: {
   locale: Locale;
   item: Omit<CartItem, "quantity">;
   inventory: number;
+  iconOnly?: boolean;
+  quantity?: number;
 }) {
   const { toast } = useFeedback();
   return (
     <button
-      className="public-button"
+      className={iconOnly ? "public-button cart-icon-button" : "public-button"}
+      type="button"
+      aria-label={text(locale, "افزودن به سبد", "Add to cart")}
+      title={text(locale, "افزودن به سبد", "Add to cart")}
       disabled={inventory < 1}
       onClick={() => {
         try {
@@ -79,7 +86,7 @@ export function AddToCart({
               i.productId === item.productId && i.variantId === item.variantId,
           );
           if (
-            (existing?.quantity ?? 0) >= Math.min(inventory, 100) ||
+            !Number.isInteger(quantity) || quantity < 1 || (existing?.quantity ?? 0) + quantity > Math.min(inventory, 100) ||
             (!existing && cart.length >= 50)
           ) {
             toast.error(
@@ -94,9 +101,9 @@ export function AddToCart({
           write(
             existing
               ? cart.map((i) =>
-                  i === existing ? { ...i, quantity: i.quantity + 1 } : i,
+                  i === existing ? { ...i, quantity: i.quantity + quantity } : i,
                 )
-              : [...cart, { ...item, quantity: 1 }],
+              : [...cart, { ...item, quantity }],
           );
           toast.success(text(locale, "به سبد اضافه شد.", "Added to cart."));
         } catch {
@@ -110,7 +117,8 @@ export function AddToCart({
         }
       }}
     >
-      {text(locale, "افزودن به سبد", "Add to cart")}
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true" className="size-5"><path d="M6 7h14l-2 10H8L5 3H2M9 21h1m6 0h1" /></svg>
+      {!iconOnly && text(locale, "افزودن به سبد", "Add to cart")}
     </button>
   );
 }

@@ -40,12 +40,14 @@ export async function PublicShell({
   heading,
   description,
   children,
+  compact = false,
 }: {
   locale: Locale;
   path: string;
   heading: string;
   description?: string;
   children: React.ReactNode;
+  compact?: boolean;
 }) {
   const kinds: Record<string, [string, string, string]> = {
     "/courses": ["01", "مسیرهای یادگیری", "LEARNING PATHS"],
@@ -66,7 +68,7 @@ export async function PublicShell({
     <div className="public-site">
       <SiteHeader locale={locale} currentPath={path} />
       <main id="public-main">
-        <PageIntro
+        {!compact && <PageIntro
           locale={locale}
           kind={
             path === "/search"
@@ -79,7 +81,7 @@ export async function PublicShell({
           eyebrow={locale === "fa" ? fa : en}
           title={heading}
           description={description}
-        />
+        />}
         <div className="public-wrap public-shell-content">{children}</div>
       </main>
       <SiteFooter locale={locale} />
@@ -281,26 +283,27 @@ export async function CourseDetail({
       locale={locale}
       path={`/courses/${slug}`}
       heading={title(c, locale)}
+      compact
     >
       <div className="course-detail-layout grid items-start gap-8 lg:grid-cols-[1fr_340px]">
-        <article className="space-y-8">
-          {(
+        <article className="space-y-8 course-detail-main">
+          <header className="course-detail-heading"><Link className="public-link" href={localizePath(locale, "/courses")}>{text(locale, "همه دوره‌ها", "All courses")}<Arrow /></Link><div className="course-detail-badges"><span>{c.topic}</span><span>{text(locale, ({beginner:"مقدماتی",intermediate:"متوسط",advanced:"پیشرفته"} as Record<string,string>)[c.level] || c.level, c.level)}</span>{term && <span>{text(locale, ({online:"آنلاین",in_person:"حضوری",hybrid:"ترکیبی"} as Record<string,string>)[term.deliveryMode] || term.deliveryMode, term.deliveryMode.replaceAll("_", " "))}</span>}</div><h1 dir={locale === "en" && !c.titleEn ? "rtl" : undefined}>{title(c, locale)}</h1><p className="public-description" dir={locale === "en" && !c.summaryEn ? "rtl" : undefined}>{locale === "en" ? c.summaryEn || c.summaryFa : c.summaryFa}</p><p className="course-detail-meta">{c.duration} · {c.ageGroup}</p></header>
+          {c.videoUrl ? <VideoPlayer url={c.videoUrl} locale={locale} label={text(locale, "معرفی دوره", "Course introduction")} frame="landscape" /> : (
             <img
               src={c.coverImageUrl || "/images/reference-v4/scene-arduino.svg"}
               alt=""
               className="aspect-video w-full rounded-3xl object-cover"
             />
           )}
-          <p className="public-description" dir={locale === "en" && !c.summaryEn ? "rtl" : undefined}>{locale === "en" ? c.summaryEn || c.summaryFa : c.summaryFa}</p>
-          <RichContent html={locale === "en" ? c.contentEn || c.contentFa : c.contentFa} dir={locale === "en" && !c.contentEn ? "rtl" : undefined} />
-          {c.videoUrl && <VideoPlayer url={c.videoUrl} locale={locale} label={text(locale, "معرفی دوره", "Course introduction")} />}
-          {instructors.length > 0 ? <section className="space-y-4"><h2 className="text-2xl font-bold">{text(locale, "مدرس‌های دوره", "Course instructors")}</h2><div className="grid gap-4 sm:grid-cols-2">{instructors.map(({user: instructor, username}) => <article className="flex items-center gap-4 rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800" key={instructor.id}>{instructor.avatarUrl && <img className="size-16 rounded-full object-cover" src={instructor.avatarUrl} alt="" />}<div>{username ? <Link href={localizePath(locale, `/teachers/${username}`)}>{getLocalizedUserName(instructor, locale)}</Link> : <strong>{getLocalizedUserName(instructor, locale)}</strong>}</div></article>)}</div></section> : <section><h2 className="text-2xl font-bold">{text(locale, "مدرس دوره", "Course instructor")}</h2><p className="mt-3 text-zinc-500">{text(locale, "مدرس این دوره به‌زودی معرفی می‌شود.", "The instructor will be announced soon.")}</p></section>}
-          {c.sections.syllabus.length > 0 && <h2 className="text-2xl font-bold">{text(locale, "سرفصل‌های دوره", "Course syllabus")}</h2>}
+          <nav className="course-section-nav" aria-label={text(locale, "بخش‌های دوره", "Course sections")}><a href="#course-overview">{text(locale, "معرفی دوره", "Overview")}</a>{c.sections.syllabus.length > 0 && <a href="#course-syllabus">{text(locale, "سرفصل‌ها", "Syllabus")}</a>}<a href="#course-instructors">{text(locale, "مدرس دوره", "Instructors")}</a><a href="#course-comments">{text(locale, "نظرات دانش‌پژوهان", "Student comments")}</a></nav>
+          <section id="course-overview"><h2 className="mb-5 text-2xl font-bold">{text(locale, "درباره این دوره", "About this course")}</h2><RichContent html={locale === "en" ? c.contentEn || c.contentFa : c.contentFa} dir={locale === "en" && !c.contentEn ? "rtl" : undefined} /></section>
+          {instructors.length > 0 ? <section id="course-instructors" className="space-y-4"><h2 className="text-2xl font-bold">{text(locale, "مدرس‌های دوره", "Course instructors")}</h2><div className="grid gap-4 sm:grid-cols-2">{instructors.map(({user: instructor, username}) => <article className="flex items-center gap-4 rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800" key={instructor.id}>{instructor.avatarUrl && <img className="size-16 rounded-full object-cover" src={instructor.avatarUrl} alt="" />}<div>{username ? <Link href={localizePath(locale, `/teachers/${username}`)}>{getLocalizedUserName(instructor, locale)}</Link> : <strong>{getLocalizedUserName(instructor, locale)}</strong>}</div></article>)}</div></section> : <section id="course-instructors"><h2 className="text-2xl font-bold">{text(locale, "مدرس دوره", "Course instructor")}</h2><p className="mt-3 text-zinc-500">{text(locale, "مدرس این دوره به‌زودی معرفی می‌شود.", "The instructor will be announced soon.")}</p></section>}
+          {c.sections.syllabus.length > 0 && <h2 id="course-syllabus" className="text-2xl font-bold">{text(locale, "سرفصل‌های دوره", "Course syllabus")}</h2>}
           {c.sections.syllabus.map((s, i) => (
             <details
               key={i}
               className="rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800"
-              open
+              open={i === 0}
               dir={locale === "en" && !s.titleEn ? "rtl" : undefined}
             >
               <summary className="cursor-pointer font-bold">
@@ -380,7 +383,9 @@ export async function CourseDetail({
             </section>
           )}
         </article>
-        <aside className="space-y-5 rounded-3xl border border-zinc-200 p-7 lg:sticky lg:top-6 dark:border-zinc-800">
+        <aside className="course-enrollment-panel space-y-5 rounded-3xl border border-zinc-200 p-7 lg:sticky lg:top-6 dark:border-zinc-800">
+          <img className="course-purchase-cover" src={c.coverImageUrl || "/images/reference-v4/scene-arduino.svg"} alt="" />
+          <h2 className="purchase-heading">{text(locale, "شرکت در دوره", "Join this course")}</h2>
           <p>
             {c.topic} · {c.ageGroup}
           </p>
@@ -389,7 +394,7 @@ export async function CourseDetail({
           {term && <p>{text(locale, "شیوه برگزاری", "Delivery")}: {text(locale, ({online:"آنلاین",in_person:"حضوری",hybrid:"ترکیبی"} as Record<string,string>)[term.deliveryMode] || term.deliveryMode, term.deliveryMode.replaceAll("_", " "))}</p>}
           {term && (
             <>
-              <p className="text-2xl font-bold">
+              <p className="course-tuition text-2xl font-bold">
                 {term.tuitionToman.toLocaleString(locale)}{" "}
                 {text(locale, "تومان", "toman")}
               </p>
@@ -440,10 +445,12 @@ export async function CourseDetail({
               </Link>
             </>
           )}
+          {!term && <p className="public-description">{text(locale, "زمان ثبت‌نام به‌زودی اعلام می‌شود.", "Enrollment dates will be announced soon.")}</p>}
+          <Link className="public-link" href={localizePath(locale, "/about")}>{text(locale, "برای انتخاب دوره راهنمایی می‌خواهید؟", "Need help choosing a course?")}<Arrow /></Link>
         </aside>
       </div>
       <Reactions kind="course" id={c.id} locale={locale} />
-      <CommentsSection locale={locale} targetType="course" targetId={c.id} slug={c.slug} comments={courseComments} user={user} />
+      <div id="course-comments"><CommentsSection locale={locale} targetType="course" targetId={c.id} slug={c.slug} comments={courseComments} user={user} /></div>
     </PublicShell>
   );
 }
@@ -625,7 +632,7 @@ export async function RequirementsPage({ locale }: { locale: Locale }) {
     <PublicShell
       locale={locale}
       path="/requirements"
-      heading={text(locale, "برای یادگیری آماده شوید", "Get ready to learn")}
+      heading={text(locale, "نرم‌افزارهای مورد نیاز", "Required software")}
       description={text(
         locale,
         "نرم‌افزارها و راهنمای آماده‌سازی را پیدا کنید؛ پیش از شروع، با ابزارهای مسیرتان آشنا شوید.",

@@ -25,7 +25,8 @@ export function PublicVariantPicker({
   baseInventory: number;
   variants: ProductVariant[];
 }) {
-  const [selectedId, setSelectedId] = useState(variants[0]?.id ?? "");
+  const [selectedId, setSelectedId] = useState(variants.find(v => v.inventory > 0)?.id ?? variants[0]?.id ?? "");
+  const [quantity, setQuantity] = useState(1);
   const selected = variants.find((variant) => variant.id === selectedId);
   const price = selected?.price ?? basePrice;
   const inventory = selected ? selected.inventory : baseInventory;
@@ -53,7 +54,7 @@ export function PublicVariantPicker({
                   key={variant.id}
                   type="button"
                   aria-pressed={selectedVariant}
-                  onClick={() => setSelectedId(variant.id)}
+                  onClick={() => { setSelectedId(variant.id); setQuantity(1); }}
                   className={`cursor-pointer rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
                     selectedVariant
                       ? "border-emerald-700 bg-emerald-700 text-white dark:border-emerald-400 dark:bg-emerald-400 dark:text-emerald-950"
@@ -95,7 +96,9 @@ export function PublicVariantPicker({
           {inventory > 0 ? dictionary.inStock : dictionary.outOfStock}
         </span>
       </div>
+      <div className="purchase-quantity"><span>{locale === "fa" ? "تعداد" : "Quantity"}</span><div><button type="button" disabled={quantity <= 1} onClick={() => setQuantity(q => q - 1)} aria-label={locale === "fa" ? "کاهش تعداد" : "Decrease quantity"}>−</button><output aria-live="polite">{quantity.toLocaleString(locale)}</output><button type="button" disabled={quantity >= Math.min(inventory, 100)} onClick={() => setQuantity(q => q + 1)} aria-label={locale === "fa" ? "افزایش تعداد" : "Increase quantity"}>+</button></div></div>
       <AddToCart
+        quantity={quantity}
         locale={locale}
         inventory={inventory}
         item={{

@@ -1,4 +1,10 @@
 "use client";
+/* eslint-disable @next/next/no-img-element -- Validated managed media. */
+import Link from "next/link";
+import { localizePath } from "@/lib/i18n/config";
+import { Arrow } from "@/components/public/design";
+import { PublicIcon } from "@/components/public/icons";
+import type { SoftwareMetadata } from "@/lib/resources/software";
 import { useState } from "react";
 import {
   FormLabel,
@@ -12,8 +18,7 @@ import {
 } from "@/components/panel/ui";
 import { text, title } from "@/lib/workflows";
 import type { Locale } from "@/lib/i18n/config";
-type Software = {
-  body: React.ReactNode;
+type Software = SoftwareMetadata & {
   id: string;
   titleFa: string;
   titleEn: string | null;
@@ -100,49 +105,79 @@ export function SoftwareCatalog({
       </div>
       <div className="software-grid grid items-start gap-5 sm:grid-cols-2">
         {filtered.map((i) => (
-          <details key={i.id} className="software-item border p-6">
-            <summary className="cursor-pointer text-lg font-bold">
-              {title(i, locale)}
+          <article key={i.id} className="software-card">
+            <Link
+              className="software-visual"
+              href={localizePath(locale, `/requirements/${i.id}`)}
+              aria-label={title(i, locale)}
+            >
+              {i.imageUrl ? (
+                <img src={i.imageUrl} alt="" loading="lazy" />
+              ) : (
+                <PublicIcon name="software" />
+              )}
+            </Link>
+            <div className="software-copy">
+              <h2
+                className="text-lg font-bold"
+                dir={locale === "en" && !i.titleEn ? "rtl" : undefined}
+              >
+                <Link href={localizePath(locale, `/requirements/${i.id}`)}>
+                  {title(i, locale)}
+                </Link>
+              </h2>
               <span className="mt-2 block text-xs font-normal text-zinc-500">
                 {i.platforms}
               </span>
-            </summary>
-            <div className="mt-5 space-y-5">
-              {i.version && (
-                <p className="text-sm text-zinc-500">
-                  {text(locale, "نسخه پیشنهادی", "Recommended version")}:{" "}
-                  {i.version}
+              <div className="mt-5 space-y-5">
+                {i.version && (
+                  <p className="text-sm text-zinc-500">
+                    {text(locale, "نسخه پیشنهادی", "Recommended version")}:{" "}
+                    {i.version}
+                  </p>
+                )}
+                <p
+                  className="software-summary"
+                  dir={locale === "en" && !i.summaryEn ? "rtl" : undefined}
+                >
+                  {locale === "en" ? i.summaryEn || i.summaryFa : i.summaryFa}
                 </p>
-              )}
-              {i.body}
-              <div className="flex flex-wrap gap-3">
-                {i.attachmentUrl && (
-                  <a
-                    href={i.attachmentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={primaryButtonClass}
-                  >
-                    {text(locale, "دانلود رسمی", "Official download")}
-                  </a>
-                )}
-                {i.documentationUrl && (
-                  <a
-                    href={i.documentationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={secondaryButtonClass}
-                  >
-                    {text(
-                      locale,
-                      "راهنمای نصب و استفاده",
-                      "Installation & documentation",
-                    )}
-                  </a>
-                )}
+                <Link
+                  className="public-link"
+                  href={localizePath(locale, `/requirements/${i.id}`)}
+                >
+                  {text(locale, "مشخصات و راهنما", "Details & guide")}
+                  <Arrow />
+                </Link>
+                <div className="flex flex-wrap gap-3">
+                  {i.attachmentUrl && (
+                    <a
+                      href={i.attachmentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={primaryButtonClass}
+                    >
+                      {text(locale, "دانلود رسمی", "Official download")}
+                    </a>
+                  )}
+                  {i.documentationUrl && (
+                    <a
+                      href={i.documentationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={secondaryButtonClass}
+                    >
+                      {text(
+                        locale,
+                        "راهنمای نصب و استفاده",
+                        "Installation & documentation",
+                      )}
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
-          </details>
+          </article>
         ))}
       </div>
       {!filtered.length && (

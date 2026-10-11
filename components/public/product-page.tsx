@@ -53,7 +53,7 @@ export async function ProductPage({
                 <img
                   src={product.coverImageUrl}
                   alt=""
-                  className="size-full object-cover"
+                  className="size-full object-contain"
                 />
               ) : (
                 <span className="product-placeholder">
@@ -96,8 +96,10 @@ export async function ProductPage({
                 dir={locale === "en" && !product.summaryEn ? "rtl" : undefined}
                 className="mt-5 text-justify text-lg leading-8 text-zinc-600 dark:text-zinc-300"
               />
+              {(product.specificationsFa || product.specificationsEn) && <div className="product-key-specifications"><h2>{locale === "fa" ? "مشخصات کلیدی" : "Key specifications"}</h2><ProductSpecifications value={(locale === "en" ? product.specificationsEn || product.specificationsFa : product.specificationsFa) || ""} locale={locale} fallback={locale === "en" && !product.specificationsEn} /></div>}
             </div>
             <aside className="product-buy-panel">
+              <h2 className="purchase-heading">{locale === "fa" ? "خرید از کاکتوس" : "Buy from Cactus"}</h2>
               {product.compareAtPrice && product.compareAtPrice > product.price && !product.variants.length && <p className="mb-4 text-sm"><del>{product.compareAtPrice.toLocaleString(locale)} {dictionary.toman}</del> <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">{locale === "fa" ? "تخفیف ویژه" : "On sale"}</span></p>}
               <PublicVariantPicker
                 product={product}
@@ -110,6 +112,7 @@ export async function ProductPage({
           </div>
         </section>
         <article className="product-description-panel public-wrap">
+          <h2>{locale === "fa" ? "توضیحات تکمیلی محصول" : "About this product"}</h2>
           <RichContent
             html={formatMarketingText(content)}
             dir={locale === "en" && !product.contentEn ? "rtl" : undefined}
@@ -117,14 +120,6 @@ export async function ProductPage({
             className="text-lg leading-9 text-zinc-700 dark:text-zinc-300"
           />
         </article>
-        {(product.specificationsFa || product.specificationsEn) && (
-          <section className="mx-auto max-w-3xl px-5 pb-10">
-            <h2 className="mb-5 text-2xl font-bold">
-              {locale === "fa" ? "مشخصات فنی" : "Technical specifications"}
-            </h2>
-            <ProductSpecifications value={(locale === "en" ? product.specificationsEn || product.specificationsFa : product.specificationsFa) || ""} locale={locale} fallback={locale === "en" && !product.specificationsEn} />
-          </section>
-        )}
         <CommentsSection
           locale={locale}
           targetType="product"

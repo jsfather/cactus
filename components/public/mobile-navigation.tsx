@@ -3,16 +3,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { localizePath, type Locale } from "@/lib/i18n/config";
-import { publicLinks } from "./navigation-links";
+import type { NavigationLink } from "@/lib/site-content/navigation";
 import { PublicIcon } from "./icons";
 export function MobileNavigation({
   locale,
   currentPath,
   signedIn,
+  links,
 }: {
   locale: Locale;
   currentPath: string;
   signedIn: boolean;
+  links: NavigationLink[];
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -82,10 +84,10 @@ export function MobileNavigation({
             <Link href={localizePath(locale, "/")} onClick={close}>
               {locale === "fa" ? "خانه" : "Home"}
             </Link>
-            {publicLinks.map(([path, fa, en]) => (
+            {links.map(({ href: path, labelFa: fa, labelEn: en }) => (
               <Link
                 key={path}
-                href={localizePath(locale, path)}
+                href={path.startsWith("/") ? localizePath(locale, path) : path}
                 aria-current={
                   currentPath === path || currentPath.startsWith(path + "/")
                     ? "page"

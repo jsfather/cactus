@@ -21,6 +21,7 @@ function publicProductSelection(locale: Locale) {
     tags: products.tags,
     compareAtPrice: products.compareAtPrice,
     hasVariants: sql<boolean>`exists(select 1 from ${productVariants} where ${productVariants.productId} = ${products.id} and ${productVariants.isActive} = true)`,
+    variantLabels: sql<{ id: string; titleFa: string; titleEn: string | null; price: number | null; inventory: number }[]>`coalesce((select json_agg(v order by v."sortOrder", v.id) from (select ${productVariants.id} as id, ${productVariants.titleFa} as "titleFa", ${productVariants.titleEn} as "titleEn", ${productVariants.price} as price, ${productVariants.inventory} as inventory, ${productVariants.sortOrder} as "sortOrder" from ${productVariants} where ${productVariants.productId} = ${products.id} and ${productVariants.isActive} = true) v), '[]'::json)`,
     availableInventory: sql<number>`case when exists(select 1 from ${productVariants} where ${productVariants.productId} = ${products.id} and ${productVariants.isActive} = true) then (select coalesce(sum(${productVariants.inventory}), 0)::int from ${productVariants} where ${productVariants.productId} = ${products.id} and ${productVariants.isActive} = true) else ${products.inventory} end`,
     specificationsFa: products.specificationsFa,
     specificationsEn: products.specificationsEn,

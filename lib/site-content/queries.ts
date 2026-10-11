@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm";
+import { cache } from "react";
 import { getDatabase } from "@/lib/db/client";
 import { siteContent } from "@/lib/db/schema";
 
@@ -19,7 +20,7 @@ export const defaultSiteContent = {
   footerTextEn: "All rights reserved by Cactus Robotics School.",
 };
 
-export async function getSiteContent() {
+export const getSiteContent = cache(async () => {
   const [content] = await getDatabase()
     .select()
     .from(siteContent)
@@ -27,4 +28,4 @@ export async function getSiteContent() {
     .limit(1);
 
   return content ?? defaultSiteContent;
-}
+});
