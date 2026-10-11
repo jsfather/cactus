@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { createComment, type CommentFormState } from "@/app/comment-actions";
+import { useActionErrorToast } from "@/components/feedback/toast-effects";
 import { useFeedback } from "@/components/feedback/feedback-provider";
 import { FieldError, PanelTextarea } from "@/components/panel/form-controls";
 import { primaryButtonClass } from "@/components/panel/ui";
@@ -9,7 +10,8 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
 const initialState: CommentFormState = {};
-export function CommentForm({ targetType, targetId, slug, locale }: { targetType: "post" | "product"; targetId: string; slug: string; locale: Locale }) { const dictionary = getDictionary(locale); const [body, setBody] = useState(""); const [state, action, pending] = useActionState(createComment.bind(null, targetType, targetId, slug), initialState); const { toast } = useFeedback();
+export function CommentForm({ targetType, targetId, slug, locale }: { targetType: "post" | "product" | "course"; targetId: string; slug: string; locale: Locale }) { const dictionary = getDictionary(locale); const [body, setBody] = useState(""); const [state, action, pending] = useActionState(createComment.bind(null, targetType, targetId, slug), initialState); const { toast } = useFeedback();
+  useActionErrorToast(state);
   useEffect(() => {
     if (!state.success) return;
     toast.success(state.success);

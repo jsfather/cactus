@@ -1,3 +1,6 @@
+import { formatMarketingText } from "@/lib/content/marketing";
+import { RichContent } from "@/components/content/rich-content";
+import { AddToCart } from "@/components/workflows/cart";
 /* eslint-disable @next/next/no-img-element -- Managed media can use arbitrary validated remote hosts. */
 import Link from "next/link";
 import type { getPublishedProducts } from "@/lib/products/queries";
@@ -33,27 +36,25 @@ export function ProductCard({
             <CircuitMark />
           </span>
         )}
-        {product.isFeatured && (
-          <span className="product-badge">
-            {locale === "fa" ? "منتخب کاکتوس" : "CACTUS PICK"}
-          </span>
-        )}
+        <div className="product-status-badges">
+          <span className={product.availableInventory > 0 ? "badge-stock" : "badge-out"}>{product.availableInventory > 0 ? d.inStock : d.outOfStock}</span>
+          {product.compareAtPrice && product.compareAtPrice > product.price && <span className="badge-sale">{Math.round((1 - product.price / product.compareAtPrice) * 100).toLocaleString(locale)}٪ {locale === "fa" ? "تخفیف" : "off"}</span>}
+          {product.isFeatured && <span className="badge-featured">{locale === "fa" ? "منتخب کاکتوس" : "Cactus pick"}</span>}
+        </div>
       </Link>
       <div className="product-copy">
         <Heading dir={locale === "en" && !product.titleEn ? "rtl" : undefined}>
           <Link href={href}>{title}</Link>
         </Heading>
-        <p
+        <RichContent
+          html={formatMarketingText(summary)}
           className="line-clamp-2"
           dir={locale === "en" && !product.summaryEn ? "rtl" : undefined}
-        >
-          {summary}
-        </p>
-        <p className="text-xs">
-          {product.inventory > 0 ? d.inStock : d.outOfStock}
-        </p>
+        />
+
         <div className="product-bottom">
           <strong>
+            {product.compareAtPrice && product.compareAtPrice > product.price && <del className="block text-xs font-normal opacity-60">{product.compareAtPrice.toLocaleString(locale)} {d.toman}</del>}
             {new Intl.NumberFormat(localeConfig[locale].dateLocale).format(
               product.price,
             )}{" "}
@@ -63,6 +64,7 @@ export function ProductCard({
             {d.viewProduct} <Arrow />
           </Link>
         </div>
+        {product.hasVariants ? <Link className="public-button" href={href}>{locale === "fa" ? "انتخاب تنوع و خرید" : "Choose options"}</Link> : <AddToCart locale={locale} inventory={product.availableInventory} item={{productId: product.id, variantId: "", titleFa: product.titleFa, titleEn: product.titleEn || product.titleFa, price: product.price, imageUrl: product.coverImageUrl || undefined, slug: product.slug}} />}
       </div>
     </article>
   );

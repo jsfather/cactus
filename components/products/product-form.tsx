@@ -14,12 +14,12 @@ import { getPanelDictionary } from "@/lib/i18n/panel";
 
 const initialState: ProductFormState = {};
 export type ProductFormValues = {
-  slug: string; titleFa: string; titleEn: string; summaryFa: string; summaryEn: string;
+  tags: string; compareAtPrice: string; slug: string; titleFa: string; titleEn: string; summaryFa: string; summaryEn: string;
   contentFa: string; contentEn: string; coverImageUrl: string; price: string; inventory: string;
   status: "draft" | "published"; isFeatured: boolean;
   categoryIds: string[];
 };
-const emptyValues: ProductFormValues = { slug: "", titleFa: "", titleEn: "", summaryFa: "", summaryEn: "", contentFa: "", contentEn: "", coverImageUrl: "", price: "", inventory: "0", status: "draft", isFeatured: false, categoryIds: [] };
+const emptyValues: ProductFormValues = { tags: "", compareAtPrice: "", slug: "", titleFa: "", titleEn: "", summaryFa: "", summaryEn: "", contentFa: "", contentEn: "", coverImageUrl: "", price: "", inventory: "0", status: "draft", isFeatured: false, categoryIds: [] };
 
 export function ProductForm({ locale, mode = "create", productId, initialValues = emptyValues, categories = [] }: { locale: Locale; mode?: "create" | "edit"; productId?: string; initialValues?: ProductFormValues; categories?: Array<{ id: string; titleFa: string; titleEn: string | null }> }) {
   const dictionary = getPanelDictionary(locale);
@@ -27,6 +27,8 @@ export function ProductForm({ locale, mode = "create", productId, initialValues 
   const [state, action, pending] = useActionState(formAction, initialState);
   useActionErrorToast(state);
   const { bind } = usePreservedFields({
+    tags: initialValues.tags,
+    compareAtPrice: initialValues.compareAtPrice,
     slug: initialValues.slug,
     titleFa: initialValues.titleFa,
     titleEn: initialValues.titleEn,
@@ -75,6 +77,8 @@ export function ProductForm({ locale, mode = "create", productId, initialValues 
                 </FormLabel>
                 <FieldError errors={state.fieldErrors?.price} />
               </div>
+              <div><FormLabel label={isFa ? "قیمت قبل از تخفیف (اختیاری)" : "Original price (optional)"}><PanelInput {...bind("compareAtPrice")} type="number" min="0" dir="ltr" className="nums-en" /></FormLabel><FieldError errors={state.fieldErrors?.compareAtPrice} /></div>
+              <div className="sm:col-span-2"><FormLabel label={isFa ? "برچسب‌ها" : "Tags"} hint={isFa ? "با ویرگول جدا کنید؛ هر برچسب حداکثر ۸۰ حرف." : "Separate with commas; up to 80 characters per tag."}><PanelInput {...bind("tags")} /></FormLabel><FieldError errors={state.fieldErrors?.tags} /></div>
               <div>
                 <FormLabel label={dictionary.shop.inventory}>
                   <PanelInput {...bind("inventory")} required type="number" min="0" dir="ltr" className="nums-en" />

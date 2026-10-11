@@ -155,6 +155,20 @@
       "when": 1791629897546,
       "tag": "0021_draft_term_assignments",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1791705451173,
+      "tag": "0022_chubby_wind_dancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1791705978693,
+      "tag": "0023_huge_warlock",
+      "breakpoints": true
     }
   ]
 }

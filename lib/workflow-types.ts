@@ -1,4 +1,5 @@
 export type CourseSections = {
+  teacherIds?: string[];
   syllabus: {
     titleFa: string;
     titleEn: string;

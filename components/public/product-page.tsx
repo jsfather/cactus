@@ -1,3 +1,5 @@
+import { formatMarketingText } from "@/lib/content/marketing";
+import { ProductSpecifications } from "@/components/products/specifications";
 import { CircuitMark } from "./design";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -89,14 +91,14 @@ export async function ProductPage({
                   ))}
                 </ul>
               ) : null}
-              <p
+              <RichContent
+                html={formatMarketingText(summary)}
                 dir={locale === "en" && !product.summaryEn ? "rtl" : undefined}
-                className="mt-5 text-lg leading-8 text-zinc-600 dark:text-zinc-300"
-              >
-                {summary}
-              </p>
+                className="mt-5 text-justify text-lg leading-8 text-zinc-600 dark:text-zinc-300"
+              />
             </div>
             <aside className="product-buy-panel">
+              {product.compareAtPrice && product.compareAtPrice > product.price && !product.variants.length && <p className="mb-4 text-sm"><del>{product.compareAtPrice.toLocaleString(locale)} {dictionary.toman}</del> <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">{locale === "fa" ? "تخفیف ویژه" : "On sale"}</span></p>}
               <PublicVariantPicker
                 product={product}
                 locale={locale}
@@ -109,7 +111,7 @@ export async function ProductPage({
         </section>
         <article className="product-description-panel public-wrap">
           <RichContent
-            html={content}
+            html={formatMarketingText(content)}
             dir={locale === "en" && !product.contentEn ? "rtl" : undefined}
             lang={locale === "en" && !product.contentEn ? "fa" : locale}
             className="text-lg leading-9 text-zinc-700 dark:text-zinc-300"
@@ -120,19 +122,7 @@ export async function ProductPage({
             <h2 className="mb-5 text-2xl font-bold">
               {locale === "fa" ? "مشخصات فنی" : "Technical specifications"}
             </h2>
-            <ul className="divide-y divide-zinc-200 rounded-2xl border border-zinc-200 dark:divide-zinc-800 dark:border-zinc-800">
-              {(locale === "en"
-                ? product.specificationsEn || product.specificationsFa
-                : product.specificationsFa
-              )
-                ?.split("\n")
-                .filter(Boolean)
-                .map((spec, i) => (
-                  <li className="p-4" key={i}>
-                    {spec}
-                  </li>
-                ))}
-            </ul>
+            <ProductSpecifications value={(locale === "en" ? product.specificationsEn || product.specificationsFa : product.specificationsFa) || ""} locale={locale} fallback={locale === "en" && !product.specificationsEn} />
           </section>
         )}
         <CommentsSection

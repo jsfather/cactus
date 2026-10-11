@@ -4,8 +4,8 @@ export const metadata: Metadata = { title: "Shop" };
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; q?: string; tag?: string }>;
 }) {
-  const { category } = await searchParams;
-  return <ShopIndexPage locale="en" category={category} />;
+  const { category, q, tag } = await searchParams;
+  return <ShopIndexPage locale="en" category={category} q={q} tag={tag} />;
 }

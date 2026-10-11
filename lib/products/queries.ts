@@ -18,6 +18,10 @@ import {
 
 function publicProductSelection(locale: Locale) {
   return {
+    tags: products.tags,
+    compareAtPrice: products.compareAtPrice,
+    hasVariants: sql<boolean>`exists(select 1 from ${productVariants} where ${productVariants.productId} = ${products.id} and ${productVariants.isActive} = true)`,
+    availableInventory: sql<number>`case when exists(select 1 from ${productVariants} where ${productVariants.productId} = ${products.id} and ${productVariants.isActive} = true) then (select coalesce(sum(${productVariants.inventory}), 0)::int from ${productVariants} where ${productVariants.productId} = ${products.id} and ${productVariants.isActive} = true) else ${products.inventory} end`,
     specificationsFa: products.specificationsFa,
     specificationsEn: products.specificationsEn,
     id: products.id,
@@ -39,7 +43,7 @@ function publicProductSelection(locale: Locale) {
   };
 }
 
-export function getPublishedProducts(locale: Locale, limit?: number, categorySlug?: string) {
+export function getPublishedProducts(locale: Locale, limit?: number, categorySlug?: string, search?: string, tag?: string) {
   const query = getDatabase()
     .select(publicProductSelection(locale))
     .from(products)
@@ -47,6 +51,8 @@ export function getPublishedProducts(locale: Locale, limit?: number, categorySlu
     .where(and(
       eq(products.status, "published"),
       lte(products.publishedAt, new Date()),
+      search ? or(ilike(products.titleFa, `%${escapeLikePattern(search.slice(0, 100))}%`), ilike(products.titleEn, `%${escapeLikePattern(search.slice(0, 100))}%`), ilike(products.summaryFa, `%${escapeLikePattern(search.slice(0, 100))}%`)) : undefined,
+      tag ? sql`${tag.slice(0, 80)} = any(${products.tags})` : undefined,
       categorySlug
         ? sql`exists (
             select 1
@@ -179,4 +185,9 @@ export async function getAdminProducts(
 export async function getAdminProduct(productId: string) {
   const [product] = await getDatabase().select().from(products).where(eq(products.id, productId)).limit(1);
   return product ?? null;
+}
+
+export async function getPublicProductTags() {
+  const rows = await getDatabase().select({ tag: sql<string>`distinct unnest(${products.tags})` }).from(products).where(and(eq(products.status, "published"), lte(products.publishedAt, new Date())));
+  return rows.map(r => r.tag).sort((a, b) => a.localeCompare(b));
 }

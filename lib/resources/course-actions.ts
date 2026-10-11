@@ -1,11 +1,11 @@
 "use server";
-import { eq } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
-import { coursePages } from "@/lib/db/schema";
+import { coursePages, users } from "@/lib/db/schema";
 import { sanitizeRichText } from "@/lib/content/rich-text";
 import {
   optionalUrl,
@@ -18,6 +18,7 @@ import type { Locale } from "@/lib/i18n/config";
 const short = z.string().trim().max(240);
 const long = z.string().max(100000);
 const sectionsSchema = z.object({
+  teacherIds: z.array(z.uuid()).max(12).default([]).transform(ids => [...new Set(ids)]),
   syllabus: z
     .array(
       z.object({
@@ -87,6 +88,10 @@ export async function saveCourse(
   const parsed = schema.safeParse({ ...Object.fromEntries(form), sections });
   if (!parsed.success) return validationError(locale, parsed.error);
   if (id && !z.uuid().safeParse(id).success) return failed(locale);
+  if (parsed.data.sections.teacherIds.length) {
+    const teachers = await getDatabase().select({id: users.id}).from(users).where(and(inArray(users.id, parsed.data.sections.teacherIds), eq(users.role, "teacher"), eq(users.isActive, true)));
+    if (teachers.length !== parsed.data.sections.teacherIds.length) return {error: locale === "fa" ? "یکی از مدرس‌های انتخاب‌شده فعال نیست." : "A selected instructor is no longer active.", fieldErrors: {sections: [locale === "fa" ? "انتخاب مدرس‌ها را بررسی کنید." : "Review the selected instructors."]}};
+  }
   const data = {
     ...parsed.data,
     termId: parsed.data.termId || null,

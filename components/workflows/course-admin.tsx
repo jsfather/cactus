@@ -1,9 +1,10 @@
-import { desc, eq } from "drizzle-orm";
+import { getLocalizedUserName } from "@/lib/users/name";
+import { desc, eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
-import { coursePages, terms, posts } from "@/lib/db/schema";
+import { coursePages, terms, posts, users } from "@/lib/db/schema";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { text, title } from "@/lib/workflows";
 import { saveCourse, deleteCourse } from "@/lib/resources/course-actions";
@@ -34,6 +35,7 @@ export async function CourseAdmin({ id }: { id?: string }) {
     if (id !== "new" && !item) notFound();
     const termOptions = await db.select().from(terms);
     const blogs = await db.select().from(posts);
+    const teachers = await db.select().from(users).where(and(eq(users.role, "teacher"), eq(users.isActive, true)));
     return (
       <PanelPage>
         <PanelPageHeader
@@ -175,6 +177,7 @@ export async function CourseAdmin({ id }: { id?: string }) {
           <CourseSectionsEditor
             locale={locale}
             initial={item?.sections}
+            teachers={teachers.map(t => ({id:t.id, label:getLocalizedUserName(t, locale)}))}
             blogs={blogs.map((b) => ({ id: b.id, label: title(b, locale) }))}
           />
         </ActionForm>

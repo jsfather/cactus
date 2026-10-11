@@ -1,6 +1,6 @@
 "use client";
 import { AttachmentField } from "./attachment-field";
-import { useActionState, useEffect, useRef, useTransition } from "react";
+import { createContext, useActionState, useEffect, useRef, useTransition } from "react";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
 import { useFeedback } from "@/components/feedback/feedback-provider";
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
@@ -22,12 +22,14 @@ import { RichTextEditor } from "@/components/content/rich-text-editor";
 import { ImageUploadField } from "@/components/media/image-upload-field";
 import type { Locale } from "@/lib/i18n/config";
 import { text, type ActionState } from "@/lib/workflows";
+export const ActionFormFieldErrors = createContext<Record<string, string[] | undefined> | undefined>(undefined);
 export type Field = {
   name: string;
   label: string;
   type?: string;
   required?: boolean;
   hint?: string;
+  dir?: "ltr" | "rtl";
   options?: { value: string; label: string }[];
   min?: number;
   max?: number;
@@ -40,6 +42,7 @@ export function ActionForm({
   heading,
   submitLabel,
   children,
+  sections,
 }: {
   locale: Locale;
   action: (state: ActionState, data: FormData) => Promise<ActionState>;
@@ -48,6 +51,7 @@ export function ActionForm({
   heading?: string;
   submitLabel?: string;
   children?: React.ReactNode;
+  sections?: { title: string; fields: string[]; sidebar?: boolean }[];
 }) {
   const [state, submit, pending] = useActionState(action, {});
   const { bind } = usePreservedFields(
@@ -65,12 +69,7 @@ export function ActionForm({
     if (state !== last.current && state.success) toast.success(state.success);
     last.current = state;
   }, [state, toast]);
-  return (
-    <form action={submit} className="space-y-5">
-      <input type="hidden" name="locale" value={locale} />
-      <PanelFormSection title={heading ?? text(locale, "اطلاعات", "Details")}>
-        <div className="grid gap-5 sm:grid-cols-2">
-          {fields.map((f) => (
+  const renderField = (f: Field) => (
             <div
               key={f.name}
               className={
@@ -120,7 +119,7 @@ export function ActionForm({
                       {...bind(f.name)}
                       rows={4}
                       required={f.required}
-                      dir={f.name.endsWith("En") ? "ltr" : undefined}
+                      dir={f.dir ?? (f.name.endsWith("En") ? "ltr" : f.name.endsWith("Fa") ? "rtl" : undefined)}
                     />
                   ) : (
                     <PanelInput
@@ -130,12 +129,12 @@ export function ActionForm({
                       min={f.min}
                       max={f.max}
                       dir={
-                        f.name.endsWith("En") ||
+                        f.dir ?? (f.name.endsWith("En") ||
                         ["url", "number", "datetime-local", "date"].includes(
                           f.type ?? "",
                         )
                           ? "ltr"
-                          : undefined
+                          : f.name.endsWith("Fa") ? "rtl" : undefined)
                       }
                     />
                   )}
@@ -143,10 +142,14 @@ export function ActionForm({
               )}
               <FieldError errors={state.fieldErrors?.[f.name]} />
             </div>
-          ))}
-          {children}
-        </div>
-      </PanelFormSection>
+);
+  return (
+    <ActionFormFieldErrors.Provider value={state.fieldErrors}><form action={submit} onReset={event => event.preventDefault()} className="space-y-5">
+      <input type="hidden" name="locale" value={locale} />
+      {sections ? <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_23rem]">
+        <div className="min-w-0 space-y-6">{sections.filter(section => !section.sidebar).map(section => <PanelFormSection title={section.title} key={section.title}><div className="grid gap-5 sm:grid-cols-2">{section.fields.map(name => fields.find(f => f.name === name)).filter((f): f is Field => Boolean(f)).map(renderField)}</div></PanelFormSection>)}{children}</div>
+        <aside className="min-w-0 space-y-6">{sections.filter(section => section.sidebar).map(section => <PanelFormSection title={section.title} key={section.title}><div className="grid gap-5">{section.fields.map(name => fields.find(f => f.name === name)).filter((f): f is Field => Boolean(f)).map(renderField)}</div></PanelFormSection>)}</aside>
+      </div> : <PanelFormSection title={heading ?? text(locale, "اطلاعات", "Details")}><div className="grid gap-5 sm:grid-cols-2">{fields.map(renderField)}{children}{state.fieldErrors?.sections && <FieldError errors={state.fieldErrors.sections} />}</div></PanelFormSection>}
       <PanelFormFooter error={state.error}>
         <button className={primaryButtonClass} disabled={pending}>
           {pending
@@ -154,7 +157,7 @@ export function ActionForm({
             : (submitLabel ?? text(locale, "ذخیره", "Save"))}
         </button>
       </PanelFormFooter>
-    </form>
+    </form></ActionFormFieldErrors.Provider>
   );
 }
 export function DeleteAction({

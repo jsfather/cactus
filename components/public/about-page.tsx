@@ -1,3 +1,5 @@
+import { getPresentation } from "@/lib/site-content/presentation";
+import { VideoGallery } from "./video-player";
 import Image from "next/image";
 import { connection } from "next/server";
 import { RichContent } from "@/components/content/rich-content";
@@ -62,6 +64,7 @@ export async function AboutPage({ locale }: { locale: Locale }) {
             </div>
           </Reveal>
         </section>
+        <section className="public-wrap public-section"><VideoGallery urls={getPresentation(c.presentation).aboutVideos} frames={getPresentation(c.presentation).aboutVideoFrames} locale={locale} title={locale === "fa" ? "ویدیوهای کاکتوس" : "Cactus videos"} /></section>
         <section className="public-section about-philosophy">
           <Reveal className="public-wrap about-philosophy-grid">
             {[

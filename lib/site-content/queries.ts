@@ -4,6 +4,7 @@ import { siteContent } from "@/lib/db/schema";
 
 export const defaultSiteContent = {
   key: "about",
+  presentation: {},
   contactNumber: null,
   email: null,
   addressFa: null,

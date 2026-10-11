@@ -1,8 +1,9 @@
+import { formatMarketingText } from "@/lib/content/marketing";
+import { RichContent } from "@/components/content/rich-content";
 /* eslint-disable @next/next/no-img-element -- Course covers can use arbitrary validated media hosts. */
 import Link from "next/link";
 import { coursePages } from "@/lib/db/schema";
 import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
-import { PublicIcon } from "./icons";
 import { Arrow } from "./design";
 export function CourseCard({
   course: c,
@@ -32,15 +33,9 @@ export function CourseCard({
         href={localizePath(locale, `/courses/${c.slug}`)}
         aria-label={title}
       >
-        {c.coverImageUrl ? (
-          <img src={c.coverImageUrl} alt="" loading="lazy" />
-        ) : (
-          <span className="course-placeholder">
-            <PublicIcon name="courses" />
-          </span>
-        )}
+        <img src={c.coverImageUrl || "/images/reference-v4/scene-arduino.svg"} alt="" loading="lazy" />
         {c.level && (
-          <span className="course-level">{level[locale === "fa" ? 0 : 1]}</span>
+          <span className="course-level">{level?.[locale === "fa" ? 0 : 1] || c.level}</span>
         )}
       </Link>
       <div className="course-copy">
@@ -50,12 +45,11 @@ export function CourseCard({
         <Heading dir={locale === "en" && !c.titleEn ? "rtl" : undefined}>
           <Link href={localizePath(locale, `/courses/${c.slug}`)}>{title}</Link>
         </Heading>
-        <p
+        <RichContent
+          html={formatMarketingText(summary)}
           className="line-clamp-2"
           dir={locale === "en" && !c.summaryEn ? "rtl" : undefined}
-        >
-          {summary}
-        </p>
+        />
         <div className="course-bottom">
           <strong>
             {price === null

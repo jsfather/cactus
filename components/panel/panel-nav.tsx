@@ -544,6 +544,11 @@ export function PanelNav({
                 icon: "comments",
               },
               {
+                href: "/panel/admin/pages",
+                label: locale === "fa" ? "ویرایش صفحات ثابت" : "Static pages",
+                icon: "about",
+              },
+              {
                 href: "/panel/admin/about",
                 label: dictionary.nav.about,
                 icon: "about",

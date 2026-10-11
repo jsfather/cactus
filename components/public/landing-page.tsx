@@ -1,3 +1,6 @@
+import { HeroVideo } from "./hero-video";
+import { getPresentation } from "@/lib/site-content/presentation";
+import { VideoGallery } from "./video-player";
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -40,6 +43,8 @@ export async function LandingPage({ locale }: { locale: Locale }) {
         .orderBy(desc(coursePages.isFeatured), desc(coursePages.createdAt))
         .limit(4),
     ]);
+  const presentation = getPresentation(content.presentation);
+  const local = (fa: string, en: string) => locale === "en" ? en || fa : fa;
   const features: [string, string, string, string, string, PublicIconName][] = [
     [
       "/shop",
@@ -87,36 +92,16 @@ export async function LandingPage({ locale }: { locale: Locale }) {
       <SiteHeader locale={locale} />
       <main id="public-main">
         <section className="home-hero">
-          <Image
-            className="home-hero-media"
-            src="/images/reference-v4/hero-arena.svg"
-            alt=""
-            fill
-            preload
-            sizes="100vw"
-          />
+          {presentation.heroVideoUrl ? <HeroVideo url={presentation.heroVideoUrl} poster={presentation.heroImageUrl} locale={locale} /> : presentation.heroImageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="home-hero-media" src={presentation.heroImageUrl} alt="" />
+          ) : <Image className="home-hero-media" src="/images/reference-v4/hero-arena.svg" alt="" fill preload sizes="100vw" />}
           <div className="home-hero-shade" />
           <div className="public-wrap home-hero-inner">
             <div className="home-hero-copy">
-              <p className="hero-overline nums-en" lang="en">
-                ROBOTICS FOR A BRIGHTER TOMORROW
-              </p>
-              <h1>
-                {locale === "fa" ? (
-                  <>
-                    رباتیک، مهارت، آینده
-                    <br />
-                    با <em>کاکتوس</em> بسازید
-                  </>
-                ) : (
-                  <>
-                    Robotics. Skills. Future.
-                    <br />
-                    Build with <em>Cactus.</em>
-                  </>
-                )}
-              </h1>
-              <p className="public-description">{d.heroDescription}</p>
+              <p className="hero-overline" dir={locale === "en" && !presentation.heroEyebrowEn ? "rtl" : undefined}>{local(presentation.heroEyebrowFa, presentation.heroEyebrowEn)}</p>
+              <h1 dir={locale === "en" && !presentation.heroTitleEn ? "rtl" : undefined}>{local(presentation.heroTitleFa, presentation.heroTitleEn)}</h1>
+              <p className="public-description" dir={locale === "en" && !presentation.heroDescriptionEn ? "rtl" : undefined}>{local(presentation.heroDescriptionFa, presentation.heroDescriptionEn)}</p>
               <div className="home-actions">
                 <Link
                   className="public-button"
@@ -159,88 +144,15 @@ export async function LandingPage({ locale }: { locale: Locale }) {
             </nav>
           </div>
         </section>
-        <nav
-          className="public-wrap feature-strip"
-          aria-label={
-            locale === "fa" ? "بخش‌های وب‌سایت" : "Explore the website"
-          }
-        >
-          {features.map(([path, fa, en, subFa, subEn, icon]) => (
-            <Link key={path} href={localizePath(locale, path)}>
-              <PublicIcon name={icon} />
-              <strong>{locale === "fa" ? fa : en}</strong>
-              <small>{locale === "fa" ? subFa : subEn}</small>
-            </Link>
-          ))}
-        </nav>
-        {products.length > 0 && (
-          <section className="public-wrap public-section">
-            <SectionHeading
-              locale={locale}
-              eyebrow={
-                locale === "fa" ? "برای پروژه بعدی تو" : "FOR YOUR NEXT PROJECT"
-              }
-              title={d.featuredProducts}
-              href="/shop"
-              action={d.allProducts}
-            />
-            <Reveal className="product-grid">
-              {products.map((p) => (
-                <ProductCard key={p.id} product={p} locale={locale} />
-              ))}
-            </Reveal>
-          </section>
-        )}
-        {courses.length > 0 && (
-          <section className="public-wrap public-section">
-            <SectionHeading
-              locale={locale}
-              eyebrow={locale === "fa" ? "آکادمی کاکتوس" : "CACTUS ACADEMY"}
-              title={locale === "fa" ? "دوره‌های آموزشی" : "Learning courses"}
-              href="/courses"
-              action={
-                locale === "fa" ? "مشاهده همه دوره‌ها" : "View all courses"
-              }
-            />
-            <Reveal pattern="image" className="course-grid">
-              {courses.map(({ course, price }) => (
-                <CourseCard
-                  key={course.id}
-                  course={course}
-                  price={price}
-                  locale={locale}
-                />
-              ))}
-            </Reveal>
-          </section>
-        )}
-        {honors.length > 0 && (
-          <section className="public-wrap public-section home-honors">
-            <SectionHeading
-              locale={locale}
-              eyebrow={
-                locale === "fa"
-                  ? "ساختن، یادگیری، پیشرفت"
-                  : "BUILD. LEARN. PROGRESS."
-              }
-              title={d.honorsTitle}
-              href="/honors"
-              action={d.allHonors}
-            />
-            {honors.map((h) => (
-              <HonorCard key={h.id} honor={h} locale={locale} />
-            ))}
-          </section>
-        )}
+        <section className="public-wrap public-section home-why">
+          <SectionHeading locale={locale} title={local(presentation.whyTitleFa, presentation.whyTitleEn)} eyebrow={locale === "fa" ? "یادگیری برای آینده" : "LEARN FOR THE FUTURE"} />
+          <RichContent html={local(presentation.whyContentFa, presentation.whyContentEn)} dir={locale === "en" && !presentation.whyContentEn ? "rtl" : undefined} />
+        </section>
         <section className="public-wrap public-section">
           <Reveal className="home-about">
             <div>
               <p className="public-kicker">{d.aboutTitle}</p>
-              <h2>
-                {locale === "fa"
-                  ? "آینده با یادگیری و ساختن شروع می‌شود"
-                  : "The future starts with learning and building"}
-              </h2>
+              <h2>{local(presentation.aboutTitleFa, presentation.aboutTitleEn)}</h2>
               <RichContent
                 html={
                   locale === "en"
@@ -267,25 +179,58 @@ export async function LandingPage({ locale }: { locale: Locale }) {
                 <Arrow />
               </Link>
             </div>
-            <div className="home-about-art">
-              <Image
-                src="/images/reference-v4/scene-electronics.svg"
-                alt={
-                  locale === "fa"
-                    ? "تصویرسازی یادگیری الکترونیک و مدار"
-                    : "Illustration of learning electronics and circuitry"
-                }
-                fill
-                sizes="(max-width:600px) 100vw, 50vw"
-              />
-              <span>
-                {locale === "fa"
-                  ? "کنجکاوی. تجربه. ساختن."
-                  : "Curiosity. Experimentation. Creation."}
-              </span>
+            <div className="space-y-5">
+              <VideoGallery urls={presentation.aboutVideos} frames={presentation.aboutVideoFrames} locale={locale} title={locale === "fa" ? "معرفی کاکتوس" : "Discover Cactus"} />
             </div>
           </Reveal>
         </section>
+        {courses.length > 0 && (
+          <section className="public-wrap public-section">
+            <SectionHeading
+              locale={locale}
+              eyebrow={locale === "fa" ? "آکادمی کاکتوس" : "CACTUS ACADEMY"}
+              title={local(presentation.coursesTitleFa, presentation.coursesTitleEn)}
+              href="/courses"
+              action={
+                locale === "fa" ? "مشاهده همه دوره‌ها" : "View all courses"
+              }
+            />
+            <Reveal pattern="image" className="course-grid">
+              {courses.map(({ course, price }) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  price={price}
+                  locale={locale}
+                />
+              ))}
+            </Reveal>
+          </section>
+        )}
+        {presentation.bannerImageUrl && <section className="public-wrap public-section"><div className="home-promotion">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={presentation.bannerImageUrl} alt={local(presentation.bannerTitleFa, presentation.bannerTitleEn)} loading="lazy" />
+          <div><h2>{local(presentation.bannerTitleFa, presentation.bannerTitleEn)}</h2><p>{local(presentation.bannerTextFa, presentation.bannerTextEn)}</p>{presentation.bannerLink && <a className="public-button" href={presentation.bannerLink} target="_blank" rel="noopener noreferrer">{locale === "fa" ? "اطلاعات بیشتر" : "Learn more"}<Arrow /></a>}</div>
+        </div></section>}
+        {products.length > 0 && (
+          <section className="public-wrap public-section">
+            <SectionHeading
+              locale={locale}
+              eyebrow={
+                locale === "fa" ? "برای پروژه بعدی تو" : "FOR YOUR NEXT PROJECT"
+              }
+              title={local(presentation.productsTitleFa, presentation.productsTitleEn)}
+              href="/shop"
+              action={d.allProducts}
+            />
+            <Reveal className="product-grid">
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} locale={locale} />
+              ))}
+            </Reveal>
+          </section>
+        )}
+        <section className="public-wrap public-section"><VideoGallery urls={presentation.testimonialVideos} frames={presentation.testimonialVideoFrames} locale={locale} title={local(presentation.testimonialsTitleFa, presentation.testimonialsTitleEn)} /></section>
         {posts.length > 0 && (
           <section className="public-wrap public-section">
             <SectionHeading
@@ -293,7 +238,7 @@ export async function LandingPage({ locale }: { locale: Locale }) {
               eyebrow={
                 locale === "fa" ? "تازه‌های کاکتوس" : "LATEST FROM CACTUS"
               }
-              title={d.latestPosts}
+              title={local(presentation.newsTitleFa, presentation.newsTitleEn)}
               href="/blog"
               action={d.allPosts}
             />
@@ -322,6 +267,38 @@ export async function LandingPage({ locale }: { locale: Locale }) {
             </Reveal>
           </section>
         )}
+        {honors.length > 0 && (
+          <section className="public-wrap public-section home-honors">
+            <SectionHeading
+              locale={locale}
+              eyebrow={
+                locale === "fa"
+                  ? "ساختن، یادگیری، پیشرفت"
+                  : "BUILD. LEARN. PROGRESS."
+              }
+              title={d.honorsTitle}
+              href="/honors"
+              action={d.allHonors}
+            />
+            {honors.map((h) => (
+              <HonorCard key={h.id} honor={h} locale={locale} />
+            ))}
+          </section>
+        )}
+        <nav
+          className="public-wrap feature-strip"
+          aria-label={
+            locale === "fa" ? "بخش‌های وب‌سایت" : "Explore the website"
+          }
+        >
+          {features.map(([path, fa, en, subFa, subEn, icon]) => (
+            <Link key={path} href={localizePath(locale, path)}>
+              <PublicIcon name={icon} />
+              <strong>{locale === "fa" ? fa : en}</strong>
+              <small>{locale === "fa" ? subFa : subEn}</small>
+            </Link>
+          ))}
+        </nav>
         <ClosingInvitation locale={locale} />
       </main>
       <SiteFooter locale={locale} />

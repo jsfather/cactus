@@ -26,7 +26,7 @@ export function CommentsSection({
   user,
 }: {
   locale: Locale;
-  targetType: "post" | "product";
+  targetType: "post" | "product" | "course";
   targetId: string;
   slug: string;
   comments: CommentItem[];

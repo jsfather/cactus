@@ -20,10 +20,12 @@ export function CourseSectionsEditor({
   locale,
   initial = emptySections,
   blogs,
+  teachers = [],
 }: {
   locale: Locale;
   initial?: CourseSections;
   blogs: { id: string; label: string }[];
+  teachers?: { id: string; label: string }[];
 }) {
   const [value, setValue] = useState(initial);
   const sections = [
@@ -76,6 +78,7 @@ export function CourseSectionsEditor({
   return (
     <div className="space-y-6 sm:col-span-2">
       <input type="hidden" name="sections" value={JSON.stringify(value)} />
+      <fieldset className="rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800"><legend className="px-2 font-bold">{text(locale, "مدرس‌های دوره", "Course instructors")}</legend><p className="mb-4 text-sm text-zinc-500">{text(locale, "مدرس‌های انتخاب‌شده همراه مدرس‌های ترم در صفحه دوره نمایش داده می‌شوند.", "Selected instructors appear alongside linked term instructors on the course page.")}</p><div className="grid gap-3 sm:grid-cols-2">{teachers.map(t => <label key={t.id} className="flex cursor-pointer items-center gap-3"><PanelInput type="checkbox" className="!size-4" checked={(value.teacherIds || []).includes(t.id)} onChange={e => setValue({...value,teacherIds:e.target.checked ? [...(value.teacherIds || []),t.id] : (value.teacherIds || []).filter(id => id !== t.id)})} />{t.label}</label>)}</div></fieldset>
       {sections.map((section) => (
         <section
           key={section.key}

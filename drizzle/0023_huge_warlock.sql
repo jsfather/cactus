@@ -1,0 +1,1 @@
+CREATE INDEX "comments_course_status_created_index" ON "comments" USING btree ("course_id","status","created_at");

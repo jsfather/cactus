@@ -824,6 +824,8 @@ export const products = pgTable(
   "products",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    tags: text("tags").array().notNull().default(sql`ARRAY[]::text[]`),
+    compareAtPrice: bigint("compare_at_price", { mode: "number" }),
     specificationsFa: text("specifications_fa"),
     specificationsEn: text("specifications_en"),
     slug: varchar("slug", { length: 180 }).notNull(),
@@ -941,6 +943,7 @@ export const comments = pgTable(
   "comments",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    courseId: uuid("course_id").references(() => coursePages.id, { onDelete: "cascade" }),
     postId: uuid("post_id").references(() => posts.id, { onDelete: "cascade" }),
     productId: uuid("product_id").references(() => products.id, {
       onDelete: "cascade",
@@ -968,7 +971,7 @@ export const comments = pgTable(
   (table) => [
     check(
       "comments_exactly_one_target_check",
-      sql`((${table.postId} is not null)::int + (${table.productId} is not null)::int) = 1`,
+      sql`((${table.postId} is not null)::int + (${table.productId} is not null)::int + (${table.courseId} is not null)::int) = 1`,
     ),
     index("comments_post_status_created_index").on(
       table.postId,
@@ -981,10 +984,12 @@ export const comments = pgTable(
       table.createdAt,
     ),
     index("comments_author_index").on(table.authorId),
+    index("comments_course_status_created_index").on(table.courseId, table.status, table.createdAt),
   ],
 );
 
 export const siteContent = pgTable("site_content", {
+  presentation: jsonb("presentation").$type<import("@/lib/site-content/presentation").SitePresentation>().notNull().default({}),
   key: varchar("key", { length: 80 }).primaryKey(),
   contactNumber: varchar("contact_number", { length: 80 }),
   email: varchar("email", { length: 320 }),

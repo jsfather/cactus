@@ -1,3 +1,11 @@
+/* eslint-disable @next/next/no-img-element -- Course imagery uses validated managed or remote media. */
+import { VideoPlayer, VideoGallery } from "./video-player";
+import { getPresentation } from "@/lib/site-content/presentation";
+import { getSiteContent } from "@/lib/site-content/queries";
+import { CommentsSection } from "@/components/comments/comments-section";
+import { getContentComments } from "@/lib/comments/queries";
+import { getCurrentUser } from "@/lib/auth/session";
+import { getLocalizedUserName } from "@/lib/users/name";
 import { Reactions } from "@/components/workflows/reactions";
 import Link from "next/link";
 import { and, desc, eq, ilike, inArray, or, sql, lte } from "drizzle-orm";
@@ -12,6 +20,7 @@ import {
   teacherProfiles,
   users,
   termSchedules,
+  termTeachers,
 } from "@/lib/db/schema";
 import { text, title } from "@/lib/workflows";
 import { localizePath, type Locale } from "@/lib/i18n/config";
@@ -249,6 +258,12 @@ export async function CourseDetail({
         .from(termSchedules)
         .where(eq(termSchedules.termId, term.id))
     : [];
+  const linkedTeachers = term ? await db.select({id: termTeachers.teacherId}).from(termTeachers).where(eq(termTeachers.termId, term.id)) : [];
+  const instructorIds = [...new Set([...(c.sections.teacherIds || []), ...linkedTeachers.map(t => t.id)])];
+  const instructors = instructorIds.length ? await db.select({ user: users, username: sql<string | null>`case when ${teacherProfiles.isPublic} then ${teacherProfiles.username} else null end` }).from(users).leftJoin(teacherProfiles, eq(teacherProfiles.userId, users.id)).where(and(inArray(users.id, instructorIds), eq(users.role, "teacher"), eq(users.isActive, true))) : [];
+  const user = await getCurrentUser();
+  const courseComments = await getContentComments({ courseId: c.id }, user?.id);
+  const presentation = getPresentation((await getSiteContent()).presentation);
   const related = c.sections.blogIds.length
     ? await db
         .select()
@@ -266,35 +281,27 @@ export async function CourseDetail({
       locale={locale}
       path={`/courses/${slug}`}
       heading={title(c, locale)}
-      description={locale === "en" ? c.summaryEn || c.summaryFa : c.summaryFa}
     >
       <div className="course-detail-layout grid items-start gap-8 lg:grid-cols-[1fr_340px]">
         <article className="space-y-8">
-          {c.coverImageUrl && (
+          {(
             <img
-              src={c.coverImageUrl}
+              src={c.coverImageUrl || "/images/reference-v4/scene-arduino.svg"}
               alt=""
               className="aspect-video w-full rounded-3xl object-cover"
             />
           )}
-          <RichContent
-            html={locale === "en" ? c.contentEn || c.contentFa : c.contentFa}
-          />
-          {c.videoUrl && (
-            <a
-              className={primaryButtonClass}
-              href={c.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {text(locale, "تماشای معرفی دوره", "Watch course introduction")}
-            </a>
-          )}
+          <p className="public-description" dir={locale === "en" && !c.summaryEn ? "rtl" : undefined}>{locale === "en" ? c.summaryEn || c.summaryFa : c.summaryFa}</p>
+          <RichContent html={locale === "en" ? c.contentEn || c.contentFa : c.contentFa} dir={locale === "en" && !c.contentEn ? "rtl" : undefined} />
+          {c.videoUrl && <VideoPlayer url={c.videoUrl} locale={locale} label={text(locale, "معرفی دوره", "Course introduction")} />}
+          {instructors.length > 0 ? <section className="space-y-4"><h2 className="text-2xl font-bold">{text(locale, "مدرس‌های دوره", "Course instructors")}</h2><div className="grid gap-4 sm:grid-cols-2">{instructors.map(({user: instructor, username}) => <article className="flex items-center gap-4 rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800" key={instructor.id}>{instructor.avatarUrl && <img className="size-16 rounded-full object-cover" src={instructor.avatarUrl} alt="" />}<div>{username ? <Link href={localizePath(locale, `/teachers/${username}`)}>{getLocalizedUserName(instructor, locale)}</Link> : <strong>{getLocalizedUserName(instructor, locale)}</strong>}</div></article>)}</div></section> : <section><h2 className="text-2xl font-bold">{text(locale, "مدرس دوره", "Course instructor")}</h2><p className="mt-3 text-zinc-500">{text(locale, "مدرس این دوره به‌زودی معرفی می‌شود.", "The instructor will be announced soon.")}</p></section>}
+          {c.sections.syllabus.length > 0 && <h2 className="text-2xl font-bold">{text(locale, "سرفصل‌های دوره", "Course syllabus")}</h2>}
           {c.sections.syllabus.map((s, i) => (
             <details
               key={i}
               className="rounded-2xl border border-zinc-200 p-5 dark:border-zinc-800"
               open
+              dir={locale === "en" && !s.titleEn ? "rtl" : undefined}
             >
               <summary className="cursor-pointer font-bold">
                 {locale === "en" ? s.titleEn || s.titleFa : s.titleFa}
@@ -312,6 +319,7 @@ export async function CourseDetail({
           {c.sections.faqs.map((f, i) => (
             <details
               key={i}
+              dir={locale === "en" && !f.questionEn ? "rtl" : undefined}
               className="rounded-2xl bg-zinc-50 p-5 dark:bg-zinc-900"
             >
               <summary className="cursor-pointer font-bold">
@@ -343,17 +351,7 @@ export async function CourseDetail({
               </ul>
             </section>
           )}
-          {c.sections.testimonials.map((t, i) => (
-            <a
-              key={i}
-              className="block rounded-2xl bg-emerald-50 p-5 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-              href={t.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ▶ {t.name}
-            </a>
-          ))}
+          {c.sections.testimonials.length > 0 ? <section className="space-y-4"><h2 className="text-2xl font-bold">{text(locale, "ویدیو نظرات دانش‌پژوهان", "Student video testimonials")}</h2><div className="public-video-grid">{c.sections.testimonials.map((t, i) => <VideoPlayer key={i} url={t.videoUrl} label={t.name} locale={locale} />)}</div></section> : <VideoGallery urls={presentation.testimonialVideos} frames={presentation.testimonialVideoFrames} locale={locale} title={text(locale, "رضایت دانش‌پژوهان کاکتوس", "Cactus student testimonials")} />}
           {c.certificateImageUrl && (
             <img
               src={c.certificateImageUrl}
@@ -387,6 +385,8 @@ export async function CourseDetail({
             {c.topic} · {c.ageGroup}
           </p>
           <p>{c.duration}</p>
+          <p>{text(locale, "سطح دوره", "Course level")}: {text(locale, ({beginner:"مقدماتی",intermediate:"متوسط",advanced:"پیشرفته"} as Record<string,string>)[c.level] || c.level, c.level)}</p>
+          {term && <p>{text(locale, "شیوه برگزاری", "Delivery")}: {text(locale, ({online:"آنلاین",in_person:"حضوری",hybrid:"ترکیبی"} as Record<string,string>)[term.deliveryMode] || term.deliveryMode, term.deliveryMode.replaceAll("_", " "))}</p>}
           {term && (
             <>
               <p className="text-2xl font-bold">
@@ -443,6 +443,7 @@ export async function CourseDetail({
         </aside>
       </div>
       <Reactions kind="course" id={c.id} locale={locale} />
+      <CommentsSection locale={locale} targetType="course" targetId={c.id} slug={c.slug} comments={courseComments} user={user} />
     </PublicShell>
   );
 }

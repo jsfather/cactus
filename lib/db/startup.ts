@@ -1,3 +1,4 @@
+import { defaultPresentation } from "@/lib/site-content/presentation";
 import { seedWorkflows } from "./workflow-seeds";
 import path from "node:path";
 import { randomBytes } from "node:crypto";
@@ -411,6 +412,11 @@ export async function setupDatabase() {
       });
 
       await database.transaction(async (transaction) => {
+        const [claimed] = await transaction.insert(appSettings).values({ key: "seed-static-page-presentation-v1", value: "complete" }).onConflictDoNothing().returning({key: appSettings.key});
+        if (claimed) await transaction.update(siteContent).set({presentation: defaultPresentation}).where(and(eq(siteContent.key, "about"), sql`${siteContent.presentation} = '{}'::jsonb`));
+      });
+
+      await database.transaction(async (transaction) => {
         const [claimedSeed] = await transaction
           .insert(appSettings)
           .values({ key: starterSiteContentSeedKey, value: "complete" })
@@ -422,6 +428,7 @@ export async function setupDatabase() {
           .insert(siteContent)
           .values({
             key: "about",
+            presentation: defaultPresentation,
             contactNumber: "+98 21 0000 0000",
             email: "hello@cactus.local",
             addressFa: "تهران، ایران",

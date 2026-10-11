@@ -1,3 +1,4 @@
+import { getPresentation } from "@/lib/site-content/presentation";
 import Link from "next/link";
 import Image from "next/image";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -6,6 +7,7 @@ import { getSiteContent } from "@/lib/site-content/queries";
 export async function SiteFooter({ locale }: { locale: Locale }) {
   const dictionary = getDictionary(locale);
   const content = await getSiteContent();
+  const presentation = getPresentation(content.presentation);
   const year = new Intl.DateTimeFormat(localeConfig[locale].dateLocale, {
     year: "numeric",
   }).format(new Date());
@@ -32,11 +34,13 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
               {locale === "fa" ? "کاکتوس" : "Cactus"}
             </Link>
             <p>
-              {locale === "fa"
-                ? "کنجکاو باش. تجربه کن. بساز."
-                : "Stay curious. Experiment. Build."}
+              {locale === "en" ? presentation.footerTaglineEn || presentation.footerTaglineFa : presentation.footerTaglineFa}
             </p>
           </div>
+          {presentation.trustImageUrl && presentation.trustLink && <div className="footer-trust"><h2>{locale === "fa" ? "نماد اعتماد الکترونیکی" : "Electronic trust seal"}</h2><a href={presentation.trustLink} referrerPolicy="origin" target="_blank" rel="noopener noreferrer" aria-label={locale === "fa" ? "اعتبارسنجی نماد اعتماد" : "Verify trust seal"}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={presentation.trustImageUrl} referrerPolicy="origin" alt={locale === "fa" ? "نماد اعتماد الکترونیکی" : "Electronic trust seal"} width={100} height={100} loading="lazy" />
+          </a></div>}
           <div className="footer-links">
             <h2>{locale === "fa" ? "دسترسی سریع" : "Explore Cactus"}</h2>
             <nav

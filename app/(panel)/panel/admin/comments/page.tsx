@@ -41,7 +41,7 @@ export default async function AdminCommentsPage({
       ? statusValue
       : "all";
   const target: CommentTargetFilter =
-    targetValue === "blog" || targetValue === "shop" ? targetValue : "all";
+    targetValue === "blog" || targetValue === "shop" || targetValue === "courses" ? targetValue : "all";
   const result = await getAdminComments({ ...listQuery, status, target });
   const dictionary = getPanelDictionary(locale);
   const statusLabels = {
@@ -63,8 +63,8 @@ export default async function AdminCommentsPage({
         title={locale === "fa" ? "مدیریت دیدگاه‌ها" : "Comment moderation"}
         description={
           locale === "fa"
-            ? "دیدگاه‌های وبلاگ و فروشگاه را بررسی، تأیید، رد یا حذف کنید."
-            : "Review, approve, reject, or delete blog and shop comments."
+            ? "دیدگاه‌های دوره‌ها، وبلاگ و فروشگاه را بررسی، تأیید، رد یا حذف کنید."
+            : "Review, approve, reject, or delete course, blog and shop comments."
         }
       />
       <PanelSurface>
@@ -102,6 +102,7 @@ export default async function AdminCommentsPage({
                   label: locale === "fa" ? "همه بخش‌ها" : "All sections",
                 },
                 { value: "blog", label: locale === "fa" ? "وبلاگ" : "Blog" },
+                { value: "courses", label: locale === "fa" ? "دوره‌ها" : "Courses" },
                 { value: "shop", label: locale === "fa" ? "فروشگاه" : "Shop" },
               ],
             },
@@ -149,7 +150,7 @@ export default async function AdminCommentsPage({
                       ? locale === "fa"
                         ? "وبلاگ"
                         : "Blog"
-                      : locale === "fa"
+                      : comment.courseId ? (locale === "fa" ? "دوره" : "Course") : locale === "fa"
                         ? "فروشگاه"
                         : "Shop"}
                   </span>
