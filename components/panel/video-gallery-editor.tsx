@@ -17,14 +17,12 @@ export function VideoGalleryEditor({ locale, name, title, urls, frames }: { loca
     setItems(current => { const next = [...current]; [next[index], next[index + offset]] = [next[index + offset], next[index]]; return next; });
   }
   return <PanelFormSection title={title}>
-    <input type="hidden" name={name} value={items.map(item => item.url).join("\n")} />
-    <input type="hidden" name={name === "aboutVideos" ? "aboutVideoFrames" : "testimonialVideoFrames"} value={items.length ? items.map(item => item.frame).join("\n") : "auto"} />
     <p className="mb-4 text-sm text-zinc-500">{fa ? "ویدیوی عمودی دو جایگاه را پر می‌کند؛ دو ویدیوی افقی کنار آن قرار می‌گیرند. ترتیب جایگاه‌ها را با دکمه‌های بالا و پایین تغییر دهید. پخش خودکار بی‌صداست." : "Portrait videos occupy two slots, with landscape videos beside them. Move videos up or down to choose their positions. Autoplay is muted."}</p>
     <div className="space-y-4">{items.map((item, i) => <div key={item.id} className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
       <p className="mb-3 text-sm font-bold">{fa ? "جایگاه" : "Position"} {(i + 1).toLocaleString(locale)}</p>
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
-        <FormLabel label={fa ? "لینک مستقیم ویدیو" : "Direct video URL"}><PanelInput dir="ltr" type="url" required value={item.url} onChange={e => { const url = e.target.value; setItems(current => current.map(row => row.id === item.id ? { ...row, url } : row)); }} /></FormLabel>
-        <FormLabel label={fa ? "قاب ویدیو" : "Video frame"}><PanelSelect value={item.frame} onChange={e => { const frame = e.target.value; setItems(current => current.map(row => row.id === item.id ? { ...row, frame } : row)); }}>{[["auto", "خودکار", "Automatic"], ["portrait", "عمودی", "Portrait"], ["landscape", "افقی", "Landscape"], ["square", "مربع", "Square"]].map(([value, labelFa, labelEn]) => <option key={value} value={value}>{fa ? labelFa : labelEn}</option>)}</PanelSelect></FormLabel>
+        <FormLabel label={fa ? "لینک مستقیم ویدیو" : "Direct video URL"}><PanelInput name={`${name}Url`} dir="ltr" type="url" required value={item.url} onChange={e => { const url = e.target.value; setItems(current => current.map(row => row.id === item.id ? { ...row, url } : row)); }} /></FormLabel>
+        <FormLabel label={fa ? "قاب ویدیو" : "Video frame"}><PanelSelect name={`${name}Frame`} value={item.frame} onChange={e => { const frame = e.target.value; setItems(current => current.map(row => row.id === item.id ? { ...row, frame } : row)); }}>{[["auto", "خودکار", "Automatic"], ["portrait", "عمودی", "Portrait"], ["landscape", "افقی", "Landscape"], ["square", "مربع", "Square"]].map(([value, labelFa, labelEn]) => <option key={value} value={value}>{fa ? labelFa : labelEn}</option>)}</PanelSelect></FormLabel>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" className={secondaryButtonClass} disabled={i === 0} aria-label={`${fa ? "انتقال به بالا" : "Move up"}: ${(i + 1).toLocaleString(locale)}`} onClick={() => move(i, -1)}>↑ {fa ? "بالا" : "Up"}</button>

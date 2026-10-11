@@ -9,7 +9,12 @@ import { validationError, saved, text, type ActionState } from "@/lib/workflows"
 export async function savePresentation(_state: ActionState, form: FormData): Promise<ActionState> {
   const admin = await requireRole("admin");
   const locale = form.get("locale") === "en" ? "en" : "fa";
-  const parsed = presentationSchema.safeParse(Object.fromEntries(form));
+  const data = Object.fromEntries(form);
+  for (const name of ["aboutVideos", "testimonialVideos"] as const) {
+    data[name] = form.getAll(`${name}Url`).map(String).join("\n");
+    data[name === "aboutVideos" ? "aboutVideoFrames" : "testimonialVideoFrames"] = form.getAll(`${name}Frame`).map(String).join("\n") || "auto";
+  }
+  const parsed = presentationSchema.safeParse(data);
   if (!parsed.success) return validationError(locale, parsed.error);
   try {
     await getDatabase().insert(siteContent).values({ ...defaultSiteContent, presentation: parsed.data, updatedById: admin.id }).onConflictDoUpdate({ target: siteContent.key, set: { presentation: parsed.data, updatedById: admin.id, updatedAt: new Date() } });
