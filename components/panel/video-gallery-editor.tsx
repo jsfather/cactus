@@ -23,16 +23,16 @@ export function VideoGalleryEditor({ locale, name, title, urls, frames }: { loca
     <div className="space-y-4">{items.map((item, i) => <div key={item.id} className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
       <p className="mb-3 text-sm font-bold">{fa ? "جایگاه" : "Position"} {(i + 1).toLocaleString(locale)}</p>
       <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
-        <FormLabel label={fa ? "لینک مستقیم ویدیو" : "Direct video URL"}><PanelInput dir="ltr" type="url" required value={item.url} onChange={e => setItems(items.map(row => row.id === item.id ? { ...row, url: e.target.value } : row))} /></FormLabel>
-        <FormLabel label={fa ? "قاب ویدیو" : "Video frame"}><PanelSelect value={item.frame} onChange={e => setItems(items.map(row => row.id === item.id ? { ...row, frame: e.target.value } : row))}>{[["auto", "خودکار", "Automatic"], ["portrait", "عمودی", "Portrait"], ["landscape", "افقی", "Landscape"], ["square", "مربع", "Square"]].map(([value, labelFa, labelEn]) => <option key={value} value={value}>{fa ? labelFa : labelEn}</option>)}</PanelSelect></FormLabel>
+        <FormLabel label={fa ? "لینک مستقیم ویدیو" : "Direct video URL"}><PanelInput dir="ltr" type="url" required value={item.url} onChange={e => { const url = e.target.value; setItems(current => current.map(row => row.id === item.id ? { ...row, url } : row)); }} /></FormLabel>
+        <FormLabel label={fa ? "قاب ویدیو" : "Video frame"}><PanelSelect value={item.frame} onChange={e => { const frame = e.target.value; setItems(current => current.map(row => row.id === item.id ? { ...row, frame } : row)); }}>{[["auto", "خودکار", "Automatic"], ["portrait", "عمودی", "Portrait"], ["landscape", "افقی", "Landscape"], ["square", "مربع", "Square"]].map(([value, labelFa, labelEn]) => <option key={value} value={value}>{fa ? labelFa : labelEn}</option>)}</PanelSelect></FormLabel>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" className={secondaryButtonClass} disabled={i === 0} aria-label={`${fa ? "انتقال به بالا" : "Move up"}: ${(i + 1).toLocaleString(locale)}`} onClick={() => move(i, -1)}>↑ {fa ? "بالا" : "Up"}</button>
         <button type="button" className={secondaryButtonClass} disabled={i === items.length - 1} aria-label={`${fa ? "انتقال به پایین" : "Move down"}: ${(i + 1).toLocaleString(locale)}`} onClick={() => move(i, 1)}>↓ {fa ? "پایین" : "Down"}</button>
-        <button type="button" className={secondaryButtonClass} onClick={() => setItems(items.filter(row => row.id !== item.id))}>{fa ? "حذف از چیدمان" : "Remove from layout"}</button>
+        <button type="button" className={secondaryButtonClass} onClick={() => setItems(current => current.filter(row => row.id !== item.id))}>{fa ? "حذف از چیدمان" : "Remove from layout"}</button>
       </div>
     </div>)}</div>
     <FieldError errors={errors?.[name]} /><FieldError errors={errors?.[name === "aboutVideos" ? "aboutVideoFrames" : "testimonialVideoFrames"]} />
-    <button type="button" className={`${secondaryButtonClass} mt-4`} disabled={items.length >= 12} onClick={() => { setItems([...items, { id: nextId, url: "", frame: "auto" }]); setNextId(nextId + 1); }}>{fa ? "افزودن ویدیو" : "Add video"}</button>
+    <button type="button" className={`${secondaryButtonClass} mt-4`} disabled={items.length >= 12} onClick={() => { setItems(current => [...current, { id: nextId, url: "", frame: "auto" }]); setNextId(nextId + 1); }}>{fa ? "افزودن ویدیو" : "Add video"}</button>
   </PanelFormSection>;
 }
