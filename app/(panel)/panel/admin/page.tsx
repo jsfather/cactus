@@ -67,12 +67,12 @@ export default async function AdminDashboard() {
                 return (
                   <div key={day.date.toISOString()} className="flex h-full min-w-0 flex-col justify-end gap-2 text-center">
                     <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{number(total)}</span>
-                    <div className="flex w-full flex-col justify-end overflow-hidden rounded-t-lg bg-zinc-100 dark:bg-zinc-900" style={{ height: `${height}%` }} title={`${number(total)} · ${new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", { dateStyle: "medium", timeZone: "UTC" }).format(day.date)}`}>
+                    <div className="flex w-full flex-col justify-end overflow-hidden rounded-t-lg bg-zinc-100 dark:bg-zinc-900" style={{ height: `${height}%` }} title={`${number(total)} · ${new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { dateStyle: "medium", timeZone: "UTC" }).format(day.date)}`}>
                       {day.products ? <span className="bg-amber-500" style={{ flex: day.products }} /> : null}
                       {day.posts ? <span className="bg-sky-500" style={{ flex: day.posts }} /> : null}
                       {day.users ? <span className="bg-emerald-500" style={{ flex: day.users }} /> : null}
                     </div>
-                    <span className="truncate text-[11px] text-zinc-500 dark:text-zinc-400">{new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", { weekday: "short", timeZone: "UTC" }).format(day.date)}</span>
+                    <span className="truncate text-[11px] text-zinc-500 dark:text-zinc-400">{new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { weekday: "short", timeZone: "UTC" }).format(day.date)}</span>
                   </div>
                 );
               })}
@@ -114,7 +114,7 @@ export default async function AdminDashboard() {
               {analytics.recentActivity.map((item) => (
                 <Link key={`${item.kind}-${item.id}`} href={item.href} className="flex items-center justify-between gap-4 py-3.5">
                   <span className="min-w-0"><span className="block truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">{locale === "fa" ? item.titleFa : item.titleEn}</span><span className="mt-1 block text-xs text-zinc-500">{activityLabels[item.kind]}</span></span>
-                  <time className="shrink-0 text-xs text-zinc-500" dateTime={item.createdAt.toISOString()}>{new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", { month: "short", day: "numeric" }).format(item.createdAt)}</time>
+                  <time className="shrink-0 text-xs text-zinc-500" dateTime={item.createdAt.toISOString()}>{new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { month: "short", day: "numeric" }).format(item.createdAt)}</time>
                 </Link>
               ))}
             </div>

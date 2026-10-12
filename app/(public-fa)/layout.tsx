@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
+import { PublicSettingsProvider } from "@/components/public/public-settings-provider";
+import { getSiteNavigation } from "@/lib/site-content/navigation-server";
+import { getSiteAppearance } from "@/lib/site-content/appearance-server";
+import { appearanceCss } from "@/lib/site-content/appearance";
+import { LiveChat } from "@/components/support/live-chat";
 import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
 import "@/components/public/public.css";
-import { getSiteUrl } from "@/lib/seo/site";
+import { getSiteMetadata } from "@/lib/site-content/metadata";
 
-export const metadata: Metadata = {
-  metadataBase: getSiteUrl(),
-  title: {
-    default: "مدرسه رباتیک کاکتوس",
-    template: "%s | کاکتوس",
-  },
-  description:
-    "مدرسه رباتیک کاکتوس؛ آموزش پروژه‌محور رباتیک و برنامه‌نویسی برای کودکان و نوجوانان.",
-  icons: { icon: "/cactus-logo.svg" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getSiteMetadata("fa");
+}
 
-export default function PersianPublicLayout({
+export default async function PersianPublicLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  await connection();
+  const [navigation, appearance] = await Promise.all([getSiteNavigation(), getSiteAppearance()]);
   return (
     <html
       lang="fa"
@@ -30,9 +31,10 @@ export default function PersianPublicLayout({
     >
       <head>
         <ThemeScript />
+        <style>{appearanceCss(appearance)}</style>
       </head>
       <body className="min-h-full bg-white font-sans dark:bg-zinc-950">
-        <AppFeedbackProvider locale="fa">{children}</AppFeedbackProvider>
+        <PublicSettingsProvider loadingIconUrl={navigation.loadingIconUrl}><AppFeedbackProvider locale="fa">{children}<LiveChat locale="fa" /></AppFeedbackProvider></PublicSettingsProvider>
       </body>
     </html>
   );

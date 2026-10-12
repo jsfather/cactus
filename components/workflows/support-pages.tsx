@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { and, asc, desc, eq, or } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
+import { formatPanelDate } from "@/lib/date/panel";
 import { z } from "zod";
 import { notFound } from "next/navigation";
 import { requireUser, requireRole } from "@/lib/auth/session";
@@ -9,6 +10,9 @@ import {
   ticketMessages,
   ticketDepartments,
   users,
+  termEnrollments,
+  terms,
+  attachments,
   notifications,
 } from "@/lib/db/schema";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
@@ -17,6 +21,7 @@ import { text, title } from "@/lib/workflows";
 import {
   saveTicket,
   replyTicket,
+  rateTicket,
   deleteTicket,
   changeTicketStatus,
   saveDepartment,
@@ -38,7 +43,6 @@ import {
   PanelSurface,
   PanelTable,
   PanelTableCell,
-  PanelTableActions,
   PanelEmptyState,
   PanelFormSection,
 } from "@/components/panel/ui";
@@ -74,6 +78,24 @@ export async function TicketsPage({
           )
       : [];
   if (id && id !== "new" && !ticket) notFound();
+  const statusLabel = (status: string) =>
+    text(
+      locale,
+      (
+        {
+          open: "در انتظار پاسخ",
+          pending: "پاسخ‌داده‌شده",
+          closed: "بسته‌شده",
+        } as Record<string, string>
+      )[status] ?? status,
+      (
+        {
+          open: "Awaiting response",
+          pending: "Answered",
+          closed: "Closed",
+        } as Record<string, string>
+      )[status] ?? status,
+    );
   if (id === "new" || edit) {
     if (edit && !admin) notFound();
     const departments = await db
@@ -107,7 +129,6 @@ export async function TicketsPage({
               name: "body",
               label: text(locale, "پیام", "Message"),
               type: "textarea",
-              required: true,
             },
             {
               name: "attachmentUrl",
@@ -138,8 +159,8 @@ export async function TicketsPage({
           name: "status",
           label: text(locale, "وضعیت", "Status"),
           options: [
-            { value: "open", label: text(locale, "باز", "Open") },
-            { value: "pending", label: text(locale, "در انتظار", "Pending") },
+            { value: "open", label: statusLabel("open") },
+            { value: "pending", label: statusLabel("pending") },
             { value: "closed", label: text(locale, "بسته", "Closed") },
           ],
         },
@@ -168,23 +189,44 @@ export async function TicketsPage({
   }
   if (ticket) {
     const messages = await db
-      .select({ message: ticketMessages, name: userNameSql(locale) })
+      .select({ message: ticketMessages, name: userNameSql(locale), attachmentMime: attachments.mimeType })
       .from(ticketMessages)
       .innerJoin(users, eq(users.id, ticketMessages.authorId))
+      .leftJoin(attachments, eq(ticketMessages.attachmentUrl, sql`'/api/attachments/' || ${attachments.id}::text`))
       .where(eq(ticketMessages.ticketId, ticket.id))
-      .orderBy(asc(ticketMessages.createdAt));
+      .orderBy(desc(ticketMessages.createdAt), desc(ticketMessages.id))
+      .limit(200);
+    const [department] = await db
+      .select()
+      .from(ticketDepartments)
+      .where(eq(ticketDepartments.id, ticket.departmentId))
+      .limit(1);
+    const [requester] = admin
+      ? await db
+          .select({
+            name: userNameSql(locale),
+            mobile: users.mobile,
+            role: users.role,
+          })
+          .from(users)
+          .where(eq(users.id, ticket.ownerId))
+          .limit(1)
+      : [];
+    const requesterTerms = admin
+      ? await db
+          .select({ titleFa: terms.titleFa, titleEn: terms.titleEn })
+          .from(termEnrollments)
+          .innerJoin(terms, eq(terms.id, termEnrollments.termId))
+          .where(eq(termEnrollments.studentId, ticket.ownerId))
+          .orderBy(desc(terms.startDate))
+          .limit(10)
+      : [];
     return (
       <PanelPage>
         <PanelPageHeader
           eyebrow={text(locale, "پشتیبانی", "Support")}
           title={ticket.subject}
-          description={text(
-            locale,
-            { open: "باز", pending: "در انتظار", closed: "بسته" }[
-              ticket.status
-            ] ?? ticket.status,
-            ticket.status,
-          )}
+          description={`${statusLabel(ticket.status)} · ${department ? title(department, locale) : ""}`}
           actions={
             admin ? (
               <PanelPrimaryLink href={`/panel/tickets/${ticket.id}/edit`}>
@@ -193,24 +235,85 @@ export async function TicketsPage({
             ) : undefined
           }
         />
-        {messages.map(({ message: m, name }) => (
-          <PanelSurface key={m.id} className="p-6">
-            <p className="text-sm text-zinc-500">
-              {name} · {m.createdAt.toLocaleString(locale)}
+        {requester && (
+          <PanelSurface>
+            <h2 className="font-bold">
+              {text(locale, "مشخصات درخواست‌کننده", "Requester")}
+            </h2>
+            <p className="mt-2">
+              {requester.name} ·{" "}
+              <bdi dir="ltr" className="nums-en">
+                {requester.mobile}
+              </bdi>
             </p>
-            <p className="mt-4 whitespace-pre-wrap leading-8">{m.body}</p>
-            {m.attachmentUrl && (
-              <a
-                className="text-emerald-700"
-                href={m.attachmentUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+            {requesterTerms.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {requesterTerms.map((term, index) => (
+                  <span
+                    key={index}
+                    className="rounded-full bg-zinc-100 px-3 py-1 text-xs dark:bg-zinc-800"
+                  >
+                    {title(term, locale)}
+                  </span>
+                ))}
+              </div>
+            )}
+            {requester.role === "student" && (
+              <Link
+                className="mt-3 inline-flex cursor-pointer text-sm text-emerald-600"
+                href={`/panel/admin/students/${ticket.ownerId}`}
               >
-                {text(locale, "فایل پیوست", "Attachment")}
-              </a>
+                {text(
+                  locale,
+                  "مشاهده پرونده کامل دانش‌پژوه",
+                  "View full student record",
+                )}{" "}
+                ↗
+              </Link>
             )}
           </PanelSurface>
-        ))}
+        )}
+        <PanelSurface className="bg-zinc-50 dark:bg-zinc-900">
+          <p className="mb-4 text-xs text-zinc-500">
+            {text(
+              locale,
+              "نمایش حداکثر ۲۰۰ پیام اخیر",
+              "Showing up to 200 latest messages",
+            )}
+          </p>
+          <div
+            className="max-h-[65vh] space-y-4 overflow-y-auto p-1"
+            role="log"
+            aria-label={text(locale, "گفت‌وگوی تیکت", "Ticket conversation")}
+          >
+            {messages.reverse().map(({ message: m, name, attachmentMime }) => (
+              <article
+                key={m.id}
+                className={`w-fit max-w-[90%] rounded-2xl border p-4 sm:max-w-[80%] ${m.authorId === user.id ? "ms-auto border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950" : "me-auto border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-950"}`}
+              >
+                <p className="text-sm text-zinc-500">
+                  {name} · {formatPanelDate(m.createdAt, locale, true)}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap break-words leading-7">
+                  {m.body}
+                </p>
+                {m.attachmentUrl && (
+                  attachmentMime === "audio/webm" ? <audio controls preload="none" src={m.attachmentUrl} aria-label={text(locale, "پیام صوتی", "Voice message")} className="mt-3 max-w-full" /> :
+                  <a
+                    className="text-emerald-700"
+                    href={m.attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {text(locale, "فایل پیوست", "Attachment")}
+                  </a>
+                )}
+              </article>
+            ))}
+          </div>
+        </PanelSurface>
+        {ticket.rating && <PanelSurface><p>{text(locale, "امتیاز پاسخ‌گویی", "Response rating")}: <span className="text-amber-500" aria-label={`${ticket.rating}/5`}>{"★".repeat(ticket.rating)}{"☆".repeat(5 - ticket.rating)}</span></p></PanelSurface>}
+        {ticket.status === "closed" && ticket.ownerId === user.id && messages.some(item => item.message.authorId !== user.id) && <ActionForm locale={locale} action={rateTicket.bind(null, ticket.id)} heading={text(locale, "امتیاز به پاسخ‌گو", "Rate the responder")} initial={{ rating: String(ticket.rating ?? 0) }} fields={[{ name: "rating", label: text(locale, "رضایت از پاسخ‌گویی", "Response satisfaction"), options: [{ value: "0", label: text(locale, "بدون امتیاز", "No rating") }, ...[1,2,3,4,5].map(value => ({ value: String(value), label: "★".repeat(value) }))] }]} />}
         {ticket.status !== "closed" && (
           <ActionForm
             locale={locale}
@@ -221,7 +324,6 @@ export async function TicketsPage({
                 name: "body",
                 label: text(locale, "پیام", "Message"),
                 type: "textarea",
-                required: true,
               },
               {
                 name: "attachmentUrl",
@@ -249,7 +351,12 @@ export async function TicketsPage({
     );
   }
   const items = await db
-    .select()
+    .select({
+      id: tickets.id,
+      subject: tickets.subject,
+      status: tickets.status,
+      messageCount: sql<number>`(select count(*)::int from ticket_messages where ticket_messages.ticket_id = ${tickets.id})`,
+    })
     .from(tickets)
     .where(
       admin
@@ -286,6 +393,37 @@ export async function TicketsPage({
           {text(locale, "مدیریت دپارتمان‌ها", "Manage departments")}
         </Link>
       )}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          {
+            label: text(locale, "جدید", "New"),
+            count: items.filter(
+              (item) => item.status === "open" && item.messageCount <= 1,
+            ).length,
+          },
+          {
+            label: text(locale, "در انتظار پاسخ", "Awaiting response"),
+            count: items.filter(
+              (item) => item.status === "open" && item.messageCount > 1,
+            ).length,
+          },
+          {
+            label: text(locale, "پاسخ‌داده‌شده", "Answered"),
+            count: items.filter((item) => item.status === "pending").length,
+          },
+          {
+            label: text(locale, "بسته‌شده", "Closed"),
+            count: items.filter((item) => item.status === "closed").length,
+          },
+        ].map((item) => (
+          <PanelSurface key={item.label}>
+            <p className="text-sm text-zinc-500">{item.label}</p>
+            <p className="mt-2 text-2xl font-bold">
+              {item.count.toLocaleString(locale)}
+            </p>
+          </PanelSurface>
+        ))}
+      </div>
       <PanelSurface>
         {items.length ? (
           <PanelTable
@@ -309,13 +447,9 @@ export async function TicketsPage({
                   </Link>
                 </PanelTableCell>
                 <PanelTableCell>
-                  {text(
-                    locale,
-                    { open: "باز", pending: "در انتظار", closed: "بسته" }[
-                      t.status
-                    ] ?? t.status,
-                    t.status,
-                  )}
+                  {t.status === "open" && t.messageCount <= 1
+                    ? text(locale, "جدید", "New")
+                    : statusLabel(t.status)}
                 </PanelTableCell>
                 <PanelTableCell>
                   {admin && (

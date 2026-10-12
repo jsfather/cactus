@@ -1,4 +1,5 @@
 import { DeleteUserButton } from "@/components/users/delete-user-button";
+import Link from "next/link";
 import { UserAvatar } from "@/components/users/user-avatar";
 import { ToastOnMount } from "@/components/feedback/toast-effects";
 import {
@@ -26,7 +27,7 @@ import { getUsersByRole, type UserStatusFilter } from "@/lib/users/queries";
 import { getSearchParam, parseAdminListQuery, type AdminListSearchParams } from "@/lib/panel/pagination";
 
 function formatDate(date: Date, locale: Locale) {
-  return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", { dateStyle: "medium" }).format(date);
+  return new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { dateStyle: "medium" }).format(date);
 }
 
 export async function UserListPage({ role, searchParams }: { role: UserRole; searchParams: AdminListSearchParams }) {
@@ -108,7 +109,7 @@ export async function UserListPage({ role, searchParams }: { role: UserRole; sea
                 <PanelTableCell>
                   <div className="flex items-center gap-3">
                     <UserAvatar name={userName} src={user.avatarUrl} className="size-10 shrink-0" />
-                    <div className="min-w-0"><p className="truncate font-medium text-zinc-950 dark:text-zinc-50">{userName}</p>{user.id === currentAdmin.id ? <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">{dictionary.users.currentAccount}</p> : null}</div>
+                    <div className="min-w-0"><p className="truncate font-medium text-zinc-950 dark:text-zinc-50">{role === "student" ? <Link className="cursor-pointer hover:text-emerald-600" href={`${config.path}/${user.id}`}>{userName}</Link> : userName}</p>{user.id === currentAdmin.id ? <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400">{dictionary.users.currentAccount}</p> : null}</div>
                   </div>
                 </PanelTableCell>
                 <PanelTableCell>

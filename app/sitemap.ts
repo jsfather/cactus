@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { getDatabase } from "@/lib/db/client";
 import {
   coursePages,
+  landingPages,
   honors,
   posts,
   products,
@@ -75,6 +76,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from(coursePages)
     .where(eq(coursePages.status, "published"));
   const software = await database.select({ id: resources.id, updatedAt: resources.updatedAt }).from(resources).where(and(eq(resources.kind, "requirements"), eq(resources.status, "published"), eq(resources.audience, "all")));
+  const landings = await database.select({slug: landingPages.slug, updatedAt: landingPages.updatedAt}).from(landingPages).where(eq(landingPages.status, "published"));
 
   const localizedEntry = (
     faPath: string,
@@ -98,6 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   return [
+    ...landings.flatMap(page => localizedEntry(`/${page.slug}`, `/en/${page.slug}`, {lastModified: page.updatedAt, priority: 0.7})),
     ...software.flatMap(item => localizedEntry(`/requirements/${item.id}`, `/en/requirements/${item.id}`, { lastModified: item.updatedAt, priority: 0.6 })),
     ...localizedEntry("/", "/en", { changeFrequency: "weekly", priority: 1 }),
     ...localizedEntry("/courses", "/en/courses", {

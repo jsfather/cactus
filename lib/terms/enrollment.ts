@@ -55,6 +55,7 @@ export async function enrollStudent(
           : "The student must have an active student account.",
     };
   if (
+    term.archivedAt ||
     term.status === "cancelled" ||
     term.status === "completed" ||
     (source === "invitation" && term.status !== "enrollment_open")

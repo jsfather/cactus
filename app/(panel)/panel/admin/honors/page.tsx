@@ -3,7 +3,6 @@ import { DeleteHonorButton } from "@/components/honors/delete-honor-button";
 import { PanelListControls, PanelPagination } from "@/components/panel/list-controls";
 import { PanelEditIcon, PanelEmptyState, PanelPage, PanelPageHeader, PanelPrimaryLink, PanelSurface, PanelTable, PanelTableActionLink, PanelTableActions, PanelTableCell } from "@/components/panel/ui";
 import { getAdminHonors, type HonorStatusFilter } from "@/lib/honors/queries";
-import { localeConfig } from "@/lib/i18n/config";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { getSearchParam, parseAdminListQuery, type AdminListSearchParams } from "@/lib/panel/pagination";
 
@@ -14,7 +13,7 @@ export default async function AdminHonorsPage({ searchParams }: { searchParams: 
   const status: HonorStatusFilter = statusValue === "draft" || statusValue === "published" ? statusValue : "all";
   const page = await getAdminHonors({ ...listQuery, status });
   const isFa = locale === "fa";
-  const formatDate = (value: string) => new Intl.DateTimeFormat(localeConfig[locale].dateLocale, { dateStyle: "medium" }).format(new Date(`${value}T00:00:00Z`));
+  const formatDate = (value: string) => new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { dateStyle: "medium" }).format(new Date(`${value}T00:00:00Z`));
   return <PanelPage>
     {query.toast === "created" ? <ToastOnMount title={isFa ? "افتخار یا گواهینامه ساخته شد." : "Honor or certificate created."} /> : null}
     {query.toast === "updated" ? <ToastOnMount title={isFa ? "افتخار یا گواهینامه به‌روز شد." : "Honor or certificate updated."} /> : null}

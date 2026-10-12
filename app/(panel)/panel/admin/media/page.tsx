@@ -59,7 +59,7 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
                 <PanelTableCell>{getMediaKindLabel(asset.kind, locale)}</PanelTableCell>
                 <PanelTableCell><span className="block truncate">{asset.uploaderName}</span></PanelTableCell>
                 <PanelTableCell><span className="nums-en whitespace-nowrap">{formatSize(asset.size, locale)}</span></PanelTableCell>
-                <PanelTableCell>{new Intl.DateTimeFormat(locale === "fa" ? "fa-IR" : "en-US", { dateStyle: "medium" }).format(asset.createdAt)}</PanelTableCell>
+                <PanelTableCell>{new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { dateStyle: "medium" }).format(asset.createdAt)}</PanelTableCell>
                 <PanelTableCell><PanelTableActions><PanelTableActionLink href={`/panel/admin/media/${asset.id}/edit`} label={dictionary.common.edit}><PanelEditIcon /></PanelTableActionLink><CopyMediaUrlButton url={asset.url} locale={locale} /><DeleteMediaButton assetId={asset.id} locale={locale} /></PanelTableActions></PanelTableCell>
               </tr>
             ))}

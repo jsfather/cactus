@@ -2,6 +2,9 @@ import { and, asc, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
 import {
   termEnrollments,
+  academicSemesters,
+  academicYears,
+  courseTemplates,
   termInvitations,
   termLevels,
   termPrerequisites,
@@ -16,22 +19,34 @@ import type { Locale } from "@/lib/i18n/config";
 import { escapeLikePattern } from "@/lib/panel/pagination";
 import { hashTermInvitationToken } from "./invitations";
 
-const localizedUserName = (locale: Locale) => locale === "fa"
-  ? sql<string>`concat_ws(' ', ${users.firstNameFa}, ${users.lastNameFa})`
-  : sql<string>`concat_ws(' ', ${users.firstNameEn}, ${users.lastNameEn})`;
+const localizedUserName = (locale: Locale) =>
+  locale === "fa"
+    ? sql<string>`concat_ws(' ', ${users.firstNameFa}, ${users.lastNameFa})`
+    : sql<string>`concat_ws(' ', ${users.firstNameEn}, ${users.lastNameEn})`;
 
 export async function getTermLevels() {
-  return getDatabase().select().from(termLevels).orderBy(asc(termLevels.sortOrder));
+  return getDatabase()
+    .select()
+    .from(termLevels)
+    .orderBy(asc(termLevels.sortOrder));
 }
 
 export async function getTermLevel(levelId: string) {
-  const [level] = await getDatabase().select().from(termLevels).where(eq(termLevels.id, levelId)).limit(1);
+  const [level] = await getDatabase()
+    .select()
+    .from(termLevels)
+    .where(eq(termLevels.id, levelId))
+    .limit(1);
   return level ?? null;
 }
 
 export async function getActiveTeachers(locale: Locale) {
   return getDatabase()
-    .select({ id: users.id, name: localizedUserName(locale), mobile: users.mobile })
+    .select({
+      id: users.id,
+      name: localizedUserName(locale),
+      mobile: users.mobile,
+    })
     .from(users)
     .where(and(eq(users.role, "teacher"), eq(users.isActive, true)))
     .orderBy(asc(users.firstNameFa), asc(users.lastNameFa));
@@ -39,13 +54,21 @@ export async function getActiveTeachers(locale: Locale) {
 
 export async function getActiveStudents(locale: Locale) {
   return getDatabase()
-    .select({ id: users.id, name: localizedUserName(locale), mobile: users.mobile })
+    .select({
+      id: users.id,
+      name: localizedUserName(locale),
+      mobile: users.mobile,
+    })
     .from(users)
     .where(and(eq(users.role, "student"), eq(users.isActive, true)))
     .orderBy(asc(users.firstNameFa), asc(users.lastNameFa));
 }
 
-export async function getAdminTerms(locale: Locale, status: TermStatus | "all" = "all", query = "") {
+export async function getAdminTerms(
+  locale: Locale,
+  status: TermStatus | "all" = "all",
+  query = "",
+) {
   const search = query.trim().slice(0, 100);
   const pattern = `%${escapeLikePattern(search)}%`;
   return getDatabase()
@@ -71,10 +94,19 @@ export async function getAdminTerms(locale: Locale, status: TermStatus | "all" =
     .leftJoin(termEnrollments, eq(termEnrollments.termId, terms.id))
     .leftJoin(termSchedules, eq(termSchedules.termId, terms.id))
     .leftJoin(termSessions, eq(termSessions.termId, terms.id))
-    .where(and(
-      status === "all" ? undefined : eq(terms.status, status),
-      search ? or(ilike(terms.titleFa, pattern), ilike(terms.titleEn, pattern), ilike(termLevels.titleFa, pattern), ilike(termLevels.titleEn, pattern)) : undefined,
-    ))
+    .where(
+      and(
+        status === "all" ? undefined : eq(terms.status, status),
+        search
+          ? or(
+              ilike(terms.titleFa, pattern),
+              ilike(terms.titleEn, pattern),
+              ilike(termLevels.titleFa, pattern),
+              ilike(termLevels.titleEn, pattern),
+            )
+          : undefined,
+      ),
+    )
     .groupBy(terms.id, termLevels.id)
     .orderBy(desc(terms.startDate), desc(terms.createdAt));
 }
@@ -84,22 +116,59 @@ export async function getTermOptions(locale: Locale, excludeTermId?: string) {
     getTermLevels(),
     getActiveTeachers(locale),
     getDatabase()
-      .select({ id: terms.id, titleFa: terms.titleFa, titleEn: terms.titleEn, startDate: terms.startDate })
+      .select({
+        id: terms.id,
+        titleFa: terms.titleFa,
+        titleEn: terms.titleEn,
+        startDate: terms.startDate,
+      })
       .from(terms)
       .where(excludeTermId ? ne(terms.id, excludeTermId) : undefined)
       .orderBy(desc(terms.startDate), asc(terms.titleFa)),
   ]);
-  return { levels, teachers, prerequisiteTerms };
+  const [semesters, templates] = await Promise.all([
+    getDatabase()
+      .select({
+        id: academicSemesters.id,
+        titleFa: academicSemesters.titleFa,
+        titleEn: academicSemesters.titleEn,
+        yearTitleFa: academicYears.titleFa,
+        yearTitleEn: academicYears.titleEn,
+        archivedAt: academicSemesters.archivedAt,
+      })
+      .from(academicSemesters)
+      .innerJoin(academicYears, eq(academicYears.id, academicSemesters.yearId))
+      .orderBy(desc(academicSemesters.startDate)),
+    getDatabase()
+      .select()
+      .from(courseTemplates)
+      .orderBy(asc(courseTemplates.titleFa)),
+  ]);
+  return { levels, teachers, prerequisiteTerms, semesters, templates };
 }
 
 export async function getTerm(termId: string) {
   const database = getDatabase();
-  const [term] = await database.select().from(terms).where(eq(terms.id, termId)).limit(1);
+  const [term] = await database
+    .select()
+    .from(terms)
+    .where(eq(terms.id, termId))
+    .limit(1);
   if (!term) return null;
   const [teachers, prerequisites, schedules] = await Promise.all([
-    database.select({ teacherId: termTeachers.teacherId }).from(termTeachers).where(eq(termTeachers.termId, termId)),
-    database.select({ prerequisiteTermId: termPrerequisites.prerequisiteTermId }).from(termPrerequisites).where(eq(termPrerequisites.termId, termId)),
-    database.select().from(termSchedules).where(eq(termSchedules.termId, termId)).orderBy(asc(termSchedules.dayOfWeek), asc(termSchedules.startTime)),
+    database
+      .select({ teacherId: termTeachers.teacherId })
+      .from(termTeachers)
+      .where(eq(termTeachers.termId, termId)),
+    database
+      .select({ prerequisiteTermId: termPrerequisites.prerequisiteTermId })
+      .from(termPrerequisites)
+      .where(eq(termPrerequisites.termId, termId)),
+    database
+      .select()
+      .from(termSchedules)
+      .where(eq(termSchedules.termId, termId))
+      .orderBy(asc(termSchedules.dayOfWeek), asc(termSchedules.startTime)),
   ]);
   return {
     ...term,
@@ -128,26 +197,56 @@ export async function getTermRoster(termId: string, locale: Locale) {
 
 export async function getTermInvitations(termId: string) {
   return getDatabase()
-    .select({ id: termInvitations.id, expiresAt: termInvitations.expiresAt, maxUses: termInvitations.maxUses, useCount: termInvitations.useCount, revokedAt: termInvitations.revokedAt, createdAt: termInvitations.createdAt })
+    .select({
+      id: termInvitations.id,
+      expiresAt: termInvitations.expiresAt,
+      maxUses: termInvitations.maxUses,
+      useCount: termInvitations.useCount,
+      revokedAt: termInvitations.revokedAt,
+      createdAt: termInvitations.createdAt,
+    })
     .from(termInvitations)
     .where(eq(termInvitations.termId, termId))
     .orderBy(desc(termInvitations.createdAt));
 }
 
-export async function isTeacherAssignedToTerm(termId: string, teacherId: string) {
+export async function isTeacherAssignedToTerm(
+  termId: string,
+  teacherId: string,
+) {
   const [assignment] = await getDatabase()
     .select({ termId: termTeachers.termId })
     .from(termTeachers)
-    .where(and(eq(termTeachers.termId, termId), eq(termTeachers.teacherId, teacherId)))
+    .where(
+      and(
+        eq(termTeachers.termId, termId),
+        eq(termTeachers.teacherId, teacherId),
+      ),
+    )
     .limit(1);
   return Boolean(assignment);
 }
 
-export async function getUserTermSchedule(userId: string, role: "teacher" | "student") {
+export async function getUserTermSchedule(
+  userId: string,
+  role: "teacher" | "student",
+) {
   const database = getDatabase();
-  const termIds = role === "teacher"
-    ? database.select({ termId: termTeachers.termId }).from(termTeachers).where(eq(termTeachers.teacherId, userId))
-    : database.select({ termId: termEnrollments.termId }).from(termEnrollments).where(and(eq(termEnrollments.studentId, userId), eq(termEnrollments.status, "active")));
+  const termIds =
+    role === "teacher"
+      ? database
+          .select({ termId: termTeachers.termId })
+          .from(termTeachers)
+          .where(eq(termTeachers.teacherId, userId))
+      : database
+          .select({ termId: termEnrollments.termId })
+          .from(termEnrollments)
+          .where(
+            and(
+              eq(termEnrollments.studentId, userId),
+              eq(termEnrollments.status, "active"),
+            ),
+          );
   return database
     .select({
       termId: terms.id,
@@ -166,8 +265,17 @@ export async function getUserTermSchedule(userId: string, role: "teacher" | "stu
     })
     .from(terms)
     .innerJoin(termSchedules, eq(termSchedules.termId, terms.id))
-    .where(and(inArray(terms.id, termIds), or(eq(terms.status, "enrollment_open"), eq(terms.status, "active"))))
-    .orderBy(asc(termSchedules.dayOfWeek), asc(termSchedules.startTime), asc(terms.titleFa));
+    .where(
+      and(
+        inArray(terms.id, termIds),
+        or(eq(terms.status, "enrollment_open"), eq(terms.status, "active")),
+      ),
+    )
+    .orderBy(
+      asc(termSchedules.dayOfWeek),
+      asc(termSchedules.startTime),
+      asc(terms.titleFa),
+    );
 }
 
 export async function getTeacherTerms(teacherId: string) {
@@ -196,10 +304,25 @@ export async function getTeacherTerms(teacherId: string) {
 }
 
 export async function getPrerequisiteNames(termId: string, locale: Locale) {
-  const prerequisite = getDatabase().$with("prerequisite").as(
-    getDatabase().select({ id: termPrerequisites.prerequisiteTermId }).from(termPrerequisites).where(eq(termPrerequisites.termId, termId)),
-  );
-  return getDatabase().with(prerequisite).select({ id: terms.id, title: locale === "fa" ? terms.titleFa : sql<string>`coalesce(${terms.titleEn}, ${terms.titleFa})` }).from(terms).innerJoin(prerequisite, eq(terms.id, prerequisite.id));
+  const prerequisite = getDatabase()
+    .$with("prerequisite")
+    .as(
+      getDatabase()
+        .select({ id: termPrerequisites.prerequisiteTermId })
+        .from(termPrerequisites)
+        .where(eq(termPrerequisites.termId, termId)),
+    );
+  return getDatabase()
+    .with(prerequisite)
+    .select({
+      id: terms.id,
+      title:
+        locale === "fa"
+          ? terms.titleFa
+          : sql<string>`coalesce(${terms.titleEn}, ${terms.titleFa})`,
+    })
+    .from(terms)
+    .innerJoin(prerequisite, eq(terms.id, prerequisite.id));
 }
 
 export async function getTermInvitationPreview(token: string, locale: Locale) {
@@ -227,8 +350,18 @@ export async function getTermInvitationPreview(token: string, locale: Locale) {
   if (!invitation) return null;
   return {
     ...invitation,
-    title: locale === "en" ? invitation.titleEn || invitation.titleFa : invitation.titleFa,
-    level: locale === "en" ? invitation.levelEn || invitation.levelFa : invitation.levelFa,
-    usable: !invitation.revokedAt && invitation.expiresAt > new Date() && invitation.status === "enrollment_open" && (invitation.maxUses === null || invitation.useCount < invitation.maxUses),
+    title:
+      locale === "en"
+        ? invitation.titleEn || invitation.titleFa
+        : invitation.titleFa,
+    level:
+      locale === "en"
+        ? invitation.levelEn || invitation.levelFa
+        : invitation.levelFa,
+    usable:
+      !invitation.revokedAt &&
+      invitation.expiresAt > new Date() &&
+      invitation.status === "enrollment_open" &&
+      (invitation.maxUses === null || invitation.useCount < invitation.maxUses),
   };
 }

@@ -1,5 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
+import { RichContent } from "@/components/content/rich-content";
+import { richTextToPlainText } from "@/lib/content/rich-text";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { SiteFooter } from "@/components/public/site-footer";
@@ -48,7 +50,7 @@ export async function HonorPage({
     "@context": "https://schema.org",
     "@type": "CreativeWork",
     name: title,
-    description,
+    description: richTextToPlainText(description),
     image: honor.certificateImageUrl,
     dateCreated: honor.issuedAt,
     creator: { "@type": "Organization", name: organization },
@@ -117,9 +119,7 @@ export async function HonorPage({
                     ? "درباره این دستاورد"
                     : "About this achievement"}
                 </h2>
-                <p className="mt-4 whitespace-pre-line leading-8 text-zinc-600 dark:text-zinc-300">
-                  {description}
-                </p>
+                <RichContent html={description} className="mt-4 leading-8" />
               </section>
               <dl className="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 text-start dark:border-zinc-800 dark:bg-zinc-900/60">
                 <Detail label={dictionary.issuedBy} value={organization} />

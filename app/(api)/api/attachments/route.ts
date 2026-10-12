@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   const type = attachmentType(bytes);
   if (
     !type ||
-    (file.type !== type.mime &&
+    (file.type.split(";")[0] !== type.mime &&
       !(type.ext === "zip" && file.type === "application/x-zip-compressed"))
   )
     return NextResponse.json(

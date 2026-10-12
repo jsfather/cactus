@@ -350,6 +350,11 @@ export function PanelNav({
               label: dictionary.nav.teacherProfile,
               icon: "teacherProfile",
             },
+            {
+              href: "/panel/teacher/live-chat",
+              label: locale === "fa" ? "چت پشتیبانی" : "Support chat",
+              icon: "comments",
+            },
           ]
         : [];
   const fa = locale === "fa";
@@ -568,6 +573,16 @@ export function PanelNav({
                 label: fa ? "دپارتمان‌های پشتیبانی" : "Support departments",
                 icon: "comments",
               },
+              {
+                href: "/panel/admin/live-chat",
+                label: fa ? "چت آنلاین" : "Live chat",
+                icon: "comments",
+              },
+              {
+                href: "/panel/admin/academic/semesters",
+                label: fa ? "سال تحصیلی و آرشیو" : "Academic years & archive",
+                icon: "levels",
+              },
             ],
           },
           {
@@ -575,9 +590,23 @@ export function PanelNav({
             label: fa ? "تنظیمات سایت" : "Site settings",
             icon: "about",
             items: [
-              { href: "/panel/admin/settings", label: fa ? "هدر و فوتر" : "Header & footer", icon: "about" },
-              { href: "/panel/admin/pages", label: fa ? "ویرایش صفحات ثابت" : "Static pages", icon: "about" },
-              { href: "/panel/admin/about", label: dictionary.nav.about, icon: "about" },
+              { href: "/panel/admin/landings", label: fa ? "لندینگ‌ساز" : "Landing builder", icon: "blog" },
+              { href: "/panel/admin/settings/appearance", label: fa ? "رنگ‌ها و تایپوگرافی" : "Colors & typography", icon: "about" },
+              {
+                href: "/panel/admin/settings",
+                label: fa ? "هدر و فوتر" : "Header & footer",
+                icon: "about",
+              },
+              {
+                href: "/panel/admin/pages",
+                label: fa ? "ویرایش صفحات ثابت" : "Static pages",
+                icon: "about",
+              },
+              {
+                href: "/panel/admin/about",
+                label: dictionary.nav.about,
+                icon: "about",
+              },
             ],
           },
           {

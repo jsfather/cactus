@@ -1,0 +1,1 @@
+ALTER TABLE "chat_messages" ADD COLUMN "image_bytes" integer DEFAULT 0 NOT NULL;

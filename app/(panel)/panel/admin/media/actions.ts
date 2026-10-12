@@ -9,6 +9,7 @@ import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import {
   coursePages,
+  landingPages,
   learningActivities,
   resources,
   honors,
@@ -131,6 +132,7 @@ export async function deleteMediaAsset(
     resourceUse,
     settingsUse,
     presentationUse,
+    landingUse,
   ] = await Promise.all([
     database
       .select({ id: users.id })
@@ -198,6 +200,7 @@ export async function deleteMediaAsset(
       .limit(1),
     database.select({ key: appSettings.key }).from(appSettings).where(like(appSettings.value, pattern)).limit(1),
     database.select({ key: siteContent.key }).from(siteContent).where(sql`${siteContent.presentation}::text like ${pattern}`).limit(1),
+    database.select({id: landingPages.id}).from(landingPages).where(or(like(landingPages.coverImageUrl, pattern), like(landingPages.contentFa, pattern), like(landingPages.contentEn, pattern), like(landingPages.afterCtaFa, pattern), like(landingPages.afterCtaEn, pattern))).limit(1),
   ]);
 
   if (
@@ -207,7 +210,7 @@ export async function deleteMediaAsset(
     honorUse.length ||
     courseUse.length ||
     activityUse.length ||
-    resourceUse.length || settingsUse.length || presentationUse.length
+    resourceUse.length || settingsUse.length || presentationUse.length || landingUse.length
   ) {
     return {
       error:

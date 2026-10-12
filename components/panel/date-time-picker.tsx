@@ -31,9 +31,9 @@ type SharedProps = {
 const gregorianCalendar = new GregorianCalendar();
 const persianCalendar = new PersianCalendar();
 
-function parseCanonicalDate(value: string, locale: Locale) {
+function parseCanonicalDate(value: string) {
   try {
-    return toCalendar(parseDate(value), locale === "fa" ? persianCalendar : gregorianCalendar);
+    return toCalendar(parseDate(value), persianCalendar);
   } catch {
     return null;
   }
@@ -120,23 +120,23 @@ export function PanelDatePicker({
   "aria-label": ariaLabel,
 }: SharedProps & { min?: string; max?: string }) {
   const isFa = locale === "fa";
-  const calendar = isFa ? persianCalendar : gregorianCalendar;
-  const selected = parseCanonicalDate(value, locale);
+  const calendar = persianCalendar;
+  const selected = parseCanonicalDate(value);
   const current = toCalendar(today("Asia/Tehran"), calendar);
   const [open, setOpen] = useState(false);
   const [visibleMonth, setVisibleMonth] = useState(() => startOfMonth(selected ?? current));
   const triggerRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const number = useMemo(() => new Intl.NumberFormat(isFa ? "fa-IR" : "en-US", { useGrouping: false }), [isFa]);
-  const dateFormatter = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }), [isFa]);
-  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { month: "long", timeZone: "UTC" }), [isFa]);
+  const dateFormatter = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }), [isFa]);
+  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { month: "long", timeZone: "UTC" }), [isFa]);
   const weekdays = isFa ? ["ش", "ی", "د", "س", "چ", "پ", "ج"] : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const minDate = min ? parseDate(min) : null;
   const maxDate = max ? parseDate(max) : null;
   const minimumYear = Math.min(minDate ? toCalendar(minDate, calendar).year : current.year - 100, visibleMonth.year);
   const maximumYear = Math.max(maxDate ? toCalendar(maxDate, calendar).year : current.year + 20, visibleMonth.year);
   const years = Array.from({ length: maximumYear - minimumYear + 1 }, (_, index) => maximumYear - index);
-  const months = Array.from({ length: calendar.getMonthsInYear(visibleMonth) }, (_, index) => {
+  const months = Array.from({ length: calendar.getMonthsInYear() }, (_, index) => {
     const month = index + 1;
     return { month, label: monthFormatter.format(dateForIntl(new CalendarDate(calendar, visibleMonth.year, month, 1))) };
   });

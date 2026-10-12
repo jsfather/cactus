@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { richTextToPlainText } from "@/lib/content/rich-text";
 import { HonorPage } from "@/components/public/honor-page";
 import { getPublishedHonor } from "@/lib/honors/queries";
 
@@ -11,7 +12,7 @@ export async function generateMetadata({
   return honor
     ? {
         title: honor.titleEn || honor.titleFa,
-        description: (honor.descriptionEn || honor.descriptionFa).slice(0, 160),
+        description: richTextToPlainText(honor.descriptionEn || honor.descriptionFa).slice(0, 160),
         openGraph: { images: [honor.certificateImageUrl] },
       }
     : { title: "Honor not found" };

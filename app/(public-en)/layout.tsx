@@ -1,25 +1,26 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
+import { PublicSettingsProvider } from "@/components/public/public-settings-provider";
+import { getSiteNavigation } from "@/lib/site-content/navigation-server";
+import { getSiteAppearance } from "@/lib/site-content/appearance-server";
+import { appearanceCss } from "@/lib/site-content/appearance";
+import { LiveChat } from "@/components/support/live-chat";
 import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
 import "@/components/public/public.css";
-import { getSiteUrl } from "@/lib/seo/site";
+import { getSiteMetadata } from "@/lib/site-content/metadata";
 
-export const metadata: Metadata = {
-  metadataBase: getSiteUrl(),
-  title: {
-    default: "Cactus Robotics School",
-    template: "%s | Cactus",
-  },
-  description:
-    "Project-based robotics and programming education for children and teenagers.",
-  icons: { icon: "/cactus-logo.svg" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return getSiteMetadata("en");
+}
 
-export default function EnglishPublicLayout({
+export default async function EnglishPublicLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  await connection();
+  const [navigation, appearance] = await Promise.all([getSiteNavigation(), getSiteAppearance()]);
   return (
     <html
       lang="en"
@@ -30,9 +31,10 @@ export default function EnglishPublicLayout({
     >
       <head>
         <ThemeScript />
+        <style>{appearanceCss(appearance)}</style>
       </head>
       <body className="nums-en min-h-full bg-white font-sans dark:bg-zinc-950">
-        <AppFeedbackProvider locale="en">{children}</AppFeedbackProvider>
+        <PublicSettingsProvider loadingIconUrl={navigation.loadingIconUrl}><AppFeedbackProvider locale="en">{children}<LiveChat locale="en" /></AppFeedbackProvider></PublicSettingsProvider>
       </body>
     </html>
   );

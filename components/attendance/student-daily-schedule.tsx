@@ -10,7 +10,7 @@ export function StudentDailySchedule({ sessions, locale }: { sessions: StudentUp
   const today = getTehranTodayIso();
   const number = new Intl.NumberFormat(isFa ? "fa-IR" : "en-US");
   const todayCount = sessions.filter((session) => session.sessionDate === today).length;
-  const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
+  const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" });
   return <section aria-labelledby="student-daily-heading" className="space-y-4">
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div><h2 id="student-daily-heading" className="text-xl font-bold text-zinc-950 dark:text-zinc-50">{isFa ? "امروز و کلاس‌های بعدی" : "Today and next classes"}</h2><p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{todayCount ? (isFa ? `${number.format(todayCount)} کلاس امروز دارید؛ نزدیک‌ترین جلسات بعدی هم اینجا هستند.` : `You have ${number.format(todayCount)} class${todayCount === 1 ? "" : "es"} today, followed by your next sessions.`) : (isFa ? "امروز کلاسی ندارید؛ نزدیک‌ترین جلسات بعدی را از همین‌جا ببینید." : "You have no class today. Your next sessions are shown here.")}</p></div>

@@ -25,7 +25,7 @@ export async function AttendanceSessionPage({
   if (role === "teacher" && !(await isTeacherAssignedToTerm(session.termId, user.id))) notFound();
   const roster = await getSessionRoster(session.id, session.termId, session.sessionDate, locale);
   const isFa = locale === "fa";
-  const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", {
+  const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", {
     weekday: "long",
     year: "numeric",
     month: "long",

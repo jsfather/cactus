@@ -111,9 +111,7 @@ export async function StudentTermsPage({ id }: { id?: string }) {
               <tr key={s.id}>
                 <PanelTableCell>{s.sequence}</PanelTableCell>
                 <PanelTableCell>
-                  {new Date(`${s.sessionDate}T12:00:00Z`).toLocaleDateString(
-                    locale,
-                  )}{" "}
+                  {new Date(`${s.sessionDate}T12:00:00Z`).toLocaleDateString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian")}{" "}
                   · {s.startTime.slice(0, 5)}
                 </PanelTableCell>
                 <PanelTableCell>
@@ -217,13 +215,9 @@ export async function StudentTermsPage({ id }: { id?: string }) {
                   {text(locale, "تومان", "toman")}
                 </p>
                 <p className="text-sm text-zinc-500">
-                  {new Date(`${t.startDate}T12:00:00Z`).toLocaleDateString(
-                    locale,
-                  )}{" "}
+                  {new Date(`${t.startDate}T12:00:00Z`).toLocaleDateString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian")}{" "}
                   –{" "}
-                  {new Date(`${t.endDate}T12:00:00Z`).toLocaleDateString(
-                    locale,
-                  )}
+                  {new Date(`${t.endDate}T12:00:00Z`).toLocaleDateString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian")}
                 </p>
                 {missing.length ? (
                   <p className="text-amber-700 dark:text-amber-400">
@@ -319,9 +313,7 @@ export async function StudentAttendancePage({
                 )}
               </PanelTableCell>
               <PanelTableCell>
-                {new Date(`${s.sessionDate}T12:00:00Z`).toLocaleDateString(
-                  locale,
-                )}
+                {new Date(`${s.sessionDate}T12:00:00Z`).toLocaleDateString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian")}
               </PanelTableCell>
               <PanelTableCell>
                 {r.attendance

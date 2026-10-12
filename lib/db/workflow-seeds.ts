@@ -1,7 +1,16 @@
 import { eq, asc } from "drizzle-orm";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import {
+  CalendarDate,
+  GregorianCalendar,
+  PersianCalendar,
+  today,
+  toCalendar,
+} from "@internationalized/date";
+import { defaultChatSettings } from "@/lib/live-chat/settings";
+import {
   appSettings,
+  landingPages,
   coursePages,
   resources,
   ticketDepartments,
@@ -12,6 +21,9 @@ import {
   termTeachers,
   termSchedules,
   users,
+  academicYears,
+  academicSemesters,
+  courseTemplates,
 } from "./schema";
 export async function seedWorkflows(db: NodePgDatabase, adminId: string) {
   await db.transaction(async (tx) => {
@@ -29,6 +41,63 @@ export async function seedWorkflows(db: NodePgDatabase, adminId: string) {
       await tx
         .insert(ticketDepartments)
         .values({ titleFa: "پشتیبانی آموزشی", titleEn: "Learning support" });
+    if (await claim("landing-builder")) await tx.insert(landingPages).values({slug: "robotics-discovery", titleFa: "اولین قدم در دنیای رباتیک", titleEn: "Discover robotics", contentFa: "<p>با ساخت پروژه‌های واقعی، مسیر یادگیری رباتیک را آغاز کنید. این پیش‌نویس را پیش از انتشار ویرایش کنید.</p>", contentEn: "<p>Start learning robotics through hands-on projects. Edit this draft before publishing.</p>", afterCtaFa: "<p>از آشنایی با قطعات تا برنامه‌نویسی اولین ربات؛ همراه شما هستیم.</p>", afterCtaEn: "<p>From components to programming your first robot, we are here to help.</p>", status: "draft", cta: {titleFa: "برای شروع آماده‌اید؟", titleEn: "Ready to start?", textFa: "مسیر مناسب خود را انتخاب کنید.", textEn: "Choose your learning path.", labelFa: "مشاهده دوره‌ها", labelEn: "Explore courses", href: "/courses"}}).onConflictDoNothing();
+    if (await claim("live-chat"))
+      await tx
+        .insert(appSettings)
+        .values({
+          key: "support.live-chat",
+          value: JSON.stringify({
+            ...defaultChatSettings,
+            operatorIds: [adminId],
+          }),
+        })
+        .onConflictDoNothing();
+    if (await claim("academic-catalog")) {
+      const persian = new PersianCalendar();
+      const current = toCalendar(today("Asia/Tehran"), persian);
+      const yearNumber = current.month >= 7 ? current.year : current.year - 1;
+      const date = (year: number, month: number, day: number) =>
+        toCalendar(
+          new CalendarDate(persian, year, month, day),
+          new GregorianCalendar(),
+        ).toString();
+      const [year] = await tx
+        .insert(academicYears)
+        .values({
+          titleFa: `سال تحصیلی ${yearNumber}–${yearNumber + 1}`,
+          titleEn: `Academic year ${yearNumber}–${yearNumber + 1}`,
+          startDate: date(yearNumber, 7, 1),
+          endDate: date(yearNumber + 1, 6, 31),
+        })
+        .returning();
+      await tx
+        .insert(academicSemesters)
+        .values({
+          yearId: year.id,
+          titleFa: "نیمسال اول",
+          titleEn: "First semester",
+          startDate: year.startDate,
+          endDate: date(yearNumber, 10, 30),
+        });
+      const [level] = await tx
+        .select()
+        .from(termLevels)
+        .orderBy(asc(termLevels.sortOrder))
+        .limit(1);
+      if (level)
+        await tx
+          .insert(courseTemplates)
+          .values({
+            titleFa: "مبانی رباتیک",
+            titleEn: "Robotics foundations",
+            descriptionFa:
+              "الگوی قابل استفاده برای ارائه‌های مختلف؛ اطلاعات هر ورودی مستقل نگهداری می‌شود.",
+            descriptionEn:
+              "A reusable course template; every intake retains independent records.",
+            levelId: level.id,
+          });
+    }
     for (const kind of ["faqs", "guides", "requirements"] as const) {
       if (!(await claim(kind))) continue;
       const content = {
@@ -63,15 +132,102 @@ export async function seedWorkflows(db: NodePgDatabase, adminId: string) {
     }
     if (await claim("software-catalog")) {
       const software = [
-        ["Arduino IDE", "برنامه‌نویسی", "Programming", "Windows, macOS, Linux", "https://www.arduino.cc/en/software", "https://docs.arduino.cc/software/ide/", "برنامه‌نویسی بردهای آردوینو و کار با حسگرها.", "Program Arduino boards and work with sensors."],
-        ["Scratch", "برنامه‌نویسی بصری", "Visual programming", "Windows, macOS, Web", "https://scratch.mit.edu/download", "https://scratch.mit.edu/help", "یادگیری برنامه‌نویسی با ساخت بازی و پویانمایی.", "Learn programming through games and animation."],
-        ["Python", "برنامه‌نویسی", "Programming", "Windows, macOS, Linux", "https://www.python.org/downloads/", "https://docs.python.org/3/", "برنامه‌نویسی رباتیک، هوش مصنوعی و پردازش داده.", "Programming for robotics, AI, and data processing."],
-        ["ROS 2", "رباتیک", "Robotics", "Linux, Windows", "https://docs.ros.org/", "https://docs.ros.org/", "چارچوب توسعه سامانه‌های رباتیک.", "A framework for building robotics systems."],
-        ["Gazebo", "شبیه‌سازی", "Simulation", "Linux, macOS, Windows", "https://gazebosim.org/docs/", "https://gazebosim.org/docs/", "شبیه‌سازی ربات‌ها، محیط و حسگرها.", "Simulate robots, environments, and sensors."],
-        ["OpenCV", "بینایی ماشین", "Computer vision", "Windows, macOS, Linux", "https://opencv.org/releases/", "https://docs.opencv.org/", "پردازش تصویر و ویدئو در پروژه‌های رباتیک.", "Image and video processing for robotics projects."],
-        ["MATLAB", "محاسبات علمی", "Scientific computing", "Windows, macOS, Linux", "https://www.mathworks.com/products/matlab.html", "https://www.mathworks.com/help/matlab/", "محاسبات، مدل‌سازی و کنترل؛ نیازمند مجوز مناسب.", "Computation, modeling, and control; requires an appropriate license."],
+        [
+          "Arduino IDE",
+          "برنامه‌نویسی",
+          "Programming",
+          "Windows, macOS, Linux",
+          "https://www.arduino.cc/en/software",
+          "https://docs.arduino.cc/software/ide/",
+          "برنامه‌نویسی بردهای آردوینو و کار با حسگرها.",
+          "Program Arduino boards and work with sensors.",
+        ],
+        [
+          "Scratch",
+          "برنامه‌نویسی بصری",
+          "Visual programming",
+          "Windows, macOS, Web",
+          "https://scratch.mit.edu/download",
+          "https://scratch.mit.edu/help",
+          "یادگیری برنامه‌نویسی با ساخت بازی و پویانمایی.",
+          "Learn programming through games and animation.",
+        ],
+        [
+          "Python",
+          "برنامه‌نویسی",
+          "Programming",
+          "Windows, macOS, Linux",
+          "https://www.python.org/downloads/",
+          "https://docs.python.org/3/",
+          "برنامه‌نویسی رباتیک، هوش مصنوعی و پردازش داده.",
+          "Programming for robotics, AI, and data processing.",
+        ],
+        [
+          "ROS 2",
+          "رباتیک",
+          "Robotics",
+          "Linux, Windows",
+          "https://docs.ros.org/",
+          "https://docs.ros.org/",
+          "چارچوب توسعه سامانه‌های رباتیک.",
+          "A framework for building robotics systems.",
+        ],
+        [
+          "Gazebo",
+          "شبیه‌سازی",
+          "Simulation",
+          "Linux, macOS, Windows",
+          "https://gazebosim.org/docs/",
+          "https://gazebosim.org/docs/",
+          "شبیه‌سازی ربات‌ها، محیط و حسگرها.",
+          "Simulate robots, environments, and sensors.",
+        ],
+        [
+          "OpenCV",
+          "بینایی ماشین",
+          "Computer vision",
+          "Windows, macOS, Linux",
+          "https://opencv.org/releases/",
+          "https://docs.opencv.org/",
+          "پردازش تصویر و ویدئو در پروژه‌های رباتیک.",
+          "Image and video processing for robotics projects.",
+        ],
+        [
+          "MATLAB",
+          "محاسبات علمی",
+          "Scientific computing",
+          "Windows, macOS, Linux",
+          "https://www.mathworks.com/products/matlab.html",
+          "https://www.mathworks.com/help/matlab/",
+          "محاسبات، مدل‌سازی و کنترل؛ نیازمند مجوز مناسب.",
+          "Computation, modeling, and control; requires an appropriate license.",
+        ],
       ];
-      for (const [name, categoryFa, categoryEn, platforms, attachmentUrl, documentationUrl, fa, en] of software) await tx.insert(resources).values({kind:"requirements",titleFa:name,titleEn:name,categoryFa,categoryEn,platforms,attachmentUrl,documentationUrl,status:"published",contentFa:`<p>${fa}</p><p>نسخه سازگار با دوره و سیستم‌عامل خود را طبق راهنمای رسمی نصب کنید. پیش‌نیازهای سخت‌افزاری و مراحل نصب در مستندات رسمی آمده‌اند.</p>`,contentEn:`<p>${en}</p><p>Install the version compatible with your course and operating system using the official guide. See the documentation for system requirements and installation steps.</p>`});
+      for (const [
+        name,
+        categoryFa,
+        categoryEn,
+        platforms,
+        attachmentUrl,
+        documentationUrl,
+        fa,
+        en,
+      ] of software)
+        await tx
+          .insert(resources)
+          .values({
+            kind: "requirements",
+            titleFa: name,
+            titleEn: name,
+            categoryFa,
+            categoryEn,
+            platforms,
+            attachmentUrl,
+            documentationUrl,
+            status: "published",
+            contentFa: `<p>${fa}</p><p>نسخه سازگار با دوره و سیستم‌عامل خود را طبق راهنمای رسمی نصب کنید. پیش‌نیازهای سخت‌افزاری و مراحل نصب در مستندات رسمی آمده‌اند.</p>`,
+            contentEn: `<p>${en}</p><p>Install the version compatible with your course and operating system using the official guide. See the documentation for system requirements and installation steps.</p>`,
+          });
     }
     let [term] = await tx
       .select()
@@ -112,60 +268,52 @@ export async function seedWorkflows(db: NodePgDatabase, adminId: string) {
           .where(eq(users.role, "teacher"))
           .limit(1);
         if (teacher) {
-          await tx
-            .insert(termTeachers)
-            .values({
-              termId: term.id,
-              teacherId: teacher.id,
-              assignedById: adminId,
-            });
-          await tx
-            .insert(termSchedules)
-            .values({
-              termId: term.id,
-              dayOfWeek: 0,
-              startTime: "09:00",
-              endTime: "10:00",
-            });
+          await tx.insert(termTeachers).values({
+            termId: term.id,
+            teacherId: teacher.id,
+            assignedById: adminId,
+          });
+          await tx.insert(termSchedules).values({
+            termId: term.id,
+            dayOfWeek: 0,
+            startTime: "09:00",
+            endTime: "10:00",
+          });
         }
       }
     }
     if (await claim("course"))
-      await tx
-        .insert(coursePages)
-        .values({
-          slug: "getting-started-with-robotics",
-          termId: term?.id ?? null,
-          titleFa: "آشنایی با رباتیک",
-          titleEn: "Getting started with robotics",
-          summaryFa: "یک دوره نمونه برای معرفی مسیر یادگیری رباتیک.",
-          summaryEn:
-            "A sample course introducing the robotics learning journey.",
-          contentFa:
-            "<p>این صفحه نمونه را با محتوای دوره خود جایگزین و سپس منتشر کنید.</p>",
-          contentEn:
-            "<p>Replace this sample with your course content before publishing.</p>",
-          topic: "Robotics",
-          level: "beginner",
-          ageGroup: "8–12",
-          duration: "4 sessions",
-          status: "draft",
-          sections: {
-            syllabus: [
-              {
-                titleFa: "اولین ربات من",
-                titleEn: "My first robot",
-                itemsFa: "شناخت قطعات\nساخت مدار\nبرنامه‌نویسی حرکت",
-                itemsEn:
-                  "Meet the components\nBuild a circuit\nProgram movement",
-              },
-            ],
-            faqs: [],
-            tools: [],
-            testimonials: [],
-            blogIds: [],
-          },
-        });
+      await tx.insert(coursePages).values({
+        slug: "getting-started-with-robotics",
+        termId: term?.id ?? null,
+        titleFa: "آشنایی با رباتیک",
+        titleEn: "Getting started with robotics",
+        summaryFa: "یک دوره نمونه برای معرفی مسیر یادگیری رباتیک.",
+        summaryEn: "A sample course introducing the robotics learning journey.",
+        contentFa:
+          "<p>این صفحه نمونه را با محتوای دوره خود جایگزین و سپس منتشر کنید.</p>",
+        contentEn:
+          "<p>Replace this sample with your course content before publishing.</p>",
+        topic: "Robotics",
+        level: "beginner",
+        ageGroup: "8–12",
+        duration: "4 sessions",
+        status: "draft",
+        sections: {
+          syllabus: [
+            {
+              titleFa: "اولین ربات من",
+              titleEn: "My first robot",
+              itemsFa: "شناخت قطعات\nساخت مدار\nبرنامه‌نویسی حرکت",
+              itemsEn: "Meet the components\nBuild a circuit\nProgram movement",
+            },
+          ],
+          faqs: [],
+          tools: [],
+          testimonials: [],
+          blogIds: [],
+        },
+      });
     if (term) {
       for (const kind of ["homework", "recordings", "reports"] as const) {
         if (!(await claim(kind))) continue;
@@ -177,33 +325,28 @@ export async function seedWorkflows(db: NodePgDatabase, adminId: string) {
           recordings: ["جلسه ضبط‌شده نمونه", "Sample recorded lesson"],
           reports: ["گزارش آموزشی نمونه", "Sample teaching report"],
         }[kind];
-        await tx
-          .insert(learningActivities)
-          .values({
-            kind,
-            termId: term.id,
-            creatorId: adminId,
-            titleFa: labels[0],
-            titleEn: labels[1],
-            contentFa:
-              "<p>این پیش‌نویس نمونه را پیش از انتشار ویرایش کنید.</p>",
-            contentEn: "<p>Edit this sample draft before publishing it.</p>",
-            status: "draft",
-          });
+        await tx.insert(learningActivities).values({
+          kind,
+          termId: term.id,
+          creatorId: adminId,
+          titleFa: labels[0],
+          titleEn: labels[1],
+          contentFa: "<p>این پیش‌نویس نمونه را پیش از انتشار ویرایش کنید.</p>",
+          contentEn: "<p>Edit this sample draft before publishing it.</p>",
+          status: "draft",
+        });
       }
     }
     if (await claim("notification"))
-      await tx
-        .insert(notifications)
-        .values({
-          userId: adminId,
-          titleFa: "گردش‌کارهای جدید آماده‌اند",
-          titleEn: "New workflows are ready",
-          bodyFa:
-            "دوره‌ها، تکالیف، تیکت‌ها و سفارش‌ها را از منوی پنل مدیریت کنید. محتواهای نمونه پیش‌نویس هستند.",
-          bodyEn:
-            "Manage courses, homework, support, and orders from the workspace menu. Sample course and classroom content are drafts.",
-          href: "/panel/admin/courses",
-        });
+      await tx.insert(notifications).values({
+        userId: adminId,
+        titleFa: "گردش‌کارهای جدید آماده‌اند",
+        titleEn: "New workflows are ready",
+        bodyFa:
+          "دوره‌ها، تکالیف، تیکت‌ها و سفارش‌ها را از منوی پنل مدیریت کنید. محتواهای نمونه پیش‌نویس هستند.",
+        bodyEn:
+          "Manage courses, homework, support, and orders from the workspace menu. Sample course and classroom content are drafts.",
+        href: "/panel/admin/courses",
+      });
   });
 }

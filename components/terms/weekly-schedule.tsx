@@ -20,7 +20,7 @@ export type ScheduleEntry = {
 
 export function WeeklySchedule({ entries, locale }: { entries: ScheduleEntry[]; locale: Locale }) {
   const isFa = locale === "fa";
-  const date = new Intl.DateTimeFormat(isFa ? "fa-IR" : "en-US", { year: "numeric", month: "short", day: "numeric" });
+  const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { year: "numeric", month: "short", day: "numeric" });
   if (!entries.length) return <PanelSurface><PanelEmptyState title={isFa ? "برنامه‌ای وجود ندارد" : "No schedule yet"} description={isFa ? "وقتی ترمی به شما اختصاص داده شود، زمان کلاس‌ها اینجا نمایش داده می‌شود." : "Class times appear here when a term is assigned to you."} /></PanelSurface>;
   return <div className="grid items-start gap-4 md:grid-cols-2 xl:grid-cols-3">
     {termWeekDays.map((day) => {

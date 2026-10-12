@@ -5,7 +5,7 @@ import { and, eq, gt } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db/client";
-import { sessions, users, type UserRole } from "@/lib/db/schema";
+import { sessions, users, loginEvents, type UserRole } from "@/lib/db/schema";
 
 const SESSION_COOKIE = "cactus_session";
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30;
@@ -27,14 +27,18 @@ function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
 }
 
-export async function createSession(userId: string) {
+export async function createSession(
+  userId: string,
+  method: "otp" | "password" | "registration",
+) {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
 
-  await getDatabase().insert(sessions).values({
-    tokenHash: hashToken(token),
-    userId,
-    expiresAt,
+  await getDatabase().transaction(async (tx) => {
+    await tx
+      .insert(sessions)
+      .values({ tokenHash: hashToken(token), userId, expiresAt });
+    await tx.insert(loginEvents).values({ userId, method });
   });
 
   (await cookies()).set(SESSION_COOKIE, token, {
@@ -93,7 +97,9 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   return result
     ? {
         ...result,
-        profileComplete: Boolean(result.firstNameFa.trim() && result.lastNameFa.trim()),
+        profileComplete: Boolean(
+          result.firstNameFa.trim() && result.lastNameFa.trim(),
+        ),
       }
     : null;
 });

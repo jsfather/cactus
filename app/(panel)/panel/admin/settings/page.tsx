@@ -29,6 +29,8 @@ export default async function SiteSettings() {
         }
       />
       <div className="grid gap-4 sm:grid-cols-2">
+        <PanelDashboardCard href="/panel/admin/settings/appearance" eyebrow={fa ? "دیزاین سیستم" : "Design system"} title={fa ? "رنگ‌ها و تایپوگرافی" : "Colors & typography"} description={fa ? "رنگ‌های روشن و تاریک با راهنمای محل استفاده" : "Light and dark palettes with usage labels"} />
+        <PanelDashboardCard href="/panel/admin/landings" eyebrow={fa ? "صفحه‌های مستقل" : "Standalone pages"} title={fa ? "لندینگ‌ساز" : "Landing builder"} description={fa ? "محتوا، تصویر، ویدیو، دعوت به اقدام و دیدگاه" : "Content, image, video, call to action and comments"} />
         <PanelDashboardCard
           href="/panel/admin/pages"
           eyebrow={fa ? "صفحه اصلی" : "Homepage"}
@@ -54,11 +56,50 @@ export default async function SiteSettings() {
         locale={locale}
         action={saveNavigation}
         initial={{
+          loadingIconUrl: settings.loadingIconUrl,
           logoUrl: settings.logoUrl,
           subtitleFa: settings.subtitleFa,
           subtitleEn: settings.subtitleEn,
+          siteTitleFa: settings.siteTitleFa,
+          siteTitleEn: settings.siteTitleEn,
+          descriptionFa: settings.descriptionFa,
+          descriptionEn: settings.descriptionEn,
+          googleVerification: settings.googleVerification,
         }}
         fields={[
+          { name: "loadingIconUrl", label: fa ? "نشان بارگذاری" : "Loading icon", type: "image", hint: fa ? "با حذف تصویر، نشان کاکتوس نمایش داده می‌شود." : "Leave empty to use the Cactus mark." },
+          {
+            name: "siteTitleFa",
+            label: fa
+              ? "عنوان سایت و سئو (فارسی)"
+              : "Site / SEO title (Persian)",
+            required: true,
+          },
+          {
+            name: "siteTitleEn",
+            label: fa
+              ? "عنوان سایت و سئو (انگلیسی)"
+              : "Site / SEO title (English)",
+            required: true,
+          },
+          {
+            name: "descriptionFa",
+            label: fa ? "توضیحات سئو (فارسی)" : "SEO description (Persian)",
+            type: "textarea",
+          },
+          {
+            name: "descriptionEn",
+            label: fa ? "توضیحات سئو (انگلیسی)" : "SEO description (English)",
+            type: "textarea",
+          },
+          {
+            name: "googleVerification",
+            label: "Google Search Console",
+            dir: "ltr",
+            hint: fa
+              ? "فقط مقدار content متاتگ google-site-verification را وارد کنید، نه کد HTML کامل."
+              : "Enter only the content value of google-site-verification, not the complete HTML tag.",
+          },
           {
             name: "logoUrl",
             label: fa ? "نشان هدر و فوتر" : "Header and footer logo",
@@ -80,11 +121,26 @@ export default async function SiteSettings() {
         ]}
         sections={[
           {
+            title: fa ? "عنوان و توضیحات سایت" : "Site title and description",
+            fields: [
+              "siteTitleFa",
+              "siteTitleEn",
+              "descriptionFa",
+              "descriptionEn",
+              "googleVerification",
+            ],
+          },
+          {
             title: fa ? "هویت سایت" : "Site identity",
-            fields: ["logoUrl", "subtitleFa", "subtitleEn"],
+            fields: ["logoUrl", "loadingIconUrl", "subtitleFa", "subtitleEn"],
           },
         ]}
       >
+        <NavigationEditor
+          name="socialLinks"
+          initial={settings.socialLinks}
+          locale={locale}
+        />
         <NavigationEditor
           name="headerLinks"
           initial={settings.headerLinks}

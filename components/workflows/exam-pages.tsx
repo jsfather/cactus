@@ -142,7 +142,7 @@ export async function ExamAssignmentsPage({
                     className="text-emerald-700 dark:text-emerald-400"
                     href={`/panel/${admin ? "admin" : "student"}/exams/attempts/${at.id}`}
                   >
-                    {at.startedAt.toLocaleString(locale)} ·{" "}
+                    {at.startedAt.toLocaleString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { timeZone: "Asia/Tehran" })} ·{" "}
                     {at.finishedAt
                       ? `${at.score}%`
                       : text(locale, "ادامه آزمون", "Resume exam")}

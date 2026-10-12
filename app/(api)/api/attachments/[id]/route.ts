@@ -12,6 +12,7 @@ import {
   ticketMessages,
   tickets,
   resources,
+  landingPages,
 } from "@/lib/db/schema";
 import { getActivity, canAccessTerm } from "@/lib/learning/queries";
 import { attachmentRoot } from "@/lib/attachments/storage";
@@ -30,10 +31,11 @@ export async function GET(
     .where(eq(attachments.id, id));
   if (!item) return new NextResponse(null, { status: 404 });
   const url = `/api/attachments/${id}`;
-  // Only a deliberately published, public software download is anonymous.
+  // Only deliberately published software downloads and landing videos are anonymous.
   // Learning activities, submissions, tickets and other resources retain their role checks.
   const [publicSoftware] = await db.select({ id: resources.id }).from(resources).where(and(eq(resources.kind, "requirements"), eq(resources.attachmentUrl, url), eq(resources.status, "published"), eq(resources.audience, "all"))).limit(1);
-  let allowed = Boolean(publicSoftware) || Boolean(user && (user.role === "admin" || item.uploaderId === user.id));
+  const [publicVideo] = item.mimeType === "video/mp4" ? await db.select({id: landingPages.id}).from(landingPages).where(and(eq(landingPages.videoUrl, url), eq(landingPages.status, "published"))).limit(1) : [];
+  let allowed = Boolean(publicSoftware || publicVideo) || Boolean(user && (user.role === "admin" || item.uploaderId === user.id));
   if (!user && !allowed) return new NextResponse(null, { status: 401 });
   if (!allowed && user) {
     const activities = await db
@@ -101,7 +103,7 @@ export async function GET(
     return new NextResponse(bytes, {
       headers: {
         "Content-Type": item.mimeType,
-        "Content-Disposition": `attachment; filename="download.${item.pathname.split(".").pop()}"; filename*=UTF-8''${encodeURIComponent(item.originalName)}`,
+        "Content-Disposition": `${publicVideo ? "inline" : "attachment"}; filename="download.${item.pathname.split(".").pop()}"; filename*=UTF-8''${encodeURIComponent(item.originalName)}`,
         "Cache-Control": "private, no-store",
         "X-Content-Type-Options": "nosniff",
         "Content-Security-Policy": "sandbox",

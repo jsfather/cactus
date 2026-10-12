@@ -28,6 +28,12 @@ import { enrollStudent } from "@/lib/terms/enrollment";
 
 async function canManageTerm(termId: string) {
   const user = await requireUser();
+  const [term] = await getDatabase()
+    .select({ archivedAt: terms.archivedAt })
+    .from(terms)
+    .where(eq(terms.id, termId))
+    .limit(1);
+  if (!term || term.archivedAt) return null;
   if (user.role === "admin") return user;
   if (user.role !== "teacher") return null;
   const [assignment] = await getDatabase()

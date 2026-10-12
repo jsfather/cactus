@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- Managed media can use arbitrary validated remote hosts. */
 import Link from "next/link";
+import { RichContent } from "@/components/content/rich-content";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { localeConfig, localizePath, type Locale } from "@/lib/i18n/config";
 import type { getPublishedHonors } from "@/lib/honors/queries";
@@ -46,7 +47,7 @@ export function HonorCard({
           {localized(honor.organizationEn, honor.organizationFa, locale)} ·{" "}
           {date}
         </p>
-        <p>{localized(honor.descriptionEn, honor.descriptionFa, locale)}</p>
+        <RichContent className="line-clamp-3" html={localized(honor.descriptionEn, honor.descriptionFa, locale)} />
         <Link className="public-link mt-5" href={href}>
           {d.viewHonor}
           <Arrow />

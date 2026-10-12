@@ -16,14 +16,14 @@ export function NavigationEditor({
   initial,
   locale,
 }: {
-  name: "headerLinks" | "footerLinks";
+  name: "headerLinks" | "footerLinks" | "socialLinks";
   initial: NavigationLink[];
   locale: Locale;
 }) {
   const [links, setLinks] = useState(initial);
   const errors = useContext(ActionFormFieldErrors);
   const fa = locale === "fa";
-  const limit = name === "headerLinks" ? 10 : 16;
+  const limit = name === "headerLinks" ? 10 : name === "socialLinks" ? 12 : 16;
   function move(index: number, offset: number) {
     setLinks((current) => {
       const next = [...current];
@@ -41,18 +41,26 @@ export function NavigationEditor({
   return (
     <PanelFormSection
       title={
-        name === "headerLinks"
+        name === "socialLinks"
           ? fa
-            ? "منوی هدر"
-            : "Header navigation"
-          : fa
-            ? "پیوندهای فوتر"
-            : "Footer links"
+            ? "شبکه‌های اجتماعی"
+            : "Social networks"
+          : name === "headerLinks"
+            ? fa
+              ? "منوی هدر"
+              : "Header navigation"
+            : fa
+              ? "پیوندهای فوتر"
+              : "Footer links"
       }
       description={
-        fa
-          ? "پیوندهای داخلی بدون /en وارد شوند؛ زبان مسیر خودکار تنظیم می‌شود. ترتیب ردیف‌ها، ترتیب نمایش است."
-          : "Enter internal paths without /en; locale is applied automatically. Rows appear in this order."
+        name === "socialLinks"
+          ? fa
+            ? "نام شبکه و نشانی کامل HTTPS صفحه خود را وارد کنید."
+            : "Enter the network name and your full HTTPS profile URL."
+          : fa
+            ? "پیوندهای داخلی بدون /en وارد شوند؛ زبان مسیر خودکار تنظیم می‌شود. ترتیب ردیف‌ها، ترتیب نمایش است."
+            : "Enter internal paths without /en; locale is applied automatically. Rows appear in this order."
       }
     >
       <input type="hidden" name={name} value={JSON.stringify(links)} />

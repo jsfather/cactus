@@ -7,7 +7,9 @@ const optionalInteger = (minimum: number, maximum: number) =>
     .trim()
     .refine((value) => !value || /^\d+$/.test(value))
     .transform((value) => (value ? Number(value) : null))
-    .refine((value) => value === null || (value >= minimum && value <= maximum));
+    .refine(
+      (value) => value === null || (value >= minimum && value <= maximum),
+    );
 
 const scheduleSchema = z.object({
   dayOfWeek: z.coerce.number().int().min(0).max(6),
@@ -30,7 +32,15 @@ export const termSchema = z
     descriptionFa: z.string().trim().max(4000),
     descriptionEn: z.string().trim().max(4000),
     levelId: z.uuid(),
-    status: z.enum(["draft", "enrollment_open", "active", "completed", "cancelled"]),
+    semesterId: z.union([z.uuid(), z.literal("")]).default(""),
+    courseTemplateId: z.union([z.uuid(), z.literal("")]).default(""),
+    status: z.enum([
+      "draft",
+      "enrollment_open",
+      "active",
+      "completed",
+      "cancelled",
+    ]),
     deliveryMode: z.enum(["in_person", "online", "hybrid"]),
     startDate: z.iso.date(),
     endDate: z.iso.date(),
@@ -47,37 +57,115 @@ export const termSchema = z
   .superRefine((data, context) => {
     if (data.status !== "draft") {
       if (!data.teacherIds.length) {
-        context.addIssue({ code: "custom", path: ["teacherIds"], message: data.locale === "fa" ? "برای خروج از پیش‌نویس حداقل یک مدرس فعال انتخاب کنید." : "Select at least one active teacher before leaving draft status." });
+        context.addIssue({
+          code: "custom",
+          path: ["teacherIds"],
+          message:
+            data.locale === "fa"
+              ? "برای خروج از پیش‌نویس حداقل یک مدرس فعال انتخاب کنید."
+              : "Select at least one active teacher before leaving draft status.",
+        });
       }
       if (!data.schedules.length) {
-        context.addIssue({ code: "custom", path: ["schedules"], message: data.locale === "fa" ? "برای خروج از پیش‌نویس حداقل یک زمان هفتگی تعریف کنید." : "Add at least one weekly slot before leaving draft status." });
+        context.addIssue({
+          code: "custom",
+          path: ["schedules"],
+          message:
+            data.locale === "fa"
+              ? "برای خروج از پیش‌نویس حداقل یک زمان هفتگی تعریف کنید."
+              : "Add at least one weekly slot before leaving draft status.",
+        });
       }
     }
     if (data.endDate < data.startDate) {
-      context.addIssue({ code: "custom", path: ["endDate"], message: data.locale === "fa" ? "تاریخ پایان باید پس از تاریخ شروع باشد." : "End date must be on or after the start date." });
+      context.addIssue({
+        code: "custom",
+        path: ["endDate"],
+        message:
+          data.locale === "fa"
+            ? "تاریخ پایان باید پس از تاریخ شروع باشد."
+            : "End date must be on or after the start date.",
+      });
     }
-    if ((data.deliveryMode === "in_person" || data.deliveryMode === "hybrid") && !data.locationFa) {
-      context.addIssue({ code: "custom", path: ["locationFa"], message: data.locale === "fa" ? "نشانی فارسی برای کلاس حضوری الزامی است." : "A Persian location is required for in-person delivery." });
+    if (
+      (data.deliveryMode === "in_person" || data.deliveryMode === "hybrid") &&
+      !data.locationFa
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["locationFa"],
+        message:
+          data.locale === "fa"
+            ? "نشانی فارسی برای کلاس حضوری الزامی است."
+            : "A Persian location is required for in-person delivery.",
+      });
     }
-    if ((data.deliveryMode === "online" || data.deliveryMode === "hybrid") && !data.meetingUrl) {
-      context.addIssue({ code: "custom", path: ["meetingUrl"], message: data.locale === "fa" ? "پیوند کلاس آنلاین الزامی است." : "An online meeting link is required." });
+    if (
+      (data.deliveryMode === "online" || data.deliveryMode === "hybrid") &&
+      !data.meetingUrl
+    ) {
+      context.addIssue({
+        code: "custom",
+        path: ["meetingUrl"],
+        message:
+          data.locale === "fa"
+            ? "پیوند کلاس آنلاین الزامی است."
+            : "An online meeting link is required.",
+      });
     }
     const uniqueTeachers = new Set(data.teacherIds);
     if (uniqueTeachers.size !== data.teacherIds.length) {
-      context.addIssue({ code: "custom", path: ["teacherIds"], message: data.locale === "fa" ? "هر مدرس را فقط یک‌بار انتخاب کنید." : "Select each teacher only once." });
+      context.addIssue({
+        code: "custom",
+        path: ["teacherIds"],
+        message:
+          data.locale === "fa"
+            ? "هر مدرس را فقط یک‌بار انتخاب کنید."
+            : "Select each teacher only once.",
+      });
     }
     const uniquePrerequisites = new Set(data.prerequisiteIds);
     if (uniquePrerequisites.size !== data.prerequisiteIds.length) {
-      context.addIssue({ code: "custom", path: ["prerequisiteIds"], message: data.locale === "fa" ? "هر پیش‌نیاز را فقط یک‌بار انتخاب کنید." : "Select each prerequisite only once." });
+      context.addIssue({
+        code: "custom",
+        path: ["prerequisiteIds"],
+        message:
+          data.locale === "fa"
+            ? "هر پیش‌نیاز را فقط یک‌بار انتخاب کنید."
+            : "Select each prerequisite only once.",
+      });
     }
     for (let first = 0; first < data.schedules.length; first += 1) {
       const schedule = data.schedules[first];
       if (schedule.endTime <= schedule.startTime) {
-        context.addIssue({ code: "custom", path: ["schedules"], message: data.locale === "fa" ? "زمان پایان هر جلسه باید پس از زمان شروع باشد." : "Each meeting must end after it starts." });
+        context.addIssue({
+          code: "custom",
+          path: ["schedules"],
+          message:
+            data.locale === "fa"
+              ? "زمان پایان هر جلسه باید پس از زمان شروع باشد."
+              : "Each meeting must end after it starts.",
+        });
       }
-      for (let second = first + 1; second < data.schedules.length; second += 1) {
-        if (schedulesOverlap(schedule as TermScheduleValue, data.schedules[second] as TermScheduleValue)) {
-          context.addIssue({ code: "custom", path: ["schedules"], message: data.locale === "fa" ? "زمان جلسه‌های یک روز نباید هم‌پوشانی داشته باشد." : "Meeting times on the same day cannot overlap." });
+      for (
+        let second = first + 1;
+        second < data.schedules.length;
+        second += 1
+      ) {
+        if (
+          schedulesOverlap(
+            schedule as TermScheduleValue,
+            data.schedules[second] as TermScheduleValue,
+          )
+        ) {
+          context.addIssue({
+            code: "custom",
+            path: ["schedules"],
+            message:
+              data.locale === "fa"
+                ? "زمان جلسه‌های یک روز نباید هم‌پوشانی داشته باشد."
+                : "Meeting times on the same day cannot overlap.",
+          });
         }
       }
     }
@@ -96,6 +184,8 @@ export function readTermFormData(formData: FormData) {
     descriptionFa: formData.get("descriptionFa"),
     descriptionEn: formData.get("descriptionEn"),
     levelId: formData.get("levelId"),
+    semesterId: formData.get("semesterId") ?? "",
+    courseTemplateId: formData.get("courseTemplateId") ?? "",
     status: formData.get("status"),
     deliveryMode: formData.get("deliveryMode"),
     startDate: formData.get("startDate"),

@@ -1,6 +1,6 @@
 "use server";
 import { ownsAttachment } from "@/lib/attachments/storage";
-import { and, eq, or } from "drizzle-orm";
+import { and, desc, eq, ne, or } from "drizzle-orm";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -14,7 +14,6 @@ import {
   users,
 } from "@/lib/db/schema";
 import {
-  optionalUrl,
   internalHref,
   validationError,
   saved,
@@ -23,6 +22,12 @@ import {
   type ActionState,
 } from "@/lib/workflows";
 import type { Locale } from "@/lib/i18n/config";
+const ticketAttachment = z
+  .string()
+  .trim()
+  .refine(
+    (value) => !value || /^\/api\/attachments\/[0-9a-f-]{36}$/.test(value),
+  );
 export async function saveTicket(
   id: string | null,
   _state: ActionState,
@@ -35,7 +40,7 @@ export async function saveTicket(
       subject: z.string().trim().min(2).max(240),
       departmentId: z.uuid(),
       body: z.string().trim().max(10000),
-      attachmentUrl: optionalUrl,
+      attachmentUrl: ticketAttachment,
       ownerId: z.uuid(),
       assignedToId: z.union([z.uuid(), z.literal("")]),
       status: z.enum(["open", "pending", "closed"]),
@@ -49,7 +54,7 @@ export async function saveTicket(
   if (!parsed.success) return validationError(locale, parsed.error);
   const input = parsed.data;
   if (!(await ownsAttachment(user, input.attachmentUrl))) return denied(locale);
-  if (!id && !input.body)
+  if (!id && !input.body && !input.attachmentUrl)
     return validationError(
       locale,
       new z.ZodError([{ code: "custom", path: ["body"], message: "Required" }]),
@@ -103,14 +108,12 @@ export async function saveTicket(
           assignedToId: input.assignedToId || null,
         })
         .returning();
-      await tx
-        .insert(ticketMessages)
-        .values({
-          ticketId: ticket.id,
-          authorId: user.id,
-          body: input.body,
-          attachmentUrl: input.attachmentUrl,
-        });
+      await tx.insert(ticketMessages).values({
+        ticketId: ticket.id,
+        authorId: user.id,
+        body: input.body,
+        attachmentUrl: input.attachmentUrl,
+      });
       return ticket.id;
     });
   }
@@ -126,8 +129,15 @@ export async function replyTicket(
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = z
     .object({
-      body: z.string().trim().min(1).max(10000),
-      attachmentUrl: optionalUrl,
+      body: z.string().trim().max(10000),
+      attachmentUrl: ticketAttachment,
+    })
+    .refine((value) => Boolean(value.body || value.attachmentUrl), {
+      path: ["body"],
+      message:
+        locale === "fa"
+          ? "پیام یا فایل را اضافه کنید."
+          : "Add a message or file.",
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return validationError(locale, parsed.error);
@@ -156,26 +166,77 @@ export async function replyTicket(
       .set({
         updatedAt: new Date(),
         status: user.id === ticket.ownerId ? "open" : "pending",
+        ...(user.id !== ticket.ownerId
+          ? { rating: null, ratingResponderId: null }
+          : {}),
       })
       .where(eq(tickets.id, id));
     const target =
       user.id === ticket.ownerId ? ticket.assignedToId : ticket.ownerId;
     if (target && target !== user.id)
-      await tx
-        .insert(notifications)
-        .values({
-          userId: target,
-          titleFa: "پاسخ جدید تیکت",
-          titleEn: "New ticket reply",
-          bodyFa: ticket.subject,
-          bodyEn: ticket.subject,
-          href: `/panel/tickets/${id}`,
-        });
+      await tx.insert(notifications).values({
+        userId: target,
+        titleFa: "پاسخ جدید تیکت",
+        titleEn: "New ticket reply",
+        bodyFa: ticket.subject,
+        bodyEn: ticket.subject,
+        href: `/panel/tickets/${id}`,
+      });
     return saved(locale);
   });
   revalidatePath("/panel", "layout");
   return result;
 }
+export async function rateTicket(
+  id: string,
+  _state: ActionState,
+  form: FormData,
+): Promise<ActionState> {
+  const user = await requireUser();
+  const locale = form.get("locale") === "en" ? "en" : "fa";
+  const parsed = z
+    .object({ id: z.uuid(), rating: z.coerce.number().int().min(0).max(5) })
+    .safeParse({ id, rating: form.get("rating") });
+  if (!parsed.success) return validationError(locale, parsed.error);
+  try {
+    const result = await getDatabase().transaction(async (tx) => {
+      const [ticket] = await tx
+        .select()
+        .from(tickets)
+        .where(and(eq(tickets.id, id), eq(tickets.ownerId, user.id)))
+        .for("update");
+      if (!ticket || ticket.status !== "closed") return denied(locale);
+      const [reply] = await tx
+        .select({ authorId: ticketMessages.authorId })
+        .from(ticketMessages)
+        .innerJoin(users, eq(users.id, ticketMessages.authorId))
+        .where(
+          and(
+            eq(ticketMessages.ticketId, id),
+            ne(ticketMessages.authorId, ticket.ownerId),
+            or(eq(users.role, "admin"), eq(users.role, "teacher")),
+          ),
+        )
+        .orderBy(desc(ticketMessages.createdAt), desc(ticketMessages.id))
+        .limit(1);
+      if (!reply) return denied(locale);
+      await tx
+        .update(tickets)
+        .set({
+          rating: parsed.data.rating || null,
+          ratingResponderId: parsed.data.rating ? reply.authorId : null,
+        })
+        .where(eq(tickets.id, id));
+      return saved(locale);
+    });
+    revalidatePath(`/panel/tickets/${id}`);
+    revalidatePath("/panel/tickets");
+    return result;
+  } catch {
+    return failed(locale);
+  }
+}
+
 export async function changeTicketStatus(
   id: string,
   status: string,

@@ -132,7 +132,7 @@ export async function verifyAuthenticationOtp(
   }
 
   if (purpose === "login") {
-    await createSession(existingUser.id);
+    await createSession(existingUser.id, "otp");
     redirect(readReturnTo(formData) || "/panel");
   }
 
@@ -152,7 +152,7 @@ export async function verifyAuthenticationOtp(
       })
       .returning({ id: users.id });
 
-    await createSession(user.id);
+    await createSession(user.id, "registration");
   } catch (error) {
     if (hasPostgresErrorCode(error, "23505")) {
       return { error: dictionary.accountChanged, mobile };
@@ -218,6 +218,6 @@ export async function loginWithPassword(
       .where(eq(users.id, user.id));
   }
 
-  await createSession(user.id);
+  await createSession(user.id, "password");
   redirect(readReturnTo(formData) || "/panel");
 }

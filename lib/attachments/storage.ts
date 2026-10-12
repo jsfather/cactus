@@ -9,6 +9,8 @@ export const attachmentRoot = () =>
     "private/attachments",
   );
 export function attachmentType(bytes: Buffer) {
+  if (bytes.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3])) && bytes.subarray(0, 4096).includes(Buffer.from("webm")) && bytes.subarray(0, 65536).includes(Buffer.from("OpusHead")))
+    return { mime: "audio/webm", ext: "webm" };
   if (bytes.subarray(0, 5).toString() === "%PDF-")
     return { mime: "application/pdf", ext: "pdf" };
   if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff)

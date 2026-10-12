@@ -41,7 +41,7 @@ export default async function AdminCommentsPage({
       ? statusValue
       : "all";
   const target: CommentTargetFilter =
-    targetValue === "blog" || targetValue === "shop" || targetValue === "courses" ? targetValue : "all";
+    targetValue === "blog" || targetValue === "shop" || targetValue === "courses" || targetValue === "landings" ? targetValue : "all";
   const result = await getAdminComments({ ...listQuery, status, target });
   const dictionary = getPanelDictionary(locale);
   const statusLabels = {
@@ -103,6 +103,7 @@ export default async function AdminCommentsPage({
                 },
                 { value: "blog", label: locale === "fa" ? "وبلاگ" : "Blog" },
                 { value: "courses", label: locale === "fa" ? "دوره‌ها" : "Courses" },
+                { value: "landings", label: locale === "fa" ? "لندینگ‌ها" : "Landings" },
                 { value: "shop", label: locale === "fa" ? "فروشگاه" : "Shop" },
               ],
             },
@@ -150,7 +151,7 @@ export default async function AdminCommentsPage({
                       ? locale === "fa"
                         ? "وبلاگ"
                         : "Blog"
-                      : comment.courseId ? (locale === "fa" ? "دوره" : "Course") : locale === "fa"
+                      : comment.landingId ? (locale === "fa" ? "لندینگ" : "Landing") : comment.courseId ? (locale === "fa" ? "دوره" : "Course") : locale === "fa"
                         ? "فروشگاه"
                         : "Shop"}
                   </span>

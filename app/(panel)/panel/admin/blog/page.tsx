@@ -14,7 +14,6 @@ import {
 import { getAdminPosts } from "@/lib/blog/queries";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
-import { localeConfig } from "@/lib/i18n/config";
 import { ToastOnMount } from "@/components/feedback/toast-effects";
 import { PanelListControls, PanelPagination } from "@/components/panel/list-controls";
 import { getSearchParam, parseAdminListQuery, type AdminListSearchParams } from "@/lib/panel/pagination";
@@ -22,7 +21,7 @@ import type { PostStatusFilter } from "@/lib/blog/queries";
 
 function formatDate(date: Date | null, locale: "fa" | "en") {
   return date
-    ? new Intl.DateTimeFormat(localeConfig[locale].dateLocale, { dateStyle: "medium" }).format(date)
+    ? new Intl.DateTimeFormat(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { dateStyle: "medium" }).format(date)
     : "—";
 }
 

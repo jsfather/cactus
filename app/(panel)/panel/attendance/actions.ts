@@ -107,6 +107,8 @@ export async function saveSessionRecords(
 
   try {
     await getDatabase().transaction(async (transaction) => {
+      const [term] = await transaction.select({ archivedAt: terms.archivedAt }).from(terms).where(eq(terms.id, managed.termId)).for("update");
+      if (!term || term.archivedAt) throw new Error("ARCHIVED_TERM");
       await transaction
         .select({ id: termSessions.id })
         .from(termSessions)

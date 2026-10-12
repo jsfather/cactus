@@ -59,7 +59,7 @@ export function AttendanceTaskBoard({
               : { label: isFa ? "پیش‌رو" : "Upcoming", className: "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-300" };
         const termTitle = locale === "en" ? session.termTitleEn || session.termTitleFa : session.termTitleFa;
         const levelTitle = locale === "en" ? session.levelTitleEn || session.levelTitleFa : session.levelTitleFa;
-        const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-gregory", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+        const date = new Intl.DateTimeFormat(isFa ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
         const progress = hasRoster ? Math.min(100, Math.round((session.recordedCount / session.eligibleCount) * 100)) : 0;
         return <PanelSurface key={session.id} className={`p-4 sm:p-5 ${isToday ? "border-emerald-300 ring-1 ring-emerald-100 dark:border-emerald-800 dark:ring-emerald-950" : ""}`}>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center">

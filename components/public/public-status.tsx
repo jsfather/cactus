@@ -1,5 +1,7 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
+import { useLoadingIcon } from "./public-settings-provider";
 import { CactusLogo } from "@/components/brand/cactus-brand";
 import { localizePath, type Locale } from "@/lib/i18n/config";
 export function PublicError({
@@ -38,9 +40,21 @@ export function PublicError({
   );
 }
 export function PublicLoading({ locale }: { locale: Locale }) {
+  const icon = useLoadingIcon();
   return (
     <main className="public-site public-status" aria-busy="true">
-      <CactusLogo />
+      {icon ? (
+        <Image
+          src={icon}
+          width={80}
+          height={80}
+          alt=""
+          unoptimized
+          className="object-contain"
+        />
+      ) : (
+        <CactusLogo />
+      )}
       <p role="status">{locale === "fa" ? "در حال بارگذاری…" : "Loading…"}</p>
       <span className="public-loading-line" aria-hidden="true" />
     </main>

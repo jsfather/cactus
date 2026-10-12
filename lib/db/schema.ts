@@ -103,6 +103,28 @@ export const appSettings = pgTable("app_settings", {
     .notNull(),
 });
 
+// Audit records are append-only: logout must not erase historical logins.
+export const loginEvents = pgTable(
+  "login_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    method: varchar("method", { length: 20 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("login_events_user_created_idx").on(table.userId, table.createdAt),
+    check(
+      "login_events_method_check",
+      sql`${table.method} in ('otp', 'password', 'registration')`,
+    ),
+  ],
+);
+
 export const users = pgTable(
   "users",
   {
@@ -422,11 +444,66 @@ export const termLevels = pgTable(
   ],
 );
 
+export const academicYears = pgTable(
+  "academic_years",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    titleFa: varchar("title_fa", { length: 160 }).notNull(),
+    titleEn: varchar("title_en", { length: 160 }),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+  },
+  (table) => [
+    check(
+      "academic_year_date_range",
+      sql`${table.endDate} >= ${table.startDate}`,
+    ),
+  ],
+);
+export const academicSemesters = pgTable(
+  "academic_semesters",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    yearId: uuid("year_id")
+      .notNull()
+      .references(() => academicYears.id, { onDelete: "restrict" }),
+    titleFa: varchar("title_fa", { length: 160 }).notNull(),
+    titleEn: varchar("title_en", { length: 160 }),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
+  },
+  (table) => [
+    check(
+      "academic_semester_date_range",
+      sql`${table.endDate} >= ${table.startDate}`,
+    ),
+  ],
+);
+export const courseTemplates = pgTable("course_templates", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  titleFa: varchar("title_fa", { length: 240 }).notNull(),
+  titleEn: varchar("title_en", { length: 240 }),
+  descriptionFa: text("description_fa"),
+  descriptionEn: text("description_en"),
+  levelId: uuid("level_id")
+    .notNull()
+    .references(() => termLevels.id, { onDelete: "restrict" }),
+});
+
 export const terms = pgTable(
   "terms",
   {
     id: uuid("id").defaultRandom().primaryKey(),
     titleFa: varchar("title_fa", { length: 240 }).notNull(),
+    semesterId: uuid("semester_id").references(() => academicSemesters.id, {
+      onDelete: "restrict",
+    }),
+    courseTemplateId: uuid("course_template_id").references(
+      () => courseTemplates.id,
+      { onDelete: "restrict" },
+    ),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
     titleEn: varchar("title_en", { length: 240 }),
     descriptionFa: text("description_fa"),
     descriptionEn: text("description_en"),
@@ -824,7 +901,10 @@ export const products = pgTable(
   "products",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    tags: text("tags").array().notNull().default(sql`ARRAY[]::text[]`),
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
     compareAtPrice: bigint("compare_at_price", { mode: "number" }),
     specificationsFa: text("specifications_fa"),
     specificationsEn: text("specifications_en"),
@@ -939,11 +1019,34 @@ export const productVariants = pgTable(
   ],
 );
 
+export const landingPages = pgTable("landing_pages", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  slug: varchar("slug", {length: 180}).notNull().unique(),
+  titleFa: varchar("title_fa", {length: 180}).notNull(),
+  titleEn: varchar("title_en", {length: 180}).notNull().default(""),
+  summaryFa: text("summary_fa").notNull().default(""),
+  summaryEn: text("summary_en").notNull().default(""),
+  contentFa: text("content_fa").notNull().default(""),
+  contentEn: text("content_en").notNull().default(""),
+  afterCtaFa: text("after_cta_fa").notNull().default(""),
+  afterCtaEn: text("after_cta_en").notNull().default(""),
+  coverImageUrl: text("cover_image_url").notNull().default(""),
+  videoUrl: text("video_url").notNull().default(""),
+  cta: jsonb("cta").$type<{titleFa: string; titleEn: string; textFa: string; textEn: string; labelFa: string; labelEn: string; href: string}>().notNull(),
+  commentsEnabled: boolean("comments_enabled").notNull().default(true),
+  status: postStatus("status").notNull().default("draft"),
+  updatedAt: timestamp("updated_at", {withTimezone: true}).notNull().defaultNow(),
+  createdAt: timestamp("created_at", {withTimezone: true}).notNull().defaultNow(),
+});
+
 export const comments = pgTable(
   "comments",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    courseId: uuid("course_id").references(() => coursePages.id, { onDelete: "cascade" }),
+    landingId: uuid("landing_id").references(() => landingPages.id, {onDelete: "cascade"}),
+    courseId: uuid("course_id").references(() => coursePages.id, {
+      onDelete: "cascade",
+    }),
     postId: uuid("post_id").references(() => posts.id, { onDelete: "cascade" }),
     productId: uuid("product_id").references(() => products.id, {
       onDelete: "cascade",
@@ -971,7 +1074,7 @@ export const comments = pgTable(
   (table) => [
     check(
       "comments_exactly_one_target_check",
-      sql`((${table.postId} is not null)::int + (${table.productId} is not null)::int + (${table.courseId} is not null)::int) = 1`,
+      sql`((${table.postId} is not null)::int + (${table.productId} is not null)::int + (${table.courseId} is not null)::int + (${table.landingId} is not null)::int) = 1`,
     ),
     index("comments_post_status_created_index").on(
       table.postId,
@@ -984,12 +1087,20 @@ export const comments = pgTable(
       table.createdAt,
     ),
     index("comments_author_index").on(table.authorId),
-    index("comments_course_status_created_index").on(table.courseId, table.status, table.createdAt),
+    index("comments_landing_status_created_index").on(table.landingId, table.status, table.createdAt),
+    index("comments_course_status_created_index").on(
+      table.courseId,
+      table.status,
+      table.createdAt,
+    ),
   ],
 );
 
 export const siteContent = pgTable("site_content", {
-  presentation: jsonb("presentation").$type<import("@/lib/site-content/presentation").SitePresentation>().notNull().default({}),
+  presentation: jsonb("presentation")
+    .$type<import("@/lib/site-content/presentation").SitePresentation>()
+    .notNull()
+    .default({}),
   key: varchar("key", { length: 80 }).primaryKey(),
   contactNumber: varchar("contact_number", { length: 80 }),
   email: varchar("email", { length: 320 }),
@@ -1230,11 +1341,11 @@ export const resources = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     categoryFa: varchar("category_fa", { length: 120 }),
-  categoryEn: varchar("category_en", { length: 120 }),
-  platforms: varchar("platforms", { length: 240 }),
-  version: varchar("version", { length: 120 }),
-  documentationUrl: text("documentation_url"),
-  kind: varchar("kind", { length: 30 }).notNull(),
+    categoryEn: varchar("category_en", { length: 120 }),
+    platforms: varchar("platforms", { length: 240 }),
+    version: varchar("version", { length: 120 }),
+    documentationUrl: text("documentation_url"),
+    kind: varchar("kind", { length: 30 }).notNull(),
     titleFa: varchar("title_fa", { length: 240 }).notNull(),
     titleEn: varchar("title_en", { length: 240 }),
     contentFa: text("content_fa").notNull(),
@@ -1367,6 +1478,10 @@ export const tickets = pgTable(
       onDelete: "set null",
     }),
     subject: varchar("subject", { length: 240 }).notNull(),
+    rating: integer("rating"),
+    ratingResponderId: uuid("rating_responder_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     status: varchar("status", { length: 20 }).default("open").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -1375,7 +1490,10 @@ export const tickets = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (t) => [index("tickets_owner_status_idx").on(t.ownerId, t.status)],
+  (t) => [
+    index("tickets_owner_status_idx").on(t.ownerId, t.status),
+    check("tickets_rating_range", sql`${t.rating} between 1 and 5`),
+  ],
 );
 export const ticketMessages = pgTable("ticket_messages", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -1391,6 +1509,73 @@ export const ticketMessages = pgTable("ticket_messages", {
     .defaultNow()
     .notNull(),
 });
+export const chatConversations = pgTable(
+  "chat_conversations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    visitorHash: varchar("visitor_hash", { length: 64 }).notNull(),
+    name: varchar("name", { length: 160 }).notNull(),
+    mobile: varchar("mobile", { length: 20 }).notNull(),
+    locale: varchar("locale", { length: 2 }).default("fa").notNull(),
+    operatorId: uuid("operator_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    status: varchar("status", { length: 12 }).default("open").notNull(),
+    lastMessageAt: timestamp("last_message_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("chat_visitor_history_idx").on(table.visitorHash, table.createdAt),
+    index("chat_operator_status_idx").on(table.operatorId, table.status),
+    uniqueIndex("chat_one_open_visitor_idx")
+      .on(table.visitorHash)
+      .where(sql`${table.status} = 'open'`),
+    check("chat_status_check", sql`${table.status} in ('open', 'closed')`),
+  ],
+);
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    conversationId: uuid("conversation_id")
+      .notNull()
+      .references(() => chatConversations.id, { onDelete: "cascade" }),
+    sender: varchar("sender", { length: 12 }).notNull(),
+    authorId: uuid("author_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    body: text("body").notNull(),
+    imagePath: text("image_path"),
+    imageMime: varchar("image_mime", { length: 50 }),
+    imageBytes: integer("image_bytes").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("chat_messages_conversation_idx").on(
+      table.conversationId,
+      table.createdAt,
+    ),
+    check(
+      "chat_sender_check",
+      sql`${table.sender} in ('visitor', 'operator', 'system')`,
+    ),
+  ],
+);
+export const chatOperatorPresence = pgTable("chat_operator_presence", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 export const notifications = pgTable(
   "notifications",
   {

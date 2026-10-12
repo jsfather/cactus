@@ -227,7 +227,7 @@ export async function LearningPage({
           title={title(item, locale)}
           description={
             item.dueAt
-              ? `${text(locale, "مهلت تحویل", "Due")}: ${item.dueAt.toLocaleString(locale)}`
+              ? `${text(locale, "مهلت تحویل", "Due")}: ${item.dueAt.toLocaleString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { timeZone: "Asia/Tehran" })}`
               : ""
           }
           actions={
@@ -317,7 +317,7 @@ export async function LearningPage({
                 </a>
               )}
               <p className="text-sm text-zinc-500">
-                {s.updatedAt.toLocaleString(locale)}
+                {s.updatedAt.toLocaleString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { timeZone: "Asia/Tehran" })}
                 {item.dueAt && s.updatedAt > item.dueAt
                   ? text(locale, " · تحویل دیرهنگام", " · Late submission")
                   : ""}
@@ -361,7 +361,7 @@ export async function LearningPage({
                       className="rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900"
                     >
                       <p className="text-xs text-zinc-500">
-                        {m.name} · {m.message.createdAt.toLocaleString(locale)}
+                        {m.name} · {m.message.createdAt.toLocaleString(locale === "fa" ? "fa-IR-u-ca-persian" : "en-US-u-ca-persian", { timeZone: "Asia/Tehran" })}
                       </p>
                       <p className="mt-2 whitespace-pre-wrap">
                         {m.message.body}

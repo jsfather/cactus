@@ -88,6 +88,9 @@ export async function SiteFooter({ locale }: { locale: Locale }) {
                 </p>
               )}
             </address>
+            {settings.socialLinks.length > 0 && <nav className="mt-5 flex flex-wrap gap-2" aria-label={locale === "fa" ? "شبکه‌های اجتماعی" : "Social networks"}>
+              {settings.socialLinks.map(link => <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="inline-flex cursor-pointer items-center rounded-full border border-current/20 px-3 py-2 text-sm transition hover:bg-emerald-500/10">{locale === "fa" ? link.labelFa : link.labelEn}<span aria-hidden="true" className="ms-2">↗</span></a>)}
+            </nav>}
           </div>
         </div>
         <div className="public-footer-bottom">

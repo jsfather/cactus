@@ -84,6 +84,7 @@ export async function saveNavigation(
     links = {
       headerLinks: JSON.parse(String(form.get("headerLinks"))),
       footerLinks: JSON.parse(String(form.get("footerLinks"))),
+      socialLinks: JSON.parse(String(form.get("socialLinks") ?? "[]")),
     };
   } catch {
     return {
