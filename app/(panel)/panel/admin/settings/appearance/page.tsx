@@ -5,6 +5,23 @@ import { saveAppearance } from "@/lib/site-content/appearance-actions";
 import { colorTokens } from "@/lib/site-content/appearance";
 import { ActionForm } from "@/components/workflows/action-form";
 import { PanelPage, PanelPageHeader } from "@/components/panel/ui";
+function describeUsage(selectors: string | undefined, fa: boolean) {
+  if (!selectors) return undefined;
+  const areas = [
+    [/button|category-nav|badge/, "دکمه‌ها و نشان‌ها", "Buttons & badges"],
+    [/header|theme|mobile-nav|mobile-menu/, "هدر و منو", "Header & navigation"],
+    [/hero/, "هیرو و اسلایدر", "Hero & slider"],
+    [/event|banner/, "بنر رویداد", "Event banner"],
+    [/footer|trust/, "فوتر و نماد اعتماد", "Footer & trust seal"],
+    [/video/, "ویدیو و کنترل پخش", "Video controls"],
+    [/product|cart/, "محصولات و خرید", "Products & checkout"],
+    [/course|home-close/, "دوره و دعوت به اقدام", "Courses & calls to action"],
+  ] as const;
+  const names = areas
+    .filter(([pattern]) => pattern.test(selectors))
+    .map(([, faLabel, enLabel]) => (fa ? faLabel : enLabel));
+  return `${fa ? "محل استفاده: " : "Used in: "}${names.length ? names.join(fa ? "، " : ", ") : fa ? "سطوح و جزئیات عمومی سایت" : "Public surfaces and details"}`;
+}
 export default async function AppearancePage() {
   await requireRole("admin");
   const [locale, settings] = await Promise.all([
@@ -22,12 +39,11 @@ export default async function AppearancePage() {
   const colors = (["light", "dark"] as const).flatMap((mode) =>
     colorTokens.map(([key, labelFa, labelEn, light, dark, ...locations]) => ({
       name: `${mode}-${key}`,
-      label: fa ? labelFa : labelEn,
+      label: (fa ? labelFa : labelEn).replace(/\s*\(#[0-9a-fA-F]{6}\)/g, ""),
       type: "color",
       dir: "ltr" as const,
-      hint:
-        locations[0] ||
-        `${fa ? "رنگ پیش‌فرض" : "Default color"}: ${mode === "light" ? light : dark}`,
+      hint: describeUsage(locations[0], fa),
+      defaultColor: mode === "light" ? light : dark,
     })),
   );
   return (

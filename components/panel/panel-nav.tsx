@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/(auth)/login/actions";
@@ -13,27 +13,11 @@ import type { Locale } from "@/lib/i18n/config";
 import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getLocalizedUserName } from "@/lib/users/name";
 
-type NavIcon =
-  | "home"
-  | "blog"
-  | "shop"
-  | "categories"
-  | "media"
-  | "exams"
-  | "attendance"
-  | "terms"
-  | "levels"
-  | "schedule"
-  | "comments"
-  | "about"
-  | "users"
-  | "profile"
-  | "studentInfo"
-  | "teacherProfile"
-  | "honors";
-
-type NavItem = { href: string; label: string; icon: NavIcon };
-type NavGroup = { id: string; label: string; icon: NavIcon; items: NavItem[] };
+import {
+  getPanelNavigation,
+  type PanelNavIcon as NavIcon,
+  type PanelNavItem as NavItem,
+} from "@/lib/panel/navigation";
 
 function Icon({
   name,
@@ -284,9 +268,11 @@ const groupLinkClass =
 export function PanelNav({
   user,
   locale,
+  unreadCount = 0,
 }: {
   user: CurrentUser;
   locale: Locale;
+  unreadCount?: number;
 }) {
   const pathname = usePathname();
   const dictionary = getPanelDictionary(locale);
@@ -314,320 +300,7 @@ export function PanelNav({
     label: dictionary.nav.overview,
     icon: "home",
   };
-  const directLinks: NavItem[] =
-    user.role === "student"
-      ? [
-          {
-            href: "/panel/student/schedule",
-            label: dictionary.nav.schedule,
-            icon: "schedule",
-          },
-          {
-            href: "/panel/student/information",
-            label: dictionary.nav.studentInformation,
-            icon: "studentInfo",
-          },
-        ]
-      : user.role === "teacher"
-        ? [
-            {
-              href: "/panel/teacher/attendance",
-              label: dictionary.nav.attendance,
-              icon: "attendance",
-            },
-            {
-              href: "/panel/teacher/terms",
-              label: dictionary.nav.terms,
-              icon: "terms",
-            },
-            {
-              href: "/panel/teacher/schedule",
-              label: dictionary.nav.schedule,
-              icon: "schedule",
-            },
-            {
-              href: "/panel/teacher/profile",
-              label: dictionary.nav.teacherProfile,
-              icon: "teacherProfile",
-            },
-            {
-              href: "/panel/teacher/live-chat",
-              label: locale === "fa" ? "چت پشتیبانی" : "Support chat",
-              icon: "comments",
-            },
-          ]
-        : [];
-  const fa = locale === "fa";
-  const sharedLinks: NavItem[] = [
-    { href: "/panel/orders", label: fa ? "سفارش‌ها" : "Orders", icon: "shop" },
-    {
-      href: "/panel/tickets",
-      label: fa ? "پشتیبانی" : "Support",
-      icon: "comments",
-    },
-    {
-      href: "/panel/notifications",
-      label: fa ? "اعلان‌ها" : "Notifications",
-      icon: "about",
-    },
-    { href: "/panel/guides", label: fa ? "راهنما" : "Guides", icon: "blog" },
-  ];
-  directLinks.push(...sharedLinks);
-  if (user.role === "student")
-    directLinks.unshift(
-      {
-        href: "/panel/student/terms",
-        label: fa ? "کلاس‌ها و ثبت‌نام" : "Classes & enrollment",
-        icon: "terms",
-      },
-      {
-        href: "/panel/student/attendance",
-        label: fa ? "حضور و نمره‌ها" : "Attendance & grades",
-        icon: "attendance",
-      },
-      {
-        href: "/panel/student/exams",
-        label: fa ? "آزمون‌ها" : "Exams",
-        icon: "exams",
-      },
-      {
-        href: "/panel/student/learning/homework",
-        label: fa ? "تکالیف" : "Homework",
-        icon: "blog",
-      },
-      {
-        href: "/panel/student/learning/recordings",
-        label: fa ? "جلسات ضبط‌شده" : "Recorded lessons",
-        icon: "media",
-      },
-      {
-        href: "/panel/student/previous-courses",
-        label: fa ? "دوره‌های گذشته" : "Previous courses",
-        icon: "levels",
-      },
-    );
-  if (user.role === "teacher")
-    directLinks.push(
-      {
-        href: "/panel/teacher/students",
-        label: fa ? "دانش پژوهان" : "Students",
-        icon: "users",
-      },
-      {
-        href: "/panel/teacher/absences",
-        label: fa ? "غیبت‌ها" : "Absences",
-        icon: "attendance",
-      },
-      {
-        href: "/panel/teacher/learning/homework",
-        label: fa ? "تکالیف" : "Homework",
-        icon: "blog",
-      },
-      {
-        href: "/panel/teacher/learning/recordings",
-        label: fa ? "جلسات ضبط‌شده" : "Recorded lessons",
-        icon: "media",
-      },
-      {
-        href: "/panel/teacher/learning/reports",
-        label: fa ? "گزارش‌های آموزشی" : "Teaching reports",
-        icon: "blog",
-      },
-    );
-  const groups: NavGroup[] =
-    user.role === "admin"
-      ? [
-          {
-            id: "education",
-            label: dictionary.nav.education,
-            icon: "exams",
-            items: [
-              {
-                href: "/panel/admin/attendance",
-                label: dictionary.nav.attendance,
-                icon: "attendance",
-              },
-              {
-                href: "/panel/admin/terms",
-                label: dictionary.nav.terms,
-                icon: "terms",
-              },
-              {
-                href: "/panel/admin/term-levels",
-                label: dictionary.nav.termLevels,
-                icon: "levels",
-              },
-              {
-                href: "/panel/admin/exams",
-                label: dictionary.nav.exams,
-                icon: "exams",
-              },
-              {
-                href: "/panel/admin/exam-assignments",
-                label: fa
-                  ? "تخصیص و نتایج آزمون"
-                  : "Exam assignments & results",
-                icon: "exams",
-              },
-              {
-                href: "/panel/admin/courses",
-                label: fa ? "صفحه‌های دوره" : "Course pages",
-                icon: "blog",
-              },
-              {
-                href: "/panel/admin/learning/homework",
-                label: fa ? "تکالیف" : "Homework",
-                icon: "blog",
-              },
-              {
-                href: "/panel/admin/learning/recordings",
-                label: fa ? "جلسات ضبط‌شده" : "Recorded lessons",
-                icon: "media",
-              },
-              {
-                href: "/panel/admin/learning/reports",
-                label: fa ? "گزارش‌های آموزشی" : "Teaching reports",
-                icon: "blog",
-              },
-              {
-                href: "/panel/admin/absences",
-                label: fa ? "غیبت‌ها" : "Absences",
-                icon: "attendance",
-              },
-            ],
-          },
-          {
-            id: "people",
-            label: dictionary.nav.people,
-            icon: "users",
-            items: [
-              {
-                href: "/panel/admin/students",
-                label: dictionary.nav.students,
-                icon: "users",
-              },
-              {
-                href: "/panel/admin/teachers",
-                label: dictionary.nav.teachers,
-                icon: "users",
-              },
-              {
-                href: "/panel/admin/members",
-                label: dictionary.nav.members,
-                icon: "users",
-              },
-              {
-                href: "/panel/admin/admins",
-                label: dictionary.nav.admins,
-                icon: "users",
-              },
-            ],
-          },
-          {
-            id: "content",
-            label: dictionary.nav.content,
-            icon: "blog",
-            items: [
-              {
-                href: "/panel/admin/blog",
-                label: dictionary.nav.blog,
-                icon: "blog",
-              },
-              {
-                href: "/panel/admin/honors",
-                label: dictionary.nav.honors,
-                icon: "honors",
-              },
-              {
-                href: "/panel/admin/media",
-                label: dictionary.nav.media,
-                icon: "media",
-              },
-              {
-                href: "/panel/admin/comments",
-                label: dictionary.nav.comments,
-                icon: "comments",
-              },
-              {
-                href: "/panel/admin/resources/faqs",
-                label: fa ? "پرسش‌های متداول" : "FAQs",
-                icon: "about",
-              },
-              {
-                href: "/panel/admin/resources/guides",
-                label: fa ? "راهنمای پنل" : "Panel guides",
-                icon: "blog",
-              },
-              {
-                href: "/panel/admin/resources/requirements",
-                label: fa ? "نرم‌افزارهای مورد نیاز" : "Required software",
-                icon: "levels",
-              },
-              {
-                href: "/panel/admin/notifications",
-                label: fa ? "مدیریت اعلان‌ها" : "Manage notifications",
-                icon: "about",
-              },
-              {
-                href: "/panel/admin/departments",
-                label: fa ? "دپارتمان‌های پشتیبانی" : "Support departments",
-                icon: "comments",
-              },
-              {
-                href: "/panel/admin/live-chat",
-                label: fa ? "چت آنلاین" : "Live chat",
-                icon: "comments",
-              },
-              {
-                href: "/panel/admin/academic/semesters",
-                label: fa ? "سال تحصیلی و آرشیو" : "Academic years & archive",
-                icon: "levels",
-              },
-            ],
-          },
-          {
-            id: "settings",
-            label: fa ? "تنظیمات سایت" : "Site settings",
-            icon: "about",
-            items: [
-              { href: "/panel/admin/landings", label: fa ? "لندینگ‌ساز" : "Landing builder", icon: "blog" },
-              { href: "/panel/admin/settings/appearance", label: fa ? "رنگ‌ها و تایپوگرافی" : "Colors & typography", icon: "about" },
-              {
-                href: "/panel/admin/settings",
-                label: fa ? "هدر و فوتر" : "Header & footer",
-                icon: "about",
-              },
-              {
-                href: "/panel/admin/pages",
-                label: fa ? "ویرایش صفحات ثابت" : "Static pages",
-                icon: "about",
-              },
-              {
-                href: "/panel/admin/about",
-                label: dictionary.nav.about,
-                icon: "about",
-              },
-            ],
-          },
-          {
-            id: "commerce",
-            label: dictionary.nav.commerce,
-            icon: "shop",
-            items: [
-              {
-                href: "/panel/admin/products",
-                label: dictionary.nav.shop,
-                icon: "shop",
-              },
-              {
-                href: "/panel/admin/product-categories",
-                label: dictionary.nav.categories,
-                icon: "categories",
-              },
-            ],
-          },
-        ]
-      : [];
+  const { directLinks, groups } = getPanelNavigation(user.role, locale);
   const isActive = (href: string) =>
     pathname === href ||
     (href !== roleHome[user.role] && pathname.startsWith(`${href}/`));
@@ -642,14 +315,44 @@ export function PanelNav({
     ...directLinks,
     ...groups.flatMap((group) => group.items),
   ];
-  const activeItem = allItems.find((item) => isActive(item.href)) ?? overview;
+  const activeItem =
+    [...allItems]
+      .sort((a, b) => b.href.length - a.href.length)
+      .find((item) => isActive(item.href)) ?? overview;
+  const navigationRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const close = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !navigationRef.current?.contains(event.target)
+      )
+        setMobileOpen(false);
+    };
+    const keyboard = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", keyboard);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", keyboard);
+    };
+  }, [mobileOpen]);
 
   function closeMobileNavigation() {
     setMobileOpen(false);
   }
 
   return (
-    <aside className="relative z-50 flex flex-col border-b border-zinc-200 bg-white/95 px-4 py-4 backdrop-blur-xl lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:overflow-hidden lg:border-b-0 lg:border-e lg:px-4 lg:py-5 dark:border-zinc-800 dark:bg-zinc-950/95">
+    <aside
+      ref={navigationRef}
+      className="relative z-50 flex flex-col border-b border-zinc-200 bg-white/95 px-4 py-4 backdrop-blur-xl lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:overflow-hidden lg:border-b-0 lg:border-e lg:px-4 lg:py-5 dark:border-zinc-800 dark:bg-zinc-950/95"
+    >
       <div className="flex shrink-0 items-center justify-between gap-4 border-b border-zinc-200 pb-4 dark:border-zinc-800">
         <Link
           href={roleHome[user.role]}
@@ -659,6 +362,29 @@ export function PanelNav({
           <CactusBrand locale={locale} subtitle={roleName} />
         </Link>
         <div className="flex items-center gap-2">
+          <Link
+            href="/panel/notifications"
+            onClick={closeMobileNavigation}
+            className="relative grid size-9 shrink-0 place-items-center rounded-xl bg-zinc-50 text-zinc-600 hover:bg-emerald-50 dark:bg-zinc-900 dark:text-zinc-300"
+            aria-label={`${locale === "fa" ? "اعلان‌های خوانده‌نشده" : "Unread notifications"}: ${unreadCount.toLocaleString(locale)}`}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="size-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <path d="M5 17h14l-2-3V9a5 5 0 0 0-10 0v5l-2 3Z" />
+              <path d="M10 20h4" />
+            </svg>
+            {unreadCount > 0 && (
+              <span className="absolute -end-1 -top-1 rounded-full bg-rose-500 px-1.5 text-[10px] leading-4 text-white">
+                {unreadCount > 99 ? "99+" : unreadCount.toLocaleString(locale)}
+              </span>
+            )}
+          </Link>
           <Link
             href="/panel/profile"
             className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 lg:hidden"
@@ -680,6 +406,7 @@ export function PanelNav({
           type="button"
           aria-expanded={mobileOpen}
           aria-controls="panel-navigation"
+          ref={toggleRef}
           onClick={() => setMobileOpen((current) => !current)}
           className="flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-3 py-3 text-start outline-none transition hover:border-emerald-300 hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-emerald-600 lg:hidden dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/40"
         >

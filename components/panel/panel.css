@@ -1,0 +1,72 @@
+.panel-workspace {
+  min-width: 0;
+}
+.panel-workspace main {
+  min-width: 0;
+}
+.panel-page {
+  width: 100%;
+  min-width: 0;
+}
+.panel-page > *,
+.panel-form-section,
+.panel-surface {
+  min-width: 0;
+}
+.panel-surface:has(> h2) {
+  padding: 1.25rem;
+}
+.panel-page :is(input, textarea, select) {
+  min-width: 0;
+  max-width: 100%;
+}
+.panel-page :is(img, video, canvas) {
+  max-width: 100%;
+}
+.panel-page :is(h1, h2, h3, p, dd, address) {
+  overflow-wrap: anywhere;
+}
+.panel-table-scroll {
+  scrollbar-width: thin;
+  overscroll-behavior-inline: contain;
+}
+.panel-table tbody tr {
+  transition: background-color 0.15s;
+}
+.panel-table tbody tr:hover {
+  background: color-mix(in srgb, #10b981 4%, transparent);
+}
+.panel-page
+  :is(button, a, summary, select, input[type="color"], input[type="checkbox"]) {
+  cursor: pointer;
+}
+.panel-page :is(button, input, textarea, select):disabled {
+  cursor: not-allowed;
+}
+.panel-page :focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 3px;
+}
+@media (max-width: 639px) {
+  .panel-page {
+    gap: 1.25rem;
+  }
+  .panel-page > header h1 {
+    font-size: 1.6rem;
+  }
+  .panel-form-footer > div {
+    width: 100%;
+  }
+  .panel-form-footer > div > :is(button, a) {
+    flex: 1 1 auto;
+  }
+  .panel-page pre {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel-workspace * {
+    scroll-behavior: auto;
+  }
+}

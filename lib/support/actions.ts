@@ -1,6 +1,7 @@
 "use server";
 import { ownsAttachment } from "@/lib/attachments/storage";
-import { and, desc, eq, ne, or } from "drizzle-orm";
+import { and, desc, eq, ne, or, isNull } from "drizzle-orm";
+import { notifyAdmins, notifyUsers } from "@/lib/notifications/events";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -114,6 +115,20 @@ export async function saveTicket(
         body: input.body,
         attachmentUrl: input.attachmentUrl,
       });
+      await notifyAdmins(tx, {
+        titleFa: "تیکت جدید",
+        titleEn: "New support ticket",
+        bodyFa: `تیکت «${input.subject}» ثبت شد.`,
+        bodyEn: `A ticket titled “${input.subject}” was opened.`,
+        href: `/panel/tickets/${ticket.id}`,
+      });
+      await notifyUsers(tx, [input.ownerId, input.assignedToId], {
+        titleFa: "تیکت پشتیبانی ثبت شد",
+        titleEn: "Support ticket opened",
+        bodyFa: `تیکت «${input.subject}» آماده پیگیری است.`,
+        bodyEn: `You can follow ticket “${input.subject}”.`,
+        href: `/panel/tickets/${ticket.id}`,
+      });
       return ticket.id;
     });
   }
@@ -171,17 +186,24 @@ export async function replyTicket(
           : {}),
       })
       .where(eq(tickets.id, id));
-    const target =
-      user.id === ticket.ownerId ? ticket.assignedToId : ticket.ownerId;
-    if (target && target !== user.id)
-      await tx.insert(notifications).values({
-        userId: target,
-        titleFa: "پاسخ جدید تیکت",
-        titleEn: "New ticket reply",
-        bodyFa: ticket.subject,
-        bodyEn: ticket.subject,
-        href: `/panel/tickets/${id}`,
-      });
+    const replyNotice = {
+      titleFa: "پاسخ جدید تیکت",
+      titleEn: "New ticket reply",
+      bodyFa: ticket.subject,
+      bodyEn: ticket.subject,
+      href: `/panel/tickets/${id}`,
+    };
+    if (user.id === ticket.ownerId) {
+      await notifyAdmins(tx, replyNotice);
+      if (ticket.assignedToId && ticket.assignedToId !== user.id) {
+        const [assignee] = await tx
+          .select({ role: users.role })
+          .from(users)
+          .where(eq(users.id, ticket.assignedToId));
+        if (assignee?.role !== "admin")
+          await notifyUsers(tx, [ticket.assignedToId], replyNotice);
+      }
+    } else await notifyUsers(tx, [ticket.ownerId], replyNotice);
     return saved(locale);
   });
   revalidatePath("/panel", "layout");
@@ -355,8 +377,31 @@ export async function readNotification(
   await getDatabase()
     .update(notifications)
     .set({ readAt: new Date() })
-    .where(and(eq(notifications.id, id), eq(notifications.userId, user.id)));
-  revalidatePath("/panel/notifications");
+    .where(
+      and(
+        eq(notifications.id, id),
+        eq(notifications.userId, user.id),
+        isNull(notifications.readAt),
+      ),
+    );
+  revalidatePath("/panel", "layout");
+  return saved(locale);
+}
+export async function readAllNotifications(
+  locale: Locale,
+): Promise<ActionState> {
+  const user = await requireUser();
+  try {
+    await getDatabase()
+      .update(notifications)
+      .set({ readAt: new Date() })
+      .where(
+        and(eq(notifications.userId, user.id), isNull(notifications.readAt)),
+      );
+  } catch {
+    return failed(locale);
+  }
+  revalidatePath("/panel", "layout");
   return saved(locale);
 }
 export async function deleteNotification(

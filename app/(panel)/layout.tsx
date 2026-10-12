@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
+import { getSiteIcons } from "@/lib/site-content/metadata";
 import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { localeConfig } from "@/lib/i18n/config";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { vazirmatn } from "../fonts";
 import "../globals.css";
+import "@/components/panel/panel.css";
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   title: {
     default: "پنل کاکتوس",
     template: "%s | پنل کاکتوس",
@@ -14,6 +16,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
   icons: { icon: "/cactus-logo.svg" },
 };
+export async function generateMetadata(): Promise<Metadata> {return {...baseMetadata,icons:await getSiteIcons()};}
 
 export default async function PanelRootLayout({
   children,

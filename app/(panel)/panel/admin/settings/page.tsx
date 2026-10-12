@@ -56,6 +56,7 @@ export default async function SiteSettings() {
         locale={locale}
         action={saveNavigation}
         initial={{
+          faviconUrl: settings.faviconUrl,
           loadingIconUrl: settings.loadingIconUrl,
           logoUrl: settings.logoUrl,
           subtitleFa: settings.subtitleFa,
@@ -67,6 +68,7 @@ export default async function SiteSettings() {
           googleVerification: settings.googleVerification,
         }}
         fields={[
+          {name: "faviconUrl", label: fa ? "فاوآیکن مرورگر" : "Browser favicon", type: "image", hint: fa ? "تصویر مربعی PNG پیشنهاد می‌شود؛ با حذف آن نشان پیش‌فرض نمایش داده می‌شود." : "A square PNG is recommended. Leave empty for the default mark."},
           { name: "loadingIconUrl", label: fa ? "نشان بارگذاری" : "Loading icon", type: "image", hint: fa ? "با حذف تصویر، نشان کاکتوس نمایش داده می‌شود." : "Leave empty to use the Cactus mark." },
           {
             name: "siteTitleFa",
@@ -132,7 +134,7 @@ export default async function SiteSettings() {
           },
           {
             title: fa ? "هویت سایت" : "Site identity",
-            fields: ["logoUrl", "loadingIconUrl", "subtitleFa", "subtitleEn"],
+            fields: ["logoUrl", "faviconUrl", "loadingIconUrl", "subtitleFa", "subtitleEn"],
           },
         ]}
       >

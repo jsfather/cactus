@@ -1,4 +1,5 @@
 "use server";
+import { notifyUsers } from "@/lib/notifications/events";
 
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -335,6 +336,12 @@ async function saveTerm(
       meetingUrl: data.meetingUrl || null,
       updatedAt: new Date(),
     };
+    const previousTeachers = termId
+      ? await transaction
+          .select({ teacherId: termTeachers.teacherId })
+          .from(termTeachers)
+          .where(eq(termTeachers.termId, termId))
+      : [];
     let savedId = termId;
     if (termId) {
       const updated = await transaction
@@ -365,24 +372,20 @@ async function saveTerm(
     }
     if (!savedId) throw new Error("Term identifier was not created.");
     if (data.teacherIds.length)
-      await transaction
-        .insert(termTeachers)
-        .values(
-          data.teacherIds.map((teacherId) => ({
-            termId: savedId!,
-            teacherId,
-            assignedById: creatorId,
-          })),
-        );
+      await transaction.insert(termTeachers).values(
+        data.teacherIds.map((teacherId) => ({
+          termId: savedId!,
+          teacherId,
+          assignedById: creatorId,
+        })),
+      );
     if (data.prerequisiteIds.length)
-      await transaction
-        .insert(termPrerequisites)
-        .values(
-          data.prerequisiteIds.map((prerequisiteTermId) => ({
-            termId: savedId!,
-            prerequisiteTermId,
-          })),
-        );
+      await transaction.insert(termPrerequisites).values(
+        data.prerequisiteIds.map((prerequisiteTermId) => ({
+          termId: savedId!,
+          prerequisiteTermId,
+        })),
+      );
     if (data.schedules.length)
       await transaction
         .insert(termSchedules)
@@ -431,15 +434,25 @@ async function saveTerm(
         }
       }
     } else if (generatedSessions.length) {
-      await transaction
-        .insert(termSessions)
-        .values(
-          generatedSessions.map((session) => ({
-            termId: savedId!,
-            ...session,
-          })),
-        );
+      await transaction.insert(termSessions).values(
+        generatedSessions.map((session) => ({
+          termId: savedId!,
+          ...session,
+        })),
+      );
     }
+    const previousIds = new Set(previousTeachers.map((item) => item.teacherId));
+    await notifyUsers(
+      transaction,
+      data.teacherIds.filter((teacherId) => !previousIds.has(teacherId)),
+      {
+        titleFa: "کلاس جدید برای تدریس",
+        titleEn: "New teaching assignment",
+        bodyFa: `شما به کلاس «${data.titleFa}» اضافه شدید.`,
+        bodyEn: `You were assigned to “${data.titleEn || data.titleFa}”.`,
+        href: `/panel/teacher/terms/${savedId}`,
+      },
+    );
     return { id: savedId };
   });
 }

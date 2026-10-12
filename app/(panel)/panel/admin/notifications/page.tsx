@@ -1,4 +1,5 @@
 import { NotificationsPage } from "@/components/workflows/support-pages";
-export default function Page() {
-  return <NotificationsPage admin />;
+export default async function Page({searchParams}: {searchParams: Promise<{page?: string; filter?: string}>}) {
+ const query = await searchParams;
+ return <NotificationsPage admin page={Number(query.page ?? 1)} filter={query.filter === "unread" || query.filter === "read" ? query.filter : ""}/>;
 }

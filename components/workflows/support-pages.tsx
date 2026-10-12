@@ -1,3 +1,6 @@
+import { PanelStatCard, PanelStatGrid } from "@/components/panel/stat-card";
+import { PanelPagination } from "@/components/panel/list-controls";
+import { ADMIN_PAGE_SIZE, normalizePage } from "@/lib/panel/pagination";
 import Link from "next/link";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { formatPanelDate } from "@/lib/date/panel";
@@ -28,6 +31,7 @@ import {
   deleteDepartment,
   saveNotification,
   readNotification,
+  readAllNotifications,
   deleteNotification,
 } from "@/lib/support/actions";
 import {
@@ -189,10 +193,20 @@ export async function TicketsPage({
   }
   if (ticket) {
     const messages = await db
-      .select({ message: ticketMessages, name: userNameSql(locale), attachmentMime: attachments.mimeType })
+      .select({
+        message: ticketMessages,
+        name: userNameSql(locale),
+        attachmentMime: attachments.mimeType,
+      })
       .from(ticketMessages)
       .innerJoin(users, eq(users.id, ticketMessages.authorId))
-      .leftJoin(attachments, eq(ticketMessages.attachmentUrl, sql`'/api/attachments/' || ${attachments.id}::text`))
+      .leftJoin(
+        attachments,
+        eq(
+          ticketMessages.attachmentUrl,
+          sql`'/api/attachments/' || ${attachments.id}::text`,
+        ),
+      )
       .where(eq(ticketMessages.ticketId, ticket.id))
       .orderBy(desc(ticketMessages.createdAt), desc(ticketMessages.id))
       .limit(200);
@@ -297,23 +311,73 @@ export async function TicketsPage({
                 <p className="mt-2 whitespace-pre-wrap break-words leading-7">
                   {m.body}
                 </p>
-                {m.attachmentUrl && (
-                  attachmentMime === "audio/webm" ? <audio controls preload="none" src={m.attachmentUrl} aria-label={text(locale, "پیام صوتی", "Voice message")} className="mt-3 max-w-full" /> :
-                  <a
-                    className="text-emerald-700"
-                    href={m.attachmentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {text(locale, "فایل پیوست", "Attachment")}
-                  </a>
-                )}
+                {m.attachmentUrl &&
+                  (attachmentMime === "audio/webm" ? (
+                    <audio
+                      controls
+                      preload="none"
+                      src={m.attachmentUrl}
+                      aria-label={text(locale, "پیام صوتی", "Voice message")}
+                      className="mt-3 max-w-full"
+                    />
+                  ) : (
+                    <a
+                      className="text-emerald-700"
+                      href={m.attachmentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {text(locale, "فایل پیوست", "Attachment")}
+                    </a>
+                  ))}
               </article>
             ))}
           </div>
         </PanelSurface>
-        {ticket.rating && <PanelSurface><p>{text(locale, "امتیاز پاسخ‌گویی", "Response rating")}: <span className="text-amber-500" aria-label={`${ticket.rating}/5`}>{"★".repeat(ticket.rating)}{"☆".repeat(5 - ticket.rating)}</span></p></PanelSurface>}
-        {ticket.status === "closed" && ticket.ownerId === user.id && messages.some(item => item.message.authorId !== user.id) && <ActionForm locale={locale} action={rateTicket.bind(null, ticket.id)} heading={text(locale, "امتیاز به پاسخ‌گو", "Rate the responder")} initial={{ rating: String(ticket.rating ?? 0) }} fields={[{ name: "rating", label: text(locale, "رضایت از پاسخ‌گویی", "Response satisfaction"), options: [{ value: "0", label: text(locale, "بدون امتیاز", "No rating") }, ...[1,2,3,4,5].map(value => ({ value: String(value), label: "★".repeat(value) }))] }]} />}
+        {ticket.rating && (
+          <PanelSurface>
+            <p>
+              {text(locale, "امتیاز پاسخ‌گویی", "Response rating")}:{" "}
+              <span
+                className="text-amber-500"
+                aria-label={`${ticket.rating}/5`}
+              >
+                {"★".repeat(ticket.rating)}
+                {"☆".repeat(5 - ticket.rating)}
+              </span>
+            </p>
+          </PanelSurface>
+        )}
+        {ticket.status === "closed" &&
+          ticket.ownerId === user.id &&
+          messages.some((item) => item.message.authorId !== user.id) && (
+            <ActionForm
+              locale={locale}
+              action={rateTicket.bind(null, ticket.id)}
+              heading={text(locale, "امتیاز به پاسخ‌گو", "Rate the responder")}
+              initial={{ rating: String(ticket.rating ?? 0) }}
+              fields={[
+                {
+                  name: "rating",
+                  label: text(
+                    locale,
+                    "رضایت از پاسخ‌گویی",
+                    "Response satisfaction",
+                  ),
+                  options: [
+                    {
+                      value: "0",
+                      label: text(locale, "بدون امتیاز", "No rating"),
+                    },
+                    ...[1, 2, 3, 4, 5].map((value) => ({
+                      value: String(value),
+                      label: "★".repeat(value),
+                    })),
+                  ],
+                },
+              ]}
+            />
+          )}
         {ticket.status !== "closed" && (
           <ActionForm
             locale={locale}
@@ -393,7 +457,7 @@ export async function TicketsPage({
           {text(locale, "مدیریت دپارتمان‌ها", "Manage departments")}
         </Link>
       )}
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <PanelStatGrid>
         {[
           {
             label: text(locale, "جدید", "New"),
@@ -416,14 +480,19 @@ export async function TicketsPage({
             count: items.filter((item) => item.status === "closed").length,
           },
         ].map((item) => (
-          <PanelSurface key={item.label}>
-            <p className="text-sm text-zinc-500">{item.label}</p>
-            <p className="mt-2 text-2xl font-bold">
-              {item.count.toLocaleString(locale)}
-            </p>
-          </PanelSurface>
+          <PanelStatCard
+            key={item.label}
+            label={item.label}
+            value={item.count.toLocaleString(locale)}
+            icon="message"
+            tone={
+              item.label === text(locale, "در انتظار پاسخ", "Awaiting response")
+                ? "amber"
+                : "emerald"
+            }
+          />
         ))}
-      </div>
+      </PanelStatGrid>
       <PanelSurface>
         {items.length ? (
           <PanelTable
@@ -530,114 +599,258 @@ export async function DepartmentsPage() {
 }
 export async function NotificationsPage({
   admin = false,
+  page = 1,
+  filter = "",
 }: {
   admin?: boolean;
+  page?: number;
+  filter?: string;
 }) {
-  const user = admin ? await requireRole("admin") : await requireUser();
-  const locale = await getPanelLocale();
-  const db = getDatabase();
-  const items = await db
-    .select()
+  const user = admin ? await requireRole("admin") : await requireUser(),
+    locale = await getPanelLocale(),
+    fa = locale === "fa",
+    db = getDatabase();
+  const scope = admin ? undefined : eq(notifications.userId, user.id);
+  const where = and(
+    scope,
+    filter === "unread"
+      ? sql`${notifications.readAt} is null`
+      : filter === "read"
+        ? sql`${notifications.readAt} is not null`
+        : undefined,
+  );
+  const [stats] = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      unread: sql<number>`count(*) filter(where ${notifications.readAt} is null)::int`,
+    })
     .from(notifications)
-    .where(admin ? undefined : eq(notifications.userId, user.id))
-    .orderBy(desc(notifications.createdAt));
+    .where(scope);
+  const [{ total }] = await db
+    .select({ total: sql<number>`count(*)::int` })
+    .from(notifications)
+    .where(where);
+  const normalized = normalizePage(
+    Number.isSafeInteger(page) && page > 0 ? page : 1,
+    total,
+  );
+  const rows = await db
+    .select({ notification: notifications, recipient: userNameSql(locale) })
+    .from(notifications)
+    .innerJoin(users, eq(users.id, notifications.userId))
+    .where(where)
+    .orderBy(desc(notifications.createdAt), desc(notifications.id))
+    .limit(ADMIN_PAGE_SIZE)
+    .offset((normalized.page - 1) * ADMIN_PAGE_SIZE);
   const people = admin
     ? await db.select({ id: users.id, name: userNameSql(locale) }).from(users)
     : [];
   const fields: Field[] = [
     {
       name: "userId",
-      label: text(locale, "گیرنده", "Recipient"),
-      options: people.map((p) => ({ value: p.id, label: p.name })),
+      label: fa ? "گیرنده" : "Recipient",
+      options: people.map((person) => ({
+        value: person.id,
+        label: person.name,
+      })),
     },
     {
       name: "titleFa",
-      label: text(locale, "عنوان فارسی", "Persian title"),
+      label: fa ? "عنوان فارسی" : "Persian title",
       required: true,
     },
-    { name: "titleEn", label: text(locale, "عنوان انگلیسی", "English title") },
+    { name: "titleEn", label: fa ? "عنوان انگلیسی" : "English title" },
     {
       name: "bodyFa",
-      label: text(locale, "متن فارسی", "Persian message"),
+      label: fa ? "متن فارسی" : "Persian message",
       type: "textarea",
       required: true,
     },
     {
       name: "bodyEn",
-      label: text(locale, "متن انگلیسی", "English message"),
+      label: fa ? "متن انگلیسی" : "English message",
       type: "textarea",
     },
-    { name: "href", label: text(locale, "مسیر داخلی", "Internal path") },
+    { name: "href", label: fa ? "مسیر داخلی" : "Internal path", dir: "ltr" },
   ];
+  const path = admin ? "/panel/admin/notifications" : "/panel/notifications";
   return (
     <PanelPage>
       <PanelPageHeader
-        eyebrow={text(locale, "پنل", "Workspace")}
-        title={text(locale, "اعلان‌ها", "Notifications")}
-        description=""
+        eyebrow={fa ? "مرکز پیام‌های سیستم" : "System inbox"}
+        title={
+          admin
+            ? fa
+              ? "مدیریت اعلان‌ها"
+              : "Manage notifications"
+            : fa
+              ? "اعلان‌های من"
+              : "My notifications"
+        }
+        description={
+          fa
+            ? "پیام‌های مربوط به سفارش، پشتیبانی و فعالیت‌های آموزشی را اینجا پیگیری کنید."
+            : "Keep up with orders, support and educational activity."
+        }
+        actions={
+          !admin && (
+            <ActionButton
+              locale={locale}
+              action={readAllNotifications.bind(null, locale)}
+              label={fa ? "خواندن همه" : "Mark all read"}
+            />
+          )
+        }
       />
+      <PanelStatGrid>
+        <PanelStatCard
+          label={fa ? "کل اعلان‌ها" : "All notifications"}
+          value={stats.total.toLocaleString(locale)}
+          icon="message"
+          href={path}
+        />
+        <PanelStatCard
+          label={fa ? "خوانده‌نشده" : "Unread"}
+          value={stats.unread.toLocaleString(locale)}
+          tone="amber"
+          icon="message"
+          href={`${path}?filter=unread`}
+        />
+        <PanelStatCard
+          label={fa ? "خوانده‌شده" : "Read"}
+          value={(stats.total - stats.unread).toLocaleString(locale)}
+          tone="sky"
+          icon="message"
+          href={`${path}?filter=read`}
+        />
+      </PanelStatGrid>
       {admin && (
-        <ActionForm
-          locale={locale}
-          action={saveNotification.bind(null, null)}
-          fields={fields}
-        />
+        <details className="rounded-3xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950">
+          <summary className="font-semibold">
+            {fa ? "ارسال اعلان دستی" : "Send a manual notification"}
+          </summary>
+          <div className="mt-5">
+            <ActionForm
+              locale={locale}
+              action={saveNotification.bind(null, null)}
+              fields={fields}
+            />
+          </div>
+        </details>
       )}
-      <div className="space-y-4">
-        {items.map((n) => (
-          <PanelSurface key={n.id} className="p-6">
-            <h2 className="font-bold">
-              {title(n, locale)}{" "}
-              {!n.readAt && <span className="text-emerald-600">●</span>}
-            </h2>
-            <p className="mt-3 whitespace-pre-wrap">
-              {locale === "en" ? n.bodyEn || n.bodyFa : n.bodyFa}
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              {n.href && (
-                <Link
-                  className="text-emerald-700 dark:text-emerald-400"
-                  href={n.href}
-                >
-                  {text(locale, "مشاهده", "Open")}
-                </Link>
-              )}
-              {!admin && !n.readAt && (
-                <ActionButton
-                  locale={locale}
-                  action={readNotification.bind(null, n.id, locale)}
-                  label={text(locale, "خوانده شد", "Mark read")}
+      <PanelSurface>
+        <nav
+          aria-label={fa ? "فیلتر اعلان‌ها" : "Notification filters"}
+          className="flex flex-wrap gap-2 border-b border-zinc-200 p-4 dark:border-zinc-800"
+        >
+          {[
+            ["", fa ? "همه" : "All"],
+            ["unread", fa ? "خوانده‌نشده" : "Unread"],
+            ["read", fa ? "خوانده‌شده" : "Read"],
+          ].map(([key, label]) => (
+            <Link
+              key={key}
+              href={`${path}${key ? `?filter=${key}` : ""}`}
+              aria-current={filter === key ? "page" : undefined}
+              className="rounded-full px-4 py-2 text-sm font-semibold text-zinc-500 transition hover:bg-zinc-100 aria-[current=page]:bg-emerald-50 aria-[current=page]:text-emerald-700 dark:hover:bg-zinc-800 dark:aria-[current=page]:bg-emerald-950 dark:aria-[current=page]:text-emerald-300"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          {rows.map(({ notification: n, recipient }) => (
+            <article
+              key={n.id}
+              className={`p-5 sm:p-6 ${!n.readAt ? "bg-emerald-50/30 dark:bg-emerald-950/10" : ""}`}
+            >
+              <div className="flex min-w-0 items-start gap-3">
+                <span
+                  aria-hidden="true"
+                  className={`mt-2 size-2 shrink-0 rounded-full ${n.readAt ? "bg-zinc-300 dark:bg-zinc-700" : "bg-emerald-500"}`}
                 />
-              )}
-              <DeleteAction
-                locale={locale}
-                action={deleteNotification.bind(null, n.id, locale)}
-              />
-            </div>
-            {admin && (
-              <details className="mt-4">
-                <summary className="cursor-pointer">
-                  {text(locale, "ویرایش", "Edit")}
-                </summary>
-                <ActionForm
-                  locale={locale}
-                  action={saveNotification.bind(null, n.id)}
-                  initial={Object.fromEntries(
-                    Object.entries(n).map(([k, v]) => [k, String(v ?? "")]),
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="font-semibold">{title(n, locale)}</h2>
+                    <time
+                      className="text-xs text-zinc-500"
+                      dateTime={n.createdAt.toISOString()}
+                    >
+                      {formatPanelDate(n.createdAt, locale, true)}
+                    </time>
+                  </div>
+                  {admin && (
+                    <p className="mt-1 text-xs text-zinc-500">
+                      {fa ? "گیرنده: " : "Recipient: "}
+                      {recipient}
+                    </p>
                   )}
-                  fields={fields}
-                />
-              </details>
-            )}
-          </PanelSurface>
-        ))}
-      </div>
-      {!items.length && (
-        <PanelEmptyState
-          title={text(locale, "اعلانی وجود ندارد", "No notifications yet")}
-          description=""
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-zinc-600 dark:text-zinc-300">
+                    {fa ? n.bodyFa : n.bodyEn || n.bodyFa}
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center gap-3">
+                    {n.href && (
+                      <Link
+                        href={n.href}
+                        className="text-sm font-semibold text-emerald-700 dark:text-emerald-300"
+                      >
+                        {fa ? "مشاهده جزئیات" : "Open details"} ↗
+                      </Link>
+                    )}
+                    {n.userId === user.id && !n.readAt && (
+                      <ActionButton
+                        locale={locale}
+                        action={readNotification.bind(null, n.id, locale)}
+                        label={fa ? "خوانده شد" : "Mark read"}
+                      />
+                    )}
+                    <DeleteAction
+                      locale={locale}
+                      action={deleteNotification.bind(null, n.id, locale)}
+                    />
+                  </div>
+                  {admin && (
+                    <details className="mt-4">
+                      <summary className="text-sm text-zinc-500">
+                        {fa ? "ویرایش اعلان" : "Edit notification"}
+                      </summary>
+                      <div className="mt-4">
+                        <ActionForm
+                          locale={locale}
+                          action={saveNotification.bind(null, n.id)}
+                          initial={Object.fromEntries(
+                            Object.entries(n).map(([key, value]) => [
+                              key,
+                              String(value ?? ""),
+                            ]),
+                          )}
+                          fields={fields}
+                        />
+                      </div>
+                    </details>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+        {!rows.length && (
+          <PanelEmptyState
+            title={fa ? "اعلانی در این بخش نیست" : "No notifications here"}
+            description={
+              fa
+                ? "اعلان‌های جدید به‌صورت خودکار در این بخش ظاهر می‌شوند."
+                : "New system notifications will appear here automatically."
+            }
+          />
+        )}
+        <PanelPagination
+          action={path}
+          locale={locale}
+          pagination={{ ...normalized, total, pageSize: ADMIN_PAGE_SIZE }}
+          query={filter ? { filter } : {}}
         />
-      )}
+      </PanelSurface>
     </PanelPage>
   );
 }

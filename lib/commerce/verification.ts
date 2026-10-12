@@ -1,6 +1,13 @@
 import { eq } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
-import { orders, orderItems, payments, notifications } from "@/lib/db/schema";
+import {
+  orders,
+  orderItems,
+  payments,
+  notifications,
+  orderEvents,
+} from "@/lib/db/schema";
+import { notifyAdmins } from "@/lib/notifications/events";
 import { gatewayRequest, tomanToRial } from "./gateway";
 import { enrollStudent } from "@/lib/terms/enrollment";
 export async function verifyPayment(authority: string) {
@@ -35,6 +42,8 @@ export async function verifyPayment(authority: string) {
       .update(payments)
       .set({ status: "paid", reference: String(result.ref_id) })
       .where(eq(payments.id, record.id));
+    // A second verified payment must not rewind an already fulfilled order.
+    if (order.paymentStatus === "paid") return;
     const items = await tx
       .select()
       .from(orderItems)
@@ -61,20 +70,34 @@ export async function verifyPayment(authority: string) {
         updatedAt: new Date(),
       })
       .where(eq(orders.id, order.id));
-    await tx
-      .insert(notifications)
-      .values({
-        userId: order.userId,
-        titleFa: "پرداخت تأیید شد",
-        titleEn: "Payment confirmed",
-        bodyFa: review
-          ? "پرداخت دریافت شد. برای نهایی‌سازی ثبت‌نام با پشتیبانی تماس بگیرید."
-          : "سفارش شما در حال پردازش است.",
-        bodyEn: review
-          ? "Payment received. Contact support to finalize enrollment."
-          : "Your order is being processed.",
-        href: `/panel/orders/${order.id}`,
-      });
+    if (order.status !== (review ? "pending" : "processing"))
+      await tx
+        .insert(orderEvents)
+        .values({
+          orderId: order.id,
+          status: review ? "pending" : "processing",
+          previousStatus: order.status,
+          note: "Payment verified",
+        });
+    await notifyAdmins(tx, {
+      titleFa: "پرداخت سفارش تأیید شد",
+      titleEn: "Order payment confirmed",
+      bodyFa: `پرداخت سفارش ${order.code} تأیید شد.`,
+      bodyEn: `Payment for order ${order.code} was confirmed.`,
+      href: `/panel/orders/${order.id}`,
+    });
+    await tx.insert(notifications).values({
+      userId: order.userId,
+      titleFa: "پرداخت تأیید شد",
+      titleEn: "Payment confirmed",
+      bodyFa: review
+        ? "پرداخت دریافت شد. برای نهایی‌سازی ثبت‌نام با پشتیبانی تماس بگیرید."
+        : "سفارش شما در حال پردازش است.",
+      bodyEn: review
+        ? "Payment received. Contact support to finalize enrollment."
+        : "Your order is being processed.",
+      href: `/panel/orders/${order.id}`,
+    });
   });
   return payment.order.id;
 }

@@ -9,6 +9,7 @@ import { getSafeReturnTo } from "@/lib/auth/return-to";
 import { createSession } from "@/lib/auth/session";
 import { normalizeIranianMobile, normalizeOtpCode } from "@/lib/auth/mobile";
 import { consumeOtp, requestOtp } from "@/lib/auth/otp";
+import { notifyAdmins, notifyUsers } from "@/lib/notifications/events";
 import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
 import { users, type OtpPurpose } from "@/lib/db/schema";
@@ -137,7 +138,8 @@ export async function verifyAuthenticationOtp(
   }
 
   try {
-    const [user] = await getDatabase()
+    const user = await getDatabase().transaction(async tx => {
+      const [created] = await tx
       .insert(users)
       .values({
         mobile,
@@ -151,7 +153,10 @@ export async function verifyAuthenticationOtp(
         isActive: true,
       })
       .returning({ id: users.id });
-
+      await notifyAdmins(tx,{titleFa:"کاربر جدید",titleEn:"New user",bodyFa:"یک عضو جدید در سایت ثبت‌نام کرد.",bodyEn:"A new member registered on the website.",href:"/panel/admin/members"});
+      await notifyUsers(tx,[created.id],{titleFa:"به کاکتوس خوش آمدید",titleEn:"Welcome to Cactus",bodyFa:"مشخصات حساب را تکمیل کنید؛ سفارش‌ها و پیام‌های پشتیبانی از پنل قابل پیگیری هستند.",bodyEn:"Complete your profile. Track orders and support messages from your workspace.",href:"/panel/profile"});
+      return created;
+    });
     await createSession(user.id, "registration");
   } catch (error) {
     if (hasPostgresErrorCode(error, "23505")) {

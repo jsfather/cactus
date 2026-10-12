@@ -11,10 +11,13 @@ import {
   productVariants,
   orders,
   orderItems,
+  orderEvents,
   payments,
   terms,
   termEnrollments,
 } from "@/lib/db/schema";
+import { notifyAdmins, notifyUsers } from "@/lib/notifications/events";
+import { orderLabel, orderStages } from "./status";
 import { enrollStudent } from "@/lib/terms/enrollment";
 import { gatewayRequest, paymentConfigured, tomanToRial } from "./gateway";
 import {
@@ -163,6 +166,23 @@ export async function checkout(
       await tx
         .insert(orderItems)
         .values(lines.map((l) => ({ ...l, orderId: order.id })));
+      await tx
+        .insert(orderEvents)
+        .values({ orderId: order.id, actorId: user.id, status: order.status });
+      await notifyAdmins(tx, {
+        titleFa: "سفارش جدید",
+        titleEn: "New order",
+        bodyFa: `سفارش ${order.code} ثبت شد.`,
+        bodyEn: `Order ${order.code} was placed.`,
+        href: `/panel/orders/${order.id}`,
+      });
+      await notifyUsers(tx, [user.id], {
+        titleFa: "سفارش شما ثبت شد",
+        titleEn: "Order placed",
+        bodyFa: `سفارش ${order.code} از بخش سفارش‌ها قابل پیگیری است.`,
+        bodyEn: `Track order ${order.code} from your orders page.`,
+        href: `/panel/orders/${order.id}`,
+      });
       return order.id;
     });
   } catch {
@@ -233,16 +253,14 @@ export async function purchaseTerm(
         status: term.tuitionToman === 0 ? "processing" : "pending",
       })
       .returning({ id: orders.id });
-    await tx
-      .insert(orderItems)
-      .values({
-        orderId: order.id,
-        termId,
-        quantity: 1,
-        unitPriceToman: term.tuitionToman,
-        titleFa: term.titleFa,
-        titleEn: term.titleEn,
-      });
+    await tx.insert(orderItems).values({
+      orderId: order.id,
+      termId,
+      quantity: 1,
+      unitPriceToman: term.tuitionToman,
+      titleFa: term.titleFa,
+      titleEn: term.titleEn,
+    });
     if (term.tuitionToman === 0) {
       const result = await enrollStudent(
         tx,
@@ -254,6 +272,27 @@ export async function purchaseTerm(
       );
       if (result.error) throw new Error(result.error);
     }
+    await tx
+      .insert(orderEvents)
+      .values({
+        orderId: order.id,
+        actorId: user.id,
+        status: term.tuitionToman === 0 ? "processing" : "pending",
+      });
+    await notifyAdmins(tx, {
+      titleFa: "سفارش آموزشی جدید",
+      titleEn: "New course order",
+      bodyFa: `سفارش ثبت‌نام «${term.titleFa}» ثبت شد.`,
+      bodyEn: `An enrollment order for “${term.titleEn || term.titleFa}” was placed.`,
+      href: `/panel/orders/${order.id}`,
+    });
+    await notifyUsers(tx, [user.id], {
+      titleFa: "سفارش آموزشی ثبت شد",
+      titleEn: "Course order placed",
+      bodyFa: `سفارش «${term.titleFa}» قابل پیگیری است.`,
+      bodyEn: `You can track your order for “${term.titleEn || term.titleFa}”.`,
+      href: `/panel/orders/${order.id}`,
+    });
     return order;
   });
   if ("error" in result) return result;
@@ -377,6 +416,21 @@ export async function cancelOrder(
       .update(orders)
       .set({ status: "cancelled", updatedAt: new Date() })
       .where(eq(orders.id, id));
+    await tx
+      .insert(orderEvents)
+      .values({
+        orderId: id,
+        actorId: user.id,
+        status: "cancelled",
+        previousStatus: order.status,
+      });
+    await notifyUsers(tx, [order.userId], {
+      titleFa: "سفارش لغو شد",
+      titleEn: "Order cancelled",
+      bodyFa: `سفارش ${order.code} لغو شد.`,
+      bodyEn: `Order ${order.code} was cancelled.`,
+      href: `/panel/orders/${id}`,
+    });
     return saved(locale);
   });
   revalidatePath("/", "layout");
@@ -387,39 +441,171 @@ export async function updateOrder(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
-  const locale = form.get("locale") === "en" ? "en" : "fa";
+  const admin = await requireRole("admin"),
+    locale = form.get("locale") === "en" ? "en" : "fa";
   if (!z.uuid().safeParse(id).success) return denied(locale);
   const parsed = z
     .object({
-      status: z.enum(["pending", "processing", "shipped", "delivered"]),
+      status: z.enum(orderStages),
+      expectedStatus: z.string().max(20),
       address: z.string().trim().min(1).max(2000),
       postalCode: z.string().regex(/^\d{10}$/),
-      trackingCode: z.string().max(120),
+      trackingCode: z
+        .string()
+        .trim()
+        .max(120)
+        .regex(/^[A-Za-z0-9 -]*$/),
       notes: z.string().max(5000),
+      changeReason: z.string().trim().max(500),
     })
     .safeParse(Object.fromEntries(form));
   if (!parsed.success) return validationError(locale, parsed.error);
-  const result = await getDatabase().transaction(async (tx) => {
-    const [order] = await tx
-      .select()
-      .from(orders)
-      .where(eq(orders.id, id))
-      .for("update");
-    if (
-      !order ||
-      order.status === "cancelled" ||
-      (parsed.data.status !== "pending" && order.paymentStatus !== "paid")
-    )
-      return denied(locale);
-    await tx
-      .update(orders)
-      .set({ ...parsed.data, updatedAt: new Date() })
-      .where(eq(orders.id, id));
-    return saved(locale);
-  });
-  revalidatePath("/panel", "layout");
-  return result;
+  try {
+    const result = await getDatabase().transaction(
+      async (tx): Promise<ActionState> => {
+        const [order] = await tx
+          .select()
+          .from(orders)
+          .where(eq(orders.id, id))
+          .for("update");
+        if (!order || order.status === "cancelled") return denied(locale);
+        if (order.status !== parsed.data.expectedStatus)
+          return {
+            error: text(
+              locale,
+              "این سفارش هم‌زمان تغییر کرده است؛ صفحه را تازه کنید.",
+              "This order changed concurrently. Refresh the page.",
+            ),
+          };
+        if (parsed.data.status !== "pending" && order.paymentStatus !== "paid")
+          return {
+            error: text(
+              locale,
+              "پیش از پردازش، پرداخت باید تأیید شده باشد.",
+              "Payment must be confirmed before fulfillment.",
+            ),
+            fieldErrors: {
+              status: [
+                text(
+                  locale,
+                  "پرداخت هنوز تأیید نشده است.",
+                  "Payment is not confirmed.",
+                ),
+              ],
+            },
+          };
+        const items = await tx
+          .select({ termId: orderItems.termId })
+          .from(orderItems)
+          .where(eq(orderItems.orderId, id));
+        const physical = items.some((item) => !item.termId);
+        if (!physical && ["packing", "shipped"].includes(parsed.data.status))
+          return {
+            error: text(
+              locale,
+              "سفارش آموزشی بسته‌بندی یا ارسال پستی ندارد.",
+              "Educational orders do not require packing or postal shipping.",
+            ),
+          };
+        if (
+          physical &&
+          ["shipped", "delivered"].includes(parsed.data.status) &&
+          !parsed.data.trackingCode
+        )
+          return {
+            error: text(
+              locale,
+              "کد رهگیری پستی را ثبت کنید.",
+              "Add a postal tracking number.",
+            ),
+            fieldErrors: {
+              trackingCode: [
+                text(
+                  locale,
+                  "کد رهگیری الزامی است.",
+                  "Tracking number is required.",
+                ),
+              ],
+            },
+          };
+        const stages: string[] = physical
+          ? [...orderStages]
+          : ["pending", "processing", "delivered"];
+        const previous = stages.indexOf(order.status),
+          next = stages.indexOf(parsed.data.status);
+        if (next > previous + 1)
+          return {
+            error: text(
+              locale,
+              "مراحل سفارش را به ترتیب تکمیل کنید.",
+              "Complete the order stages in sequence.",
+            ),
+            fieldErrors: {
+              status: [
+                text(
+                  locale,
+                  "مرحله بعدی را انتخاب کنید.",
+                  "Select the next stage.",
+                ),
+              ],
+            },
+          };
+        if (next < previous && !parsed.data.changeReason)
+          return {
+            error: text(
+              locale,
+              "برای بازگشت مرحله، دلیل اصلاح را بنویسید.",
+              "Provide a reason when moving to an earlier stage.",
+            ),
+            fieldErrors: {
+              changeReason: [
+                text(
+                  locale,
+                  "دلیل اصلاح الزامی است.",
+                  "A correction reason is required.",
+                ),
+              ],
+            },
+          };
+        const {
+          expectedStatus: _expected,
+          changeReason,
+          ...values
+        } = parsed.data;
+        await tx
+          .update(orders)
+          .set({ ...values, updatedAt: new Date() })
+          .where(eq(orders.id, id));
+        if (
+          order.status !== values.status ||
+          (order.trackingCode || "") !== values.trackingCode
+        ) {
+          await tx
+            .insert(orderEvents)
+            .values({
+              orderId: id,
+              actorId: admin.id,
+              status: values.status,
+              previousStatus: order.status,
+              note: changeReason,
+              trackingCode: values.trackingCode || null,
+            });
+          await notifyUsers(tx, [order.userId], {
+            titleFa: "وضعیت سفارش به‌روز شد",
+            titleEn: "Order updated",
+            bodyFa: `سفارش ${order.code}: ${orderLabel(values.status, "fa")}${values.trackingCode ? `؛ کد رهگیری: ${values.trackingCode}` : ""}`,
+            bodyEn: `Order ${order.code}: ${orderLabel(values.status, "en")}${values.trackingCode ? `; tracking: ${values.trackingCode}` : ""}`,
+            href: `/panel/orders/${id}`,
+          });
+        }
+        return saved(locale);
+      },
+    );
+    revalidatePath("/panel", "layout");
+    return result;
+  } catch {
+    return failed(locale);
+  }
 }
 export async function deleteOrder(
   id: string,

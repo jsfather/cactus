@@ -15,7 +15,18 @@ export const navigationLinkSchema = z.object({
     ),
 });
 export const navigationSchema = z.object({
-  loadingIconUrl: z.string().trim().max(2048).refine(isAllowedImageReference).default(""),
+  faviconUrl: z
+    .string()
+    .trim()
+    .max(2048)
+    .refine(isAllowedImageReference)
+    .default(""),
+  loadingIconUrl: z
+    .string()
+    .trim()
+    .max(2048)
+    .refine(isAllowedImageReference)
+    .default(""),
   siteTitleFa: z.string().trim().min(1).max(160).default("مدرسه رباتیک کاکتوس"),
   siteTitleEn: z
     .string()
@@ -84,6 +95,7 @@ export const navigationSchema = z.object({
 export type SiteNavigation = z.infer<typeof navigationSchema>;
 export type NavigationLink = z.infer<typeof navigationLinkSchema>;
 export const defaultNavigation: SiteNavigation = {
+  faviconUrl: "",
   loadingIconUrl: "",
   siteTitleFa: "مدرسه رباتیک کاکتوس",
   siteTitleEn: "Cactus Robotics School",

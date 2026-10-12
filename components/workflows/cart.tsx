@@ -168,7 +168,7 @@ export function CartCheckout({
     }
   }
   return items.length ? (
-    <div className="grid items-start gap-8 lg:grid-cols-[1fr_400px]">
+    <div className="grid min-w-0 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,22rem)]">
       <div className="space-y-4">
         {items.map((i) => (
           <div
@@ -182,7 +182,7 @@ export function CartCheckout({
                 <CircuitMark />
               </span>
             )}
-            <div className="min-w-40 flex-1">
+            <div className="min-w-0 flex-1 basis-40">
               <h2 className="font-bold">
                 {i.slug ? (
                   <Link href={localizePath(locale, `/shop/${i.slug}`)}>

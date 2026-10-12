@@ -18,6 +18,17 @@ export async function getSiteMetadata(locale: Locale): Promise<Metadata> {
     verification: settings.googleVerification
       ? { google: settings.googleVerification }
       : undefined,
-    icons: { icon: "/cactus-logo.svg" },
+    icons: {
+      icon: settings.faviconUrl || "/cactus-logo.svg",
+      apple: settings.faviconUrl || "/cactus-logo.svg",
+    },
+  };
+}
+export async function getSiteIcons() {
+  await connection();
+  const settings = await getSiteNavigation();
+  return {
+    icon: settings.faviconUrl || "/cactus-logo.svg",
+    apple: settings.faviconUrl || "/cactus-logo.svg",
   };
 }

@@ -1,3 +1,4 @@
+import { PanelStatCard, PanelStatGrid } from "@/components/panel/stat-card";
 import Link from "next/link";
 import { and, desc, eq, sql } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -163,24 +164,19 @@ export default async function StudentHistory({
           {t("ویرایش حساب", "Edit account")}
         </PanelPrimaryLink>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <PanelSurface>
-          <p className="text-sm">
-            {t("مجموع سفارش‌های پرداخت‌شده", "Total paid orders")}
-          </p>
-          <p className="mt-2 text-2xl font-bold text-emerald-600">
-            {money(totals[0]?.paid ?? "0")}
-          </p>
-        </PanelSurface>
-        <PanelSurface>
-          <p className="text-sm">
-            {t("مبلغ سفارش‌های در انتظار پرداخت", "Pending order amount")}
-          </p>
-          <p className="mt-2 text-2xl font-bold">
-            {money(totals[0]?.pending ?? "0")}
-          </p>
-        </PanelSurface>
-      </div>
+      <PanelStatGrid>
+        <PanelStatCard
+          label={t("مجموع سفارش‌های پرداخت‌شده", "Total paid orders")}
+          value={money(totals[0]?.paid ?? "0")}
+          icon="trend"
+        />
+        <PanelStatCard
+          label={t("مبلغ سفارش‌های در انتظار پرداخت", "Pending order amount")}
+          value={money(totals[0]?.pending ?? "0")}
+          tone="amber"
+          icon="clock"
+        />
+      </PanelStatGrid>
       <PanelSurface>
         <h2 className="mb-4 font-bold">
           {t("ترم‌های ثبت‌نام‌شده", "Enrolled terms")}

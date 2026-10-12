@@ -68,7 +68,7 @@ export function NavigationEditor({
         {links.map((link, index) => (
           <div
             key={index}
-            className="grid items-end gap-3 rounded-xl border border-zinc-200 p-4 sm:grid-cols-[1fr_1fr_1fr_auto] dark:border-zinc-800"
+            className="grid min-w-0 items-end gap-3 rounded-2xl border border-zinc-200 p-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] dark:border-zinc-800"
           >
             <FormLabel label={fa ? "عنوان فارسی" : "Persian label"}>
               <PanelInput

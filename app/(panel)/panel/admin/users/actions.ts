@@ -9,7 +9,15 @@ import { hashPassword } from "@/lib/auth/password";
 import { requireRole } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
 import { hasPostgresErrorCode } from "@/lib/db/errors";
-import { studentDocuments, termEnrollments, termTeachers, users, userRole, type UserRole } from "@/lib/db/schema";
+import {
+  studentDocuments,
+  termEnrollments,
+  termTeachers,
+  users,
+  userRole,
+  type UserRole,
+} from "@/lib/db/schema";
+import { notifyAdmins, notifyUsers } from "@/lib/notifications/events";
 import { roleHome } from "@/lib/auth/roles";
 import { userSectionConfig } from "@/lib/users/config";
 import { isAllowedImageReference } from "@/lib/media/reference";
@@ -17,7 +25,11 @@ import { normalizeIranianMobile } from "@/lib/auth/mobile";
 import { resolveStudentDocumentPath } from "@/lib/student-information/document-storage";
 
 const roleSchema = z.enum(userRole.enumValues);
-const mobileSchema = z.string().trim().refine((value) => normalizeIranianMobile(value) !== null).transform((value) => normalizeIranianMobile(value)!);
+const mobileSchema = z
+  .string()
+  .trim()
+  .refine((value) => normalizeIranianMobile(value) !== null)
+  .transform((value) => normalizeIranianMobile(value)!);
 const commonUserSchema = z.object({
   firstNameFa: z.string().trim().min(1).max(80),
   lastNameFa: z.string().trim().min(1).max(80),
@@ -91,7 +103,10 @@ export async function createManagedUser(
 
   if (!validSectionRole.success || !parsed.success) {
     return {
-      error: formData.get("locale") === "en" ? "Please review the account information." : "لطفاً اطلاعات حساب را بررسی کنید.",
+      error:
+        formData.get("locale") === "en"
+          ? "Please review the account information."
+          : "لطفاً اطلاعات حساب را بررسی کنید.",
       fieldErrors: parsed.success
         ? undefined
         : z.flattenError(parsed.error).fieldErrors,
@@ -99,21 +114,67 @@ export async function createManagedUser(
   }
 
   try {
-    await getDatabase().insert(users).values({
-      firstNameFa: parsed.data.firstNameFa,
-      lastNameFa: parsed.data.lastNameFa,
-      firstNameEn: parsed.data.firstNameEn,
-      lastNameEn: parsed.data.lastNameEn,
-      mobile: parsed.data.mobile,
-      email: parsed.data.email ? parsed.data.email.toLowerCase() : null,
-      passwordHash: parsed.data.password ? await hashPassword(parsed.data.password) : null,
-      role: parsed.data.role,
-      isActive: parsed.data.isActive,
-      avatarUrl: parsed.data.avatarUrl || null,
+    const passwordHash = parsed.data.password
+      ? await hashPassword(parsed.data.password)
+      : null;
+    await getDatabase().transaction(async (tx) => {
+      const [created] = await tx
+        .insert(users)
+        .values({
+          firstNameFa: parsed.data.firstNameFa,
+          lastNameFa: parsed.data.lastNameFa,
+          firstNameEn: parsed.data.firstNameEn,
+          lastNameEn: parsed.data.lastNameEn,
+          mobile: parsed.data.mobile,
+          email: parsed.data.email ? parsed.data.email.toLowerCase() : null,
+          passwordHash,
+          role: parsed.data.role,
+          isActive: parsed.data.isActive,
+          avatarUrl: parsed.data.avatarUrl || null,
+        })
+        .returning({ id: users.id });
+      const descriptions = {
+        student: [
+          "ثبت‌نام کلاس‌ها، تکالیف و نمره‌ها را از بخش آموزش من دنبال کنید.",
+          "Follow enrollment, homework and grades in My learning.",
+        ],
+        teacher: [
+          "کلاس‌ها، برنامه تدریس و پرونده دانش‌پژوهان را از بخش تدریس مدیریت کنید.",
+          "Manage classes, schedules and students from Teaching.",
+        ],
+        member: [
+          "سفارش‌ها و درخواست‌های پشتیبانی خود را از پنل پیگیری کنید.",
+          "Follow orders and support requests in your workspace.",
+        ],
+        admin: [
+          "بخش‌های آموزش، فروشگاه، پشتیبانی و تنظیمات سایت برای مدیریت آماده‌اند.",
+          "Manage education, commerce, support and site settings.",
+        ],
+      };
+      const [bodyFa, bodyEn] = descriptions[parsed.data.role];
+      await notifyUsers(tx, [created.id], {
+        titleFa: "حساب شما آماده است",
+        titleEn: "Your account is ready",
+        bodyFa,
+        bodyEn,
+        href: roleHome[parsed.data.role],
+      });
+      await notifyAdmins(tx, {
+        titleFa: "حساب کاربری جدید",
+        titleEn: "New account created",
+        bodyFa: `حساب ${parsed.data.firstNameFa} ${parsed.data.lastNameFa} ایجاد شد.`,
+        bodyEn: `Account ${parsed.data.firstNameEn} ${parsed.data.lastNameEn} was created.`,
+        href: userSectionConfig[parsed.data.role].path,
+      });
     });
   } catch (error) {
     if (isUniqueViolation(error)) {
-      return { error: parsed.data.locale === "en" ? "This mobile number or email is already used by another account." : "این شماره موبایل یا ایمیل قبلاً برای حساب دیگری ثبت شده است." };
+      return {
+        error:
+          parsed.data.locale === "en"
+            ? "This mobile number or email is already used by another account."
+            : "این شماره موبایل یا ایمیل قبلاً برای حساب دیگری ثبت شده است.",
+      };
     }
 
     throw error;
@@ -136,7 +197,10 @@ export async function updateManagedUser(
 
   if (!validOriginalRole.success || !validUserId.success || !parsed.success) {
     return {
-      error: formData.get("locale") === "en" ? "Please review the account information." : "لطفاً اطلاعات حساب را بررسی کنید.",
+      error:
+        formData.get("locale") === "en"
+          ? "Please review the account information."
+          : "لطفاً اطلاعات حساب را بررسی کنید.",
       fieldErrors: parsed.success
         ? undefined
         : z.flattenError(parsed.error).fieldErrors,
@@ -144,31 +208,77 @@ export async function updateManagedUser(
   }
 
   if (currentAdmin.id === validUserId.data && !parsed.data.isActive) {
-    return { error: parsed.data.locale === "en" ? "You cannot deactivate your current administrator account." : "نمی‌توانید حساب همکاری فعال خودتان را غیرفعال کنید." };
+    return {
+      error:
+        parsed.data.locale === "en"
+          ? "You cannot deactivate your current administrator account."
+          : "نمی‌توانید حساب همکاری فعال خودتان را غیرفعال کنید.",
+    };
   }
 
-  if (validOriginalRole.data === "admin" && (parsed.data.role !== "admin" || !parsed.data.isActive)) {
+  if (
+    validOriginalRole.data === "admin" &&
+    (parsed.data.role !== "admin" || !parsed.data.isActive)
+  ) {
     const [remainingAdmins] = await getDatabase()
       .select({ value: count() })
       .from(users)
-      .where(and(eq(users.role, "admin"), eq(users.isActive, true), ne(users.id, validUserId.data)));
+      .where(
+        and(
+          eq(users.role, "admin"),
+          eq(users.isActive, true),
+          ne(users.id, validUserId.data),
+        ),
+      );
 
     if ((remainingAdmins?.value ?? 0) === 0) {
-      return { error: parsed.data.locale === "en" ? "At least one active administrator must remain." : "حداقل یک همکار فعال باید در سامانه باقی بماند." };
+      return {
+        error:
+          parsed.data.locale === "en"
+            ? "At least one active administrator must remain."
+            : "حداقل یک همکار فعال باید در سامانه باقی بماند.",
+      };
     }
   }
 
-  if (validOriginalRole.data === "teacher" && (parsed.data.role !== "teacher" || !parsed.data.isActive)) {
-    const [assignments] = await getDatabase().select({ value: count() }).from(termTeachers).where(eq(termTeachers.teacherId, validUserId.data));
+  if (
+    validOriginalRole.data === "teacher" &&
+    (parsed.data.role !== "teacher" || !parsed.data.isActive)
+  ) {
+    const [assignments] = await getDatabase()
+      .select({ value: count() })
+      .from(termTeachers)
+      .where(eq(termTeachers.teacherId, validUserId.data));
     if ((assignments?.value ?? 0) > 0) {
-      return { error: parsed.data.locale === "en" ? "Reassign or remove this teacher from every term before changing their role or deactivating the account." : "پیش از تغییر نقش یا غیرفعال‌کردن حساب، این مدرس را از همه ترم‌ها حذف یا جایگزین کنید." };
+      return {
+        error:
+          parsed.data.locale === "en"
+            ? "Reassign or remove this teacher from every term before changing their role or deactivating the account."
+            : "پیش از تغییر نقش یا غیرفعال‌کردن حساب، این مدرس را از همه ترم‌ها حذف یا جایگزین کنید.",
+      };
     }
   }
 
-  if (validOriginalRole.data === "student" && (parsed.data.role !== "student" || !parsed.data.isActive)) {
-    const [activeEnrollments] = await getDatabase().select({ value: count() }).from(termEnrollments).where(and(eq(termEnrollments.studentId, validUserId.data), eq(termEnrollments.status, "active")));
+  if (
+    validOriginalRole.data === "student" &&
+    (parsed.data.role !== "student" || !parsed.data.isActive)
+  ) {
+    const [activeEnrollments] = await getDatabase()
+      .select({ value: count() })
+      .from(termEnrollments)
+      .where(
+        and(
+          eq(termEnrollments.studentId, validUserId.data),
+          eq(termEnrollments.status, "active"),
+        ),
+      );
     if ((activeEnrollments?.value ?? 0) > 0) {
-      return { error: parsed.data.locale === "en" ? "Withdraw this student from active terms before changing their role or deactivating the account." : "پیش از تغییر نقش یا غیرفعال‌کردن حساب، انصراف دانش پژوه را از ترم‌های فعال ثبت کنید." };
+      return {
+        error:
+          parsed.data.locale === "en"
+            ? "Withdraw this student from active terms before changing their role or deactivating the account."
+            : "پیش از تغییر نقش یا غیرفعال‌کردن حساب، انصراف دانش پژوه را از ترم‌های فعال ثبت کنید.",
+      };
     }
   }
 
@@ -204,11 +314,21 @@ export async function updateManagedUser(
       .returning({ id: users.id });
 
     if (!updatedUser) {
-      return { error: parsed.data.locale === "en" ? "This account no longer exists." : "این حساب دیگر وجود ندارد." };
+      return {
+        error:
+          parsed.data.locale === "en"
+            ? "This account no longer exists."
+            : "این حساب دیگر وجود ندارد.",
+      };
     }
   } catch (error) {
     if (isUniqueViolation(error)) {
-      return { error: parsed.data.locale === "en" ? "This mobile number or email is already used by another account." : "این شماره موبایل یا ایمیل قبلاً برای حساب دیگری ثبت شده است." };
+      return {
+        error:
+          parsed.data.locale === "en"
+            ? "This mobile number or email is already used by another account."
+            : "این شماره موبایل یا ایمیل قبلاً برای حساب دیگری ثبت شده است.",
+      };
     }
 
     throw error;
@@ -231,35 +351,49 @@ export async function deleteManagedUser(
   const validUserId = z.uuid().safeParse(userId);
 
   if (!validRole.success || !validUserId.success) {
-    return { error: locale === "en" ? "The account identifier is invalid." : "شناسه حساب معتبر نیست." };
+    return {
+      error:
+        locale === "en"
+          ? "The account identifier is invalid."
+          : "شناسه حساب معتبر نیست.",
+    };
   }
 
   if (currentAdmin.id === validUserId.data) {
-    return { error: locale === "en" ? "You cannot delete the account you are currently using." : "نمی‌توانید حسابی را که با آن وارد شده‌اید حذف کنید." };
+    return {
+      error:
+        locale === "en"
+          ? "You cannot delete the account you are currently using."
+          : "نمی‌توانید حسابی را که با آن وارد شده‌اید حذف کنید.",
+    };
   }
 
   try {
-    const documentPaths = validRole.data === "student"
-      ? await getDatabase().select({ pathname: studentDocuments.pathname })
-          .from(studentDocuments)
-          .where(eq(studentDocuments.userId, validUserId.data))
-      : [];
+    const documentPaths =
+      validRole.data === "student"
+        ? await getDatabase()
+            .select({ pathname: studentDocuments.pathname })
+            .from(studentDocuments)
+            .where(eq(studentDocuments.userId, validUserId.data))
+        : [];
     await getDatabase()
       .delete(users)
       .where(
-        and(
-          eq(users.id, validUserId.data),
-          eq(users.role, validRole.data),
-        ),
+        and(eq(users.id, validUserId.data), eq(users.role, validRole.data)),
       );
-    await Promise.all(documentPaths.map(async ({ pathname }) => {
-      const absolutePath = resolveStudentDocumentPath(pathname);
-      if (absolutePath) await unlink(absolutePath).catch(() => undefined);
-    }));
+    await Promise.all(
+      documentPaths.map(async ({ pathname }) => {
+        const absolutePath = resolveStudentDocumentPath(pathname);
+        if (absolutePath) await unlink(absolutePath).catch(() => undefined);
+      }),
+    );
   } catch (error) {
     if (isForeignKeyViolation(error)) {
       return {
-        error: locale === "en" ? "This account is connected to other content and cannot be deleted yet." : "این حساب به محتوای دیگری متصل است و فعلاً قابل حذف نیست.",
+        error:
+          locale === "en"
+            ? "This account is connected to other content and cannot be deleted yet."
+            : "این حساب به محتوای دیگری متصل است و فعلاً قابل حذف نیست.",
       };
     }
 
@@ -267,5 +401,7 @@ export async function deleteManagedUser(
   }
 
   revalidateUserPages();
-  return { success: locale === "en" ? "Account deleted." : "حساب کاربری حذف شد." };
+  return {
+    success: locale === "en" ? "Account deleted." : "حساب کاربری حذف شد.",
+  };
 }

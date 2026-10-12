@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getSiteIcons } from "@/lib/site-content/metadata";
 import { AppFeedbackProvider } from "@/components/feedback/feedback-provider";
 import { ThemeScript } from "@/components/theme/theme-script";
 import { getAuthDictionary } from "@/lib/i18n/auth";
@@ -13,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: dictionary.metadataTitle,
     description: dictionary.metadataDescription,
-    icons: { icon: "/cactus-logo.svg" },
+    icons: await getSiteIcons(),
   };
 }
 

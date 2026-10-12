@@ -40,8 +40,10 @@ const panelButtonBaseClass =
   "inline-flex cursor-pointer items-center justify-center font-medium transition disabled:cursor-not-allowed disabled:opacity-60";
 
 const panelButtonToneClass: Record<PanelButtonTone, string> = {
-  primary: "bg-emerald-700 text-white hover:bg-emerald-800 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400",
-  secondary: "border border-zinc-200 bg-white text-zinc-700 hover:border-emerald-300 hover:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300",
+  primary:
+    "bg-emerald-700 text-white hover:bg-emerald-800 dark:bg-emerald-500 dark:text-emerald-950 dark:hover:bg-emerald-400",
+  secondary:
+    "border border-zinc-200 bg-white text-zinc-700 hover:border-emerald-300 hover:text-emerald-700 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300 dark:hover:border-emerald-700 dark:hover:text-emerald-300",
 };
 
 const panelButtonSizeClass: Record<PanelControlSize, string> = {
@@ -66,47 +68,181 @@ const tableActionBaseClass =
 const tableActionTone = {
   edit: "border-zinc-200 bg-white text-emerald-700 hover:border-emerald-300 hover:bg-emerald-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-emerald-400 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/50",
   copy: "border-zinc-200 bg-white text-sky-700 hover:border-sky-300 hover:bg-sky-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-sky-400 dark:hover:border-sky-700 dark:hover:bg-sky-950/50",
-  danger: "border-zinc-200 bg-white text-red-600 hover:border-red-300 hover:bg-red-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-red-400 dark:hover:border-red-800 dark:hover:bg-red-950/50",
+  danger:
+    "border-zinc-200 bg-white text-red-600 hover:border-red-300 hover:bg-red-50 dark:border-zinc-700 dark:bg-zinc-950 dark:text-red-400 dark:hover:border-red-800 dark:hover:bg-red-950/50",
 } as const;
 
 export function PanelTableActions({ children }: { children: ReactNode }) {
-  return <div className="flex max-w-full flex-wrap items-center gap-1">{children}</div>;
+  return (
+    <div className="flex max-w-full flex-wrap items-center gap-1">
+      {children}
+    </div>
+  );
 }
 
-export function PanelTableActionLink({ href, label, tone = "edit", children }: { href: string; label: string; tone?: keyof typeof tableActionTone; children: ReactNode }) {
-  return <Link href={href} aria-label={label} title={label} className={`${tableActionBaseClass} ${tableActionTone[tone]}`}>{children}</Link>;
+export function PanelTableActionLink({
+  href,
+  label,
+  tone = "edit",
+  children,
+}: {
+  href: string;
+  label: string;
+  tone?: keyof typeof tableActionTone;
+  children: ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      title={label}
+      className={`${tableActionBaseClass} ${tableActionTone[tone]}`}
+    >
+      {children}
+    </Link>
+  );
 }
 
-export function PanelTableActionButton({ label, tone = "edit", className = "", children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { label: string; tone?: keyof typeof tableActionTone }) {
-  return <button type="button" aria-label={label} title={label} className={`${tableActionBaseClass} ${tableActionTone[tone]} ${className}`} {...props}>{children}</button>;
+export function PanelTableActionButton({
+  label,
+  tone = "edit",
+  className = "",
+  children,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  label: string;
+  tone?: keyof typeof tableActionTone;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      className={`${tableActionBaseClass} ${tableActionTone[tone]} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
 }
 
 export function PanelEditIcon() {
-  return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="m12.8 3.7 3.5 3.5M4.5 15.5l1-4.2L13.8 3a1.4 1.4 0 0 1 2 0l1.2 1.2a1.4 1.4 0 0 1 0 2l-8.3 8.3-4.2 1Z" /></svg>;
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      className="size-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m12.8 3.7 3.5 3.5M4.5 15.5l1-4.2L13.8 3a1.4 1.4 0 0 1 2 0l1.2 1.2a1.4 1.4 0 0 1 0 2l-8.3 8.3-4.2 1Z"
+      />
+    </svg>
+  );
 }
 
 export function PanelDeleteIcon() {
-  return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="M3.5 5.5h13M8 8.5v5m4-5v5M6 5.5l.6 10h6.8l.6-10M8 5.5V4h4v1.5" /></svg>;
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      className="size-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.5 5.5h13M8 8.5v5m4-5v5M6 5.5l.6 10h6.8l.6-10M8 5.5V4h4v1.5"
+      />
+    </svg>
+  );
 }
 
 export function PanelCopyIcon() {
-  return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="6.5" y="6.5" width="9" height="9" rx="2" /><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6.5V5A1.5 1.5 0 0 0 12 3.5H5A1.5 1.5 0 0 0 3.5 5v7A1.5 1.5 0 0 0 5 13.5h1.5" /></svg>;
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      className="size-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+    >
+      <rect x="6.5" y="6.5" width="9" height="9" rx="2" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M13.5 6.5V5A1.5 1.5 0 0 0 12 3.5H5A1.5 1.5 0 0 0 3.5 5v7A1.5 1.5 0 0 0 5 13.5h1.5"
+      />
+    </svg>
+  );
 }
 
 export function PanelReviewIcon() {
-  return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="M3.5 10s2.3-4 6.5-4 6.5 4 6.5 4-2.3 4-6.5 4-6.5-4-6.5-4Z" /><circle cx="10" cy="10" r="2" /></svg>;
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      className="size-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.5 10s2.3-4 6.5-4 6.5 4 6.5 4-2.3 4-6.5 4-6.5-4-6.5-4Z"
+      />
+      <circle cx="10" cy="10" r="2" />
+    </svg>
+  );
 }
 
 export function PanelRegisterIcon() {
-  return <svg viewBox="0 0 20 20" aria-hidden="true" className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.7"><path strokeLinecap="round" strokeLinejoin="round" d="M5 3.5h10a2 2 0 0 1 2 2v11H3v-11a2 2 0 0 1 2-2Z" /><path strokeLinecap="round" strokeLinejoin="round" d="m6.5 9 1.5 1.5 3-3M6.5 13.5h7M13 8h1" /></svg>;
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+      className="size-4.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M5 3.5h10a2 2 0 0 1 2 2v11H3v-11a2 2 0 0 1 2-2Z"
+      />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m6.5 9 1.5 1.5 3-3M6.5 13.5h7M13 8h1"
+      />
+    </svg>
+  );
 }
 
 export function PanelActionSpinner() {
-  return <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />;
+  return (
+    <span
+      aria-hidden="true"
+      className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+    />
+  );
 }
 
 export function PanelPage({ children }: { children: ReactNode }) {
-  return <div className="mx-auto max-w-6xl space-y-8">{children}</div>;
+  return (
+    <div className="panel-page mx-auto max-w-7xl space-y-6 sm:space-y-8">
+      {children}
+    </div>
+  );
 }
 
 export function PanelPageHeader({
@@ -121,7 +257,7 @@ export function PanelPageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <header className="flex min-w-0 flex-col gap-5 rounded-3xl border border-zinc-200/70 bg-gradient-to-br from-white to-emerald-50/40 p-5 sm:flex-row sm:items-end sm:justify-between sm:p-7 dark:border-zinc-800 dark:from-zinc-950 dark:to-emerald-950/20">
       <div className="min-w-0">
         <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
           {eyebrow}
@@ -133,14 +269,26 @@ export function PanelPageHeader({
           {description}
         </p>
       </div>
-      {actions ? <div className="shrink-0">{actions}</div> : null}
+      {actions ? (
+        <div className="flex min-w-0 flex-wrap gap-2 sm:shrink-0">
+          {actions}
+        </div>
+      ) : null}
     </header>
   );
 }
 
-export function PanelSurface({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function PanelSurface({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <section className={`overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 ${className}`}>
+    <section
+      className={`panel-surface overflow-hidden rounded-3xl border border-zinc-200/80 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950 ${className}`}
+    >
       {children}
     </section>
   );
@@ -156,12 +304,16 @@ export function PanelFormSection({
   children: ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-zinc-200 bg-white text-start dark:border-zinc-800 dark:bg-zinc-950">
+    <section className="panel-form-section min-w-0 overflow-hidden rounded-3xl border border-zinc-200/80 bg-white text-start shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
       <header className="border-b border-zinc-200 bg-zinc-50/70 px-5 py-4 sm:px-6 dark:border-zinc-800 dark:bg-zinc-900/50">
         <h2 className="text-base font-semibold text-zinc-950 dark:text-zinc-50">
           {title}
         </h2>
-        {description ? <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500 dark:text-zinc-400">{description}</p> : null}
+        {description ? (
+          <p className="mt-1 max-w-3xl text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+            {description}
+          </p>
+        ) : null}
       </header>
       <div className="p-5 sm:p-6">{children}</div>
     </section>
@@ -178,11 +330,15 @@ export function PanelFormFooter({
   children: ReactNode;
 }) {
   return (
-    <footer className="flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <footer className="panel-form-footer flex min-w-0 flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-5 dark:border-zinc-800 dark:bg-zinc-950">
       {error ? (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+          {error}
+        </p>
       ) : (
-        <p className="max-w-2xl text-xs leading-5 text-zinc-500 dark:text-zinc-400">{message}</p>
+        <p className="max-w-2xl text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+          {message}
+        </p>
       )}
       <div className="flex shrink-0 flex-wrap gap-3">{children}</div>
     </footer>
@@ -205,7 +361,13 @@ export function PanelPrimaryLink({
   );
 }
 
-export function PanelBackLink({ href, children }: { href: string; children: ReactNode }) {
+export function PanelBackLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
   return (
     <Link
       href={href}
@@ -224,8 +386,13 @@ export function PanelTable({
   children: ReactNode;
 }) {
   return (
-    <div className="w-full min-w-0 overflow-hidden">
-      <table className="w-full min-w-0 table-fixed text-xs sm:text-sm">
+    <div
+      className="panel-table-scroll w-full min-w-0 overflow-x-auto"
+      role="region"
+      tabIndex={0}
+      aria-label={columns.map((column) => column.label).join(" · ")}
+    >
+      <table className="panel-table w-full min-w-[640px] table-fixed text-xs sm:text-sm">
         <thead className="bg-zinc-50 text-zinc-500 dark:bg-zinc-900 dark:text-zinc-400">
           <tr>
             {columns.map((column) => (
@@ -255,7 +422,9 @@ export function PanelTableCell({
   className?: string;
 }) {
   return (
-    <td className={`overflow-hidden px-2.5 py-3 text-start align-middle [overflow-wrap:anywhere] sm:px-3 sm:py-4 lg:px-4 ${className}`}>
+    <td
+      className={`overflow-hidden px-2.5 py-3 text-start align-middle [overflow-wrap:anywhere] sm:px-3 sm:py-4 lg:px-4 ${className}`}
+    >
       {children}
     </td>
   );

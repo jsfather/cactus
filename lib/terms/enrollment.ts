@@ -1,6 +1,8 @@
 import { and, eq, ne, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
 import { termEnrollments, termSchedules, terms, users } from "@/lib/db/schema";
+import { notifyUsers } from "@/lib/notifications/events";
+import { termTeachers } from "@/lib/db/schema";
 import { schedulesOverlap } from "@/lib/terms/schedule";
 import type { Locale } from "@/lib/i18n/config";
 type Transaction = Parameters<
@@ -15,7 +17,9 @@ export async function enrollStudent(
   locale: Locale,
   dryRun = false,
 ) {
-  await transaction.execute(sql`select id from users where id = ${studentId}::uuid for update`);
+  await transaction.execute(
+    sql`select id from users where id = ${studentId}::uuid for update`,
+  );
   await transaction.execute(
     sql`select id from terms where id = ${termId}::uuid for update`,
   );
@@ -191,5 +195,27 @@ export async function enrollStudent(
       .insert(termEnrollments)
       .values({ termId, studentId, source, enrolledById });
   }
+  await notifyUsers(transaction, [studentId], {
+    titleFa: "ثبت‌نام آموزشی تأیید شد",
+    titleEn: "Enrollment confirmed",
+    bodyFa: `ثبت‌نام شما در «${term.titleFa}» تأیید شد.`,
+    bodyEn: `Your enrollment in “${term.titleEn || term.titleFa}” was confirmed.`,
+    href: `/panel/student/terms/${termId}`,
+  });
+  const teachers = await transaction
+    .select({ id: termTeachers.teacherId })
+    .from(termTeachers)
+    .where(eq(termTeachers.termId, termId));
+  await notifyUsers(
+    transaction,
+    teachers.map((teacher) => teacher.id),
+    {
+      titleFa: "دانش‌پژوه جدید کلاس",
+      titleEn: "New class enrollment",
+      bodyFa: `دانش‌پژوه جدیدی در «${term.titleFa}» ثبت‌نام کرد.`,
+      bodyEn: `A student enrolled in “${term.titleEn || term.titleFa}”.`,
+      href: `/panel/teacher/terms/${termId}`,
+    },
+  );
   return { success: true };
 }

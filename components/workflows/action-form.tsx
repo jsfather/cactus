@@ -46,6 +46,7 @@ export type Field = {
   min?: number;
   max?: number;
   step?: number;
+  defaultColor?: string;
 };
 export function ActionForm({
   locale,
@@ -145,6 +146,16 @@ export function ActionForm({
             <p className="mt-1.5 break-words text-start text-xs leading-5 text-zinc-500 dark:text-zinc-400">
               {f.hint}
             </p>
+          )}
+          {f.defaultColor && (
+            <div className="mt-2 flex items-center gap-2 text-xs text-zinc-500">
+              <span
+                aria-hidden="true"
+                className="size-5 rounded-md border border-zinc-300 dark:border-zinc-600"
+                style={{ backgroundColor: f.defaultColor }}
+              />
+              <span>{locale === "fa" ? "رنگ پیش‌فرض" : "Default color"}</span>
+            </div>
           )}
         </fieldset>
       ) : (

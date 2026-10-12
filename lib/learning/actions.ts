@@ -1,4 +1,5 @@
 "use server";
+import { notifyUsers, notifyAdmins } from "@/lib/notifications/events";
 import { ownsAttachment } from "@/lib/attachments/storage";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -11,6 +12,8 @@ import {
   homeworkSubmissions,
   homeworkMessages,
   termSessions,
+  termEnrollments,
+  termTeachers,
   notifications,
   previousCourses,
   users,
@@ -57,7 +60,8 @@ export async function saveActivity(
     const existing = await getActivity(user, id, true);
     if (!existing) return denied(locale);
     // Keep submissions and conversations within their original class.
-    if (existing.termId !== input.termId || existing.kind !== input.kind) return denied(locale);
+    if (existing.termId !== input.termId || existing.kind !== input.kind)
+      return denied(locale);
   }
   if (input.sessionId) {
     const [session] = await getDatabase()
@@ -80,15 +84,48 @@ export async function saveActivity(
     updatedAt: new Date(),
   };
   try {
-    if (id)
-      await getDatabase()
-        .update(learningActivities)
-        .set(data)
-        .where(eq(learningActivities.id, id));
-    else
-      await getDatabase()
-        .insert(learningActivities)
-        .values({ ...data, creatorId: user.id });
+    await getDatabase().transaction(async (tx) => {
+      const [previous] = id
+        ? await tx
+            .select({ status: learningActivities.status })
+            .from(learningActivities)
+            .where(eq(learningActivities.id, id))
+            .for("update")
+        : [];
+      const [record] = id
+        ? await tx
+            .update(learningActivities)
+            .set(data)
+            .where(eq(learningActivities.id, id))
+            .returning({ id: learningActivities.id })
+        : await tx
+            .insert(learningActivities)
+            .values({ ...data, creatorId: user.id })
+            .returning({ id: learningActivities.id });
+      if (!record) throw new Error("ACTIVITY_MISSING");
+      if (data.status === "published" && previous?.status !== "published") {
+        const students = await tx
+          .select({ id: termEnrollments.studentId })
+          .from(termEnrollments)
+          .where(
+            and(
+              eq(termEnrollments.termId, input.termId),
+              eq(termEnrollments.status, "active"),
+            ),
+          );
+        await notifyUsers(
+          tx,
+          students.map((student) => student.id),
+          {
+            titleFa: "محتوای آموزشی جدید",
+            titleEn: "New learning content",
+            bodyFa: input.titleFa,
+            bodyEn: input.titleEn || input.titleFa,
+            href: `/panel/student/learning/${input.kind}/${record.id}`,
+          },
+        );
+      }
+    });
   } catch {
     return failed(locale);
   }
@@ -146,25 +183,47 @@ export async function submitHomework(
     )
       return denied(locale);
   }
-  await getDatabase()
-    .insert(homeworkSubmissions)
-    .values({
-      activityId,
-      studentId,
-      body: parsed.data.body,
-      attachmentUrl: parsed.data.attachmentUrl,
-    })
-    .onConflictDoUpdate({
-      target: [homeworkSubmissions.activityId, homeworkSubmissions.studentId],
-      set: {
+  await getDatabase().transaction(async (tx) => {
+    await tx
+      .insert(homeworkSubmissions)
+      .values({
+        activityId,
+        studentId,
         body: parsed.data.body,
         attachmentUrl: parsed.data.attachmentUrl,
-        grade: null,
-        feedback: null,
-        reviewedById: null,
-        updatedAt: new Date(),
-      },
+      })
+      .onConflictDoUpdate({
+        target: [homeworkSubmissions.activityId, homeworkSubmissions.studentId],
+        set: {
+          body: parsed.data.body,
+          attachmentUrl: parsed.data.attachmentUrl,
+          grade: null,
+          feedback: null,
+          reviewedById: null,
+          updatedAt: new Date(),
+        },
+      });
+    const teachers = await tx
+      .select({ id: termTeachers.teacherId })
+      .from(termTeachers)
+      .where(eq(termTeachers.termId, activity.termId));
+    const notice = {
+      titleFa: "تکلیف جدید برای بررسی",
+      titleEn: "Homework submitted",
+      bodyFa: activity.titleFa,
+      bodyEn: activity.titleEn || activity.titleFa,
+      href: `/panel/teacher/learning/homework/${activityId}`,
+    };
+    await notifyUsers(
+      tx,
+      teachers.map((teacher) => teacher.id),
+      notice,
+    );
+    await notifyAdmins(tx, {
+      ...notice,
+      href: `/panel/admin/learning/homework/${activityId}`,
     });
+  });
   revalidatePath("/panel", "layout");
   return saved(locale);
 }
@@ -194,16 +253,14 @@ export async function reviewHomework(
       .update(homeworkSubmissions)
       .set({ ...parsed.data, reviewedById: user.id })
       .where(eq(homeworkSubmissions.id, id));
-    await tx
-      .insert(notifications)
-      .values({
-        userId: submission.studentId,
-        titleFa: "بازخورد تکلیف",
-        titleEn: "Homework feedback",
-        bodyFa: "مدرس تکلیف شما را بررسی کرد.",
-        bodyEn: "Your homework has been reviewed.",
-        href: `/panel/student/learning/homework/${submission.activityId}`,
-      });
+    await tx.insert(notifications).values({
+      userId: submission.studentId,
+      titleFa: "بازخورد تکلیف",
+      titleEn: "Homework feedback",
+      bodyFa: "مدرس تکلیف شما را بررسی کرد.",
+      bodyEn: "Your homework has been reviewed.",
+      href: `/panel/student/learning/homework/${submission.activityId}`,
+    });
   });
   revalidatePath("/panel", "layout");
   return saved(locale);

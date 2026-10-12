@@ -1626,6 +1626,17 @@ export const orders = pgTable(
     check("orders_total_nonnegative", sql`${t.totalToman} >= 0`),
   ],
 );
+export const orderEvents = pgTable("order_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  orderId: uuid("order_id").notNull().references(() => orders.id, {onDelete: "cascade"}),
+  actorId: uuid("actor_id").references(() => users.id, {onDelete: "set null"}),
+  status: varchar("status", {length: 20}).notNull(),
+  previousStatus: varchar("previous_status", {length: 20}),
+  note: text("note").notNull().default(""),
+  trackingCode: varchar("tracking_code", {length: 120}),
+  createdAt: timestamp("created_at", {withTimezone: true}).notNull().defaultNow(),
+}, table => [index("order_events_order_created_idx").on(table.orderId, table.createdAt)]);
+
 export const orderItems = pgTable(
   "order_items",
   {
