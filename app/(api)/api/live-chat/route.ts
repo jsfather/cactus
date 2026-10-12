@@ -1,4 +1,4 @@
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
@@ -12,6 +12,7 @@ import {
   inArray,
   isNull,
   lt,
+  lte,
   or,
   sql,
 } from "drizzle-orm";
@@ -26,10 +27,15 @@ import {
 } from "@/lib/db/schema";
 import {
   chatCookie,
+  chatBindingCookie,
   getChatSettings,
   getChatVisitorHash,
-  visitorHash,
 } from "@/lib/live-chat/server";
+import {
+  newVisitorToken,
+  visitorScope,
+  chatRetentionMs,
+} from "@/lib/live-chat/identity";
 import { isChatOfficeOpen } from "@/lib/live-chat/settings";
 import { attachmentRoot, attachmentType } from "@/lib/attachments/storage";
 
@@ -47,7 +53,10 @@ const startSchema = z.object({
   locale: z.enum(["fa", "en"]),
 });
 const messageSchema = z.object({
-  operation: z.enum(["reply", "close", "claim", "delete"]),
+  operation: z.enum(["reply", "close", "claim", "delete", "read", "typing"]),
+  inbox: z.boolean().default(false),
+  lastMessageId: z.uuid().optional(),
+  typing: z.boolean().default(false),
   id: z.uuid(),
   body: z.string().trim().max(5000).default(""),
 });
@@ -69,7 +78,7 @@ async function expire() {
   const { settings, db } = await context();
   await db
     .update(chatConversations)
-    .set({ status: "closed" })
+    .set({ status: "closed", visitorTypingAt: null, operatorTypingAt: null })
     .where(
       and(
         eq(chatConversations.status, "open"),
@@ -84,6 +93,11 @@ async function expire() {
 export async function GET(request: NextRequest) {
   try {
     const { settings, user, hash, operator, db } = await context();
+    // Changing the bound address expires the browser identity, not staff history.
+    if (!hash && (await cookies()).get(chatCookie)) {
+      (await cookies()).delete(chatCookie);
+      (await cookies()).delete(chatBindingCookie);
+    }
     await expire();
     const inbox = request.nextUrl.searchParams.get("inbox") === "1";
     const pageSchema = z.coerce.number().int().min(1).max(100000).catch(1);
@@ -117,7 +131,13 @@ export async function GET(request: NextRequest) {
             isNull(chatConversations.operatorId),
           )
       : hash
-        ? eq(chatConversations.visitorHash, hash)
+        ? and(
+            eq(chatConversations.visitorHash, hash),
+            gt(
+              chatConversations.lastMessageAt,
+              new Date(Date.now() - chatRetentionMs),
+            ),
+          )
         : sql`false`;
     const history = await db
       .select({
@@ -127,6 +147,8 @@ export async function GET(request: NextRequest) {
         status: chatConversations.status,
         operatorId: chatConversations.operatorId,
         lastMessageAt: chatConversations.lastMessageAt,
+        visitorTypingAt: chatConversations.visitorTypingAt,
+        operatorTypingAt: chatConversations.operatorTypingAt,
       })
       .from(chatConversations)
       .where(allowed)
@@ -146,12 +168,16 @@ export async function GET(request: NextRequest) {
               status: chatConversations.status,
               operatorId: chatConversations.operatorId,
               lastMessageAt: chatConversations.lastMessageAt,
+              visitorTypingAt: chatConversations.visitorTypingAt,
+              operatorTypingAt: chatConversations.operatorTypingAt,
             })
             .from(chatConversations)
             .where(and(allowed, eq(chatConversations.id, requestedId)))
             .limit(1)
         )[0]
-      : history[0];
+      : inbox || request.nextUrl.searchParams.get("restore") === "1"
+        ? history[0]
+        : undefined;
     if (requestedId && !selected) return reply({ error: "Not found" }, 404);
     const messages = selected
       ? await db
@@ -160,9 +186,16 @@ export async function GET(request: NextRequest) {
             sender: chatMessages.sender,
             body: chatMessages.body,
             createdAt: chatMessages.createdAt,
+            readAt: chatMessages.readAt,
+            authorName:
+              request.nextUrl.searchParams.get("locale") === "en"
+                ? sql<string>`concat_ws(' ',${users.firstNameEn},${users.lastNameEn})`
+                : sql<string>`concat_ws(' ',${users.firstNameFa},${users.lastNameFa})`,
+            avatarUrl: users.avatarUrl,
             hasImage: sql<boolean>`${chatMessages.imagePath} is not null`,
           })
           .from(chatMessages)
+          .leftJoin(users, eq(users.id, chatMessages.authorId))
           .where(eq(chatMessages.conversationId, selected.id))
           .orderBy(desc(chatMessages.createdAt), desc(chatMessages.id))
           .limit(201)
@@ -171,6 +204,7 @@ export async function GET(request: NextRequest) {
     const [assignedOperator] = selected?.operatorId
       ? await db
           .select({
+            avatarUrl: users.avatarUrl,
             name:
               request.nextUrl.searchParams.get("locale") === "en"
                 ? sql<string>`concat_ws(' ', ${users.firstNameEn}, ${users.lastNameEn})`
@@ -181,11 +215,23 @@ export async function GET(request: NextRequest) {
           .limit(1)
       : [];
     return reply({
-      history: history.slice(0, historyLimit),
-      historyHasMore: history.length > historyLimit,
+      history: inbox ? history.slice(0, historyLimit) : [],
+      historyAvailable: !inbox && history.length > 0,
+      historyHasMore: inbox && history.length > historyLimit,
       messagesHasMore: messages.length > 200,
       conversation: selected
-        ? { ...selected, operatorName: assignedOperator?.name ?? null }
+        ? {
+            ...selected,
+            operatorName: assignedOperator?.name ?? null,
+            operatorAvatarUrl: assignedOperator?.avatarUrl ?? null,
+            peerTyping:
+              Date.now() -
+                ((inbox
+                  ? selected.visitorTypingAt
+                  : selected.operatorTypingAt
+                )?.getTime() ?? 0) <
+              6000,
+          }
         : null,
       messages: messages.slice(0, 200).reverse(),
       onlineCount: online.length,
@@ -274,11 +320,18 @@ export async function POST(request: NextRequest) {
             .where(eq(chatConversations.id, id))
             .for("update");
           const isStaff =
-            operator && user && conversation?.operatorId === user.id;
+            form.get("inbox") === "1" &&
+            operator &&
+            user &&
+            conversation?.operatorId === user.id;
           if (
             !conversation ||
             conversation.status !== "open" ||
-            (!isStaff && (!hash || conversation.visitorHash !== hash)) ||
+            (!isStaff &&
+              (!hash ||
+                conversation.visitorHash !== hash ||
+                Date.now() - conversation.lastMessageAt.getTime() >
+                  chatRetentionMs)) ||
             Date.now() - conversation.lastMessageAt.getTime() < 1000
           )
             return false;
@@ -298,7 +351,11 @@ export async function POST(request: NextRequest) {
           });
           await tx
             .update(chatConversations)
-            .set({ lastMessageAt: new Date() })
+            .set({
+              lastMessageAt: new Date(),
+              visitorTypingAt: null,
+              operatorTypingAt: null,
+            })
             .where(eq(chatConversations.id, id));
           return true;
         });
@@ -327,8 +384,9 @@ export async function POST(request: NextRequest) {
       const parsed = startSchema.safeParse(body);
       if (!parsed.success)
         return reply({ error: "Invalid name or mobile" }, 400);
-      const token = hash ? null : randomBytes(32).toString("hex");
-      const key = hash ?? visitorHash(token!);
+      const token = hash ? null : newVisitorToken();
+      const key = hash ?? visitorScope(token!, request.headers);
+      if (!key) return reply({ error: "Trusted client IP unavailable" }, 503);
       const result = await db.transaction(async (tx) => {
         // Global start cap and advisory lock bound anonymous conversation creation across instances.
         await tx.execute(sql`select pg_advisory_xact_lock(924016)`);
@@ -399,14 +457,22 @@ export async function POST(request: NextRequest) {
         return conversation;
       });
       if (!result) return reply({ error: "Please try later" }, 429);
-      if (token)
+      if (token) {
         (await cookies()).set(chatCookie, token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 180,
+          maxAge: 60 * 60 * 24 * 10,
         });
+        (await cookies()).set(chatBindingCookie, key, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 10,
+        });
+      }
       return reply(result);
     }
     const parsed = messageSchema.safeParse(body);
@@ -443,8 +509,9 @@ export async function POST(request: NextRequest) {
         .from(chatConversations)
         .where(eq(chatConversations.id, parsed.data.id))
         .for("update");
-      if (!conversation || conversation.status !== "open") return false;
+      if (!conversation) return false;
       if (parsed.data.operation === "claim") {
+        if (!parsed.data.inbox || conversation.status !== "open") return false;
         if (
           !operator ||
           !user ||
@@ -457,13 +524,70 @@ export async function POST(request: NextRequest) {
           .where(eq(chatConversations.id, conversation.id));
         return true;
       }
-      const isStaff = operator && user && conversation.operatorId === user.id;
-      if (!isStaff && (!hash || hash !== conversation.visitorHash))
+      const isStaff =
+        parsed.data.inbox &&
+        operator &&
+        user &&
+        conversation.operatorId === user.id;
+      if (
+        !isStaff &&
+        (!hash ||
+          hash !== conversation.visitorHash ||
+          Date.now() - conversation.lastMessageAt.getTime() > chatRetentionMs)
+      )
         return false;
+      if (parsed.data.operation === "read") {
+        if (!parsed.data.lastMessageId) return false;
+        const [marker] = await tx
+          .select({ createdAt: chatMessages.createdAt, id: chatMessages.id })
+          .from(chatMessages)
+          .where(
+            and(
+              eq(chatMessages.id, parsed.data.lastMessageId),
+              eq(chatMessages.conversationId, conversation.id),
+            ),
+          )
+          .limit(1);
+        if (!marker) return false;
+        await tx
+          .update(chatMessages)
+          .set({ readAt: new Date() })
+          .where(
+            and(
+              eq(chatMessages.conversationId, conversation.id),
+              eq(chatMessages.sender, isStaff ? "visitor" : "operator"),
+              isNull(chatMessages.readAt),
+              or(
+                lt(chatMessages.createdAt, marker.createdAt),
+                and(
+                  eq(chatMessages.createdAt, marker.createdAt),
+                  lte(chatMessages.id, marker.id),
+                ),
+              ),
+            ),
+          );
+        return true;
+      }
+      if (conversation.status !== "open") return false;
+      if (parsed.data.operation === "typing") {
+        await tx
+          .update(chatConversations)
+          .set(
+            isStaff
+              ? { operatorTypingAt: parsed.data.typing ? new Date() : null }
+              : { visitorTypingAt: parsed.data.typing ? new Date() : null },
+          )
+          .where(eq(chatConversations.id, conversation.id));
+        return true;
+      }
       if (parsed.data.operation === "close") {
         await tx
           .update(chatConversations)
-          .set({ status: "closed" })
+          .set({
+            status: "closed",
+            visitorTypingAt: null,
+            operatorTypingAt: null,
+          })
           .where(eq(chatConversations.id, conversation.id));
         return true;
       }
@@ -480,7 +604,11 @@ export async function POST(request: NextRequest) {
       });
       await tx
         .update(chatConversations)
-        .set({ lastMessageAt: new Date() })
+        .set({
+          lastMessageAt: new Date(),
+          visitorTypingAt: null,
+          operatorTypingAt: null,
+        })
         .where(eq(chatConversations.id, conversation.id));
       return true;
     });

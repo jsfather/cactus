@@ -1,16 +1,18 @@
 import "server-only";
-import { createHash } from "node:crypto";
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { visitorScope } from "./identity";
 import { appSettings } from "@/lib/db/schema";
 import { getDatabase } from "@/lib/db/client";
 import { chatSettingsSchema, defaultChatSettings } from "./settings";
 export const chatCookie = "cactus-chat-visitor";
-export const visitorHash = (token: string) =>
-  createHash("sha256").update(token).digest("hex");
-export async function getChatVisitorHash() {
+export const chatBindingCookie = "cactus-chat-binding";
+export async function getChatVisitorHash(requestHeaders?: Headers) {
   const token = (await cookies()).get(chatCookie)?.value;
-  return token && /^[a-f0-9]{64}$/.test(token) ? visitorHash(token) : null;
+  const scope = visitorScope(token, requestHeaders ?? (await headers()));
+  return scope && (await cookies()).get(chatBindingCookie)?.value === scope
+    ? scope
+    : null;
 }
 export async function getChatSettings() {
   const [row] = await getDatabase()

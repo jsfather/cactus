@@ -181,6 +181,8 @@ export async function replyTicket(
       .set({
         updatedAt: new Date(),
         status: user.id === ticket.ownerId ? "open" : "pending",
+        ownerTypingAt: null,
+        staffTypingAt: null,
         ...(user.id !== ticket.ownerId
           ? { rating: null, ratingResponderId: null }
           : {}),
@@ -267,27 +269,65 @@ export async function changeTicketStatus(
   const user = await requireUser();
   if (
     !z.uuid().safeParse(id).success ||
-    !z.enum(["open", "closed"]).safeParse(status).success
+    !z.enum(["open", "pending", "closed"]).safeParse(status).success
   )
     return denied(locale);
-  await getDatabase()
-    .update(tickets)
-    .set({ status, updatedAt: new Date() })
-    .where(
-      and(
-        eq(tickets.id, id),
-        user.role === "admin"
-          ? undefined
-          : or(
-              eq(tickets.ownerId, user.id),
-              user.role === "teacher"
-                ? eq(tickets.assignedToId, user.id)
-                : undefined,
+  try {
+    const result = await getDatabase().transaction(
+      async (tx): Promise<ActionState> => {
+        const [ticket] = await tx
+          .select()
+          .from(tickets)
+          .where(
+            and(
+              eq(tickets.id, id),
+              user.role === "admin"
+                ? undefined
+                : or(
+                    eq(tickets.ownerId, user.id),
+                    user.role === "teacher"
+                      ? eq(tickets.assignedToId, user.id)
+                      : undefined,
+                  ),
             ),
-      ),
+          )
+          .for("update");
+        if (!ticket) return denied(locale);
+        if (
+          status === "pending" &&
+          user.role !== "admin" &&
+          (user.role !== "teacher" || ticket.ownerId === user.id)
+        )
+          return denied(locale);
+        await tx
+          .update(tickets)
+          .set({
+            status,
+            updatedAt: new Date(),
+            ownerTypingAt: null,
+            staffTypingAt: null,
+          })
+          .where(eq(tickets.id, id));
+        if (ticket.status !== status)
+          await notifyUsers(
+            tx,
+            [ticket.ownerId === user.id ? ticket.assignedToId : ticket.ownerId],
+            {
+              titleFa: "وضعیت تیکت تغییر کرد",
+              titleEn: "Ticket status updated",
+              bodyFa: ticket.subject,
+              bodyEn: ticket.subject,
+              href: `/panel/tickets/${id}`,
+            },
+          );
+        return saved(locale);
+      },
     );
-  revalidatePath("/panel", "layout");
-  return saved(locale);
+    revalidatePath("/panel", "layout");
+    return result;
+  } catch {
+    return failed(locale);
+  }
 }
 export async function deleteTicket(
   id: string,

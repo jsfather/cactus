@@ -1482,6 +1482,8 @@ export const tickets = pgTable(
     ratingResponderId: uuid("rating_responder_id").references(() => users.id, {
       onDelete: "set null",
     }),
+    ownerTypingAt: timestamp("owner_typing_at", {withTimezone:true}),
+    staffTypingAt: timestamp("staff_typing_at", {withTimezone:true}),
     status: varchar("status", { length: 20 }).default("open").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -1505,6 +1507,7 @@ export const ticketMessages = pgTable("ticket_messages", {
     .references(() => users.id, { onDelete: "cascade" }),
   body: text("body").notNull(),
   attachmentUrl: text("attachment_url"),
+  readAt: timestamp("read_at", {withTimezone:true}),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -1514,6 +1517,8 @@ export const chatConversations = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     visitorHash: varchar("visitor_hash", { length: 64 }).notNull(),
+    visitorTypingAt: timestamp("visitor_typing_at", {withTimezone:true}),
+    operatorTypingAt: timestamp("operator_typing_at", {withTimezone:true}),
     name: varchar("name", { length: 160 }).notNull(),
     mobile: varchar("mobile", { length: 20 }).notNull(),
     locale: varchar("locale", { length: 2 }).default("fa").notNull(),
@@ -1552,6 +1557,7 @@ export const chatMessages = pgTable(
     imagePath: text("image_path"),
     imageMime: varchar("image_mime", { length: 50 }),
     imageBytes: integer("image_bytes").default(0).notNull(),
+    readAt: timestamp("read_at", {withTimezone:true}),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

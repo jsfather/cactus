@@ -1,24 +1,31 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import type { Locale } from "@/lib/i18n/config";
-import { formatPanelDate } from "@/lib/date/panel";
-import { PanelInput, PanelTextarea } from "@/components/panel/form-controls";
-import {
-  primaryButtonClass,
-  secondaryButtonClass,
-} from "@/components/panel/ui";
 import { useFeedback } from "@/components/feedback/feedback-provider";
+import { PanelInput } from "@/components/panel/form-controls";
+import { formatPanelDate } from "@/lib/date/panel";
+import {
+  ChatAvatar,
+  MessageBubble,
+  MessengerIcon,
+  messengerBackground,
+  messengerIconButton,
+} from "./messenger-ui";
+import { MessageComposer } from "./message-composer";
 type Conversation = {
-  operatorName?: string | null;
   id: string;
   name: string;
   mobile: string;
   status: string;
   operatorId: string | null;
+  operatorName?: string | null;
+  operatorAvatarUrl?: string | null;
+  peerTyping?: boolean;
+  lastMessageAt?: string;
 };
 type ChatData = {
   isAdmin?: boolean;
+  historyAvailable: boolean;
   historyHasMore: boolean;
   messagesHasMore: boolean;
   history: Conversation[];
@@ -29,6 +36,9 @@ type ChatData = {
     body: string;
     hasImage: boolean;
     createdAt: string;
+    readAt: string | null;
+    authorName?: string;
+    avatarUrl?: string | null;
   }[];
   onlineCount: number;
   operatorId?: string;
@@ -41,7 +51,6 @@ type ChatData = {
   };
   officeOpen: boolean;
 };
-
 export function LiveChat({
   locale,
   inbox = false,
@@ -49,42 +58,87 @@ export function LiveChat({
   locale: Locale;
   inbox?: boolean;
 }) {
-  const fa = locale === "fa";
-  const t = (f: string, e: string) => (fa ? f : e);
-  const [ready, setReady] = useState(inbox);
-  const [open, setOpen] = useState(inbox);
-  const [hint, setHint] = useState(true);
-  const [data, setData] = useState<ChatData | null>(null);
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [body, setBody] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [historyPage, setHistoryPage] = useState(1);
-  const [messagePage, setMessagePage] = useState(1);
-  const [available, setAvailable] = useState(true);
-  const bottom = useRef<HTMLDivElement>(null);
-  const { toast, confirm } = useFeedback();
-  const refresh = useCallback(async () => {
-    try {
-      const url = new URL("/api/live-chat", window.location.origin);
-      url.searchParams.set("locale", locale);
-      url.searchParams.set("historyPage", String(historyPage));
-      url.searchParams.set("messagePage", String(messagePage));
-      if (inbox) url.searchParams.set("inbox", "1");
-      if (selected) url.searchParams.set("id", selected);
-      const response = await fetch(url, { cache: "no-store" });
-      if (!response.ok) {
-        if (response.status === 404) setSelected(null);
-        throw new Error();
+  const fa = locale === "fa",
+    t = (f: string, e: string) => (fa ? f : e);
+  const [ready, setReady] = useState(inbox),
+    [open, setOpen] = useState(inbox),
+    [hint, setHint] = useState(true),
+    [data, setData] = useState<ChatData | null>(null),
+    [name, setName] = useState(""),
+    [mobile, setMobile] = useState(""),
+    [body, setBody] = useState(""),
+    [busy, setBusy] = useState(false),
+    [selected, setSelected] = useState<string | null>(null),
+    [historyPage, setHistoryPage] = useState(1),
+    [messagePage, setMessagePage] = useState(1),
+    [available, setAvailable] = useState(true);
+  const bottom = useRef<HTMLDivElement>(null),
+    sequence = useRef(0),
+    lastTyping = useRef(0),
+    acks = useRef(new Set<string>()),
+    floating = useRef<HTMLButtonElement>(null),
+    { toast, confirm } = useFeedback();
+  const refresh = useCallback(
+    async (idOverride?: string | null, restore = false) => {
+      const revision = ++sequence.current;
+      try {
+        const url = new URL("/api/live-chat", window.location.origin);
+        url.searchParams.set("locale", locale);
+        url.searchParams.set("messagePage", String(messagePage));
+        if (inbox) {
+          url.searchParams.set("inbox", "1");
+          url.searchParams.set("historyPage", String(historyPage));
+        }
+        const id = idOverride === undefined ? selected : idOverride;
+        if (id) url.searchParams.set("id", id);
+        if (restore && !inbox) url.searchParams.set("restore", "1");
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) {
+          if (response.status === 404 && revision === sequence.current) {
+            setSelected(null);
+            setData(null);
+          }
+          throw Error();
+        }
+        const result = (await response.json()) as ChatData;
+        if (revision !== sequence.current) return;
+        setData(result);
+        setAvailable(true);
+        if (restore && result.conversation) setSelected(result.conversation.id);
+      } catch {
+        if (revision === sequence.current) setAvailable(false);
       }
-      const result = (await response.json()) as ChatData;
-      setData(result);
-      setAvailable(true);
-    } catch {
-      setAvailable(false);
-    }
-  }, [inbox, locale, selected, historyPage, messagePage]);
+    },
+    [inbox, locale, selected, historyPage, messagePage],
+  );
+  const signal = useCallback(
+    async (payload: object) => {
+      try {
+        return await fetch("/api/live-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...payload, inbox }),
+        });
+      } catch {
+        return null;
+      }
+    },
+    [inbox],
+  );
+  const visible = useCallback(
+    (id: string) => {
+      if (!data?.conversation || acks.current.has(id)) return;
+      acks.current.add(id);
+      void signal({
+        operation: "read",
+        id: data.conversation.id,
+        lastMessageId: id,
+      }).then((result) => {
+        if (!result?.ok) acks.current.delete(id);
+      });
+    },
+    [data?.conversation, signal],
+  );
   useEffect(() => {
     if (inbox) return;
     const timer = setTimeout(() => setReady(true), 10000);
@@ -94,75 +148,92 @@ export function LiveChat({
     if (!ready) return;
     const initial = setTimeout(() => void refresh(), 0);
     if (!open) return () => clearTimeout(initial);
-    const timer = setInterval(() => void refresh(), 5000);
+    const poll = setInterval(() => {
+      if (document.visibilityState === "visible") void refresh();
+    }, 2500);
     return () => {
       clearTimeout(initial);
-      clearInterval(timer);
+      clearInterval(poll);
     };
   }, [ready, open, refresh]);
   useEffect(() => {
     if (!inbox) return;
     const heartbeat = () => {
-      void fetch("/api/live-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ operation: "presence" }),
-      });
+      void signal({ operation: "presence" });
     };
     heartbeat();
     const timer = setInterval(heartbeat, 30000);
     return () => clearInterval(timer);
-  }, [inbox]);
+  }, [inbox, signal]);
   useEffect(() => {
-    bottom.current?.scrollIntoView({ block: "nearest" });
-  }, [data?.messages.length, selected]);
+    if (messagePage === 1) bottom.current?.scrollIntoView({ block: "nearest" });
+  }, [data?.messages.length, selected, messagePage]);
   useEffect(() => {
     if (!open || inbox) return;
     const close = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        floating.current?.focus();
+      }
     };
     document.addEventListener("keydown", close);
     return () => document.removeEventListener("keydown", close);
   }, [open, inbox]);
+  const current = data?.conversation,
+    canReply =
+      current?.status === "open" &&
+      (!inbox || current.operatorId === data?.operatorId);
+  const changeBody = (value: string) => {
+    setBody(value);
+    if (current && canReply && Date.now() - lastTyping.current > 2000) {
+      lastTyping.current = Date.now();
+      void signal({
+        operation: "typing",
+        id: current.id,
+        typing: Boolean(value.trim()),
+      });
+    }
+  };
   async function send(operation: string) {
     if (busy) return;
     setBusy(true);
     try {
-      const payload =
+      const normalized = mobile
+        .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+        .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+      const response = await signal(
         operation === "start"
-          ? {
-              operation,
-              name,
-              mobile: mobile
-                .replace(/[۰-۹]/g, (digit) =>
-                  String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)),
-                )
-                .replace(/[٠-٩]/g, (digit) =>
-                  String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)),
-                ),
-              locale,
-            }
-          : { operation, id: data?.conversation?.id, body };
-      const response = await fetch("/api/live-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!response.ok) throw new Error();
+          ? { operation, name, mobile: normalized, locale }
+          : { operation, id: current?.id, body },
+      );
+      if (!response?.ok) throw Error();
       const result = await response.json();
-      if (operation === "start") setSelected(result.id);
-      if (operation === "reply") setBody("");
-      if (operation === "delete") {
+      if (operation === "start") {
+        setSelected(result.id);
+        setMessagePage(1);
+        await refresh(result.id);
+      } else if (operation === "close" && !inbox) {
+        setSelected(null);
+        setBody("");
+        setMessagePage(1);
+        await refresh(null);
+      } else if (operation === "delete") {
         setSelected(null);
         setMessagePage(1);
+        await refresh(null);
         toast.success(t("گفت‌وگو حذف شد.", "Conversation deleted."));
+      } else {
+        if (operation === "reply") {
+          setBody("");
+          void signal({ operation: "typing", id: current?.id, typing: false });
+        }
+        await refresh();
       }
-      await refresh();
     } catch {
       toast.error(
         t(
-          "ارسال انجام نشد؛ اطلاعات را بررسی کنید یا دوباره تلاش کنید.",
-          "Could not send. Check the details or try again.",
+          "عملیات انجام نشد؛ اطلاعات را بررسی کنید یا دوباره تلاش کنید.",
+          "Could not complete the action. Check the details or retry.",
         ),
       );
     } finally {
@@ -170,7 +241,7 @@ export function LiveChat({
     }
   }
   async function image(file: File) {
-    if (!data?.conversation || busy) return;
+    if (!current || busy) return;
     if (
       !file.size ||
       file.size > 5 * 1024 * 1024 ||
@@ -179,7 +250,7 @@ export function LiveChat({
       toast.error(
         t(
           "تصویر JPEG، PNG یا WebP تا ۵ مگابایت مجاز است.",
-          "JPEG, PNG or WebP images up to 5 MB are allowed.",
+          "JPEG, PNG or WebP up to 5 MB are allowed.",
         ),
       );
       return;
@@ -187,13 +258,14 @@ export function LiveChat({
     setBusy(true);
     try {
       const form = new FormData();
-      form.set("id", data.conversation.id);
+      form.set("id", current.id);
       form.set("file", file);
+      if (inbox) form.set("inbox", "1");
       const response = await fetch("/api/live-chat", {
         method: "POST",
         body: form,
       });
-      if (!response.ok) throw new Error();
+      if (!response.ok) throw Error();
       await refresh();
     } catch {
       toast.error(t("تصویر ارسال نشد.", "Could not send the image."));
@@ -203,191 +275,279 @@ export function LiveChat({
   }
   if (!ready || (!inbox && data?.settings.enabled === "false")) return null;
   const color = data?.settings.color || "#009b69";
-  const canReply =
-    data?.conversation?.status === "open" &&
-    (!inbox || data.conversation.operatorId === data.operatorId);
   const conversation = (
-    <section
-      aria-label={t("پشتیبانی آنلاین", "Live support")}
-      className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-950"
-    >
-      <header
-        className="flex items-center justify-between gap-3 p-4 text-white"
-        style={{ backgroundColor: color }}
-      >
-        <div className="flex min-w-0 items-center gap-2">
-          {data?.settings.logoUrl && (
-            <Image
-              unoptimized
-              src={data.settings.logoUrl}
-              alt=""
-              width={36}
-              height={36}
-              className="size-9 rounded-full object-contain"
-            />
-          )}
-          <div>
-            <h2 className="font-bold">
-              {t("پشتیبانی کاکتوس", "Cactus support")}
+    <section className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-950">
+      <header className="flex items-center justify-between gap-3 border-b border-slate-100 p-4 dark:border-slate-800">
+        <div className="flex min-w-0 items-center gap-3">
+          <ChatAvatar
+            src={
+              inbox
+                ? null
+                : current?.operatorAvatarUrl || data?.settings.logoUrl
+            }
+            name={
+              inbox
+                ? (current?.name ?? "")
+                : current?.operatorName ||
+                  t("پشتیبانی کاکتوس", "Cactus support")
+            }
+            system={!inbox && !current?.operatorName}
+          />
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-bold">
+              {inbox
+                ? current?.name ||
+                  t("گفت‌وگو را انتخاب کنید", "Select a conversation")
+                : current?.operatorName ||
+                  t("پشتیبانی کاکتوس", "Cactus support")}
             </h2>
-            <p className="text-xs">
-              {data?.onlineCount.toLocaleString(locale) ?? "0"}{" "}
-              {t("پشتیبان آنلاین", "operators online")}
+            <p className="mt-1 text-xs text-slate-500">
+              {inbox
+                ? current?.mobile
+                : `${data?.onlineCount.toLocaleString(locale) ?? "0"} ${t("پشتیبان آنلاین", "operators online")}`}
             </p>
-            {data?.conversation?.operatorName && (
-              <p className="text-xs">
-                {t("پاسخ‌گو", "Operator")}: {data.conversation.operatorName}
-              </p>
-            )}
           </div>
         </div>
         {!inbox && (
           <button
             type="button"
-            className="cursor-pointer rounded-lg px-2 py-1"
+            className={messengerIconButton}
             aria-label={t("بستن پنجره", "Close window")}
             onClick={() => setOpen(false)}
           >
-            ×
+            <MessengerIcon kind="close" />
           </button>
         )}
       </header>
       {!available && (
-        <p role="status" className="p-3 text-sm text-amber-700">
+        <p role="status" className="px-4 py-2 text-xs text-amber-700">
           {t(
-            "ارتباط با پشتیبانی برقرار نشد. دوباره تلاش می‌کنیم.",
-            "Support is unavailable. Retrying shortly.",
+            "ارتباط قطع شده؛ در حال تلاش مجدد…",
+            "Connection interrupted; retrying…",
           )}
         </p>
       )}
-      {data?.history.length ? (
-        <label className="p-3 text-sm">
-          {t("تاریخچه گفت‌وگو", "Conversation history")}
-          <select
-            aria-label={t("انتخاب گفت‌وگو", "Select conversation")}
-            className="mt-2 w-full cursor-pointer rounded-lg border border-zinc-300 bg-transparent p-2 dark:border-zinc-700"
-            value={data.conversation?.id ?? ""}
-            onChange={(event) => {
-              setSelected(event.target.value);
-              setMessagePage(1);
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-2 text-xs dark:border-slate-800">
+        <span className="text-slate-500">
+          {current
+            ? current.status === "open"
+              ? t("گفت‌وگوی فعال", "Active conversation")
+              : t("گفت‌وگوی بسته‌شده", "Closed conversation")
+            : t("گفت‌وگوی جدید", "New conversation")}
+        </span>
+        {current?.status === "open" && canReply && (
+          <button
+            type="button"
+            disabled={busy}
+            className="font-semibold text-rose-600"
+            onClick={async () => {
+              if (
+                await confirm({
+                  title: t("پایان گفت‌وگو؟", "End conversation?"),
+                  description: t(
+                    "تاریخچه برای پشتیبانی محفوظ می‌ماند.",
+                    "Support history will be retained.",
+                  ),
+                  confirmLabel: t("پایان گفت‌وگو", "End conversation"),
+                })
+              )
+                void send("close");
             }}
           >
-            {data.history.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name} · {item.mobile} ·{" "}
-                {item.status === "closed"
-                  ? t("بسته", "Closed")
-                  : t("باز", "Open")}
-              </option>
-            ))}
-          </select>
-        </label>
-      ) : null}
-      <div className="flex flex-wrap gap-2 px-3 text-xs">
-        {historyPage > 1 && (
+            {t("پایان گفت‌وگو", "End conversation")}
+          </button>
+        )}
+        {!inbox && !current && data?.historyAvailable && (
           <button
-            className="cursor-pointer text-emerald-600"
+            type="button"
+            disabled={busy}
+            className="font-semibold text-emerald-700 dark:text-emerald-300"
             onClick={() => {
-              setHistoryPage((value) => value - 1);
-              setSelected(null);
               setMessagePage(1);
+              void refresh(undefined, true);
             }}
           >
-            {t("گفت‌وگوهای جدیدتر", "Newer conversations")}
+            {t("بارگذاری تاریخچه من", "Load my history")}
           </button>
         )}
-        {data?.historyHasMore && (
+        {inbox && current?.status === "open" && !canReply && (
           <button
-            className="cursor-pointer text-emerald-600"
-            onClick={() => {
-              setHistoryPage((value) => value + 1);
-              setSelected(null);
-              setMessagePage(1);
-            }}
+            type="button"
+            className="font-semibold text-emerald-700 dark:text-emerald-300"
+            disabled={busy}
+            onClick={() => void send("claim")}
           >
-            {t("گفت‌وگوهای قدیمی‌تر", "Older conversations")}
-          </button>
-        )}
-        {messagePage > 1 && (
-          <button
-            className="cursor-pointer text-emerald-600"
-            onClick={() => setMessagePage((value) => value - 1)}
-          >
-            {t("پیام‌های جدیدتر", "Newer messages")}
-          </button>
-        )}
-        {data?.messagesHasMore && (
-          <button
-            className="cursor-pointer text-emerald-600"
-            onClick={() => setMessagePage((value) => value + 1)}
-          >
-            {t("پیام‌های قدیمی‌تر", "Older messages")}
+            {t("پذیرش گفت‌وگو", "Claim conversation")}
           </button>
         )}
       </div>
       <div
-        className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4"
+        className={`min-h-0 flex-1 space-y-4 overflow-y-auto p-4 ${current ? messengerBackground : "bg-white dark:bg-slate-950"}`}
         role="log"
         aria-live="polite"
         aria-label={t("پیام‌ها", "Messages")}
       >
-        {!data?.conversation && (
-          <p className="rounded-xl bg-emerald-50 p-3 text-sm leading-7 dark:bg-emerald-950">
-            {data?.settings.greeting ||
-              t(
-                "اگر سوالی دارید همکاران ما در بخش پشتیبانی در خدمت شما هستند.",
-                "Have a question? Our support team is here to help.",
-              )}
-          </p>
+        <div className="flex justify-center gap-3 text-xs text-emerald-700 dark:text-emerald-300">
+          {current && data?.messagesHasMore && (
+            <button
+              type="button"
+              onClick={() => setMessagePage((value) => value + 1)}
+            >
+              {t("پیام‌های قدیمی‌تر", "Older messages")}
+            </button>
+          )}
+          {messagePage > 1 && (
+            <button
+              type="button"
+              onClick={() => setMessagePage((value) => value - 1)}
+            >
+              {t("پیام‌های جدیدتر", "Newer messages")}
+            </button>
+          )}
+        </div>
+        {!current && (
+          <div className="flex min-h-24 flex-col items-center justify-center gap-3 py-6 text-center">
+            <ChatAvatar
+              name={t("پشتیبانی", "Support")}
+              src={data?.settings.logoUrl}
+              system
+            />
+            <p className="max-w-xs text-sm leading-7 text-slate-500">
+              {inbox
+                ? t(
+                    "از فهرست، گفت‌وگو را برای پاسخ‌گویی انتخاب کنید.",
+                    "Select a conversation from the inbox.",
+                  )
+                : t(
+                    "برای پرسیدن سوال، یک گفت‌وگوی جدید شروع کنید.",
+                    "Start a new conversation to ask a question.",
+                  )}
+            </p>
+          </div>
         )}
         {data?.messages.map((message) => (
-          <article
+          <MessageBubble
             key={message.id}
-            className={`max-w-[90%] rounded-xl p-3 text-sm ${message.sender === (inbox ? "operator" : "visitor") ? "ms-auto bg-emerald-50 dark:bg-emerald-950" : "me-auto bg-zinc-100 dark:bg-zinc-900"}`}
-          >
-            <p className="whitespace-pre-wrap break-words leading-6">
-              {message.body}
-            </p>
-            {message.hasImage && (
-              <a
-                href={`/api/live-chat/image/${message.id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Image
-                  unoptimized
-                  width={640}
-                  height={480}
-                  src={`/api/live-chat/image/${message.id}`}
-                  alt={t("تصویر پیوست گفت‌وگو", "Conversation image")}
-                  loading="lazy"
-                  className="mt-2 max-h-60 w-full rounded-lg object-contain"
-                />
-              </a>
-            )}
-            <time className="mt-2 block text-[10px] text-zinc-500">
-              {formatPanelDate(message.createdAt, locale, true)}
-            </time>
-          </article>
+            locale={locale}
+            onVisible={!inbox || canReply ? visible : undefined}
+            message={{
+              id: message.id,
+              body: message.body,
+              createdAt: message.createdAt,
+              readAt: message.readAt,
+              mine: message.sender === (inbox ? "operator" : "visitor"),
+              system: message.sender === "system",
+              name:
+                message.sender === "visitor"
+                  ? current?.name || t("شما", "You")
+                  : message.authorName ||
+                    current?.operatorName ||
+                    t("پشتیبانی", "Support"),
+              avatarUrl: message.avatarUrl,
+              attachmentUrl: message.hasImage
+                ? `/api/live-chat/image/${message.id}`
+                : null,
+              attachmentMime: message.hasImage ? "image/jpeg" : null,
+            }}
+          />
         ))}
         <div ref={bottom} />
       </div>
-      <div className="space-y-3 border-t border-zinc-200 p-4 dark:border-zinc-800">
-        {inbox && data?.isAdmin && data.conversation?.status === "closed" && (
+      <footer className="space-y-2 border-t border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-950">
+        <p className="min-h-4 text-xs text-emerald-600" role="status">
+          {current?.peerTyping ? t("در حال نوشتن پیام…", "Typing…") : ""}
+        </p>
+        {canReply ? (
+          <MessageComposer
+            locale={locale}
+            body={body}
+            onBodyChange={changeBody}
+            onSend={() => void send("reply")}
+            onFile={image}
+            pending={busy}
+            maxLength={5000}
+            accent={color}
+            onBlur={() =>
+              void signal({
+                operation: "typing",
+                id: current?.id,
+                typing: false,
+              })
+            }
+          />
+        ) : !inbox && (!current || current.status === "closed") ? (
+          <form
+            className="grid min-w-0 gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void send("start");
+            }}
+          >
+            <p className="text-xs leading-6 text-slate-500">
+              {t(
+                "برای شروع، نام و شماره موبایل خود را وارد کنید.",
+                "Enter your name and mobile to begin.",
+              )}
+            </p>
+            <label className="text-xs">
+              <span className="sr-only">{t("نام", "Name")}</span>
+              <PanelInput
+                required
+                minLength={2}
+                maxLength={160}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                autoComplete="name"
+                placeholder={t("نام شما", "Your name")}
+              />
+            </label>
+            <label className="text-xs">
+              <span className="sr-only">{t("موبایل", "Mobile")}</span>
+              <PanelInput
+                required
+                type="tel"
+                dir="ltr"
+                value={mobile}
+                onChange={(event) => setMobile(event.target.value)}
+                autoComplete="tel"
+                placeholder="09xxxxxxxxx"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={busy || !available}
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-2xl py-3 text-sm font-semibold text-white disabled:opacity-50"
+              style={{ backgroundColor: color }}
+            >
+              <MessengerIcon kind="send" />
+              {t("شروع گفت‌وگو", "Start conversation")}
+            </button>
+          </form>
+        ) : (
+          <p className="text-center text-xs leading-6 text-slate-500">
+            {current?.status === "closed"
+              ? t(
+                  "این گفت‌وگو پایان یافته است.",
+                  "This conversation has ended.",
+                )
+              : t(
+                  "برای پاسخ‌گویی، گفت‌وگو را بپذیرید.",
+                  "Claim the conversation to reply.",
+                )}
+          </p>
+        )}
+        {inbox && data?.isAdmin && current?.status === "closed" && (
           <button
             type="button"
-            className={secondaryButtonClass}
+            className="text-xs text-rose-600"
             disabled={busy}
             onClick={async () => {
               if (
                 await confirm({
-                  title: t(
-                    "حذف گفت‌وگوی بسته‌شده؟",
-                    "Delete closed conversation?",
-                  ),
+                  title: t("حذف گفت‌وگو؟", "Delete conversation?"),
                   description: t(
-                    "تاریخچه و تصاویر این گفت‌وگو حذف می‌شوند و قابل بازگشت نیستند.",
-                    "The conversation and its images will be permanently deleted.",
+                    "پیام‌ها و تصاویر برای همیشه حذف می‌شوند.",
+                    "Messages and images will be permanently deleted.",
                   ),
                   confirmLabel: t("حذف", "Delete"),
                 })
@@ -398,150 +558,101 @@ export function LiveChat({
             {t("حذف گفت‌وگو", "Delete conversation")}
           </button>
         )}
-        {!inbox &&
-        (!data?.conversation || data.conversation.status === "closed") ? (
-          <form
-            className="space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void send("start");
-            }}
-          >
-            <p className="text-sm">
-              {t(
-                "برای شروع گفت‌وگو نام و شماره موبایل را وارد کنید.",
-                "Enter your name and mobile to start a conversation.",
-              )}
-            </p>
-            <label className="block text-sm">
-              {t("نام", "Name")}
-              <PanelInput
-                required
-                maxLength={160}
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                autoComplete="name"
-              />
-            </label>
-            <label className="block text-sm">
-              {t("موبایل", "Mobile")}
-              <PanelInput
-                required
-                type="tel"
-                dir="ltr"
-                value={mobile}
-                onChange={(event) => setMobile(event.target.value)}
-                autoComplete="tel"
-              />
-            </label>
-            <button
-              className={primaryButtonClass}
-              disabled={busy || !available}
-            >
-              {t("ارسال پیام و شروع گفت‌وگو", "Start conversation")}
-            </button>
-          </form>
-        ) : canReply ? (
-          <form
-            className="space-y-2"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void send("reply");
-            }}
-          >
-            <PanelTextarea
-              aria-label={t("پیام", "Message")}
-              rows={2}
-              maxLength={5000}
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-            />
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                className={primaryButtonClass}
-                disabled={busy || !body.trim()}
-              >
-                {t("ارسال", "Send")}
-              </button>
-              <label
-                className={`${secondaryButtonClass} ${busy ? "pointer-events-none opacity-50" : ""}`}
-              >
-                {t("تصویر", "Image")}
-                <input
-                  type="file"
-                  className="sr-only"
-                  disabled={busy}
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (file) void image(file);
-                    event.target.value = "";
-                  }}
-                />
-              </label>
-              <button
-                type="button"
-                className={secondaryButtonClass}
-                disabled={busy}
-                onClick={async () => {
-                  if (
-                    await confirm({
-                      title: t("پایان گفت‌وگو؟", "Close conversation?"),
-                      description: t(
-                        "تاریخچه محفوظ می‌ماند.",
-                        "History will be retained.",
-                      ),
-                      confirmLabel: t("پایان", "Close"),
-                    })
-                  )
-                    void send("close");
-                }}
-              >
-                {t("پایان", "Close")}
-              </button>
-            </div>
-          </form>
-        ) : inbox && data?.conversation?.status === "open" ? (
-          <button
-            className={primaryButtonClass}
-            disabled={busy}
-            onClick={() => void send("claim")}
-          >
-            {t("پذیرش گفت‌وگو", "Claim conversation")}
-          </button>
-        ) : (
-          <p className="text-sm">
-            {t("گفت‌وگو بسته شده است.", "Conversation is closed.")}
-          </p>
-        )}
-      </div>
+      </footer>
     </section>
   );
   if (inbox)
     return (
-      <div className="h-[min(780px,85dvh)] [&>section]:h-full">
-        {conversation}
+      <div className="grid min-w-0 gap-4 lg:h-[min(820px,85dvh)] lg:grid-cols-[17rem_minmax(0,1fr)]">
+        <aside className="max-h-64 overflow-y-auto rounded-3xl border border-slate-200 bg-white lg:max-h-none dark:border-slate-700 dark:bg-slate-950">
+          <h2 className="border-b border-slate-100 p-4 text-sm font-bold dark:border-slate-800">
+            {t("گفت‌وگوهای پشتیبانی", "Support conversations")}
+          </h2>
+          <div className="divide-y divide-slate-100 dark:divide-slate-800">
+            {data?.history.map((item) => (
+              <button
+                type="button"
+                key={item.id}
+                aria-current={item.id === current?.id ? "page" : undefined}
+                className="flex w-full cursor-pointer gap-3 p-4 text-start transition hover:bg-slate-50 aria-[current=page]:bg-emerald-50 dark:hover:bg-slate-900 dark:aria-[current=page]:bg-emerald-950/40"
+                onClick={() => {
+                  setSelected(item.id);
+                  setMessagePage(1);
+                  setBody("");
+                }}
+              >
+                <ChatAvatar name={item.name} />
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold">
+                    {item.name}
+                  </span>
+                  <span
+                    className="nums-en mt-1 block text-xs text-slate-500"
+                    dir="ltr"
+                  >
+                    {item.mobile}
+                  </span>
+                  <span className="mt-2 block text-[10px] text-slate-500">
+                    {item.status === "open"
+                      ? t("باز", "Open")
+                      : t("بسته", "Closed")}
+                    {item.lastMessageAt
+                      ? ` · ${formatPanelDate(item.lastMessageAt, locale)}`
+                      : ""}
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-between gap-3 p-4 text-xs text-emerald-700 dark:text-emerald-300">
+            {historyPage > 1 && (
+              <button
+                onClick={() => {
+                  setHistoryPage((value) => value - 1);
+                  setSelected(null);
+                  setMessagePage(1);
+                }}
+              >
+                {t("جدیدتر", "Newer")}
+              </button>
+            )}
+            {data?.historyHasMore && (
+              <button
+                onClick={() => {
+                  setHistoryPage((value) => value + 1);
+                  setSelected(null);
+                  setMessagePage(1);
+                }}
+              >
+                {t("قدیمی‌تر", "Older")}
+              </button>
+            )}
+          </div>
+        </aside>
+        <div className="h-[min(650px,80dvh)] min-h-0 lg:h-full">
+          {conversation}
+        </div>
       </div>
     );
   return (
     <div
-      className="fixed bottom-5 end-5 z-[80] max-w-[calc(100vw-2.5rem)]"
+      className="fixed bottom-4 end-4 z-[80] max-w-[calc(100vw-2rem)]"
       dir={fa ? "rtl" : "ltr"}
     >
       {open ? (
-        <div className="mb-3 h-[min(660px,80dvh)] w-[380px] max-w-full [&>section]:h-full">
+        <div className="mb-3 h-[min(680px,82dvh)] w-[390px] max-w-full">
           {conversation}
         </div>
       ) : (
         hint && (
-          <div className="mb-3 max-w-xs rounded-2xl border border-zinc-200 bg-white p-4 text-sm leading-7 shadow-lg dark:border-zinc-700 dark:bg-zinc-950">
+          <div className="mb-3 max-w-xs rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7 shadow-lg dark:border-slate-700 dark:bg-slate-950">
             <button
+              className="float-end p-1"
               type="button"
-              className="float-end cursor-pointer px-2"
               onClick={() => setHint(false)}
               aria-label={t("بستن پیام", "Dismiss greeting")}
             >
-              ×
+              <MessengerIcon kind="close" />
             </button>
             {data?.settings.greeting ||
               t(
@@ -549,7 +660,8 @@ export function LiveChat({
                 "Have a question? Our support team is here to help.",
               )}
             <button
-              className="mt-2 block cursor-pointer font-bold text-emerald-600"
+              type="button"
+              className="mt-2 block font-semibold text-emerald-600"
               onClick={() => {
                 setOpen(true);
                 setHint(false);
@@ -561,17 +673,18 @@ export function LiveChat({
         )
       )}
       <button
+        ref={floating}
         type="button"
         aria-expanded={open}
         aria-label={t("گفت‌وگو با پشتیبانی", "Chat with support")}
-        className="ms-auto flex size-14 cursor-pointer items-center justify-center rounded-full text-2xl text-white shadow-lg"
+        className="ms-auto grid size-14 cursor-pointer place-items-center rounded-full text-white shadow-lg"
         style={{ backgroundColor: color }}
         onClick={() => {
           setOpen((value) => !value);
           setHint(false);
         }}
       >
-        ☏
+        <MessengerIcon kind={open ? "close" : "chat"} />
       </button>
     </div>
   );

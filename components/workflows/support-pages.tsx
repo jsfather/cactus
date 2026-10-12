@@ -1,3 +1,5 @@
+import { getTicketChat } from "@/lib/support/ticket-chat";
+import { TicketConversation } from "@/components/support/ticket-conversation";
 import { PanelStatCard, PanelStatGrid } from "@/components/panel/stat-card";
 import { PanelPagination } from "@/components/panel/list-controls";
 import { ADMIN_PAGE_SIZE, normalizePage } from "@/lib/panel/pagination";
@@ -13,9 +15,6 @@ import {
   ticketMessages,
   ticketDepartments,
   users,
-  termEnrollments,
-  terms,
-  attachments,
   notifications,
 } from "@/lib/db/schema";
 import { getPanelLocale } from "@/lib/i18n/panel-server";
@@ -23,10 +22,7 @@ import { userNameSql } from "@/lib/learning/queries";
 import { text, title } from "@/lib/workflows";
 import {
   saveTicket,
-  replyTicket,
-  rateTicket,
   deleteTicket,
-  changeTicketStatus,
   saveDepartment,
   deleteDepartment,
   saveNotification,
@@ -192,225 +188,17 @@ export async function TicketsPage({
     );
   }
   if (ticket) {
-    const messages = await db
-      .select({
-        message: ticketMessages,
-        name: userNameSql(locale),
-        attachmentMime: attachments.mimeType,
-      })
-      .from(ticketMessages)
-      .innerJoin(users, eq(users.id, ticketMessages.authorId))
-      .leftJoin(
-        attachments,
-        eq(
-          ticketMessages.attachmentUrl,
-          sql`'/api/attachments/' || ${attachments.id}::text`,
-        ),
-      )
-      .where(eq(ticketMessages.ticketId, ticket.id))
-      .orderBy(desc(ticketMessages.createdAt), desc(ticketMessages.id))
-      .limit(200);
-    const [department] = await db
-      .select()
-      .from(ticketDepartments)
-      .where(eq(ticketDepartments.id, ticket.departmentId))
-      .limit(1);
-    const [requester] = admin
-      ? await db
-          .select({
-            name: userNameSql(locale),
-            mobile: users.mobile,
-            role: users.role,
-          })
-          .from(users)
-          .where(eq(users.id, ticket.ownerId))
-          .limit(1)
-      : [];
-    const requesterTerms = admin
-      ? await db
-          .select({ titleFa: terms.titleFa, titleEn: terms.titleEn })
-          .from(termEnrollments)
-          .innerJoin(terms, eq(terms.id, termEnrollments.termId))
-          .where(eq(termEnrollments.studentId, ticket.ownerId))
-          .orderBy(desc(terms.startDate))
-          .limit(10)
-      : [];
+    const chat = await getTicketChat(user, ticket.id, locale);
+    if (!chat) notFound();
     return (
       <PanelPage>
-        <PanelPageHeader
-          eyebrow={text(locale, "پشتیبانی", "Support")}
-          title={ticket.subject}
-          description={`${statusLabel(ticket.status)} · ${department ? title(department, locale) : ""}`}
-          actions={
-            admin ? (
-              <PanelPrimaryLink href={`/panel/tickets/${ticket.id}/edit`}>
-                {text(locale, "ویرایش", "Edit")}
-              </PanelPrimaryLink>
-            ) : undefined
-          }
-        />
-        {requester && (
-          <PanelSurface>
-            <h2 className="font-bold">
-              {text(locale, "مشخصات درخواست‌کننده", "Requester")}
-            </h2>
-            <p className="mt-2">
-              {requester.name} ·{" "}
-              <bdi dir="ltr" className="nums-en">
-                {requester.mobile}
-              </bdi>
-            </p>
-            {requesterTerms.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {requesterTerms.map((term, index) => (
-                  <span
-                    key={index}
-                    className="rounded-full bg-zinc-100 px-3 py-1 text-xs dark:bg-zinc-800"
-                  >
-                    {title(term, locale)}
-                  </span>
-                ))}
-              </div>
-            )}
-            {requester.role === "student" && (
-              <Link
-                className="mt-3 inline-flex cursor-pointer text-sm text-emerald-600"
-                href={`/panel/admin/students/${ticket.ownerId}`}
-              >
-                {text(
-                  locale,
-                  "مشاهده پرونده کامل دانش‌پژوه",
-                  "View full student record",
-                )}{" "}
-                ↗
-              </Link>
-            )}
-          </PanelSurface>
-        )}
-        <PanelSurface className="bg-zinc-50 dark:bg-zinc-900">
-          <p className="mb-4 text-xs text-zinc-500">
-            {text(
-              locale,
-              "نمایش حداکثر ۲۰۰ پیام اخیر",
-              "Showing up to 200 latest messages",
-            )}
-          </p>
-          <div
-            className="max-h-[65vh] space-y-4 overflow-y-auto p-1"
-            role="log"
-            aria-label={text(locale, "گفت‌وگوی تیکت", "Ticket conversation")}
-          >
-            {messages.reverse().map(({ message: m, name, attachmentMime }) => (
-              <article
-                key={m.id}
-                className={`w-fit max-w-[90%] rounded-2xl border p-4 sm:max-w-[80%] ${m.authorId === user.id ? "ms-auto border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950" : "me-auto border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-950"}`}
-              >
-                <p className="text-sm text-zinc-500">
-                  {name} · {formatPanelDate(m.createdAt, locale, true)}
-                </p>
-                <p className="mt-2 whitespace-pre-wrap break-words leading-7">
-                  {m.body}
-                </p>
-                {m.attachmentUrl &&
-                  (attachmentMime === "audio/webm" ? (
-                    <audio
-                      controls
-                      preload="none"
-                      src={m.attachmentUrl}
-                      aria-label={text(locale, "پیام صوتی", "Voice message")}
-                      className="mt-3 max-w-full"
-                    />
-                  ) : (
-                    <a
-                      className="text-emerald-700"
-                      href={m.attachmentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {text(locale, "فایل پیوست", "Attachment")}
-                    </a>
-                  ))}
-              </article>
-            ))}
-          </div>
-        </PanelSurface>
-        {ticket.rating && (
-          <PanelSurface>
-            <p>
-              {text(locale, "امتیاز پاسخ‌گویی", "Response rating")}:{" "}
-              <span
-                className="text-amber-500"
-                aria-label={`${ticket.rating}/5`}
-              >
-                {"★".repeat(ticket.rating)}
-                {"☆".repeat(5 - ticket.rating)}
-              </span>
-            </p>
-          </PanelSurface>
-        )}
-        {ticket.status === "closed" &&
-          ticket.ownerId === user.id &&
-          messages.some((item) => item.message.authorId !== user.id) && (
-            <ActionForm
-              locale={locale}
-              action={rateTicket.bind(null, ticket.id)}
-              heading={text(locale, "امتیاز به پاسخ‌گو", "Rate the responder")}
-              initial={{ rating: String(ticket.rating ?? 0) }}
-              fields={[
-                {
-                  name: "rating",
-                  label: text(
-                    locale,
-                    "رضایت از پاسخ‌گویی",
-                    "Response satisfaction",
-                  ),
-                  options: [
-                    {
-                      value: "0",
-                      label: text(locale, "بدون امتیاز", "No rating"),
-                    },
-                    ...[1, 2, 3, 4, 5].map((value) => ({
-                      value: String(value),
-                      label: "★".repeat(value),
-                    })),
-                  ],
-                },
-              ]}
-            />
-          )}
-        {ticket.status !== "closed" && (
-          <ActionForm
-            locale={locale}
-            action={replyTicket.bind(null, ticket.id)}
-            heading={text(locale, "پاسخ", "Reply")}
-            fields={[
-              {
-                name: "body",
-                label: text(locale, "پیام", "Message"),
-                type: "textarea",
-              },
-              {
-                name: "attachmentUrl",
-                label: text(locale, "پیوند فایل", "Attachment link"),
-                type: "url",
-              },
-            ]}
-          />
-        )}
-        <ActionButton
-          locale={locale}
-          action={changeTicketStatus.bind(
-            null,
-            ticket.id,
-            ticket.status === "closed" ? "open" : "closed",
-            locale,
-          )}
-          label={
-            ticket.status === "closed"
-              ? text(locale, "بازگشایی تیکت", "Reopen ticket")
-              : text(locale, "بستن تیکت", "Close ticket")
-          }
-        />
+        <Link
+          href="/panel/tickets"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 dark:text-emerald-300"
+        >
+          {text(locale, "بازگشت به تیکت‌ها", "Back to tickets")}
+        </Link>
+        <TicketConversation initial={chat} locale={locale} admin={admin} />
       </PanelPage>
     );
   }

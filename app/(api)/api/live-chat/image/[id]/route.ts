@@ -7,6 +7,7 @@ import { chatMessages, chatConversations } from "@/lib/db/schema";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getChatSettings, getChatVisitorHash } from "@/lib/live-chat/server";
 import { attachmentRoot } from "@/lib/attachments/storage";
+import { chatRetentionMs } from "@/lib/live-chat/identity";
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -36,7 +37,11 @@ export async function GET(
         row?.conversation.operatorId === user.id));
   if (
     !row ||
-    (!staff && (!hash || hash !== row.conversation.visitorHash)) ||
+    (!staff &&
+      (!hash ||
+        hash !== row.conversation.visitorHash ||
+        Date.now() - row.conversation.lastMessageAt.getTime() >
+          chatRetentionMs)) ||
     !row.message.imagePath ||
     !/^[a-f0-9-]+\.(jpg|png|webp)$/.test(row.message.imagePath) ||
     !["image/jpeg", "image/png", "image/webp"].includes(
