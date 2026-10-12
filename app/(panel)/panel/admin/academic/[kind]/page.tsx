@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AcademicGuide } from "@/components/terms/academic-guide";
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { notFound } from "next/navigation";
@@ -172,6 +173,7 @@ export default async function AcademicPage({
           </Link>
         ))}
       </nav>
+      <AcademicGuide locale={locale} />
       {query.edit && !(item && "archivedAt" in item && item.archivedAt) && (
         <ActionForm
           locale={locale}

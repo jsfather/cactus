@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AcademicGuide } from "./academic-guide";
 import { useActionState, useMemo, useState } from "react";
 import {
   createTerm,
@@ -160,6 +161,7 @@ export function TermForm({
 
   return (
     <form action={action} className="space-y-6">
+      <AcademicGuide locale={locale} />
       <PanelFormSection
         title={
           isFa ? "سال تحصیلی، نیمسال و دوره" : "Semester and reusable course"

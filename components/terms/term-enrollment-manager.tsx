@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useTransition } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { assignStudentToTerm, createTermInvitation, revokeTermInvitation, updateTermEnrollment, type TermActionState } from "@/app/(panel)/panel/terms/actions";
 import { useFeedback } from "@/components/feedback/feedback-provider";
 import { useActionErrorToast } from "@/components/feedback/toast-effects";
@@ -10,19 +10,30 @@ import type { Locale } from "@/lib/i18n/config";
 
 const initialState: TermActionState = {};
 
+function normalizeStudentSearch(value: string) {
+  return value.normalize("NFKC").toLocaleLowerCase().replace(/[يى]/g, "ی").replace(/ك/g, "ک").replace(/[\u200c\u200d]/g, " ").replace(/[۰-۹٠-٩]/g, (digit) => String(digit.charCodeAt(0) - (digit >= "۰" ? 1776 : 1632))).replace(/\s+/g, " ").trim();
+}
+
 type Student = { id: string; name: string; mobile: string };
 type RosterItem = { enrollmentId: string; studentId: string; studentName: string; mobile: string; status: "active" | "withdrawn" | "completed"; source: "direct" | "invitation"; enrolledAt: Date };
 type Invitation = { id: string; expiresAt: Date; maxUses: number | null; useCount: number; revokedAt: Date | null; createdAt: Date };
 
 export function TermEnrollmentManager({ termId, locale, students, roster, invitations, enrollmentOpen }: { termId: string; locale: Locale; students: Student[]; roster: RosterItem[]; invitations: Invitation[]; enrollmentOpen: boolean }) {
   const isFa = locale === "fa";
+  const [search, setSearch] = useState("");
+  const [studentId, setStudentId] = useState("");
   const [assignState, assignAction, assigning] = useActionState(assignStudentToTerm.bind(null, termId), initialState);
   const [inviteState, inviteAction, inviting] = useActionState(createTermInvitation.bind(null, termId), initialState);
   const { toast } = useFeedback();
   useActionErrorToast(assignState); useActionErrorToast(inviteState);
   useEffect(() => { if (assignState.success) toast.success(assignState.success); }, [assignState.success, toast]);
   useEffect(() => { if (inviteState.success) toast.success(inviteState.success); }, [inviteState.success, toast]);
-  const availableStudents = students.filter((student) => !roster.some((item) => item.studentId === student.id && item.status !== "withdrawn"));
+  const enrolledStudentIds = new Set(roster.filter((item) => item.status !== "withdrawn").map((item) => item.studentId));
+  const availableStudents = students.filter((student) => !enrolledStudentIds.has(student.id));
+  const searchTerms = normalizeStudentSearch(search).split(" ").filter(Boolean);
+  const matchingStudents = availableStudents.filter((student) => searchTerms.every((word) => normalizeStudentSearch(`${student.name} ${student.mobile}`).includes(word)));
+  const selectedStudent = availableStudents.find((student) => student.id === studentId);
+  const displayedStudents = selectedStudent && !matchingStudents.some((student) => student.id === studentId) ? [selectedStudent, ...matchingStudents] : matchingStudents;
   async function copyInvitation() {
     if (!inviteState.invitationPath) return;
     try { await navigator.clipboard.writeText(`${window.location.origin}${inviteState.invitationPath}`); toast.success(isFa ? "پیوند کپی شد." : "Link copied."); } catch { toast.error(isFa ? "کپی خودکار انجام نشد؛ پیوند را دستی کپی کنید." : "Automatic copy failed. Copy the link manually."); }
@@ -30,7 +41,23 @@ export function TermEnrollmentManager({ termId, locale, students, roster, invita
 
   return <div className="space-y-6">
     <PanelFormSection title={isFa ? "افزودن دانش پژوه" : "Add a student"} description={isFa ? "دانش پژوه فعال را مستقیم اضافه کنید. ظرفیت، پیش‌نیاز و تداخل برنامه پیش از ثبت بررسی می‌شود." : "Add an active student directly. Capacity, prerequisites, and schedule conflicts are checked first."}>
-      <form action={assignAction} className="flex flex-col gap-3 sm:flex-row sm:items-end"><input type="hidden" name="locale" value={locale} /><div className="min-w-0 flex-1"><FormLabel label={isFa ? "دانش پژوه" : "Student"}><PanelSelect name="studentId" required defaultValue=""><option value="">{isFa ? "انتخاب دانش پژوه" : "Select student"}</option>{availableStudents.map((student) => <option key={student.id} value={student.id}>{student.name} · {student.mobile}</option>)}</PanelSelect></FormLabel></div><button disabled={assigning || !availableStudents.length} className={primaryButtonClass}>{assigning ? (isFa ? "در حال افزودن…" : "Adding…") : (isFa ? "افزودن به ترم" : "Add to term")}</button></form>
+      <form action={assignAction} className="grid gap-4 sm:grid-cols-2 sm:items-end">
+        <input type="hidden" name="locale" value={locale} />
+        <FormLabel label={isFa ? "جست‌وجوی دانش‌پژو" : "Search students"} hint={isFa ? "نام، نام خانوادگی یا بخشی از شماره موبایل را وارد کنید." : "Enter a name, surname, or part of a mobile number."}>
+          <PanelInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={isFa ? "نام یا شماره موبایل…" : "Name or mobile…"} disabled={assigning} />
+        </FormLabel>
+        <FormLabel label={isFa ? "انتخاب دانش‌پژو از نتایج" : "Select a student from results"}>
+          <PanelSelect name="studentId" required value={selectedStudent?.id ?? ""} onChange={(event) => setStudentId(event.target.value)} disabled={assigning || !availableStudents.length}>
+            <option value="">{isFa ? "انتخاب دانش‌پژو" : "Select student"}</option>
+            {displayedStudents.map((student) => <option key={student.id} value={student.id}>{student.name} · {student.mobile}</option>)}
+          </PanelSelect>
+        </FormLabel>
+        <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+          <p role="status" className="text-xs text-zinc-500">{matchingStudents.length ? (isFa ? `${matchingStudents.length.toLocaleString("fa-IR")} دانش‌پژو در نتایج` : `${matchingStudents.length} students found`) : (isFa ? "نتیجه‌ای پیدا نشد؛ عبارت جست‌وجو را تغییر دهید." : "No matches; try another search.")}{selectedStudent ? ` · ${isFa ? "انتخاب‌شده" : "Selected"}: ${selectedStudent.name}` : ""}</p>
+          <button disabled={assigning || !selectedStudent} className={primaryButtonClass}>{assigning ? (isFa ? "در حال افزودن…" : "Adding…") : (isFa ? "افزودن به ترم" : "Add to term")}</button>
+        </div>
+        {assignState.error ? <p role="alert" className="text-sm text-red-600 sm:col-span-2 dark:text-red-400">{assignState.error}</p> : null}
+      </form>
       {!availableStudents.length ? <p className="mt-3 text-xs text-zinc-500">{isFa ? "دانش پژوه فعال دیگری برای افزودن وجود ندارد." : "No other active student is available."}</p> : null}
     </PanelFormSection>
 

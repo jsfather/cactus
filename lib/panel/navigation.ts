@@ -290,8 +290,8 @@ export function getPanelNavigation(role: UserRole, locale: Locale) {
           ),
           item(
             "/panel/student/previous-courses",
-            "دوره‌های گذشته",
-            "Previous courses",
+            "آموزش‌های پیش از کاکتوس",
+            "Learning before Cactus",
             "levels",
           ),
           item(

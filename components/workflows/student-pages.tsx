@@ -431,6 +431,7 @@ export async function PreviousCoursesPage({
       name: "titleFa",
       label: text(locale, "نام دوره فارسی", "Persian course title"),
       required: true,
+      hint: text(locale, "نام دوره‌ای که در آموزشگاه دیگری گذرانده شده؛ مثل برنامه‌نویسی مقدماتی.", "A course completed elsewhere, such as introductory programming."),
     },
     {
       name: "titleEn",
@@ -438,35 +439,43 @@ export async function PreviousCoursesPage({
     },
     {
       name: "institution",
-      label: text(locale, "آموزشگاه", "Institution"),
+      label: text(locale, "آموزشگاه برگزارکننده قبلی", "Previous institution"),
       required: true,
+      hint: text(locale, "نام محل آموزش پیش از ورود به کاکتوس؛ این فیلد نام ترم کاکتوس نیست.", "The institution attended before joining Cactus, not a Cactus term name."),
     },
     {
       name: "completedOn",
       label: text(locale, "تاریخ پایان", "Completion date"),
       type: "date",
+      hint: text(locale, "اختیاری؛ تاریخ پایان دوره قبلی به تقویم شمسی.", "Optional; the previous course completion date in the Persian calendar."),
     },
     {
       name: "description",
       label: text(locale, "توضیحات", "Description"),
       type: "textarea",
+      hint: text(locale, "اختیاری؛ مهارت‌های آموخته‌شده، مدت دوره یا توضیح مدرک.", "Optional; skills learned, course duration, or certificate details."),
     },
   ];
   return (
     <PanelPage>
       <PanelPageHeader
         eyebrow={text(locale, "اطلاعات دانش پژوه", "Student information")}
-        title={text(locale, "دوره‌های گذرانده‌شده", "Previous courses")}
+        title={text(locale, "دوره‌های پیش از ورود به کاکتوس", "Courses before joining Cactus")}
         description={text(
           locale,
-          "سابقه یادگیری پیش از پیوستن به کاکتوس",
-          "Learning experience before joining Cactus",
+          "این بخش اختیاری است و فقط سابقه آموزش در مؤسسات دیگر را ثبت می‌کند؛ ثبت‌نام کلاس‌های کاکتوس از بخش ترم‌ها انجام می‌شود.",
+          "This optional section records learning at other institutions. Enroll in Cactus classes through Terms.",
         )}
       />
+      <PanelFormSection title={text(locale, "چه زمانی از این بخش استفاده کنیم؟", "When should this section be used?")}>
+        <p className="text-sm leading-7 text-zinc-600 dark:text-zinc-300">{text(locale, "اگر دانش‌پژو پیش از ورود آموزش دیده، عنوان دوره و آموزشگاه را ثبت کنید؛ تاریخ پایان و توضیحات اختیاری هستند. اگر سابقه‌ای ندارد، نیازی به تکمیل این فرم نیست. این اطلاعات برای شناخت سطح اولیه است و ثبت‌نام، شهریه، حضور و غیاب یا نمره ترم ایجاد نمی‌کند؛ پیش‌نیازهای ترم نیز جداگانه بررسی می‌شوند.", "If the student studied elsewhere before joining, record the course and institution; completion date and notes are optional. Leave this section empty if there is no prior learning. These records describe initial experience and do not create enrollment, tuition, attendance, or grades; term prerequisites are checked separately.")}</p>
+        {studentId ? <div className="mt-3 flex flex-wrap gap-4 text-sm font-semibold text-emerald-700 dark:text-emerald-400"><Link className="cursor-pointer hover:underline" href="/panel/admin/terms">{text(locale, "ثبت‌نام در ترم کاکتوس", "Enroll in a Cactus term")}</Link><Link className="cursor-pointer hover:underline" href={`/panel/admin/students/${target}`}>{text(locale, "مشاهده پرونده دانش‌پژو", "View student record")}</Link></div> : null}
+      </PanelFormSection>
       <ActionForm
         locale={locale}
         action={savePreviousCourse.bind(null, target, null)}
         fields={fields}
+        heading={text(locale, "افزودن سابقه آموزش خارج از کاکتوس", "Add external learning history")}
       />
       {items.map((c) => (
         <PanelFormSection key={c.id} title={title(c, locale)}>

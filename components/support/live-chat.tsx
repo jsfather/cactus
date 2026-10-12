@@ -60,6 +60,18 @@ export function LiveChat({
 }) {
   const fa = locale === "fa",
     t = (f: string, e: string) => (fa ? f : e);
+  const [navigationHeight, setNavigationHeight] = useState(0);
+  useEffect(() => {
+    if (inbox) return;
+    const navigation = document.querySelector<HTMLElement>(".public-bottom-nav");
+    if (!navigation) return;
+    const update = () => setNavigationHeight(navigation.getBoundingClientRect().height);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(navigation);
+    window.addEventListener("resize", update);
+    return () => { observer.disconnect(); window.removeEventListener("resize", update); };
+  }, [inbox]);
   const [ready, setReady] = useState(inbox),
     [open, setOpen] = useState(inbox),
     [hint, setHint] = useState(true),
@@ -636,11 +648,12 @@ export function LiveChat({
     );
   return (
     <div
-      className="fixed bottom-4 end-4 z-[80] max-w-[calc(100vw-2rem)]"
+      className="fixed end-4 z-[80] max-w-[calc(100vw-2rem)]"
+      style={{ bottom: `calc(${navigationHeight + 16}px + ${navigationHeight ? "0px" : "env(safe-area-inset-bottom, 0px)"})` }}
       dir={fa ? "rtl" : "ltr"}
     >
       {open ? (
-        <div className="mb-3 h-[min(680px,82dvh)] w-[390px] max-w-full">
+        <div className="mb-3 h-[min(680px,82dvh)] w-[390px] max-w-full" style={{ maxHeight: `calc(100dvh - ${navigationHeight + 112}px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))` }}>
           {conversation}
         </div>
       ) : (
