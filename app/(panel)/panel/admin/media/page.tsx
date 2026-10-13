@@ -25,7 +25,7 @@ export default async function MediaPage({ searchParams }: { searchParams: Promis
   const listQuery = parseAdminListQuery(query);
   const kindValue = getSearchParam(query, "kind");
   const kind: "all" | MediaKind = (["avatar", "post", "product", "content"] as const).includes(kindValue as MediaKind) ? kindValue as MediaKind : "all";
-  const [, assets] = await Promise.all([requireRole("admin"), getAdminMediaAssets(locale, { ...listQuery, kind })]);
+  const [, assets] = await Promise.all([requireRole("admin", "media"), getAdminMediaAssets(locale, { ...listQuery, kind })]);
   const dictionary = getPanelDictionary(locale);
 
   return (

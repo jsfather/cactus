@@ -42,6 +42,7 @@ export function getPanelNavigation(role: UserRole, locale: Locale) {
   ): PanelNavGroup => ({ id, label: fa ? labelFa : labelEn, icon, items });
   const directLinks = [
     item("/panel/notifications", "اعلان‌های من", "My notifications", "about"),
+    ...(role === "admin" ? [item("/panel/admin/access", "عنوان‌ها و سطح دسترسی", "Access profiles", "users"), item("/panel/admin/seo", "سئو و سرچ کنسول", "SEO & Search Console", "about")] : []),
   ];
   const support = group("support", "پشتیبانی", "Support", "comments", [
     item("/panel/tickets", "تیکت‌ها", "Tickets", "comments"),

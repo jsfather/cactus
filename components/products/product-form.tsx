@@ -1,4 +1,5 @@
 "use client";
+import { PanelMultiCombobox } from "@/components/panel/multi-combobox";
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
@@ -154,23 +155,8 @@ export function ProductForm({ locale, mode = "create", productId, initialValues 
           </PanelFormSection>
 
           <PanelFormSection title={isFa ? "دسته‌بندی‌ها" : "Categories"} description={isFa ? "محصول می‌تواند در چند دسته قرار بگیرد." : "A product can belong to multiple categories."}>
-            {categories.length ? (
-              <div className="space-y-2">
-                {categories.map((category) => (
-                  <label key={category.id} className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-200 p-3 text-start transition hover:border-emerald-300 dark:border-zinc-800 dark:hover:border-emerald-800">
-                    <input
-                      type="checkbox"
-                      checked={categoryIds.includes(category.id)}
-                      onChange={(event) => setCategoryIds((current) => event.target.checked ? [...current, category.id] : current.filter((id) => id !== category.id))}
-                      className="size-4 accent-emerald-700"
-                    />
-                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{locale === "en" ? category.titleEn || category.titleFa : category.titleFa}</span>
-                  </label>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm leading-6 text-zinc-500">{isFa ? "هنوز دسته‌ای ساخته نشده است." : "No categories have been created yet."}</p>
-            )}
+            <PanelMultiCombobox locale={locale} value={categoryIds} onValueChange={setCategoryIds} options={categories.map((category) => ({ value: category.id, label: locale === "en" ? category.titleEn || category.titleFa : category.titleFa }))} label={isFa ? "انتخاب دسته‌بندی‌های محصول" : "Choose product categories"} placeholder={isFa ? "جست‌وجو و انتخاب دسته…" : "Search and choose categories…"} searchLabel={isFa ? "جست‌وجوی دسته‌بندی" : "Search categories"} searchPlaceholder={isFa ? "نام دسته‌بندی…" : "Category name…"} noOptionsText={isFa ? "دسته‌ای پیدا نشد." : "No categories found."} selectedLabel={(count) => isFa ? `${count.toLocaleString("fa-IR")} دسته انتخاب شده` : `${count} categories selected`} closeOnSelect />
+            <FieldError errors={state.fieldErrors?.categoryIds} />
           </PanelFormSection>
         </aside>
       </div>

@@ -191,7 +191,7 @@ export async function createExam(
   _previousState: ExamFormState,
   formData: FormData,
 ): Promise<ExamFormState> {
-  const admin = await requireRole("admin");
+  const admin = await requireRole("admin", "education");
   const locale = formLocale(formData);
   const parsed = examSchema.safeParse(examData(formData));
 
@@ -249,7 +249,7 @@ export async function updateExam(
   _previousState: ExamFormState,
   formData: FormData,
 ): Promise<ExamFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const locale = formLocale(formData);
   const examId = z.uuid().safeParse(examIdValue);
   const parsed = examSchema.safeParse(examData(formData));
@@ -330,7 +330,7 @@ export async function deleteExam(
   examIdValue: string,
   locale: Locale,
 ): Promise<ExamMutationState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const examId = z.uuid().safeParse(examIdValue);
   if (!examId.success) {
     return { error: locale === "fa" ? "شناسه آزمون معتبر نیست." : "The exam identifier is invalid." };
@@ -370,7 +370,7 @@ export async function createQuestion(
   _previousState: QuestionFormState,
   formData: FormData,
 ): Promise<QuestionFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const locale = formLocale(formData);
   const examId = z.uuid().safeParse(examIdValue);
   const parsed = questionSchema.safeParse(questionData(formData));
@@ -456,7 +456,7 @@ export async function updateQuestion(
   _previousState: QuestionFormState,
   formData: FormData,
 ): Promise<QuestionFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const locale = formLocale(formData);
   const examId = z.uuid().safeParse(examIdValue);
   const questionId = z.uuid().safeParse(questionIdValue);
@@ -554,7 +554,7 @@ export async function deleteQuestion(
   questionIdValue: string,
   locale: Locale,
 ): Promise<ExamMutationState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const examId = z.uuid().safeParse(examIdValue);
   const questionId = z.uuid().safeParse(questionIdValue);
   if (!examId.success || !questionId.success) {
@@ -621,7 +621,7 @@ export async function moveQuestion(
   direction: "up" | "down",
   locale: Locale,
 ): Promise<ExamMutationState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const examId = z.uuid().safeParse(examIdValue);
   const questionId = z.uuid().safeParse(questionIdValue);
   if (!examId.success || !questionId.success) {

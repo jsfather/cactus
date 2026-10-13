@@ -12,7 +12,7 @@ export default async function EditLanding({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = await getPanelLocale(),
     { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();

@@ -1,6 +1,8 @@
 "use server";
+import { isAdministrator } from "@/lib/auth/permissions";
 import { randomBytes } from "node:crypto";
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { verifyPayment } from "./verification";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -202,7 +204,7 @@ export async function purchaseTerm(
   requestKey: string,
   locale: Locale,
 ): Promise<ActionState> {
-  const user = await requireRole("student");
+  const user = await requireRole("student", "finance");
   if (
     !z.uuid().safeParse(termId).success ||
     !z.uuid().safeParse(requestKey).success
@@ -315,6 +317,12 @@ export async function payOrder(
     };
   let authority: string;
   try {
+    const [previous] = await getDatabase().select({ authority: payments.authority }).from(payments).innerJoin(orders, eq(orders.id, payments.orderId)).where(and(eq(orders.id, id), eq(orders.userId, user.id), eq(orders.paymentStatus, "pending"), eq(payments.status, "pending"))).orderBy(desc(payments.createdAt)).limit(1);
+    if (previous?.authority) {
+      const result = await verifyPayment(previous.authority);
+      if (result?.status === "paid") { revalidatePath("/panel", "layout"); return { success: text(locale, "پرداخت قبلاً تأیید شده است؛ صفحه را تازه کنید.", "Payment is already confirmed. Refresh this page.") }; }
+      if (result?.status === "pending") return { error: text(locale, "نتیجه تراکنش قبلی هنوز قطعی نیست. از «بررسی وضعیت پرداخت» استفاده کنید؛ فعلاً دوباره پرداخت نکنید.", "The previous transaction is not final yet. Check payment status before making another payment.") };
+    }
     authority = await getDatabase().transaction(async (tx) => {
       const [order] = await tx
         .select()
@@ -350,14 +358,28 @@ export async function payOrder(
         throw new Error("Gateway rejected request");
       await tx
         .insert(payments)
-        .values({ orderId: id, authority: response.authority });
+        .values({ orderId: id, authority: response.authority, amountToman: order.totalToman });
       return response.authority;
     });
   } catch {
-    return failed(locale);
+    return { error: text(locale, "ارتباط با درگاه برقرار نشد یا سفارش قابل پرداخت نیست. سفارش محفوظ است؛ دوباره وضعیت پرداخت را بررسی کنید.", "Could not start payment, or this order is not payable. Your order is saved; check payment status again.") };
   }
   redirect(`https://www.zarinpal.com/pg/StartPay/${authority}`);
 }
+export async function checkOrderPayment(id: string, locale: Locale): Promise<ActionState> {
+  const user = await requireUser();
+  if (!z.uuid().safeParse(id).success) return denied(locale);
+  const [record] = await getDatabase().select({ authority: payments.authority, checkedAt: payments.checkedAt }).from(payments).innerJoin(orders, eq(orders.id, payments.orderId)).where(and(eq(orders.id, id), isAdministrator(user, "finance") ? undefined : eq(orders.userId, user.id))).orderBy(desc(payments.createdAt)).limit(1);
+  if (!record?.authority) return { error: text(locale, "هنوز تراکنشی به درگاه ارسال نشده است.", "No gateway transaction has been created yet.") };
+  if (record.checkedAt && Date.now() - record.checkedAt.getTime() < 15000) return { error: text(locale, "چند ثانیه صبر کنید و دوباره بررسی کنید.", "Wait a few seconds before checking again.") };
+  try {
+    const result = await verifyPayment(record.authority);
+    revalidatePath("/panel", "layout");
+    if (result?.status === "paid") return { success: text(locale, "پرداخت با موفقیت تأیید شد.", "Payment was confirmed successfully.") };
+    return { error: result?.status === "failed" ? text(locale, "پرداخت ناموفق است؛ می‌توانید دوباره پرداخت کنید یا سفارش را لغو کنید.", "Payment failed. You can retry payment or cancel the order.") : text(locale, "وضعیت پرداخت هنوز قطعی نیست؛ دوباره بررسی کنید. در صورت کسر وجه، دوباره پرداخت نکنید و با پشتیبانی تماس بگیرید.", "Payment status is not final. Check again; if charged, do not pay again and contact support.") };
+  } catch { return { error: text(locale, "بررسی پرداخت فعلاً ممکن نیست. در صورت کسر وجه، دوباره پرداخت نکنید.", "Payment cannot be checked right now. If charged, do not pay again.") }; }
+}
+
 export async function cancelOrder(
   id: string,
   locale: Locale,
@@ -371,7 +393,7 @@ export async function cancelOrder(
       .where(
         and(
           eq(orders.id, id),
-          user.role === "admin" ? undefined : eq(orders.userId, user.id),
+          isAdministrator(user, "finance") ? undefined : eq(orders.userId, user.id),
         ),
       )
       .for("update");
@@ -384,7 +406,7 @@ export async function cancelOrder(
     const [payment] = await tx
       .select()
       .from(payments)
-      .where(eq(payments.orderId, id));
+      .where(and(eq(payments.orderId, id), sql`${payments.status} <> 'failed'`));
     if (payment)
       return {
         error: text(
@@ -441,7 +463,7 @@ export async function updateOrder(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  const admin = await requireRole("admin"),
+  const admin = await requireRole("admin", "finance"),
     locale = form.get("locale") === "en" ? "en" : "fa";
   if (!z.uuid().safeParse(id).success) return denied(locale);
   const parsed = z
@@ -611,7 +633,7 @@ export async function deleteOrder(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "finance");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   const result = await getDatabase().transaction(async (tx) => {
     const [order] = await tx

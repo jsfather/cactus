@@ -35,7 +35,7 @@ function refresh() {
 }
 
 export async function createCategory(_state: CategoryFormState, formData: FormData): Promise<CategoryFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "shop");
   const parsed = categorySchema.safeParse(read(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
   if (!parsed.success) return { error: locale === "fa" ? "اطلاعات دسته را بررسی کنید." : "Please review the category information.", fieldErrors: z.flattenError(parsed.error).fieldErrors };
@@ -50,7 +50,7 @@ export async function createCategory(_state: CategoryFormState, formData: FormDa
 }
 
 export async function updateCategory(categoryIdValue: string, _state: CategoryFormState, formData: FormData): Promise<CategoryFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "shop");
   const categoryId = z.uuid().safeParse(categoryIdValue);
   const parsed = categorySchema.safeParse(read(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
@@ -67,7 +67,7 @@ export async function updateCategory(categoryIdValue: string, _state: CategoryFo
 }
 
 export async function deleteCategory(categoryIdValue: string, locale: Locale): Promise<CategoryMutationState> {
-  await requireRole("admin");
+  await requireRole("admin", "shop");
   const categoryId = z.uuid().safeParse(categoryIdValue);
   if (!categoryId.success) return { error: locale === "fa" ? "شناسه دسته معتبر نیست." : "The category identifier is invalid." };
   try {

@@ -7,7 +7,7 @@ import {
 } from "@/components/panel/ui";
 import { LiveChat } from "@/components/support/live-chat";
 export default async function ChatInbox() {
-  await requireRole("admin");
+  await requireRole("admin", "support");
   const locale = await getPanelLocale();
   return (
     <PanelPage>

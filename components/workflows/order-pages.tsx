@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import Link from "next/link";
 import { and, asc, desc, eq, ilike, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -24,6 +25,7 @@ import { getOrderStats } from "@/lib/commerce/analytics";
 import { orderLabel, orderStages } from "@/lib/commerce/status";
 import {
   payOrder,
+  checkOrderPayment,
   cancelOrder,
   updateOrder,
   deleteOrder,
@@ -52,17 +54,19 @@ export async function OrdersPage({
   query = "",
   status = "",
   created = false,
+  paymentNotice = "",
   page = 1,
 }: {
   id?: string;
   query?: string;
   status?: string;
   created?: boolean;
+  paymentNotice?: string;
   page?: number;
 }) {
   const user = await requireUser(),
     locale = await getPanelLocale(),
-    admin = user.role === "admin",
+    admin = isAdministrator(user, "finance"),
     db = getDatabase(),
     fa = locale === "fa";
   const paymentLabel = (value: string) =>
@@ -89,6 +93,8 @@ export async function OrdersPage({
           id: payments.id,
           reference: payments.reference,
           status: payments.status,
+          gatewayCode: payments.gatewayCode,
+          createdAt: payments.createdAt,
         })
         .from(payments)
         .where(eq(payments.orderId, id)),
@@ -101,6 +107,7 @@ export async function OrdersPage({
     const physical = items.some((item) => !item.termId);
     return (
       <PanelPage>
+        {paymentNotice ? <p role="status" className={`rounded-2xl border p-4 text-sm leading-7 ${order.paymentStatus === "paid" ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200" : "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200"}`}>{order.paymentStatus === "paid" ? (fa ? "پرداخت سفارش تأیید شده است. شماره پیگیری در خلاصه سفارش نمایش داده می‌شود." : "Order payment is confirmed. The payment reference appears in the summary.") : transactions.some((attempt) => attempt.status === "failed") && !transactions.some((attempt) => attempt.status === "pending") ? (fa ? "پرداخت تکمیل نشده است؛ سفارش محفوظ است و می‌توانید دوباره تلاش کنید." : "Payment was not completed. Your order is saved and you can retry.") : (fa ? "نتیجه پرداخت هنوز قطعی نیست. از دکمه بررسی وضعیت پرداخت استفاده کنید؛ اگر وجه کسر شده، دوباره پرداخت نکنید." : "Payment is not final yet. Check payment status; if charged, do not pay again.")}</p> : null}
         {created && order.userId === user.id && (
           <CompleteCart orderId={order.id} items={items} />
         )}
@@ -212,6 +219,7 @@ export async function OrdersPage({
                   <dd className="mt-1 whitespace-pre-wrap">{order.notes}</dd>
                 </div>
               )}
+              {transactions.length ? <div className="space-y-2 border-t border-zinc-200 pt-3 dark:border-zinc-800"><dt className="font-semibold">{fa ? "تلاش‌های پرداخت" : "Payment attempts"}</dt>{[...transactions].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).map((attempt) => <dd key={attempt.id} className="rounded-xl bg-zinc-50 p-3 text-xs leading-6 dark:bg-zinc-900"><p className={attempt.status === "paid" ? "font-semibold text-emerald-700 dark:text-emerald-300" : attempt.status === "failed" ? "font-semibold text-red-600 dark:text-red-400" : "font-semibold text-amber-700 dark:text-amber-300"}>{attempt.status === "paid" ? (fa ? "پرداخت تأییدشده" : "Payment confirmed") : attempt.status === "failed" ? (fa ? "پرداخت ناموفق — امکان تلاش مجدد" : "Payment failed — retry available") : (fa ? "در انتظار تعیین وضعیت" : "Awaiting verification")}</p><p>{formatPanelDate(attempt.createdAt, locale, true)}</p>{attempt.status === "pending" ? <p>{fa ? "اگر وجه کسر شده، دوباره پرداخت نکنید؛ وضعیت را بررسی کنید یا با پشتیبانی تماس بگیرید." : "If charged, do not pay again. Check payment status or contact support."}</p> : null}{admin && attempt.gatewayCode !== null ? <p>{fa ? "کد پاسخ درگاه" : "Gateway response code"}: {attempt.gatewayCode}</p> : null}</dd>)}</div> : null}
               {transactions
                 .filter((t) => t.reference)
                 .map((t) => (
@@ -229,6 +237,7 @@ export async function OrdersPage({
         </div>
         {order.status === "pending" && order.paymentStatus === "pending" && (
           <div className="flex flex-wrap gap-3">
+            {transactions.length ? <ActionButton locale={locale} action={checkOrderPayment.bind(null, id, locale)} label={fa ? "بررسی وضعیت پرداخت" : "Check payment status"} /> : null}
             {order.userId === user.id && (
               <ActionButton
                 locale={locale}
@@ -416,6 +425,7 @@ export async function OrdersPage({
   ] as const;
   return (
     <PanelPage>
+      {["invalid", "retry"].includes(paymentNotice) ? <p role="status" className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-7 text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">{fa ? "بازگشت از درگاه قابل تأیید نبود. سفارش را باز کنید و وضعیت پرداخت را بررسی کنید؛ اگر وجه کسر شده، دوباره پرداخت نکنید." : "The gateway return could not be confirmed. Open your order and check payment status; if charged, do not pay again."}</p> : null}
       <PanelPageHeader
         eyebrow={fa ? "فروشگاه و پرداخت" : "Commerce & payments"}
         title={fa ? "سفارش‌ها" : "Orders"}

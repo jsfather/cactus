@@ -56,7 +56,7 @@ export async function LearningPage({
   id?: string;
   edit?: boolean;
 }) {
-  const user = await requireRole(role);
+  const user = await requireRole(role, "education");
   const locale = await getPanelLocale();
   const parsed = activityKind.safeParse(raw);
   if (!parsed.success || (role === "student" && raw === "reports")) notFound();

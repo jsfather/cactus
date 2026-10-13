@@ -47,7 +47,7 @@ export async function updateMediaAsset(
   _state: MediaFormState,
   formData: FormData,
 ): Promise<MediaFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "media");
   const parsed = updateSchema.safeParse({
     id: assetId,
     originalName: formData.get("originalName"),
@@ -93,7 +93,7 @@ export async function deleteMediaAsset(
   locale: Locale,
   redirectAfterDelete = false,
 ): Promise<DeleteMediaState> {
-  await requireRole("admin");
+  await requireRole("admin", "media");
   const assetId = z.uuid().safeParse(assetIdValue);
   if (!assetId.success)
     return {

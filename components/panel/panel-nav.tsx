@@ -1,4 +1,5 @@
 "use client";
+import { canVisitPanelPath } from "@/lib/auth/permissions";
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -269,10 +270,12 @@ export function PanelNav({
   user,
   locale,
   unreadCount = 0,
+  logoUrl,
 }: {
   user: CurrentUser;
   locale: Locale;
   unreadCount?: number;
+  logoUrl?: string;
 }) {
   const pathname = usePathname();
   const dictionary = getPanelDictionary(locale);
@@ -280,7 +283,7 @@ export function PanelNav({
   const [mobileOpen, setMobileOpen] = useState(false);
   const alternateLocale = locale === "fa" ? "en" : "fa";
   const alternateHref = `/api/preferences/locale?locale=${alternateLocale}&returnTo=${encodeURIComponent(pathname)}`;
-  const roleName =
+  const baseRoleName =
     locale === "fa"
       ? {
           admin: "همکار",
@@ -296,11 +299,15 @@ export function PanelNav({
         }[user.role];
 
   const overview: NavItem = {
+    // Keep the role route while displaying the colleague's assigned job title.
     href: roleHome[user.role],
     label: dictionary.nav.overview,
     icon: "home",
   };
-  const { directLinks, groups } = getPanelNavigation(user.role, locale);
+  const roleName = user.accessProfileId ? (locale === "fa" ? user.accessTitleFa : user.accessTitleEn) || baseRoleName : baseRoleName;
+  const navigation = getPanelNavigation(user.role, locale);
+  const directLinks = navigation.directLinks.filter((item) => canVisitPanelPath(user, item.href));
+  const groups = navigation.groups.map((group) => ({ ...group, items: group.items.filter((item) => canVisitPanelPath(user, item.href)) })).filter((group) => group.items.length);
   const isActive = (href: string) =>
     pathname === href ||
     (href !== roleHome[user.role] && pathname.startsWith(`${href}/`));
@@ -359,7 +366,7 @@ export function PanelNav({
           aria-label={locale === "fa" ? "پنل کاکتوس" : "Cactus panel"}
           onClick={closeMobileNavigation}
         >
-          <CactusBrand locale={locale} subtitle={roleName} />
+          <CactusBrand locale={locale} subtitle={roleName} logoUrl={logoUrl} />
         </Link>
         <div className="flex items-center gap-2">
           <Link

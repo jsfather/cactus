@@ -6,6 +6,8 @@ import {
   PanelSurface,
 } from "@/components/panel/ui";
 import { requireRole } from "@/lib/auth/session";
+import { requireAdminWorkspace } from "@/lib/auth/session";
+import { permissionSections, isAdministrator } from "@/lib/auth/permissions";
 import { getAdminAnalytics } from "@/lib/dashboard/admin-analytics";
 import type { UserRole } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
@@ -43,6 +45,12 @@ function MetricCard({
 }
 
 export default async function AdminDashboard() {
+  const workspaceUser = await requireAdminWorkspace();
+  if (workspaceUser.accessProfileId) {
+    const locale = await getPanelLocale();
+    const fa = locale === "fa";
+    return <PanelPage><PanelPageHeader eyebrow={fa ? "مدیریت" : "Administration"} title={fa ? "میز کار همکار" : "Colleague workspace"} description={fa ? `عنوان دسترسی: ${workspaceUser.accessTitleFa ?? ""}. فقط بخش‌های مجاز در دسترس شما هستند.` : `Access profile: ${workspaceUser.accessTitleEn ?? ""}. Only permitted sections are available.`} /><div className="grid gap-4 sm:grid-cols-2">{permissionSections.filter((section) => isAdministrator(workspaceUser, section.key)).map((section) => <PanelSurface key={section.key} className="p-5"><Link className="cursor-pointer font-semibold text-emerald-700 dark:text-emerald-400" href={section.href}>{fa ? section.fa : section.en}</Link></PanelSurface>)}</div></PanelPage>;
+  }
   const [user, locale, analytics] = await Promise.all([
     requireRole("admin"),
     getPanelLocale(),

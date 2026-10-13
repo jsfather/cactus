@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import path from "node:path";
 import { and, eq } from "drizzle-orm";
 import type { CurrentUser } from "@/lib/auth/session";
@@ -39,7 +40,7 @@ export async function ownsAttachment(user: CurrentUser, url: string) {
     .where(
       and(
         eq(attachments.id, id),
-        user.role === "admin" ? undefined : eq(attachments.uploaderId, user.id),
+        isAdministrator(user) ? undefined : eq(attachments.uploaderId, user.id),
       ),
     );
   return Boolean(item);

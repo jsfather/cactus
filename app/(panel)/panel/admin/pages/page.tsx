@@ -8,7 +8,7 @@ import { savePresentation } from "@/lib/site-content/actions";
 import { ActionForm, type Field } from "@/components/workflows/action-form";
 import { PanelPage, PanelPageHeader, PanelPrimaryLink } from "@/components/panel/ui";
 export default async function StaticPages() {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const [locale, content] = await Promise.all([getPanelLocale(), getSiteContent()]);
   const fa = locale === "fa";
   const presentation = getPresentation(content.presentation);

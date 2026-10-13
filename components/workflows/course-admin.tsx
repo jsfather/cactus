@@ -23,7 +23,7 @@ import {
   PanelEmptyState,
 } from "@/components/panel/ui";
 export async function CourseAdmin({ id }: { id?: string }) {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const locale = await getPanelLocale();
   const db = getDatabase();
   if (id) {

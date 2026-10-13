@@ -5,7 +5,8 @@ import { and, eq, gt } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getDatabase } from "@/lib/db/client";
-import { sessions, users, loginEvents, type UserRole } from "@/lib/db/schema";
+import { sessions, users, loginEvents, accessProfiles, type UserRole } from "@/lib/db/schema";
+import { isAdministrator, type Permission } from "./permissions";
 
 const SESSION_COOKIE = "cactus_session";
 const SESSION_DURATION_MS = 1000 * 60 * 60 * 24 * 30;
@@ -21,6 +22,10 @@ export type CurrentUser = {
   role: UserRole;
   avatarUrl: string | null;
   profileComplete: boolean;
+  accessProfileId?: string | null;
+  permissions?: string[];
+  accessTitleFa?: string | null;
+  accessTitleEn?: string | null;
 };
 
 function hashToken(token: string) {
@@ -81,10 +86,15 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
       firstNameEn: users.firstNameEn,
       lastNameEn: users.lastNameEn,
       role: users.role,
+      accessProfileId: users.accessProfileId,
+      permissions: accessProfiles.permissions,
+      accessTitleFa: accessProfiles.titleFa,
+      accessTitleEn: accessProfiles.titleEn,
       avatarUrl: users.avatarUrl,
     })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))
+    .leftJoin(accessProfiles, eq(users.accessProfileId, accessProfiles.id))
     .where(
       and(
         eq(sessions.tokenHash, hashToken(token)),
@@ -97,6 +107,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   return result
     ? {
         ...result,
+        permissions: result.permissions ?? [],
         profileComplete: Boolean(
           result.firstNameFa.trim() && result.lastNameFa.trim(),
         ),
@@ -115,7 +126,7 @@ export async function requireUser(returnTo?: string) {
   return user;
 }
 
-export async function requireRole(allowedRoles: UserRole | UserRole[]) {
+export async function requireRole(allowedRoles: UserRole | UserRole[], permission?: Permission) {
   const user = await requireUser();
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
@@ -127,5 +138,14 @@ export async function requireRole(allowedRoles: UserRole | UserRole[]) {
     redirect(`/panel/${user.role}`);
   }
 
+  if (user.role === "admin" && !isAdministrator(user, permission)) redirect("/panel/admin?access=denied");
+
+  return user;
+}
+
+export async function requireAdminWorkspace() {
+  const user = await requireUser();
+  if (!user.profileComplete) redirect("/panel/profile?onboarding=1");
+  if (user.role !== "admin") redirect(`/panel/${user.role}`);
   return user;
 }

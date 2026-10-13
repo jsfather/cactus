@@ -46,7 +46,7 @@ import {
 } from "@/components/panel/ui";
 import { TermStatusBadge } from "@/components/terms/term-status-badge";
 export async function StudentTermsPage({ id }: { id?: string }) {
-  const user = await requireRole("student");
+  const user = await requireRole("student", "education");
   const locale = await getPanelLocale();
   const db = getDatabase();
   if (id) {
@@ -254,7 +254,7 @@ export async function StudentAttendancePage({
   role?: "student" | "teacher" | "admin";
   absent?: boolean;
 }) {
-  const user = await requireRole(role);
+  const user = await requireRole(role, "education");
   const locale = await getPanelLocale();
   const records = await getDatabase()
     .select({
@@ -346,7 +346,7 @@ export async function StudentAttendancePage({
   );
 }
 export async function TeacherStudentsPage({ id }: { id?: string }) {
-  const user = await requireRole("teacher");
+  const user = await requireRole("teacher", "education");
   const locale = await getPanelLocale();
   const db = getDatabase();
   const students = await db
@@ -417,7 +417,7 @@ export async function PreviousCoursesPage({
 }: {
   studentId?: string;
 }) {
-  const user = await requireRole(studentId ? "admin" : "student");
+  const user = await requireRole(studentId ? "admin" : "student", "education");
   const locale = await getPanelLocale();
   const target = studentId ?? user.id;
   if (!z.uuid().safeParse(target).success) notFound();

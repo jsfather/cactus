@@ -82,7 +82,7 @@ export async function replyToComment(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   if (!z.uuid().safeParse(id).success) return denied(locale);
   const parsed = z

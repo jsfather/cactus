@@ -17,7 +17,7 @@ export async function AttendanceSessionPage({
 }) {
   if (!z.uuid().safeParse(sessionId).success) notFound();
   const [user, locale, session] = await Promise.all([
-    requireRole(role),
+    requireRole(role, "education"),
     getPanelLocale(),
     getTermSession(sessionId),
   ]);

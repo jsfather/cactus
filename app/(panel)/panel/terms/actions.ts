@@ -1,5 +1,6 @@
 "use server";
 
+import { isAdministrator } from "@/lib/auth/permissions";
 import { randomBytes } from "node:crypto";
 import { and, eq, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -34,7 +35,7 @@ async function canManageTerm(termId: string) {
     .where(eq(terms.id, termId))
     .limit(1);
   if (!term || term.archivedAt) return null;
-  if (user.role === "admin") return user;
+  if (isAdministrator(user, "education")) return user;
   if (user.role !== "teacher") return null;
   const [assignment] = await getDatabase()
     .select({ termId: termTeachers.termId })

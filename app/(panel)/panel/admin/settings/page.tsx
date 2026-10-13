@@ -11,7 +11,7 @@ import {
 } from "@/components/panel/ui";
 
 export default async function SiteSettings() {
-  await requireRole("admin");
+  await requireRole("admin", "settings");
   const [locale, settings] = await Promise.all([
     getPanelLocale(),
     getSiteNavigation(),
@@ -68,7 +68,7 @@ export default async function SiteSettings() {
           googleVerification: settings.googleVerification,
         }}
         fields={[
-          {name: "faviconUrl", label: fa ? "فاوآیکن مرورگر" : "Browser favicon", type: "image", hint: fa ? "تصویر مربعی PNG پیشنهاد می‌شود؛ با حذف آن نشان پیش‌فرض نمایش داده می‌شود." : "A square PNG is recommended. Leave empty for the default mark."},
+          {name: "faviconUrl", label: fa ? "فاوآیکن مرورگر" : "Browser favicon", type: "image", hint: fa ? "تصویر مربعی PNG پیشنهاد می‌شود؛ اگر انتخاب نشود، لوگوی سایت و سپس نشان پیش‌فرض استفاده می‌شود." : "A square PNG is recommended. Leave empty to use the site logo, then the default mark."},
           { name: "loadingIconUrl", label: fa ? "نشان بارگذاری" : "Loading icon", type: "image", hint: fa ? "با حذف تصویر، نشان کاکتوس نمایش داده می‌شود." : "Leave empty to use the Cactus mark." },
           {
             name: "siteTitleFa",

@@ -11,7 +11,7 @@ import { getSearchParam } from "@/lib/panel/pagination";
 const validViews: AttendanceWorkspaceView[] = ["today", "needs_action", "upcoming", "all"];
 
 export default async function AdminAttendancePage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const [, locale, params] = await Promise.all([requireRole("admin"), getPanelLocale(), searchParams]);
+  const [, locale, params] = await Promise.all([requireRole("admin", "education"), getPanelLocale(), searchParams]);
   const isFa = locale === "fa";
   const rawTermId = getSearchParam(params, "termId");
   const termId = z.uuid().safeParse(rawTermId).success ? rawTermId : undefined;

@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { and, eq, or } from "drizzle-orm";
@@ -35,7 +36,9 @@ export async function GET(
   // Learning activities, submissions, tickets and other resources retain their role checks.
   const [publicSoftware] = await db.select({ id: resources.id }).from(resources).where(and(eq(resources.kind, "requirements"), eq(resources.attachmentUrl, url), eq(resources.status, "published"), eq(resources.audience, "all"))).limit(1);
   const [publicVideo] = item.mimeType === "video/mp4" ? await db.select({id: landingPages.id}).from(landingPages).where(and(eq(landingPages.videoUrl, url), eq(landingPages.status, "published"))).limit(1) : [];
-  let allowed = Boolean(publicSoftware || publicVideo) || Boolean(user && (user.role === "admin" || item.uploaderId === user.id));
+  // Media-library permission does not grant access to private ticket or
+  // educational files; those are authorized through their parent record below.
+  let allowed = Boolean(publicSoftware || publicVideo) || Boolean(user && (isAdministrator(user) || item.uploaderId === user.id));
   if (!user && !allowed) return new NextResponse(null, { status: 401 });
   if (!allowed && user) {
     const activities = await db
@@ -72,7 +75,7 @@ export async function GET(
       .where(
         and(
           eq(ticketMessages.attachmentUrl, url),
-          or(
+          isAdministrator(user, "support") ? undefined : or(
             eq(tickets.ownerId, user.id),
             user.role === "teacher"
               ? eq(tickets.assignedToId, user.id)
@@ -89,8 +92,8 @@ export async function GET(
       .where(
         and(
           eq(resources.attachmentUrl, url),
-          eq(resources.status, "published"),
-          or(eq(resources.audience, "all"), eq(resources.audience, user.role)),
+          isAdministrator(user, "content") ? undefined : eq(resources.status, "published"),
+          isAdministrator(user, "content") ? undefined : or(eq(resources.audience, "all"), eq(resources.audience, user.role)),
         ),
       );
     allowed = Boolean(row);

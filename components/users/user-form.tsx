@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { permissionSections } from "@/lib/auth/permissions";
 import Link from "next/link";
 import { createManagedUser, type UserFormState, updateManagedUser } from "@/app/(panel)/panel/admin/users/actions";
 import { usePreservedFields } from "@/components/forms/use-preserved-fields";
@@ -14,15 +15,15 @@ import { getPanelDictionary } from "@/lib/i18n/panel";
 import { getUserSectionConfig } from "@/lib/users/config";
 
 const initialState: UserFormState = {};
-export type UserFormValues = { firstNameFa: string; lastNameFa: string; firstNameEn: string; lastNameEn: string; mobile: string; email: string; password: string; role: UserRole; isActive: boolean; avatarUrl: string };
+export type UserFormValues = { firstNameFa: string; lastNameFa: string; firstNameEn: string; lastNameEn: string; mobile: string; email: string; password: string; role: UserRole; isActive: boolean; avatarUrl: string; accessProfileId?: string };
 
-export function UserForm({ role, locale, mode = "create", userId, initialValues = { firstNameFa: "", lastNameFa: "", firstNameEn: "", lastNameEn: "", mobile: "", email: "", password: "", role, isActive: true, avatarUrl: "" } }: { role: UserRole; locale: Locale; mode?: "create" | "edit"; userId?: string; initialValues?: UserFormValues }) {
+export function UserForm({ role, locale, mode = "create", userId, accessProfiles = [], initialValues = { firstNameFa: "", lastNameFa: "", firstNameEn: "", lastNameEn: "", mobile: "", email: "", password: "", role, isActive: true, avatarUrl: "" } }: { role: UserRole; locale: Locale; mode?: "create" | "edit"; userId?: string; initialValues?: UserFormValues; accessProfiles?: Array<{ id: string; titleFa: string; titleEn: string; permissions: string[] }> }) {
   const config = getUserSectionConfig(role, locale);
   const dictionary = getPanelDictionary(locale);
   const formAction = mode === "edit" && userId ? updateManagedUser.bind(null, role, userId) : createManagedUser.bind(null, role);
   const [state, action, pending] = useActionState(formAction, initialState);
   useActionErrorToast(state);
-  const { bind } = usePreservedFields({ firstNameFa: initialValues.firstNameFa, lastNameFa: initialValues.lastNameFa, firstNameEn: initialValues.firstNameEn, lastNameEn: initialValues.lastNameEn, mobile: initialValues.mobile, email: initialValues.email, password: initialValues.password, role: initialValues.role });
+  const { bind, values } = usePreservedFields({ firstNameFa: initialValues.firstNameFa, lastNameFa: initialValues.lastNameFa, firstNameEn: initialValues.firstNameEn, lastNameEn: initialValues.lastNameEn, mobile: initialValues.mobile, email: initialValues.email, password: initialValues.password, role: initialValues.role, accessProfileId: initialValues.accessProfileId ?? "" });
   const [isActive, setIsActive] = useState(initialValues.isActive);
   const isFa = locale === "fa";
 
@@ -102,6 +103,14 @@ export function UserForm({ role, locale, mode = "create", userId, initialValues 
             title={isFa ? "دسترسی حساب" : "Account access"}
             description={isFa ? "نقش و وضعیت فعال بودن، سطح دسترسی این حساب را تعیین می‌کنند." : "Role and active status determine this account's access."}
           >
+            {values.role === "admin" ? <div className="mb-5">
+              <FormLabel label={isFa ? "عنوان کاری و سطح دسترسی همکار" : "Colleague job title and permissions"} hint={isFa ? "مدیر کامل همه بخش‌ها را دارد؛ برای سایر همکاران یک عنوان محدود انتخاب کنید." : "Full administrators access every section. Choose a restricted profile for other colleagues."}>
+                <PanelSelect {...bind("accessProfileId")}><option value="">{isFa ? "مدیر کامل — همه دسترسی‌ها" : "Full administrator — all permissions"}</option>{accessProfiles.map((profile) => <option key={profile.id} value={profile.id}>{isFa ? profile.titleFa : profile.titleEn}</option>)}</PanelSelect>
+              </FormLabel>
+              <FieldError errors={state.fieldErrors?.accessProfileId} />
+              <p className="mt-2 text-xs leading-6 text-zinc-500">{values.accessProfileId ? (permissionSections.filter((section) => accessProfiles.find((profile) => profile.id === values.accessProfileId)?.permissions.includes(section.key)).map((section) => isFa ? section.fa : section.en).join(" · ") || (isFa ? "این عنوان دسترسی مدیریتی ندارد." : "This profile has no administrative permissions.")) : (isFa ? "دسترسی کامل، شامل مدیریت همکاران و عنوان‌های دسترسی." : "Full access, including colleague and permission management.")}</p>
+              <Link href="/panel/admin/access" className="mt-2 inline-block cursor-pointer text-xs font-semibold text-emerald-700 dark:text-emerald-400">{isFa ? "تعریف و ویرایش عنوان‌های دسترسی" : "Manage access profiles"}</Link>
+            </div> : null}
             <div className="space-y-4">
               <div>
                 <FormLabel label={dictionary.users.role}>

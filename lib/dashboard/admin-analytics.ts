@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { desc, gte, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
 import { mediaAssets, posts, products, users, type UserRole } from "@/lib/db/schema";
@@ -33,7 +34,7 @@ export async function getAdminAnalytics() {
 
   const roles = Object.fromEntries(((["admin", "teacher", "student", "member"] as UserRole[]).map((role) => [role, roleRows.find((row) => row.role === role)?.count ?? 0]))) as Record<UserRole, number>;
   const recentActivity: DashboardActivity[] = [
-    ...recentUsers.map((user) => ({ id: user.id, kind: "user" as const, titleFa: `${user.firstNameFa} ${user.lastNameFa}`.trim(), titleEn: `${user.firstNameEn} ${user.lastNameEn}`.trim(), createdAt: user.createdAt, href: `/panel/admin/${user.role === "admin" ? "admins" : user.role === "teacher" ? "teachers" : user.role === "student" ? "students" : "members"}/${user.id}/edit` })),
+    ...recentUsers.map((user) => ({ id: user.id, kind: "user" as const, titleFa: `${user.firstNameFa} ${user.lastNameFa}`.trim(), titleEn: `${user.firstNameEn} ${user.lastNameEn}`.trim(), createdAt: user.createdAt, href: `/panel/admin/${isAdministrator(user) ? "admins" : user.role === "teacher" ? "teachers" : user.role === "student" ? "students" : "members"}/${user.id}/edit` })),
     ...recentPosts.map((post) => ({ id: post.id, kind: "post" as const, titleFa: post.titleFa, titleEn: post.titleEn || post.titleFa, createdAt: post.createdAt, href: `/panel/admin/blog/${post.id}/edit` })),
     ...recentProducts.map((product) => ({ id: product.id, kind: "product" as const, titleFa: product.titleFa, titleEn: product.titleEn || product.titleFa, createdAt: product.createdAt, href: `/panel/admin/products/${product.id}/edit` })),
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 7);

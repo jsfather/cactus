@@ -22,7 +22,7 @@ export async function saveLanding(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   if (id && !z.uuid().safeParse(id).success) return denied(locale);
   const keys = [
@@ -128,7 +128,7 @@ export async function deleteLanding(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   try {
     const [row] = await getDatabase()

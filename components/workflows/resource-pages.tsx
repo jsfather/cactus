@@ -38,7 +38,7 @@ export async function ResourceAdmin({
   id?: string;
   saved?: boolean;
 }) {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = await getPanelLocale();
   const parsed = resourceKind.safeParse(raw);
   if (!parsed.success) notFound();

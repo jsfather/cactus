@@ -29,7 +29,7 @@ function refresh() {
 }
 
 export async function createTermLevel(_state: TermLevelFormState, formData: FormData): Promise<TermLevelFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const parsed = termLevelSchema.safeParse(read(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
   if (!parsed.success) return { error: locale === "fa" ? "اطلاعات سطح را بررسی کنید." : "Review the level information.", fieldErrors: z.flattenError(parsed.error).fieldErrors };
@@ -54,7 +54,7 @@ export async function createTermLevel(_state: TermLevelFormState, formData: Form
 }
 
 export async function updateTermLevel(levelIdValue: string, _state: TermLevelFormState, formData: FormData): Promise<TermLevelFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const levelId = z.uuid().safeParse(levelIdValue);
   const parsed = termLevelSchema.safeParse(read(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
@@ -71,7 +71,7 @@ export async function updateTermLevel(levelIdValue: string, _state: TermLevelFor
 }
 
 export async function deleteTermLevel(levelIdValue: string, locale: "fa" | "en"): Promise<TermLevelMutationState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const levelId = z.uuid().safeParse(levelIdValue);
   if (!levelId.success) return { error: locale === "fa" ? "شناسه سطح معتبر نیست." : "The level identifier is invalid." };
   try {

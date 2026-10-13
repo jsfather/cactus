@@ -17,7 +17,7 @@ export async function saveChatSettings(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "support");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = chatSettingsSchema.safeParse({
     ...Object.fromEntries(form),

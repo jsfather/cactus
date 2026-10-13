@@ -14,7 +14,7 @@ export async function saveAppearance(
   _: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "settings");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const palette = (mode: string) =>
     Object.fromEntries(

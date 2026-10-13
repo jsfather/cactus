@@ -19,8 +19,8 @@ export async function getSiteMetadata(locale: Locale): Promise<Metadata> {
       ? { google: settings.googleVerification }
       : undefined,
     icons: {
-      icon: settings.faviconUrl || "/cactus-logo.svg",
-      apple: settings.faviconUrl || "/cactus-logo.svg",
+      icon: settings.faviconUrl || settings.logoUrl || "/cactus-logo.svg",
+      apple: settings.faviconUrl || settings.logoUrl || "/cactus-logo.svg",
     },
   };
 }
@@ -28,7 +28,7 @@ export async function getSiteIcons() {
   await connection();
   const settings = await getSiteNavigation();
   return {
-    icon: settings.faviconUrl || "/cactus-logo.svg",
-    apple: settings.faviconUrl || "/cactus-logo.svg",
+    icon: settings.faviconUrl || settings.logoUrl || "/cactus-logo.svg",
+    apple: settings.faviconUrl || settings.logoUrl || "/cactus-logo.svg",
   };
 }

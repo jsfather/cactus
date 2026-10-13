@@ -29,7 +29,7 @@ export default async function LandingList({
 }: {
   searchParams: Promise<AdminListSearchParams>;
 }) {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = await getPanelLocale(),
     fa = locale === "fa",
     params = await searchParams,

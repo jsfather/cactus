@@ -29,6 +29,10 @@ export function PanelMultiCombobox({
   label,
   placeholder,
   noOptionsText,
+  searchLabel,
+  searchPlaceholder,
+  selectedLabel,
+  closeOnSelect = false,
 }: {
   locale: Locale;
   options: MultiComboboxOption[];
@@ -37,6 +41,10 @@ export function PanelMultiCombobox({
   label: string;
   placeholder?: string;
   noOptionsText?: string;
+  searchLabel?: string;
+  searchPlaceholder?: string;
+  selectedLabel?: (count: number) => string;
+  closeOnSelect?: boolean;
 }) {
   const isFa = locale === "fa";
   const [open, setOpen] = useState(false);
@@ -76,15 +84,16 @@ export function PanelMultiCombobox({
 
   function toggle(optionValue: string) {
     onValueChange(value.includes(optionValue) ? value.filter((item) => item !== optionValue) : [...value, optionValue]);
+    if (closeOnSelect) { setOpen(false); triggerRef.current?.focus(); }
   }
 
   return <div ref={rootRef} className="relative">
     <button ref={triggerRef} type="button" role="combobox" aria-label={label} aria-haspopup="listbox" aria-controls={listboxId} aria-expanded={open} onClick={() => { if (open) setOpen(false); else { setQuery(""); if (triggerRef.current) setPopupStyle(getPopupPosition(triggerRef.current)); setOpen(true); } }} className={`${getPanelSelectClass()} relative flex min-h-12 items-center text-start`}>
-      <span className={selected.length ? "truncate" : "truncate text-zinc-400"}>{selected.length ? (isFa ? `${selected.length.toLocaleString("fa-IR")} مدرس انتخاب شده` : `${selected.length} teacher${selected.length === 1 ? "" : "s"} selected`) : (placeholder ?? (isFa ? "انتخاب مدرس‌ها" : "Choose teachers"))}</span>
+      <span className={selected.length ? "truncate" : "truncate text-zinc-400"}>{selected.length ? (selectedLabel?.(selected.length) ?? (isFa ? `${selected.length.toLocaleString("fa-IR")} مدرس انتخاب شده` : `${selected.length} teacher${selected.length === 1 ? "" : "s"} selected`)) : (placeholder ?? (isFa ? "انتخاب مدرس‌ها" : "Choose teachers"))}</span>
       <SelectChevron />
     </button>
     {open && typeof document !== "undefined" ? createPortal(<div ref={popupRef} dir={isFa ? "rtl" : "ltr"} style={popupStyle} className="fixed z-[110] flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white p-2 shadow-2xl dark:border-zinc-700 dark:bg-zinc-950">
-      <label className="relative block"><span className="sr-only">{isFa ? "جست‌وجوی مدرس" : "Search teachers"}</span><svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400"><circle cx="8.5" cy="8.5" r="5" /><path strokeLinecap="round" d="m12.2 12.2 4 4" /></svg><input ref={searchRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={isFa ? "نام یا شماره موبایل…" : "Name or mobile…"} className={`${getPanelInputClass("compact")} ps-9`} /></label>
+      <label className="relative block"><span className="sr-only">{searchLabel ?? (isFa ? "جست‌وجوی مدرس" : "Search teachers")}</span><svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400"><circle cx="8.5" cy="8.5" r="5" /><path strokeLinecap="round" d="m12.2 12.2 4 4" /></svg><input ref={searchRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder={searchPlaceholder ?? (isFa ? "نام یا شماره موبایل…" : "Name or mobile…")} className={`${getPanelInputClass("compact")} ps-9`} /></label>
       <div id={listboxId} role="listbox" aria-label={label} aria-multiselectable="true" className="mt-2 min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain">
         {filtered.length ? filtered.map((option) => {
           const checked = value.includes(option.value);

@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import "server-only";
 import { and, desc, eq, or, sql } from "drizzle-orm";
 import { getDatabase } from "@/lib/db/client";
@@ -28,7 +29,7 @@ export async function getTicketChat(
     .where(
       and(
         eq(tickets.id, id),
-        user.role === "admin"
+        isAdministrator(user, "support")
           ? undefined
           : or(
               eq(tickets.ownerId, user.id),
@@ -41,7 +42,7 @@ export async function getTicketChat(
     .limit(1);
   if (!ticket) return null;
   const staff =
-    user.role === "admin" ||
+    isAdministrator(user, "support") ||
     (user.role === "teacher" &&
       ticket.assignedToId === user.id &&
       ticket.ownerId !== user.id);

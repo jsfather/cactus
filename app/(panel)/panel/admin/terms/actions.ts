@@ -461,7 +461,7 @@ export async function createTerm(
   _state: TermFormState,
   formData: FormData,
 ): Promise<TermFormState> {
-  const admin = await requireRole("admin");
+  const admin = await requireRole("admin", "education");
   const parsed = termSchema.safeParse(readTermFormData(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
   if (!parsed.success)
@@ -499,7 +499,7 @@ export async function updateTerm(
   _state: TermFormState,
   formData: FormData,
 ): Promise<TermFormState> {
-  const admin = await requireRole("admin");
+  const admin = await requireRole("admin", "education");
   const termId = z.uuid().safeParse(termIdValue);
   const parsed = termSchema.safeParse(readTermFormData(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
@@ -539,7 +539,7 @@ export async function deleteTerm(
   termIdValue: string,
   locale: "fa" | "en",
 ): Promise<TermMutationState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const termId = z.uuid().safeParse(termIdValue);
   if (!termId.success)
     return {

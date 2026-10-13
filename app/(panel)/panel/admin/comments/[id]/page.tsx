@@ -13,7 +13,7 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = await getPanelLocale();
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();

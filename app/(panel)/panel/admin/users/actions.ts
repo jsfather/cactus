@@ -1,7 +1,7 @@
 "use server";
 
 import { unlink } from "node:fs/promises";
-import { and, count, eq, ne } from "drizzle-orm";
+import { and, count, eq, ne, isNull, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -14,6 +14,7 @@ import {
   termEnrollments,
   termTeachers,
   users,
+  accessProfiles,
   userRole,
   type UserRole,
 } from "@/lib/db/schema";
@@ -38,6 +39,7 @@ const commonUserSchema = z.object({
   mobile: mobileSchema,
   email: z.union([z.literal(""), z.string().trim().email().max(320)]),
   role: roleSchema,
+  accessProfileId: z.union([z.uuid(), z.literal("")]),
   isActive: z.boolean(),
   avatarUrl: z.string().trim().max(2048).refine(isAllowedImageReference),
   locale: z.enum(["fa", "en"]),
@@ -68,6 +70,7 @@ function readUserForm(formData: FormData) {
     email: formData.get("email"),
     mobile: formData.get("mobile"),
     role: formData.get("role"),
+    accessProfileId: formData.get("accessProfileId") ?? "",
     password: formData.get("password"),
     isActive: formData.get("isActive") === "on",
     avatarUrl: formData.get("avatarUrl"),
@@ -114,6 +117,10 @@ export async function createManagedUser(
   }
 
   try {
+    if (parsed.data.role === "admin" && parsed.data.accessProfileId) {
+      const [profile] = await getDatabase().select({ id: accessProfiles.id }).from(accessProfiles).where(eq(accessProfiles.id, parsed.data.accessProfileId));
+      if (!profile) return { error: parsed.data.locale === "fa" ? "عنوان دسترسی پیدا نشد." : "Access profile not found." };
+    }
     const passwordHash = parsed.data.password
       ? await hashPassword(parsed.data.password)
       : null;
@@ -129,6 +136,7 @@ export async function createManagedUser(
           email: parsed.data.email ? parsed.data.email.toLowerCase() : null,
           passwordHash,
           role: parsed.data.role,
+          accessProfileId: parsed.data.role === "admin" ? parsed.data.accessProfileId || null : null,
           isActive: parsed.data.isActive,
           avatarUrl: parsed.data.avatarUrl || null,
         })
@@ -207,18 +215,18 @@ export async function updateManagedUser(
     };
   }
 
-  if (currentAdmin.id === validUserId.data && !parsed.data.isActive) {
+  if (currentAdmin.id === validUserId.data && (!parsed.data.isActive || Boolean(parsed.data.accessProfileId))) {
     return {
       error:
         parsed.data.locale === "en"
-          ? "You cannot deactivate your current administrator account."
-          : "نمی‌توانید حساب همکاری فعال خودتان را غیرفعال کنید.",
+          ? "You cannot deactivate your current account or restrict your own access."
+          : "نمی‌توانید حساب فعال خودتان را غیرفعال یا دسترسی خودتان را محدود کنید.",
     };
   }
 
   if (
     validOriginalRole.data === "admin" &&
-    (parsed.data.role !== "admin" || !parsed.data.isActive)
+    (parsed.data.role !== "admin" || !parsed.data.isActive || Boolean(parsed.data.accessProfileId))
   ) {
     const [remainingAdmins] = await getDatabase()
       .select({ value: count() })
@@ -227,6 +235,7 @@ export async function updateManagedUser(
         and(
           eq(users.role, "admin"),
           eq(users.isActive, true),
+          isNull(users.accessProfileId),
           ne(users.id, validUserId.data),
         ),
       );
@@ -292,8 +301,14 @@ export async function updateManagedUser(
     isActive: parsed.data.isActive,
     avatarUrl: parsed.data.avatarUrl || null,
     role: parsed.data.role,
+    accessProfileId: parsed.data.role === "admin" ? parsed.data.accessProfileId || null : null,
     updatedAt: new Date(),
   };
+
+  if (parsed.data.role === "admin" && parsed.data.accessProfileId) {
+    const [profile] = await getDatabase().select({ id: accessProfiles.id }).from(accessProfiles).where(eq(accessProfiles.id, parsed.data.accessProfileId));
+    if (!profile) return { error: parsed.data.locale === "fa" ? "عنوان دسترسی پیدا نشد." : "Access profile not found." };
+  }
 
   if (parsed.data.password) {
     changes.passwordHash = await hashPassword(parsed.data.password);
@@ -302,23 +317,25 @@ export async function updateManagedUser(
   }
 
   try {
-    const [updatedUser] = await getDatabase()
-      .update(users)
-      .set(changes)
-      .where(
-        and(
-          eq(users.id, validUserId.data),
-          eq(users.role, validOriginalRole.data),
-        ),
-      )
-      .returning({ id: users.id });
+    const [updatedUser] = await getDatabase().transaction(async (tx) => {
+      // Serialize administrative access changes so concurrent demotions cannot
+      // leave the installation without a full administrator.
+      await tx.execute(sql`select pg_advisory_xact_lock(1128352837)`);
+      const [actor] = await tx.select({ id: users.id }).from(users).where(and(eq(users.id, currentAdmin.id), eq(users.role, "admin"), eq(users.isActive, true), isNull(users.accessProfileId)));
+      if (!actor) return [];
+      if (validOriginalRole.data === "admin" && (parsed.data.role !== "admin" || !parsed.data.isActive || parsed.data.accessProfileId)) {
+        const [remaining] = await tx.select({ value: count() }).from(users).where(and(eq(users.role, "admin"), eq(users.isActive, true), isNull(users.accessProfileId), ne(users.id, validUserId.data)));
+        if (!remaining?.value) return [];
+      }
+      return tx.update(users).set(changes).where(and(eq(users.id, validUserId.data), eq(users.role, validOriginalRole.data))).returning({ id: users.id });
+    });
 
     if (!updatedUser) {
       return {
         error:
           parsed.data.locale === "en"
-            ? "This account no longer exists."
-            : "این حساب دیگر وجود ندارد.",
+          ? "The account was not found or this change would remove the last full administrator."
+          : "حساب پیدا نشد یا این تغییر دسترسی آخرین مدیر کامل را حذف می‌کند.",
       };
     }
   } catch (error) {
@@ -376,11 +393,18 @@ export async function deleteManagedUser(
             .from(studentDocuments)
             .where(eq(studentDocuments.userId, validUserId.data))
         : [];
-    await getDatabase()
-      .delete(users)
-      .where(
-        and(eq(users.id, validUserId.data), eq(users.role, validRole.data)),
-      );
+    const deleted = await getDatabase().transaction(async (tx) => {
+      await tx.execute(sql`select pg_advisory_xact_lock(1128352837)`);
+      const [actor] = await tx.select({ id: users.id }).from(users).where(and(eq(users.id, currentAdmin.id), eq(users.role, "admin"), eq(users.isActive, true), isNull(users.accessProfileId)));
+      if (!actor) return false;
+      if (validRole.data === "admin") {
+        const [remaining] = await tx.select({ value: count() }).from(users).where(and(eq(users.role, "admin"), eq(users.isActive, true), isNull(users.accessProfileId), ne(users.id, validUserId.data)));
+        if (!remaining?.value) return false;
+      }
+      const result = await tx.delete(users).where(and(eq(users.id, validUserId.data), eq(users.role, validRole.data))).returning({ id: users.id });
+      return Boolean(result.length);
+    });
+    if (!deleted) return { error: locale === "fa" ? "حذف حساب مجاز نیست؛ دسترسی شما یا وجود مدیر کامل را بررسی کنید." : "Deletion was denied. Check your access and ensure a full administrator remains." };
     await Promise.all(
       documentPaths.map(async ({ pathname }) => {
         const absolutePath = resolveStudentDocumentPath(pathname);

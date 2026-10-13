@@ -1,5 +1,6 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { usePathname } from "next/navigation";
 import type { Locale } from "@/lib/i18n/config";
 import { useFeedback } from "@/components/feedback/feedback-provider";
 import { PanelInput } from "@/components/panel/form-controls";
@@ -61,17 +62,33 @@ export function LiveChat({
   const fa = locale === "fa",
     t = (f: string, e: string) => (fa ? f : e);
   const [navigationHeight, setNavigationHeight] = useState(0);
+  const pathname = usePathname();
   useEffect(() => {
     if (inbox) return;
-    const navigation = document.querySelector<HTMLElement>(".public-bottom-nav");
-    if (!navigation) return;
-    const update = () => setNavigationHeight(navigation.getBoundingClientRect().height);
-    update();
+    let navigation: HTMLElement | null = null;
+    let frame = 0;
+    const update = () => {
+      if (navigation?.isConnected) setNavigationHeight(navigation.getBoundingClientRect().height);
+    };
     const observer = new ResizeObserver(update);
-    observer.observe(navigation);
+    const attach = () => {
+      const next = document.querySelector<HTMLElement>(".public-bottom-nav");
+      if (next === navigation) return;
+      if (navigation) observer.unobserve(navigation);
+      navigation = next;
+      if (navigation) { observer.observe(navigation); update(); }
+    };
+    // The public header belongs to each page, while this widget lives in the
+    // persistent root layout. Reattach whenever routing replaces that header.
+    const mutations = new MutationObserver(() => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(attach);
+    });
+    mutations.observe(document.body, { childList: true, subtree: true });
+    attach();
     window.addEventListener("resize", update);
-    return () => { observer.disconnect(); window.removeEventListener("resize", update); };
-  }, [inbox]);
+    return () => { cancelAnimationFrame(frame); mutations.disconnect(); observer.disconnect(); window.removeEventListener("resize", update); };
+  }, [inbox, pathname]);
   const [ready, setReady] = useState(inbox),
     [open, setOpen] = useState(inbox),
     [hint, setHint] = useState(true),
@@ -648,12 +665,12 @@ export function LiveChat({
     );
   return (
     <div
-      className="fixed end-4 z-[80] max-w-[calc(100vw-2rem)]"
-      style={{ bottom: `calc(${navigationHeight + 16}px + ${navigationHeight ? "0px" : "env(safe-area-inset-bottom, 0px)"})` }}
+      className="live-chat-floating fixed end-4 z-[80] max-w-[calc(100vw-2rem)]"
+      style={{ "--chat-bottom-offset": `calc(${navigationHeight + 16}px + ${navigationHeight ? "0px" : "env(safe-area-inset-bottom, 0px)"})` } as CSSProperties}
       dir={fa ? "rtl" : "ltr"}
     >
       {open ? (
-        <div className="mb-3 h-[min(680px,82dvh)] w-[390px] max-w-full" style={{ maxHeight: `calc(100dvh - ${navigationHeight + 112}px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))` }}>
+        <div className="live-chat-popup mb-3 w-[390px] max-w-full">
           {conversation}
         </div>
       ) : (

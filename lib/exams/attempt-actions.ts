@@ -38,7 +38,7 @@ export async function assignExam(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = z
     .object({
@@ -108,7 +108,7 @@ export async function deleteExamAssignment(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   await getDatabase().delete(examAssignments).where(eq(examAssignments.id, id));
   revalidatePath("/panel", "layout");
@@ -118,7 +118,7 @@ export async function startExam(
   assignmentId: string,
   locale: Locale,
 ): Promise<ActionState> {
-  const user = await requireRole("student");
+  const user = await requireRole("student", "education");
   if (!z.uuid().safeParse(assignmentId).success) return denied(locale);
   const result = await getDatabase().transaction(async (tx) => {
     const [assignment] = await tx
@@ -221,7 +221,7 @@ export async function saveExamAnswers(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole("student");
+  const user = await requireRole("student", "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   if (!z.uuid().safeParse(id).success) return denied(locale);
   let raw: unknown;
@@ -267,7 +267,7 @@ export async function saveExamAnswers(
   return result;
 }
 export async function expireExam(id: string) {
-  const user = await requireRole("student");
+  const user = await requireRole("student", "education");
   if (!z.uuid().safeParse(id).success) return;
   await getDatabase().transaction(async (tx) => {
     const [a] = await tx
@@ -290,7 +290,7 @@ export async function deleteExamAttempt(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   await getDatabase().delete(examAttempts).where(eq(examAttempts.id, id));
   revalidatePath("/panel", "layout");

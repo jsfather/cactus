@@ -8,9 +8,10 @@ import {
   orderEvents,
 } from "@/lib/db/schema";
 import { notifyAdmins } from "@/lib/notifications/events";
-import { gatewayRequest, tomanToRial } from "./gateway";
+import { gatewayRequest, tomanToRial, GatewayRejection } from "./gateway";
 import { enrollStudent } from "@/lib/terms/enrollment";
-export async function verifyPayment(authority: string) {
+export type PaymentResult = { orderId: string; status: "paid" | "failed" | "pending" };
+export async function verifyPayment(authority: string): Promise<PaymentResult | null> {
   const db = getDatabase();
   const [payment] = await db
     .select({ payment: payments, order: orders })
@@ -18,14 +19,24 @@ export async function verifyPayment(authority: string) {
     .innerJoin(orders, eq(orders.id, payments.orderId))
     .where(eq(payments.authority, authority));
   if (!payment) return null;
-  if (payment.payment.status === "paid") return payment.order.id;
+  if (payment.payment.status === "paid") return { orderId: payment.order.id, status: "paid" };
   // Callback query parameters never establish payment; only server verification does.
-  const result = await gatewayRequest("verify", {
-    authority,
-    amount: tomanToRial(payment.order.totalToman),
-  });
-  if (![100, 101].includes(result.code) || !result.ref_id)
-    return payment.order.id;
+  let result;
+  try {
+    result = await gatewayRequest("verify", { authority, amount: tomanToRial(payment.payment.amountToman ?? payment.order.totalToman) });
+  } catch (error) {
+    // Only a definitive unsuccessful attempt permits another payment. Network
+    // and merchant/configuration failures remain pending for reconciliation.
+    const terminal = error instanceof GatewayRejection && error.code === -51;
+    return db.transaction(async (tx) => {
+      const [order] = await tx.select().from(orders).where(eq(orders.id, payment.order.id)).for("update");
+      const [record] = await tx.select().from(payments).where(eq(payments.id, payment.payment.id)).for("update");
+      if (record.status === "paid" || order.paymentStatus === "paid") return { orderId: order.id, status: "paid" as const };
+      await tx.update(payments).set({ status: terminal ? "failed" : record.status, gatewayCode: error instanceof GatewayRejection ? error.code : null, checkedAt: new Date() }).where(eq(payments.id, record.id));
+      return { orderId: order.id, status: terminal ? "failed" as const : "pending" as const };
+    });
+  }
+  if (![100, 101].includes(result.code) || !result.ref_id || String(result.ref_id) === "0") return { orderId: payment.order.id, status: "pending" };
   await db.transaction(async (tx) => {
     const [order] = await tx
       .select()
@@ -40,17 +51,20 @@ export async function verifyPayment(authority: string) {
     if (record.status === "paid") return;
     await tx
       .update(payments)
-      .set({ status: "paid", reference: String(result.ref_id) })
+      .set({ status: "paid", reference: String(result.ref_id), gatewayCode: result.code, checkedAt: new Date(), verifiedAt: new Date() })
       .where(eq(payments.id, record.id));
     // A second verified payment must not rewind an already fulfilled order.
-    if (order.paymentStatus === "paid") return;
+    if (order.paymentStatus === "paid") {
+      await notifyAdmins(tx, { titleFa: "نیاز به بررسی پرداخت تکراری", titleEn: "Duplicate payment needs review", bodyFa: `برای سفارش ${order.code} پرداخت دیگری تأیید شده است؛ بازپرداخت را بررسی کنید.`, bodyEn: `An additional payment was confirmed for ${order.code}. Review for refund.`, href: `/panel/orders/${order.id}` });
+      return;
+    }
     const items = await tx
       .select()
       .from(orderItems)
       .where(eq(orderItems.orderId, order.id));
-    let review = false;
+    let review = order.status === "cancelled";
     for (const item of items) {
-      if (item.termId) {
+      if (item.termId && order.status !== "cancelled") {
         const enrolled = await enrollStudent(
           tx,
           item.termId,
@@ -99,5 +113,5 @@ export async function verifyPayment(authority: string) {
       href: `/panel/orders/${order.id}`,
     });
   });
-  return payment.order.id;
+  return { orderId: payment.order.id, status: "paid" };
 }

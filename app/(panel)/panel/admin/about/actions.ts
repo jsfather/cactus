@@ -19,7 +19,7 @@ const contentSchema = z.object({
 export type AboutFormState = { error?: string; success?: string; fieldErrors?: Record<string, string[]> };
 
 export async function updateSiteContent(_state: AboutFormState, formData: FormData): Promise<AboutFormState> {
-  const admin = await requireRole("admin"); const locale = formData.get("locale") === "en" ? "en" : "fa";
+  const admin = await requireRole("admin", "content"); const locale = formData.get("locale") === "en" ? "en" : "fa";
   const parsed = contentSchema.safeParse({ contactNumber: formData.get("contactNumber"), email: formData.get("email"), addressFa: formData.get("addressFa"), addressEn: formData.get("addressEn"), aboutUsFa: formData.get("aboutUsFa"), aboutUsEn: formData.get("aboutUsEn"), missionFa: formData.get("missionFa"), missionEn: formData.get("missionEn"), visionFa: formData.get("visionFa"), visionEn: formData.get("visionEn"), footerTextFa: formData.get("footerTextFa"), footerTextEn: formData.get("footerTextEn"), locale: formData.get("locale") });
   if (!parsed.success) return { error: locale === "fa" ? "اطلاعات صفحه درباره ما را بررسی کنید." : "Please review the About page information.", fieldErrors: z.flattenError(parsed.error).fieldErrors };
   try {

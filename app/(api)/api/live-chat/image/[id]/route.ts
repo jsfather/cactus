@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { and, eq } from "drizzle-orm";
@@ -31,7 +32,7 @@ export async function GET(
     .limit(1);
   const staff =
     user &&
-    (user.role === "admin" ||
+    (isAdministrator(user, "support") ||
       (user.role === "teacher" &&
         settings.operatorIds.includes(user.id) &&
         row?.conversation.operatorId === user.id));

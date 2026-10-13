@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { readFile, stat, unlink } from "node:fs/promises";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -16,7 +17,7 @@ async function getAuthorizedDocument(id: string) {
   if (!parsedId.success) return { user, document: null };
 
   const [document] = await getDatabase().select().from(studentDocuments)
-    .where(user.role === "admin"
+    .where(isAdministrator(user)
       ? eq(studentDocuments.id, parsedId.data)
       : and(eq(studentDocuments.id, parsedId.data), eq(studentDocuments.userId, user.id)))
     .limit(1);
@@ -65,7 +66,7 @@ export async function DELETE(
   if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
   if (!document) return Response.json({ error: "Document not found." }, { status: 404 });
 
-  if (user.role !== "admin") {
+  if (!isAdministrator(user)) {
     const [information] = await getDatabase().select({ status: studentInformation.status })
       .from(studentInformation)
       .where(eq(studentInformation.userId, user.id))

@@ -1,4 +1,5 @@
 "use server";
+import { isAdministrator } from "@/lib/auth/permissions";
 import { notifyUsers, notifyAdmins } from "@/lib/notifications/events";
 import { ownsAttachment } from "@/lib/attachments/storage";
 import { and, eq } from "drizzle-orm";
@@ -48,7 +49,7 @@ export async function saveActivity(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole(["admin", "teacher"]);
+  const user = await requireRole(["admin", "teacher"], "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = activitySchema.safeParse(Object.fromEntries(form));
   if (!parsed.success) return validationError(locale, parsed.error);
@@ -136,7 +137,7 @@ export async function deleteActivity(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  const user = await requireRole(["admin", "teacher"]);
+  const user = await requireRole(["admin", "teacher"], "education");
   if (!z.uuid().safeParse(id).success || !(await getActivity(user, id, true)))
     return denied(locale);
   await getDatabase()
@@ -150,7 +151,7 @@ export async function submitHomework(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole(["student", "admin"]);
+  const user = await requireRole(["student", "admin"], "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = z
     .object({
@@ -160,7 +161,7 @@ export async function submitHomework(
     })
     .safeParse({
       ...Object.fromEntries(form),
-      studentId: user.role === "admin" ? form.get("studentId") : user.id,
+      studentId: isAdministrator(user, "education") ? form.get("studentId") : user.id,
     });
   if (!parsed.success) return validationError(locale, parsed.error);
   if (!z.uuid().safeParse(activityId).success) return denied(locale);
@@ -169,7 +170,7 @@ export async function submitHomework(
   if (!(await ownsAttachment(user, parsed.data.attachmentUrl)))
     return denied(locale);
   const studentId = parsed.data.studentId!;
-  if (user.role === "admin") {
+  if (isAdministrator(user, "education")) {
     const [student] = await getDatabase()
       .select()
       .from(users)
@@ -232,7 +233,7 @@ export async function reviewHomework(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole(["admin", "teacher"]);
+  const user = await requireRole(["admin", "teacher"], "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = z
     .object({
@@ -297,7 +298,7 @@ export async function deleteSubmission(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  const user = await requireRole(["admin", "student"]);
+  const user = await requireRole(["admin", "student"], "education");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   const [submission] = await getDatabase()
     .select()
@@ -305,7 +306,7 @@ export async function deleteSubmission(
     .where(eq(homeworkSubmissions.id, id));
   if (
     !submission ||
-    (user.role !== "admin" && submission.studentId !== user.id)
+    (!isAdministrator(user, "education") && submission.studentId !== user.id)
   )
     return denied(locale);
   await getDatabase()
@@ -320,11 +321,11 @@ export async function savePreviousCourse(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole(["admin", "student"]);
+  const user = await requireRole(["admin", "student"], "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   if (
     !z.uuid().safeParse(studentId).success ||
-    (user.role !== "admin" && user.id !== studentId)
+    (!isAdministrator(user, "education") && user.id !== studentId)
   )
     return denied(locale);
   const parsed = z
@@ -360,14 +361,14 @@ export async function deletePreviousCourse(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  const user = await requireRole(["admin", "student"]);
+  const user = await requireRole(["admin", "student"], "education");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   await getDatabase()
     .delete(previousCourses)
     .where(
       and(
         eq(previousCourses.id, id),
-        user.role === "admin"
+        isAdministrator(user, "education")
           ? undefined
           : eq(previousCourses.studentId, user.id),
       ),

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getSiteNavigation } from "@/lib/site-content/navigation-server";
 import { LoginForm } from "@/components/auth/login-form";
 import { CactusBrand, CactusLogo } from "@/components/brand/cactus-brand";
 import { PreferencesMenu } from "@/components/preferences/preferences-menu";
@@ -21,6 +22,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   if (await getCurrentUser()) redirect(returnTo || "/panel");
 
   const locale = await getPreferredLocale();
+  const navigation = await getSiteNavigation();
   const dictionary = getAuthDictionary(locale);
   const isFa = locale === "fa";
   const alternateLocale = isFa ? "en" : "fa";
@@ -45,7 +47,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
       <div className="relative mx-auto flex min-h-[calc(100dvh-2rem)] max-w-7xl flex-col sm:min-h-[calc(100dvh-3rem)]">
         <header className="flex items-center justify-between gap-4 px-2 py-2 sm:px-3">
-          <a href={localizePath(locale, "/")} aria-label={dictionary.backHome} className="rounded-xl transition hover:opacity-80"><CactusBrand locale={locale} /></a>
+          <a href={localizePath(locale, "/")} aria-label={dictionary.backHome} className="rounded-xl transition hover:opacity-80"><CactusBrand locale={locale} logoUrl={navigation.logoUrl} /></a>
           <div className="flex items-center gap-2">
             <a href={localizePath(locale, "/")} className="hidden rounded-xl px-3 py-2 text-sm font-medium text-zinc-600 transition hover:bg-white hover:text-emerald-800 sm:inline-flex dark:text-zinc-300 dark:hover:bg-white/5 dark:hover:text-emerald-300">{dictionary.backHome}</a>
             <PreferencesMenu locale={locale} alternateHref={languageHref} />

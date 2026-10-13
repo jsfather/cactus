@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { randomUUID } from "node:crypto";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import path from "node:path";
@@ -69,7 +70,7 @@ async function context() {
   ]);
   const operator = Boolean(
     user &&
-    (user.role === "admin" ||
+    (isAdministrator(user, "support") ||
       (user.role === "teacher" && settings.operatorIds.includes(user.id))),
   );
   return { settings, user, hash, operator, db: getDatabase() };
@@ -124,7 +125,7 @@ export async function GET(request: NextRequest) {
           )
       : [];
     const allowed = inbox
-      ? user?.role === "admin"
+      ? isAdministrator(user, "support")
         ? undefined
         : or(
             eq(chatConversations.operatorId, user!.id),
@@ -247,7 +248,7 @@ export async function GET(request: NextRequest) {
       },
       officeOpen: isChatOfficeOpen(settings),
       operatorId: inbox ? user?.id : undefined,
-      isAdmin: inbox && user?.role === "admin",
+      isAdmin: inbox && isAdministrator(user, "support"),
     });
   } catch {
     return reply({ error: "Chat unavailable" }, 503);
@@ -478,7 +479,7 @@ export async function POST(request: NextRequest) {
     const parsed = messageSchema.safeParse(body);
     if (!parsed.success) return reply({ error: "Invalid message" }, 400);
     if (parsed.data.operation === "delete") {
-      if (user?.role !== "admin") return reply({ error: "Forbidden" }, 403);
+      if (!isAdministrator(user, "support")) return reply({ error: "Forbidden" }, 403);
       const removed = await db.transaction(async (tx) => {
         const [conversation] = await tx
           .select()
@@ -515,7 +516,7 @@ export async function POST(request: NextRequest) {
         if (
           !operator ||
           !user ||
-          (conversation.operatorId && user.role !== "admin")
+          (conversation.operatorId && !isAdministrator(user, "support"))
         )
           return false;
         await tx

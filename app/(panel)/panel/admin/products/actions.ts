@@ -66,7 +66,7 @@ function formError(locale: unknown) {
 }
 
 export async function createProduct(_state: ProductFormState, formData: FormData): Promise<ProductFormState> {
-  const admin = await requireRole("admin");
+  const admin = await requireRole("admin", "shop");
   const parsed = productSchema.safeParse(readProductForm(formData));
   if (!parsed.success) return { error: formError(formData.get("locale")), fieldErrors: productFieldErrors(parsed.error, formData.get("locale")) };
   const data = parsed.data;
@@ -103,7 +103,7 @@ export async function createProduct(_state: ProductFormState, formData: FormData
 }
 
 export async function updateProduct(productId: string, _state: ProductFormState, formData: FormData): Promise<ProductFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "shop");
   const validId = z.uuid().safeParse(productId);
   const parsed = productSchema.safeParse(readProductForm(formData));
   if (!validId.success || !parsed.success) return { error: formError(formData.get("locale")), fieldErrors: parsed.success ? undefined : productFieldErrors(parsed.error, formData.get("locale")) };
@@ -139,7 +139,7 @@ export async function updateProduct(productId: string, _state: ProductFormState,
 }
 
 export async function deleteProduct(productIdValue: string, locale: Locale): Promise<DeleteProductState> {
-  await requireRole("admin");
+  await requireRole("admin", "shop");
   const productId = z.uuid().safeParse(productIdValue);
   if (!productId.success) return { error: locale === "fa" ? "شناسه محصول معتبر نیست." : "The product identifier is invalid." };
   try {

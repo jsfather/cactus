@@ -125,10 +125,18 @@ export const loginEvents = pgTable(
   ],
 );
 
+export const accessProfiles = pgTable("access_profiles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  titleFa: varchar("title_fa", { length: 160 }).notNull(),
+  titleEn: varchar("title_en", { length: 160 }).notNull(),
+  permissions: jsonb("permissions").$type<string[]>().default([]).notNull(),
+});
+
 export const users = pgTable(
   "users",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    accessProfileId: uuid("access_profile_id").references(() => accessProfiles.id, { onDelete: "restrict" }),
     mobile: varchar("mobile", { length: 64 }).notNull(),
     email: varchar("email", { length: 320 }),
     firstNameFa: varchar("first_name_fa", { length: 80 }).notNull(),
@@ -1676,6 +1684,10 @@ export const payments = pgTable("payments", {
     .references(() => orders.id, { onDelete: "restrict" }),
   authority: varchar("authority", { length: 100 }).unique(),
   reference: varchar("reference", { length: 120 }),
+  amountToman: bigint("amount_toman", { mode: "number" }),
+  gatewayCode: integer("gateway_code"),
+  checkedAt: timestamp("checked_at", { withTimezone: true }),
+  verifiedAt: timestamp("verified_at", { withTimezone: true }),
   status: varchar("status", { length: 20 }).default("pending").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()

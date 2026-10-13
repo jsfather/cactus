@@ -3,16 +3,20 @@ import { z } from "zod";
 // Protocol: https://github.com/ZarinPal-Lab/Zarinpal-RestAPI-Sample-php
 const responseSchema = z.object({
   data: z
-    .object({
+    .union([z.object({
       code: z.number(),
       authority: z.string().optional(),
       ref_id: z.union([z.number(), z.string()]).optional(),
-    })
+    }), z.array(z.unknown()).max(0)])
     .optional(),
-  errors: z.unknown().optional(),
+  errors: z.union([z.array(z.unknown()), z.object({ code: z.number(), message: z.string().optional() })]).optional(),
 });
 export function paymentConfigured() {
-  return Boolean(process.env.ZARINPAL_MERCHANT_ID && process.env.SITE_URL);
+  if (!z.uuid().safeParse(process.env.ZARINPAL_MERCHANT_ID).success) return false;
+  try { const site = new URL(process.env.SITE_URL ?? ""); return site.protocol === "https:" || (process.env.NODE_ENV !== "production" && site.protocol === "http:"); } catch { return false; }
+}
+export class GatewayRejection extends Error {
+  constructor(public readonly code: number) { super("Gateway rejected request"); }
 }
 export async function gatewayRequest(
   method: "request" | "verify",
@@ -30,10 +34,18 @@ export async function gatewayRequest(
       cache: "no-store",
     },
   );
-  if (!response.ok) throw new Error("Gateway unavailable");
+  // Business errors may use a non-2xx HTTP status. Parse the gateway code
+  // before classifying the response as a connection/service failure.
   const parsed = responseSchema.parse(await response.json());
-  if (!parsed.data) throw new Error("Gateway rejected request");
-  return parsed.data;
+  const data = Array.isArray(parsed.data) ? undefined : parsed.data;
+  if (!data?.code || data.code < 0) {
+    const code = !Array.isArray(parsed.errors) ? parsed.errors?.code : undefined;
+    if (typeof code === "number") throw new GatewayRejection(code);
+    if (data && data.code < 0) throw new GatewayRejection(data.code);
+    throw new Error("Invalid gateway response");
+  }
+  if (!response.ok) throw new Error("Gateway unavailable");
+  return data;
 }
 export function tomanToRial(amount: number) {
   const rial = amount * 10;

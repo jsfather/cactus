@@ -27,7 +27,7 @@ function read(formData: FormData) { return { sku: formData.get("sku"), titleFa: 
 function refresh(productId: string) { revalidatePath(`/panel/admin/products/${productId}/edit`); revalidatePath("/shop"); revalidatePath("/en/shop"); }
 
 export async function createVariant(productIdValue: string, _state: VariantFormState, formData: FormData): Promise<VariantFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "shop");
   const productId = z.uuid().safeParse(productIdValue);
   const parsed = variantSchema.safeParse(read(formData));
   const locale = formData.get("locale") === "en" ? "en" : "fa";
@@ -51,7 +51,7 @@ export async function createVariant(productIdValue: string, _state: VariantFormS
 }
 
 export async function updateVariant(productIdValue: string, variantIdValue: string, _state: VariantFormState, formData: FormData): Promise<VariantFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "shop");
   const productId = z.uuid().safeParse(productIdValue); const variantId = z.uuid().safeParse(variantIdValue);
   const parsed = variantSchema.safeParse(read(formData)); const locale = formData.get("locale") === "en" ? "en" : "fa";
   if (!productId.success || !variantId.success || !parsed.success) return { error: locale === "fa" ? "اطلاعات تنوع را بررسی کنید." : "Please review the variant information.", fieldErrors: parsed.success ? undefined : z.flattenError(parsed.error).fieldErrors };
@@ -67,7 +67,7 @@ export async function updateVariant(productIdValue: string, variantIdValue: stri
 }
 
 export async function deleteVariant(productIdValue: string, variantIdValue: string, locale: Locale): Promise<VariantMutationState> {
-  await requireRole("admin"); const productId = z.uuid().safeParse(productIdValue); const variantId = z.uuid().safeParse(variantIdValue);
+  await requireRole("admin", "shop"); const productId = z.uuid().safeParse(productIdValue); const variantId = z.uuid().safeParse(variantIdValue);
   if (!productId.success || !variantId.success) return { error: locale === "fa" ? "شناسه تنوع معتبر نیست." : "The variant identifier is invalid." };
   try {
     const removed = await getDatabase().delete(productVariants).where(and(eq(productVariants.id, variantId.data), eq(productVariants.productId, productId.data))).returning({ id: productVariants.id });

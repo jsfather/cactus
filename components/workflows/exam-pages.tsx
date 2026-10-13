@@ -34,7 +34,7 @@ export async function ExamAssignmentsPage({
 }: {
   admin?: boolean;
 }) {
-  const user = await requireRole(admin ? "admin" : "student");
+  const user = await requireRole(admin ? "admin" : "student", "education");
   const locale = await getPanelLocale();
   const db = getDatabase();
   const assignments = await db
@@ -212,7 +212,7 @@ export async function ExamAttemptPage({
   id: string;
   admin?: boolean;
 }) {
-  const user = await requireRole(admin ? "admin" : "student");
+  const user = await requireRole(admin ? "admin" : "student", "education");
   const locale = await getPanelLocale();
   if (!z.uuid().safeParse(id).success) notFound();
   const [attempt] = await getDatabase()

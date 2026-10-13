@@ -3,7 +3,7 @@ import { getPanelLocale } from "@/lib/i18n/panel-server";
 import { LandingForm } from "@/components/landings/landing-form";
 import { PanelPage, PanelPageHeader } from "@/components/panel/ui";
 export default async function NewLanding() {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = await getPanelLocale();
   return (
     <PanelPage>

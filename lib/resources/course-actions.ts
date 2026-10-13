@@ -77,7 +77,7 @@ export async function saveCourse(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   let sections: unknown;
   try {
@@ -116,7 +116,7 @@ export async function deleteCourse(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   if (!z.uuid().safeParse(id).success) return failed(locale);
   await getDatabase().delete(coursePages).where(eq(coursePages.id, id));
   revalidatePath("/", "layout");

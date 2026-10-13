@@ -37,7 +37,7 @@ export async function saveAcademic(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   if (
     !kindSchema.safeParse(kind).success ||
@@ -187,7 +187,7 @@ export async function deleteAcademic(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   if (!kindSchema.safeParse(kind).success || !z.uuid().safeParse(id).success)
     return denied(locale);
   try {
@@ -222,7 +222,7 @@ export async function archiveSemester(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   try {
     await getDatabase().transaction(async (tx) => {

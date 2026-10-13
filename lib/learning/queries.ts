@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { and, eq, inArray, ne, sql } from "drizzle-orm";
 import type { CurrentUser } from "@/lib/auth/session";
 import { getDatabase } from "@/lib/db/client";
@@ -29,7 +30,7 @@ export async function canAccessTerm(
   termId: string,
   manage = false,
 ) {
-  if (user.role === "admin") return true;
+  if (isAdministrator(user, "education")) return true;
   if (manage && user.role !== "teacher") return false;
   if (!["teacher", "student"].includes(user.role)) return false;
   const [row] = await getDatabase()

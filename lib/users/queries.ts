@@ -18,6 +18,7 @@ const managedUserSelection = {
   firstNameEn: users.firstNameEn,
   lastNameEn: users.lastNameEn,
   role: users.role,
+  accessProfileId: users.accessProfileId,
   isActive: users.isActive,
   avatarUrl: users.avatarUrl,
   createdAt: users.createdAt,

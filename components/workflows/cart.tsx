@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- Managed media can use arbitrary validated remote hosts. */
 "use client";
 import Link from "next/link";
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { z } from "zod";
 import { useFeedback } from "@/components/feedback/feedback-provider";
 import { PanelInput } from "@/components/panel/form-controls";
@@ -124,11 +124,43 @@ export function AddToCart({
 }
 export function CartLink({ locale }: { locale: Locale }) {
   const cart = useCart();
+  const [open, setOpen] = useState(false);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const id = useId();
+  const { toast } = useFeedback();
+  const count = cart.reduce((total, item) => total + item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previous; };
+  }, [open]);
+  function close() { dialog.current?.close(); }
+  function change(item: CartItem, delta: number | null) {
+    try {
+      const current = parse(snapshot());
+      const matches = (row: CartItem) => row.productId === item.productId && row.variantId === item.variantId;
+      if (delta === null) {
+        write(current.filter((row) => !matches(row)));
+        toast.success(text(locale, "از سبد حذف شد.", "Removed from cart."));
+      } else {
+        write(current.map((row) => matches(row) ? { ...row, quantity: Math.max(1, Math.min(100, row.quantity + delta)) } : row));
+      }
+    } catch { toast.error(text(locale, "ذخیره سبد ممکن نیست.", "Cart storage is unavailable.")); }
+  }
   return (
-    <Link
-      href={localizePath(locale, "/shop/checkout")}
+    <div className="public-cart-control">
+    <button
+      type="button"
+      ref={trigger}
       className="public-cart-link"
-      aria-label={`${text(locale, "سبد خرید", "Shopping cart")}: ${cart.reduce((n, item) => n + item.quantity, 0).toLocaleString(locale)}`}
+      aria-label={`${text(locale, "سبد خرید", "Shopping cart")}: ${count.toLocaleString(locale)}`}
+      aria-haspopup="dialog"
+      aria-expanded={open}
+      aria-controls={id}
+      onClick={() => { dialog.current?.showModal(); setOpen(true); }}
     >
       <svg
         viewBox="0 0 24 24"
@@ -142,9 +174,39 @@ export function CartLink({ locale }: { locale: Locale }) {
       </svg>
       <span>{text(locale, "سبد", "Cart")}</span>
       <span>
-        {cart.reduce((n, i) => n + i.quantity, 0).toLocaleString(locale)}
+        {count.toLocaleString(locale)}
       </span>
-    </Link>
+    </button>
+    <dialog ref={dialog} id={id} className="public-cart-dialog" dir={locale === "fa" ? "rtl" : "ltr"} aria-modal="true" aria-labelledby={`${id}-title`} onClose={() => { setOpen(false); if (trigger.current?.isConnected) trigger.current.focus(); }} onClick={(event) => { if (event.target === dialog.current) close(); }}>
+      <header className="mini-cart-header">
+        <div><h2 id={`${id}-title`}>{text(locale, "سبد خرید شما", "Your shopping cart")}</h2><p>{count.toLocaleString(locale)} {text(locale, "کالا در سبد", "items in your cart")}</p></div>
+        <button autoFocus type="button" onClick={close} className="mini-cart-icon" aria-label={text(locale, "بستن سبد خرید", "Close shopping cart")}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6" /></svg></button>
+      </header>
+      <div className="mini-cart-items">
+        {cart.length ? cart.map((item) => {
+          const title = locale === "fa" ? item.titleFa : item.titleEn || item.titleFa;
+          return <article key={`${item.productId}:${item.variantId}`} className="mini-cart-item">
+            {item.imageUrl && /^(\/media\/|https?:\/\/)/.test(item.imageUrl) ? <img className="mini-cart-thumbnail" src={item.imageUrl} alt="" width={64} height={64} /> : <span className="mini-cart-thumbnail"><CircuitMark /></span>}
+            <div className="mini-cart-item-info">
+              <h3>{item.slug ? <Link href={localizePath(locale, `/shop/${encodeURIComponent(item.slug)}`)} onClick={close}>{title}</Link> : title}</h3>
+              <p>{(item.price * item.quantity).toLocaleString(locale)} {text(locale, "تومان", "toman")}</p>
+              <div className="mini-cart-item-actions">
+                <div className="mini-cart-quantity" role="group" aria-label={`${text(locale, "تعداد", "Quantity")} — ${title}`}>
+                  <button type="button" disabled={item.quantity >= 100} onClick={() => change(item, 1)} aria-label={`${text(locale, "افزایش تعداد", "Increase quantity")} — ${title}`}>+</button>
+                  <span aria-live="polite">{item.quantity.toLocaleString(locale)}</span>
+                  <button type="button" disabled={item.quantity <= 1} onClick={() => change(item, -1)} aria-label={`${text(locale, "کاهش تعداد", "Decrease quantity")} — ${title}`}>−</button>
+                </div>
+                <button className="mini-cart-remove" type="button" onClick={() => change(item, null)} aria-label={`${text(locale, "حذف از سبد", "Remove from cart")} — ${title}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7M14 10v7" /></svg></button>
+              </div>
+            </div>
+          </article>;
+        }) : <div className="mini-cart-empty"><span><CircuitMark /></span><h3>{text(locale, "سبد خریدتان خالی است", "Your cart is empty")}</h3><p>{text(locale, "محصولات مورد نیازتان را انتخاب کنید و اینجا ببینید.", "Choose the products you need and find them here.")}</p></div>}
+      </div>
+      <footer className="mini-cart-footer">
+        {cart.length ? <><div className="mini-cart-total"><span>{text(locale, "جمع تقریبی", "Estimated total")}</span><strong>{total.toLocaleString(locale)} {text(locale, "تومان", "toman")}</strong></div><p>{text(locale, "قیمت و موجودی هنگام ثبت سفارش بررسی می‌شود.", "Prices and stock are checked when you place your order.")}</p><Link className="public-button" href={localizePath(locale, "/shop/checkout")} onClick={close}>{text(locale, "مشاهده سبد و تکمیل سفارش", "Review cart and checkout")}<span aria-hidden="true">{locale === "fa" ? "←" : "→"}</span></Link></> : <Link className="public-button" href={localizePath(locale, "/shop")} onClick={close}>{text(locale, "رفتن به فروشگاه", "Explore the shop")}</Link>}
+      </footer>
+    </dialog>
+    </div>
   );
 }
 export function CartCheckout({

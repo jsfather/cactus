@@ -43,7 +43,7 @@ export default async function AcademicPage({
   params: Promise<{ kind: string }>;
   searchParams: Promise<{ edit?: string }>;
 }) {
-  await requireRole("admin");
+  await requireRole("admin", "education");
   const [{ kind }, query, locale] = await Promise.all([
     params,
     searchParams,

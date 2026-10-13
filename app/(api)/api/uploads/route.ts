@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { randomUUID } from "node:crypto";
 import { mkdir, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -36,7 +37,7 @@ export async function GET(request: Request) {
   const kind = mediaKind.enumValues.includes(requestedKind as MediaKind)
     ? (requestedKind as MediaKind)
     : null;
-  const filters = user.role === "admin"
+  const filters = isAdministrator(user, "media")
     ? kind ? eq(mediaAssets.kind, kind) : undefined
     : and(eq(mediaAssets.uploaderId, user.id), eq(mediaAssets.kind, "avatar"));
 
@@ -84,7 +85,7 @@ export async function POST(request: Request) {
 
   const { kind, originalName, altFa, altEn } = metadata.data;
 
-  if (kind !== "avatar" && user.role !== "admin") {
+  if (kind !== "avatar" && !isAdministrator(user, "media")) {
     return errorResponse("You do not have permission to upload this image.", 403);
   }
 

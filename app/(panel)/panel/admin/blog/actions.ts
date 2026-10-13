@@ -81,7 +81,7 @@ export async function createPost(
   _previousState: CreatePostState,
   formData: FormData,
 ): Promise<CreatePostState> {
-  const admin = await requireRole("admin");
+  const admin = await requireRole("admin", "content");
   const parsed = postSchema.safeParse({
     slug: formData.get("slug"),
     titleFa: formData.get("titleFa"),
@@ -152,7 +152,7 @@ export async function updatePost(
   _previousState: PostFormState,
   formData: FormData,
 ): Promise<PostFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
 
   const validPostId = z.uuid().safeParse(postId);
   const parsed = postSchema.safeParse({
@@ -242,7 +242,7 @@ export async function updatePost(
 }
 
 export async function deletePost(postIdValue: string, locale: Locale): Promise<DeletePostState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
 
   const postId = z.uuid().safeParse(postIdValue);
 

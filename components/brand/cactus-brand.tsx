@@ -31,14 +31,19 @@ export function CactusBrand({
   locale = "fa",
   compact = false,
   subtitle,
+  logoUrl,
 }: {
   locale?: Locale;
   compact?: boolean;
   subtitle?: string;
+  logoUrl?: string;
 }) {
   return (
     <span className="inline-flex min-w-0 items-center gap-3">
-      <CactusLogo className="size-10 shrink-0 sm:size-11" />
+      {logoUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element -- Validated managed media supports remote hosts.
+        <img src={logoUrl} alt="" width={44} height={44} className="size-10 shrink-0 object-contain sm:size-11" />
+      ) : <CactusLogo className="size-10 shrink-0 sm:size-11" />}
       {!compact ? (
         <span className="min-w-0 leading-tight">
           <span className="block truncate font-bold text-zinc-950 dark:text-zinc-50">

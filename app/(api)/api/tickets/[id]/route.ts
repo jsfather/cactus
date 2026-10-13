@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { and, eq, isNull, lt, lte, ne, or } from "drizzle-orm";
@@ -71,7 +72,7 @@ export async function POST(
         .where(
           and(
             eq(tickets.id, id),
-            user.role === "admin"
+            isAdministrator(user, "support")
               ? undefined
               : or(
                   eq(tickets.ownerId, user.id),

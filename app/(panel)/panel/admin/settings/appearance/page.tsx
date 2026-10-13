@@ -23,7 +23,7 @@ function describeUsage(selectors: string | undefined, fa: boolean) {
   return `${fa ? "محل استفاده: " : "Used in: "}${names.length ? names.join(fa ? "، " : ", ") : fa ? "سطوح و جزئیات عمومی سایت" : "Public surfaces and details"}`;
 }
 export default async function AppearancePage() {
-  await requireRole("admin");
+  await requireRole("admin", "settings");
   const [locale, settings] = await Promise.all([
     getPanelLocale(),
     getSiteAppearance(),

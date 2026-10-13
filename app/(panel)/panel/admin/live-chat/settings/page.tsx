@@ -10,7 +10,7 @@ import { ActionForm } from "@/components/workflows/action-form";
 import { OperatorSelector } from "@/components/support/operator-selector";
 import { PanelPage, PanelPageHeader } from "@/components/panel/ui";
 export default async function ChatSettingsPage() {
-  await requireRole("admin");
+  await requireRole("admin", "support");
   const [locale, settings] = await Promise.all([
     getPanelLocale(),
     getChatSettings(),

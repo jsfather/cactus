@@ -1,4 +1,5 @@
 "use server";
+import { isAdministrator } from "@/lib/auth/permissions";
 import { ownsAttachment } from "@/lib/attachments/storage";
 import { and, desc, eq, ne, or, isNull } from "drizzle-orm";
 import { notifyAdmins, notifyUsers } from "@/lib/notifications/events";
@@ -48,9 +49,9 @@ export async function saveTicket(
     })
     .safeParse({
       ...Object.fromEntries(form),
-      ownerId: user.role === "admin" ? form.get("ownerId") : user.id,
-      assignedToId: user.role === "admin" ? form.get("assignedToId") : "",
-      status: user.role === "admin" ? form.get("status") : "open",
+      ownerId: isAdministrator(user, "support") ? form.get("ownerId") : user.id,
+      assignedToId: isAdministrator(user, "support") ? form.get("assignedToId") : "",
+      status: isAdministrator(user, "support") ? form.get("status") : "open",
     });
   if (!parsed.success) return validationError(locale, parsed.error);
   const input = parsed.data;
@@ -85,7 +86,7 @@ export async function saveTicket(
     if (!assignee) return denied(locale);
   }
   if (id) {
-    if (user.role !== "admin" || !z.uuid().safeParse(id).success)
+    if (!isAdministrator(user, "support") || !z.uuid().safeParse(id).success)
       return denied(locale);
     await db
       .update(tickets)
@@ -168,7 +169,7 @@ export async function replyTicket(
     if (
       !ticket ||
       ticket.status === "closed" ||
-      (user.role !== "admin" &&
+      (!isAdministrator(user, "support") &&
         ticket.ownerId !== user.id &&
         !(user.role === "teacher" && ticket.assignedToId === user.id))
     )
@@ -281,7 +282,7 @@ export async function changeTicketStatus(
           .where(
             and(
               eq(tickets.id, id),
-              user.role === "admin"
+              isAdministrator(user, "support")
                 ? undefined
                 : or(
                     eq(tickets.ownerId, user.id),
@@ -295,7 +296,7 @@ export async function changeTicketStatus(
         if (!ticket) return denied(locale);
         if (
           status === "pending" &&
-          user.role !== "admin" &&
+          !isAdministrator(user, "support") &&
           (user.role !== "teacher" || ticket.ownerId === user.id)
         )
           return denied(locale);
@@ -333,7 +334,7 @@ export async function deleteTicket(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "support");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   await getDatabase().delete(tickets).where(eq(tickets.id, id));
   revalidatePath("/panel", "layout");
@@ -344,7 +345,7 @@ export async function saveDepartment(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "support");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = z
     .object({
@@ -368,7 +369,7 @@ export async function deleteDepartment(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "support");
   if (!z.uuid().safeParse(id).success) return denied(locale);
   try {
     await getDatabase()
@@ -455,7 +456,7 @@ export async function deleteNotification(
     .where(
       and(
         eq(notifications.id, id),
-        user.role === "admin" ? undefined : eq(notifications.userId, user.id),
+        isAdministrator(user) ? undefined : eq(notifications.userId, user.id),
       ),
     );
   revalidatePath("/panel", "layout");

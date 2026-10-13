@@ -38,7 +38,7 @@ export async function saveResource(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const kind = resourceKind.parse(kindValue);
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const parsed = schema.safeParse(Object.fromEntries(form));
@@ -96,7 +96,7 @@ export async function deleteResource(
   id: string,
   locale: Locale,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const kind = resourceKind.parse(kindValue);
   if (!z.uuid().safeParse(id).success) return failed(locale);
   try {

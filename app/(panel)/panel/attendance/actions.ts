@@ -1,5 +1,6 @@
 "use server";
 
+import { isAdministrator } from "@/lib/auth/permissions";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -47,7 +48,7 @@ const payloadSchema = z.object({
 
 async function getManagedSession(sessionId: string) {
   const user = await requireUser();
-  if (user.role === "admin") {
+  if (isAdministrator(user, "education")) {
     const [session] = await getDatabase()
       .select({ id: termSessions.id, termId: termSessions.termId, sessionDate: termSessions.sessionDate, termStatus: terms.status })
       .from(termSessions)

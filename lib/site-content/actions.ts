@@ -16,7 +16,7 @@ export async function savePresentation(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  const admin = await requireRole("admin");
+  const admin = await requireRole("admin", "settings");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   const data = Object.fromEntries(form);
   try {
@@ -77,7 +77,7 @@ export async function saveNavigation(
   _state: ActionState,
   form: FormData,
 ): Promise<ActionState> {
-  await requireRole("admin");
+  await requireRole("admin", "settings");
   const locale = form.get("locale") === "en" ? "en" : "fa";
   let links;
   try {
@@ -114,5 +114,9 @@ export async function saveNavigation(
     };
   }
   revalidatePath("/", "layout");
+  revalidatePath("/en", "layout");
+  revalidatePath("/panel", "layout");
+  revalidatePath("/login");
+  revalidatePath("/join", "layout");
   return saved(locale);
 }

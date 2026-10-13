@@ -64,7 +64,7 @@ function values(data: HonorInput, previousPublishedAt?: Date | null) {
 }
 
 export async function createHonor(_state: HonorFormState, formData: FormData): Promise<HonorFormState> {
-  const admin = await requireRole("admin");
+  const admin = await requireRole("admin", "content");
   const locale = formData.get("locale") === "en" ? "en" : "fa";
   const parsed = createHonorSchema(locale).safeParse(readForm(formData));
   if (!parsed.success) return { error: locale === "fa" ? "لطفاً اطلاعات افتخار یا گواهینامه را بررسی کنید." : "Please review the honor or certificate information.", fieldErrors: z.flattenError(parsed.error).fieldErrors };
@@ -79,7 +79,7 @@ export async function createHonor(_state: HonorFormState, formData: FormData): P
 }
 
 export async function updateHonor(id: string, _state: HonorFormState, formData: FormData): Promise<HonorFormState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const locale = formData.get("locale") === "en" ? "en" : "fa";
   const validId = z.uuid().safeParse(id);
   const parsed = createHonorSchema(locale).safeParse(readForm(formData));
@@ -98,7 +98,7 @@ export async function updateHonor(id: string, _state: HonorFormState, formData: 
 }
 
 export async function deleteHonor(id: string, locale: Locale): Promise<DeleteHonorState> {
-  await requireRole("admin");
+  await requireRole("admin", "content");
   const validId = z.uuid().safeParse(id);
   if (!validId.success) return { error: locale === "fa" ? "شناسه معتبر نیست." : "The identifier is invalid." };
   const [deleted] = await getDatabase().delete(honors).where(eq(honors.id, validId.data)).returning({ id: honors.id });

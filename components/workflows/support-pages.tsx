@@ -1,3 +1,4 @@
+import { isAdministrator } from "@/lib/auth/permissions";
 import { getTicketChat } from "@/lib/support/ticket-chat";
 import { TicketConversation } from "@/components/support/ticket-conversation";
 import { PanelStatCard, PanelStatGrid } from "@/components/panel/stat-card";
@@ -55,7 +56,7 @@ export async function TicketsPage({
 }) {
   const user = await requireUser();
   const locale = await getPanelLocale();
-  const admin = user.role === "admin";
+  const admin = isAdministrator(user, "support");
   const db = getDatabase();
   if (id && id !== "new" && !z.uuid().safeParse(id).success) notFound();
   const [ticket] =
@@ -330,7 +331,7 @@ export async function TicketsPage({
   );
 }
 export async function DepartmentsPage() {
-  await requireRole("admin");
+  await requireRole("admin", "support");
   const locale = await getPanelLocale();
   const items = await getDatabase().select().from(ticketDepartments);
   const fields: Field[] = [
@@ -394,7 +395,7 @@ export async function NotificationsPage({
   page?: number;
   filter?: string;
 }) {
-  const user = admin ? await requireRole("admin") : await requireUser(),
+  const user = admin ? await requireRole("admin", "support") : await requireUser(),
     locale = await getPanelLocale(),
     fa = locale === "fa",
     db = getDatabase();
